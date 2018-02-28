@@ -1,0 +1,63 @@
+{
+    "name": "turbo-console-log",
+    "displayName": "Turbo Console Log",
+    "description": "",
+    "version": "1.0.1",
+    "publisher": "ChakrounAnas",
+    "engines": {
+        "vscode": "^1.19.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "icon": "images/icon.png",
+    "activationEvents": [
+        "onCommand:extension.displayLogMessage",
+        "onCommand:extension.deleteAllLogMessages"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.displayLogMessage",
+                "title": "Display Log Message"
+            },
+            {
+                "command": "extension.deleteAllLogMessages",
+                "title": "Delete All Log Messages"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "extension.displayLogMessage",
+                "key": "Ctrl+shift+l",
+                "mac": "Cmd+shift+l"
+            },
+            {
+                "command": "extension.deleteAllLogMessages",
+                "key": "Ctrl+d",
+                "mac": "Cmd+d"
+            }
+        ]
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.42",
+        "@types/node": "^7.0.43",
+        "chai": "^4.1.2",
+        "eslint": "^4.6.1",
+        "eslint-config-standard": "^11.0.0-beta.0",
+        "eslint-plugin-import": "^2.8.0",
+        "eslint-plugin-node": "^6.0.0",
+        "eslint-plugin-promise": "^3.6.0",
+        "eslint-plugin-standard": "^3.0.1",
+        "jsdoc": "^3.5.5",
+        "mocha": "^5.0.0",
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6"
+    },
+    "license": "SEE LICENSE IN LICENSE.txt"
+}
