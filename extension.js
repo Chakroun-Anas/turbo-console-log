@@ -14,7 +14,8 @@ function activate (context) {
     // Check if the selection line is not the last line in the document
     if (!(lineOfSelectedVar === (document.lineCount - 1))) {
       editor.edit(editBuilder => {
-        editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), logMessage.message(editor, selectedVar, lineOfSelectedVar))
+        const wrapLogMessage = vscode.workspace.getConfiguration().wrapLogMessage || false;
+        editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), logMessage.message(editor, selectedVar, lineOfSelectedVar, wrapLogMessage))
       })
     }
   })

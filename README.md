@@ -18,13 +18,17 @@ The log message will be inserted in the next line relative to the selected varia
 
 console.log('SelectedVariableEnclosingClassName -> SelectVariableEnclosingFunctionName -> SelectedVariable', SelectedVariable)
 
-![alt text](https://image.ibb.co/cwwcYH/inserting_log_message.gif "Inserting meaningful log message after selecting a variable")
+![alt text](https://image.ibb.co/mG1SXn/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
+
+The log message can be wrapped by changing the value of wrappLogMessage to true in setting.json
+
+![alt text](https://image.ibb.co/kLed57/wrap_log_message.gif "Wrapping The log message")
 
 II) Deleting all log messages from the current document
 
 All it takes to delete the log messages from the current document is to press Ctrl + d in windows/linux or Cmd + d on a MAC
 
-![alt text](https://image.ibb.co/knmcYH/deleting_log_messages.gif "Deleting all log messages from the current file")
+![alt text](https://image.ibb.co/jkoKdS/delete_all_log_messages.gif "Deleting all log messages from the current file")
 
 ## Release Notes
 ---

@@ -1,7 +1,7 @@
 {
     "name": "turbo-console-log",
     "displayName": "Turbo Console Log",
-    "description": "",
+    "description": "Automating the process of inserting log messages.",
     "version": "1.0.1",
     "publisher": "ChakrounAnas",
     "engines": {
@@ -17,6 +17,17 @@
     ],
     "main": "./extension",
     "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "Turbo Console Log Configuration",
+            "properties": {
+                "wrapLogMessage": {
+                "type": "boolean",
+                "default": false,
+                "description": "Determine if the log message should be wrapped or not."
+                }
+            }
+        },
         "commands": [
             {
                 "command": "extension.displayLogMessage",

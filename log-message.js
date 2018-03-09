@@ -8,14 +8,22 @@ const lineCodeProcessing = require('./line-code-processing')
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextEditor}
  * @param {string} selectedVar
  * @param {number} lineOfSelectedVar
+ * @param {boolean} wrapLogMessage
  * @returns {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function message (editor, selectedVar, lineOfSelectedVar) {
+function message (editor, selectedVar, lineOfSelectedVar, wrapLogMessage) {
   const classThatEncloseTheVar = enclosingBlockName(editor.document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(editor.document, lineOfSelectedVar, 'function')
-  return `${tabs(editor, lineOfSelectedVar)}console.log('${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});\n`
+  const msgTabs = tabs(editor, lineOfSelectedVar);
+  const debuggingMsg = `console.log('${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
+  if(wrapLogMessage) {
+    // 16 represents the length of console.log('');
+    const wrappingMsg = `console.log('${'-'.repeat(debuggingMsg.length - 16)}');`
+    return `${msgTabs}${wrappingMsg}\n${msgTabs}${debuggingMsg}\n${msgTabs}${wrappingMsg}\n`
+  }
+  return `${msgTabs}${debuggingMsg}\n`
 }
 
 /**
