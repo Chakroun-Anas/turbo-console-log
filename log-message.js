@@ -15,7 +15,7 @@ const lineCodeProcessing = require('./line-code-processing')
 function message (editor, selectedVar, lineOfSelectedVar) {
   const classThatEncloseTheVar = enclosingBlockName(editor.document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(editor.document, lineOfSelectedVar, 'function')
-  return `${tabs(editor, lineOfSelectedVar)}console.log('${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar})\n`
+  return `${tabs(editor, lineOfSelectedVar)}console.log('${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});\n`
 }
 
 /**
