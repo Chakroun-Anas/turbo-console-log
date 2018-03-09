@@ -20,7 +20,7 @@ console.log('SelectedVariableEnclosingClassName -> SelectVariableEnclosingFuncti
 
 ![alt text](https://image.ibb.co/mG1SXn/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
 
-The log message can be wrapped by changing the value of wrappLogMessage to true in setting.json
+The log message can be wrapped by changing the value of wrapLogMessage to true in settings.json
 
 ![alt text](https://image.ibb.co/kLed57/wrap_log_message.gif "Wrapping The log message")
 
@@ -37,10 +37,14 @@ All it takes to delete the log messages from the current document is to press Ct
 
 Initial release of Turbo Console Log
 
+### 1.1.0
+
+The possibility of wrapping the log message is added
+
 ## Participate
 ---
 
-The extension will be soon available in github so that anybody can contribute on it.
+You're more than welcome to participate in the development of the extension by creating pull requests and submitting issues, link of the project in github: https://github.com/Chakroun-Anas/turbo-console-log
 
 ## Contact
 ---

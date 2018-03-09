@@ -1,8 +1,8 @@
 {
     "name": "turbo-console-log",
     "displayName": "Turbo Console Log",
-    "description": "Automating the process of inserting log messages.",
-    "version": "1.0.1",
+    "description": "Automating the process of writing meaningful log messages.",
+    "version": "1.1.0",
     "publisher": "ChakrounAnas",
     "engines": {
         "vscode": "^1.19.0"
@@ -22,9 +22,9 @@
             "title": "Turbo Console Log Configuration",
             "properties": {
                 "wrapLogMessage": {
-                "type": "boolean",
-                "default": false,
-                "description": "Determine if the log message should be wrapped or not."
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Determine if the log message should be wrapped or not."
                 }
             }
         },
@@ -70,5 +70,13 @@
         "typescript": "^2.6.1",
         "vscode": "^1.1.6"
     },
-    "license": "SEE LICENSE IN LICENSE.txt"
+    "license": "SEE LICENSE IN LICENSE.txt",
+    "bugs": {
+        "url": "https://github.com/Chakroun-Anas/turbo-console-log/issues",
+        "email": "chakroun.anas@outlook.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Chakroun-Anas/turbo-console-log"
+    }
 }
