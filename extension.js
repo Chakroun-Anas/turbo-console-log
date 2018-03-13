@@ -19,7 +19,28 @@ function activate (context) {
       })
     }
   })
-
+  vscode.commands.registerCommand('extension.commentAllLogMessages', () => {
+    const editor = vscode.window.activeTextEditor
+    if (!editor) {
+      return
+    }
+    const document = editor.document
+    const documentNbrOfLines = document.lineCount
+    const linesToDelete = []
+    for (let i = 0; i < documentNbrOfLines; i++) {
+      if (/console\.log\(.*\)/.test(document.lineAt(i).text)) {
+        linesToDelete.push(document.lineAt(i).rangeIncludingLineBreak)
+      }
+    }
+    editor.edit(editBuilder => {
+      linesToDelete.forEach(lineToDelete => {
+        let nbrOfTabs = 0
+        nbrOfTabs = document.lineAt(lineToDelete.start).firstNonWhitespaceCharacterIndex / editor.options.tabSize
+        editBuilder.delete(lineToDelete)
+        editBuilder.insert(new vscode.Position(lineToDelete.start.line, 0), `${'\t'.repeat(nbrOfTabs)}// ${document.getText(lineToDelete).trim()}\n`)
+      })
+    })
+  })
   vscode.commands.registerCommand('extension.deleteAllLogMessages', () => {
     const editor = vscode.window.activeTextEditor
     if (!editor) {

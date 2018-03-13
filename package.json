@@ -13,7 +13,8 @@
     "icon": "images/icon.png",
     "activationEvents": [
         "onCommand:extension.displayLogMessage",
-        "onCommand:extension.deleteAllLogMessages"
+        "onCommand:extension.deleteAllLogMessages",
+        "onCommand:extension.commentAllLogMessages"
     ],
     "main": "./extension",
     "contributes": {
@@ -34,6 +35,10 @@
                 "title": "Display Log Message"
             },
             {
+                "command": "extension.commentAllLogMessages",
+                "title": "Comment All Log Messages"
+            },
+            {
                 "command": "extension.deleteAllLogMessages",
                 "title": "Delete All Log Messages"
             }
@@ -43,6 +48,11 @@
                 "command": "extension.displayLogMessage",
                 "key": "Ctrl+shift+l",
                 "mac": "Cmd+shift+l"
+            },
+            {
+                "command": "extension.commentAllLogMessages",
+                "key": "Ctrl+c",
+                "mac": "Cmd+c"
             },
             {
                 "command": "extension.deleteAllLogMessages",
