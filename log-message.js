@@ -17,10 +17,10 @@ function message (editor, selectedVar, lineOfSelectedVar, wrapLogMessage) {
   const classThatEncloseTheVar = enclosingBlockName(editor.document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(editor.document, lineOfSelectedVar, 'function')
   const msgTabs = tabs(editor, lineOfSelectedVar);
-  const debuggingMsg = `console.log('${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
+  const debuggingMsg = `\u200bconsole.log('${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
   if(wrapLogMessage) {
     // 16 represents the length of console.log('');
-    const wrappingMsg = `console.log('${'-'.repeat(debuggingMsg.length - 16)}');`
+    const wrappingMsg = `\u200bconsole.log('${'-'.repeat(debuggingMsg.length - 16)}');`
     return `${msgTabs}${wrappingMsg}\n${msgTabs}${debuggingMsg}\n${msgTabs}${wrappingMsg}\n`
   }
   return `${msgTabs}${debuggingMsg}\n`
@@ -119,7 +119,7 @@ function blockClosingBraceLineNum (document, lineNum) {
 }
 
 /** 
- * Return an array of all log messages ranges in a document
+ * Detect all log messages inserted by this extension and then return their ranges 
  * @function
  * @param {TextDocument} document
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
@@ -132,7 +132,7 @@ function detectAll(document) {
   const documentNbrOfLines = document.lineCount
     const logMessagesRanges = []
     for (let i = 0; i < documentNbrOfLines; i++) {
-      if (/console\.log\(.*\)/.test(document.lineAt(i).text)) {
+      if (/\u200bconsole\.log\(.*\)/.test(document.lineAt(i).text)) {
         logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
       }
     }
