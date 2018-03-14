@@ -6,7 +6,7 @@ This extension make debugging much easier by automating the operation of writing
 ## Features
 ---
 
-I) Inserting meaningful log message automatically 
+I) Insert meaningful log message automatically 
 
 Two steps:
 
@@ -24,9 +24,17 @@ The log message can be wrapped by changing the value of wrapLogMessage to true i
 
 ![alt text](https://image.ibb.co/kLed57/wrap_log_message.gif "Wrapping The log message")
 
-II) Deleting all log messages from the current document
+II) Comment all log messages, inserted by the extension, from the current document
 
-All it takes to delete the log messages from the current document is to press Ctrl + Alt + d
+All it takes to comment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + q
+
+III) Uncomment all log messages, inserted by the extension, from the current document
+
+All it takes to uncomment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + u
+
+IV) Delete all log messages, inserted by the extension, from the current document
+
+All it takes to delete all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + d
 
 ![alt text](https://image.ibb.co/jkoKdS/delete_all_log_messages.gif "Deleting all log messages from the current file")
 
@@ -39,7 +47,13 @@ Initial release of Turbo Console Log
 
 ### 1.1.0
 
-The possibility of wrapping the log message is added
+- New feature: The possibility of wrapping the log message is added
+
+## 1.2.0
+
+- New feature: Comment all log messages inserted by the extension
+- New feature: Uncomment all log messages inserted by the extension
+- When requested, only the log messages inserted by the extension will be commented, uncommented or deleted
 
 ## Participate
 ---

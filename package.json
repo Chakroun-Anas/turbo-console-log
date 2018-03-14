@@ -2,7 +2,7 @@
     "name": "turbo-console-log",
     "displayName": "Turbo Console Log",
     "description": "Automating the process of writing meaningful log messages.",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "publisher": "ChakrounAnas",
     "engines": {
         "vscode": "^1.19.0"
@@ -13,8 +13,9 @@
     "icon": "images/icon.png",
     "activationEvents": [
         "onCommand:turboConsoleLog.displayLogMessage",
-        "onCommand:turboConsoleLog.deleteAllLogMessages",
-        "onCommand:turboConsoleLog.commentAllLogMessages"
+        "onCommand:turboConsoleLog.commentAllLogMessages",
+        "onCommand:turboConsoleLog.uncommentAllLogMessages",
+        "onCommand:turboConsoleLog.deleteAllLogMessages"
     ],
     "main": "./turboConsoleLog",
     "contributes": {
@@ -39,6 +40,10 @@
                 "title": "Turbo Console Log: Comment All Log Messages"
             },
             {
+                "command": "turboConsoleLog.uncommentAllLogMessages",
+                "title": "Turbo Console Log: Uncomment All Log Messages"
+            },
+            {
                 "command": "turboConsoleLog.deleteAllLogMessages",
                 "title": "Turbo Console Log: Delete All Log Messages"
             }
@@ -53,6 +58,11 @@
                 "command": "turboConsoleLog.commentAllLogMessages",
                 "key": "Ctrl+Alt+q",
                 "mac": "Ctrl+Alt+q"
+            },
+            {
+                "command": "turboConsoleLog.uncommentAllLogMessages",
+                "key": "Ctrl+Alt+u",
+                "mac": "Ctrl+Alt+u"
             },
             {
                 "command": "turboConsoleLog.deleteAllLogMessages",
