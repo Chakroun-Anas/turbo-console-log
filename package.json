@@ -32,15 +32,15 @@
         "commands": [
             {
                 "command": "turboConsoleLog.displayLogMessage",
-                "title": "Display Log Message"
+                "title": "Turbo Console Log: Display Log Message"
             },
             {
                 "command": "turboConsoleLog.commentAllLogMessages",
-                "title": "Comment All Log Messages"
+                "title": "Turbo Console Log: Comment All Log Messages"
             },
             {
                 "command": "turboConsoleLog.deleteAllLogMessages",
-                "title": "Delete All Log Messages"
+                "title": "Turbo Console Log: Delete All Log Messages"
             }
         ],
         "keybindings": [
