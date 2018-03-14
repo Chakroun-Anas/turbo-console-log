@@ -12,7 +12,7 @@ Two steps:
 
 * Selecting the variable which is the subject of the debugging
 
-* Pressing Ctrl + alt + l in windows/linux Or Cmd + alt + l on a MAC
+* Pressing Ctrl + Shift + L in windows/linux Or Cmd + Shift + L on a MAC
 
 The log message will be inserted in the next line relative to the selected variable like this: 
 
