@@ -28,15 +28,19 @@ II) Comment all log messages, inserted by the extension, from the current docume
 
 All it takes to comment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + q
 
+![alt text](https://image.ibb.co/j7EN7x/comment_all_log_messages.gif "Comment all log messages, inserted by the extension, from the current file")
+
 III) Uncomment all log messages, inserted by the extension, from the current document
 
 All it takes to uncomment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + u
+
+![alt text](https://image.ibb.co/bKRr0H/uncomment_all_log_messages.gif "Uncomment all log messages, inserted by the extension, from the current file")
 
 IV) Delete all log messages, inserted by the extension, from the current document
 
 All it takes to delete all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + d
 
-![alt text](https://image.ibb.co/jkoKdS/delete_all_log_messages.gif "Deleting all log messages from the current file")
+![alt text](https://image.ibb.co/jkoKdS/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
 
 ## Release Notes
 ---
