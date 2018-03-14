@@ -12,11 +12,11 @@
     ],
     "icon": "images/icon.png",
     "activationEvents": [
-        "onCommand:extension.displayLogMessage",
-        "onCommand:extension.deleteAllLogMessages",
-        "onCommand:extension.commentAllLogMessages"
+        "onCommand:turboConsoleLog.displayLogMessage",
+        "onCommand:turboConsoleLog.deleteAllLogMessages",
+        "onCommand:turboConsoleLog.commentAllLogMessages"
     ],
-    "main": "./extension",
+    "main": "./turboConsoleLog",
     "contributes": {
         "configuration": {
             "type": "object",
@@ -31,31 +31,31 @@
         },
         "commands": [
             {
-                "command": "extension.displayLogMessage",
+                "command": "turboConsoleLog.displayLogMessage",
                 "title": "Display Log Message"
             },
             {
-                "command": "extension.commentAllLogMessages",
+                "command": "turboConsoleLog.commentAllLogMessages",
                 "title": "Comment All Log Messages"
             },
             {
-                "command": "extension.deleteAllLogMessages",
+                "command": "turboConsoleLog.deleteAllLogMessages",
                 "title": "Delete All Log Messages"
             }
         ],
         "keybindings": [
             {
-                "command": "extension.displayLogMessage",
+                "command": "turboConsoleLog.displayLogMessage",
                 "key": "Ctrl+Alt+l",
                 "mac": "Ctrl+Alt+l"
             },
             {
-                "command": "extension.commentAllLogMessages",
+                "command": "turboConsoleLog.commentAllLogMessages",
                 "key": "Ctrl+Alt+q",
                 "mac": "Ctrl+Alt+q"
             },
             {
-                "command": "extension.deleteAllLogMessages",
+                "command": "turboConsoleLog.deleteAllLogMessages",
                 "key": "Ctrl+Alt+d",
                 "mac": "Ctrl+Alt+d"
             }
