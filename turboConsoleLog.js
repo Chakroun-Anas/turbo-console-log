@@ -15,7 +15,7 @@ function activate (context) {
     if (!(lineOfSelectedVar === (document.lineCount - 1))) {
       editor.edit(editBuilder => {
         const wrapLogMessage = vscode.workspace.getConfiguration().wrapLogMessage || false;
-        editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), logMessage.message(editor, selectedVar, lineOfSelectedVar, wrapLogMessage))
+        editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage))
       })
     }
   })
@@ -28,10 +28,10 @@ function activate (context) {
     const logMessagesRanges = logMessage.detectAll(document)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
-        let nbrOfTabs = 0
-        nbrOfTabs = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex / editor.options.tabSize
+        let nbrOfSpaces = 0
+        nbrOfSpaces = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex
         editBuilder.delete(logMessageRange)
-        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${'\t'.repeat(nbrOfTabs+2)}// ${document.getText(logMessageRange).trim()}\n`)
+        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${' '.repeat(nbrOfSpaces)}// ${document.getText(logMessageRange).trim()}\n`)
       })
     })
   })
@@ -44,10 +44,10 @@ function activate (context) {
     const logMessagesRanges = logMessage.detectAll(document)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
-        let nbrOfTabs = 0
-        nbrOfTabs = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex / editor.options.tabSize
+        let nbrOfSpaces = 0
+        nbrOfSpaces = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex
         editBuilder.delete(logMessageRange)
-        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${'\t'.repeat(nbrOfTabs+2)}${document.getText(logMessageRange).replace(/\//g, '').trim()}\n`)
+        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${' '.repeat(nbrOfSpaces)}${document.getText(logMessageRange).replace(/\//g, '').trim()}\n`)
       })
     })
   })
