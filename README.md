@@ -12,7 +12,7 @@ Two steps:
 
 * Selecting the variable which is the subject of the debugging
 
-* Pressing Ctrl + alt + l in windows/linux Or Cmd + alt + l on a MAC
+* Pressing Ctrl + Alt + l
 
 The log message will be inserted in the next line relative to the selected variable like this: 
 
@@ -26,7 +26,7 @@ The log message can be wrapped by changing the value of wrapLogMessage to true i
 
 II) Deleting all log messages from the current document
 
-All it takes to delete the log messages from the current document is to press Ctrl + d in windows/linux or Cmd + d on a MAC
+All it takes to delete the log messages from the current document is to press Ctrl + Alt + d
 
 ![alt text](https://image.ibb.co/jkoKdS/delete_all_log_messages.gif "Deleting all log messages from the current file")
 

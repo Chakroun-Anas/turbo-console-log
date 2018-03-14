@@ -2,7 +2,7 @@
     "name": "turbo-console-log",
     "displayName": "Turbo Console Log",
     "description": "Automating the process of writing meaningful log messages.",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "publisher": "ChakrounAnas",
     "engines": {
         "vscode": "^1.19.0"
@@ -46,18 +46,18 @@
         "keybindings": [
             {
                 "command": "extension.displayLogMessage",
-                "key": "Ctrl+shift+l",
-                "mac": "Cmd+shift+l"
+                "key": "Ctrl+Alt+l",
+                "mac": "Ctrl+Alt+l"
             },
             {
                 "command": "extension.commentAllLogMessages",
-                "key": "Ctrl+c",
-                "mac": "Cmd+c"
+                "key": "Ctrl+Alt+q",
+                "mac": "Ctrl+Alt+q"
             },
             {
                 "command": "extension.deleteAllLogMessages",
-                "key": "Ctrl+d",
-                "mac": "Cmd+d"
+                "key": "Ctrl+Alt+d",
+                "mac": "Ctrl+Alt+d"
             }
         ]
     },
