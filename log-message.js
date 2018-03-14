@@ -118,4 +118,26 @@ function blockClosingBraceLineNum (document, lineNum) {
   }
 }
 
-module.exports.message = message
+/** 
+ * Return an array of all log messages ranges in a document
+ * @function
+ * @param {TextDocument} document
+ * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
+ * @returns {Range[]}
+ * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#Range}
+ * @author Chakroun Anas <chakroun.anas@outlook.com>
+ * @since 1.2
+*/
+function detectAll(document) {
+  const documentNbrOfLines = document.lineCount
+    const logMessagesRanges = []
+    for (let i = 0; i < documentNbrOfLines; i++) {
+      if (/console\.log\(.*\)/.test(document.lineAt(i).text)) {
+        logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
+      }
+    }
+    return logMessagesRanges
+}
+
+module.exports.message   = message
+module.exports.detectAll = detectAll
