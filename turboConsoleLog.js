@@ -31,7 +31,23 @@ function activate (context) {
         let nbrOfTabs = 0
         nbrOfTabs = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex / editor.options.tabSize
         editBuilder.delete(logMessageRange)
-        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${'\t'.repeat(nbrOfTabs)}// ${document.getText(logMessageRange).trim()}\n`)
+        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${'\t'.repeat(nbrOfTabs+2)}// ${document.getText(logMessageRange).trim()}\n`)
+      })
+    })
+  })
+  vscode.commands.registerCommand('turboConsoleLog.uncommentAllLogMessages', () => {
+    const editor = vscode.window.activeTextEditor
+    if (!editor) {
+      return
+    }
+    const document = editor.document
+    const logMessagesRanges = logMessage.detectAll(document)
+    editor.edit(editBuilder => {
+      logMessagesRanges.forEach(logMessageRange => {
+        let nbrOfTabs = 0
+        nbrOfTabs = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex / editor.options.tabSize
+        editBuilder.delete(logMessageRange)
+        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${'\t'.repeat(nbrOfTabs+2)}${document.getText(logMessageRange).replace(/\//g, '').trim()}\n`)
       })
     })
   })
