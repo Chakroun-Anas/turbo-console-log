@@ -17,10 +17,10 @@ function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage) {
   const classThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'function')
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar);
-  const debuggingMsg = `\u200bconsole.log('${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
+  const debuggingMsg = `console.log('\u200b${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
   if(wrapLogMessage) {
     // 16 represents the length of console.log('');
-    const wrappingMsg = `\u200bconsole.log('${'-'.repeat(debuggingMsg.length - 16)}');`
+    const wrappingMsg = `console.log('\u200b${'-'.repeat(debuggingMsg.length - 16)}');`
     return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
   }
   return `${spacesBeforeMsg}${debuggingMsg}\n`
@@ -131,7 +131,8 @@ function detectAll(document) {
   const documentNbrOfLines = document.lineCount
     const logMessagesRanges = []
     for (let i = 0; i < documentNbrOfLines; i++) {
-      if (/\u200bconsole\.log\(.*\)/.test(document.lineAt(i).text)) {
+      console.log(document.lineAt(i).text);
+      if (/console\.log\(\'\u200b.*\)/.test(document.lineAt(i).text)) {
         logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
       }
     }
