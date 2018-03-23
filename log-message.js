@@ -4,8 +4,8 @@ const lineCodeProcessing = require('./line-code-processing')
 /**
  * Return a log message on the following format: ClassThatEncloseTheSelectedVar -> FunctionThatEncloseTheSelectedVar -> TheSelectedVar, SelectedVarValue
  * @function
- * @param {TextEditor} document
- * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextEditor}
+ * @param {TextDocument} document
+ * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @param {string} selectedVar
  * @param {number} lineOfSelectedVar
  * @param {boolean} wrapLogMessage
@@ -13,43 +13,42 @@ const lineCodeProcessing = require('./line-code-processing')
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function message (editor, selectedVar, lineOfSelectedVar, wrapLogMessage) {
-  const classThatEncloseTheVar = enclosingBlockName(editor.document, lineOfSelectedVar, 'class')
-  const funcThatEncloseTheVar = enclosingBlockName(editor.document, lineOfSelectedVar, 'function')
-  const msgTabs = tabs(editor, lineOfSelectedVar);
-  const debuggingMsg = `console.log('${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
+function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage) {
+  const classThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'class')
+  const funcThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'function')
+  const spacesBeforeMsg = spaces(document, lineOfSelectedVar);
+  const debuggingMsg = `console.log('\u200b${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
   if(wrapLogMessage) {
     // 16 represents the length of console.log('');
-    const wrappingMsg = `console.log('${'-'.repeat(debuggingMsg.length - 16)}');`
-    return `${msgTabs}${wrappingMsg}\n${msgTabs}${debuggingMsg}\n${msgTabs}${wrappingMsg}\n`
+    const wrappingMsg = `console.log('\u200b${'-'.repeat(debuggingMsg.length - 16)}');`
+    return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
   }
-  return `${msgTabs}${debuggingMsg}\n`
+  return `${spacesBeforeMsg}${debuggingMsg}\n`
 }
 
 /**
- * Tabs to insert before the log message
+ * Spaces to insert before the log message
  * @function
- * @param {TextEditor} editor
- * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextEditor}
+ * @param {TextDocument} document
+ * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @param {number} currentSelectionLine
  * @returns {string} Tabs
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function tabs (editor, currentSelectionLine) {
-  const document = editor.document
-  let nbrOfTabs = 0
+function spaces (document, currentSelectionLine) {
+  let nbrOfSpaces = 0
   if (document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).isEmptyOrWhitespace) {
-    nbrOfTabs = document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex / editor.options.tabSize
+    nbrOfSpaces = document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex
   } else {
     if(document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).firstNonWhitespaceCharacterIndex 
           > document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex) {
-      nbrOfTabs = (document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).firstNonWhitespaceCharacterIndex) / editor.options.tabSize
+      nbrOfSpaces = (document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).firstNonWhitespaceCharacterIndex)
     } else {
-      nbrOfTabs = (document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex) / editor.options.tabSize
+      nbrOfSpaces = (document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex)
     }
   }
-  return '\t'.repeat(nbrOfTabs)
+  return ' '.repeat(nbrOfSpaces)
 }
 /**
  * Return the name of the enclosing block whether if it's a class or a function
@@ -118,4 +117,27 @@ function blockClosingBraceLineNum (document, lineNum) {
   }
 }
 
-module.exports.message = message
+/** 
+ * Detect all log messages inserted by this extension and then return their ranges 
+ * @function
+ * @param {TextDocument} document
+ * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
+ * @returns {Range[]}
+ * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#Range}
+ * @author Chakroun Anas <chakroun.anas@outlook.com>
+ * @since 1.2
+*/
+function detectAll(document) {
+  const documentNbrOfLines = document.lineCount
+    const logMessagesRanges = []
+    for (let i = 0; i < documentNbrOfLines; i++) {
+      console.log(document.lineAt(i).text);
+      if (/console\.log\(\'\u200b.*\)/.test(document.lineAt(i).text)) {
+        logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
+      }
+    }
+    return logMessagesRanges
+}
+
+module.exports.message   = message
+module.exports.detectAll = detectAll

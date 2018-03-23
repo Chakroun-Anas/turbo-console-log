@@ -19,23 +19,31 @@ function activate (context) {
       })
     }
   })
-
-  vscode.commands.registerCommand('extension.deleteAllLogMessages', () => {
+  vscode.commands.registerCommand('extension.commentAllLogMessages', () => {
     const editor = vscode.window.activeTextEditor
     if (!editor) {
       return
     }
     const document = editor.document
-    const documentNbrOfLines = document.lineCount
-    const linesToDelete = []
-    for (let i = 0; i < documentNbrOfLines; i++) {
-      if (/console\.log\(.*\)/.test(document.lineAt(i).text)) {
-        linesToDelete.push(document.lineAt(i).rangeIncludingLineBreak)
-      }
-    }
+    const logMessagesRanges = logMessage.detectAll(document)
     editor.edit(editBuilder => {
-      linesToDelete.forEach(lineToDelete => {
-        editBuilder.delete(lineToDelete)
+      logMessagesRanges.forEach(logMessageRange => {
+        let nbrOfTabs = 0
+        nbrOfTabs = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex / editor.options.tabSize
+        editBuilder.delete(logMessageRange)
+        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${'\t'.repeat(nbrOfTabs)}// ${document.getText(logMessageRange).trim()}\n`)
+      })
+    })
+  })
+  vscode.commands.registerCommand('extension.deleteAllLogMessages', () => {
+    const editor = vscode.window.activeTextEditor
+    if (!editor) {
+      return
+    }
+    const logMessagesRanges = logMessage.detectAll(editor.document)
+    editor.edit(editBuilder => {
+      logMessagesRanges.forEach(logMessageRange => {
+        editBuilder.delete(logMessageRange)
       })
     })
   })

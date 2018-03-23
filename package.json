@@ -2,7 +2,7 @@
     "name": "turbo-console-log",
     "displayName": "Turbo Console Log",
     "description": "Automating the process of writing meaningful log messages.",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "publisher": "ChakrounAnas",
     "engines": {
         "vscode": "^1.19.0"
@@ -12,10 +12,12 @@
     ],
     "icon": "images/icon.png",
     "activationEvents": [
-        "onCommand:extension.displayLogMessage",
-        "onCommand:extension.deleteAllLogMessages"
+        "onCommand:turboConsoleLog.displayLogMessage",
+        "onCommand:turboConsoleLog.commentAllLogMessages",
+        "onCommand:turboConsoleLog.uncommentAllLogMessages",
+        "onCommand:turboConsoleLog.deleteAllLogMessages"
     ],
-    "main": "./extension",
+    "main": "./turboConsoleLog",
     "contributes": {
         "configuration": {
             "type": "object",
@@ -30,24 +32,42 @@
         },
         "commands": [
             {
-                "command": "extension.displayLogMessage",
-                "title": "Display Log Message"
+                "command": "turboConsoleLog.displayLogMessage",
+                "title": "Turbo Console Log: Display Log Message"
             },
             {
-                "command": "extension.deleteAllLogMessages",
-                "title": "Delete All Log Messages"
+                "command": "turboConsoleLog.commentAllLogMessages",
+                "title": "Turbo Console Log: Comment All Log Messages"
+            },
+            {
+                "command": "turboConsoleLog.uncommentAllLogMessages",
+                "title": "Turbo Console Log: Uncomment All Log Messages"
+            },
+            {
+                "command": "turboConsoleLog.deleteAllLogMessages",
+                "title": "Turbo Console Log: Delete All Log Messages"
             }
         ],
         "keybindings": [
             {
-                "command": "extension.displayLogMessage",
-                "key": "Ctrl+shift+l",
-                "mac": "Cmd+shift+l"
+                "command": "turboConsoleLog.displayLogMessage",
+                "key": "Ctrl+Alt+l",
+                "mac": "Ctrl+Alt+l"
             },
             {
-                "command": "extension.deleteAllLogMessages",
-                "key": "Ctrl+d",
-                "mac": "Cmd+d"
+                "command": "turboConsoleLog.commentAllLogMessages",
+                "key": "Ctrl+Alt+q",
+                "mac": "Ctrl+Alt+q"
+            },
+            {
+                "command": "turboConsoleLog.uncommentAllLogMessages",
+                "key": "Ctrl+Alt+u",
+                "mac": "Ctrl+Alt+u"
+            },
+            {
+                "command": "turboConsoleLog.deleteAllLogMessages",
+                "key": "Ctrl+Alt+d",
+                "mac": "Ctrl+Alt+d"
             }
         ]
     },

@@ -6,13 +6,15 @@ This extension make debugging much easier by automating the operation of writing
 ## Features
 ---
 
-I) Inserting meaningful log message automatically 
+I) Insert meaningful log message automatically 
 
 Two steps:
 
 * Selecting the variable which is the subject of the debugging
 
 * Pressing Ctrl + Shift + L in windows/linux Or Cmd + Shift + L on a MAC
+
+* Pressing Ctrl + Alt + l
 
 The log message will be inserted in the next line relative to the selected variable like this: 
 
@@ -24,11 +26,23 @@ The log message can be wrapped by changing the value of wrapLogMessage to true i
 
 ![alt text](https://image.ibb.co/kLed57/wrap_log_message.gif "Wrapping The log message")
 
-II) Deleting all log messages from the current document
+II) Comment all log messages, inserted by the extension, from the current document
 
-All it takes to delete the log messages from the current document is to press Ctrl + d in windows/linux or Cmd + d on a MAC
+All it takes to comment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + q
 
-![alt text](https://image.ibb.co/jkoKdS/delete_all_log_messages.gif "Deleting all log messages from the current file")
+![alt text](https://image.ibb.co/j7EN7x/comment_all_log_messages.gif "Comment all log messages, inserted by the extension, from the current file")
+
+III) Uncomment all log messages, inserted by the extension, from the current document
+
+All it takes to uncomment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + u
+
+![alt text](https://image.ibb.co/bKRr0H/uncomment_all_log_messages.gif "Uncomment all log messages, inserted by the extension, from the current file")
+
+IV) Delete all log messages, inserted by the extension, from the current document
+
+All it takes to delete all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + d
+
+![alt text](https://image.ibb.co/jkoKdS/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
 
 ## Release Notes
 ---
@@ -39,7 +53,13 @@ Initial release of Turbo Console Log
 
 ### 1.1.0
 
-The possibility of wrapping the log message is added
+- New feature: The possibility of wrapping the log message is added
+
+## 1.2.0
+
+- New feature: Comment all log messages inserted by the extension
+- New feature: Uncomment all log messages inserted by the extension
+- When requested, only the log messages inserted by the extension will be commented, uncommented or deleted
 
 ## Participate
 ---
