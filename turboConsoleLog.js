@@ -28,10 +28,9 @@ function activate (context) {
     const logMessagesRanges = logMessage.detectAll(document)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
-        let nbrOfSpaces = 0
-        nbrOfSpaces = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex
+        const indentation = logMessage.indentation(document, logMessageRange.start.line)
         editBuilder.delete(logMessageRange)
-        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${' '.repeat(nbrOfSpaces)}// ${document.getText(logMessageRange).trim()}\n`)
+        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${indentation}// ${document.getText(logMessageRange).trim()}\n`)
       })
     })
   })
@@ -44,10 +43,9 @@ function activate (context) {
     const logMessagesRanges = logMessage.detectAll(document)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
-        let nbrOfSpaces = 0
-        nbrOfSpaces = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex
+        const indentation = logMessage.indentation(document, logMessageRange.start.line);
         editBuilder.delete(logMessageRange)
-        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${' '.repeat(nbrOfSpaces)}${document.getText(logMessageRange).replace(/\//g, '').trim()}\n`)
+        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${indentation}${document.getText(logMessageRange).replace(/\//g, '').trim()}\n`)
       })
     })
   })

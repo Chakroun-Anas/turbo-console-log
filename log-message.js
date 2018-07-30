@@ -16,39 +16,44 @@ const lineCodeProcessing = require('./line-code-processing')
 function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage) {
   const classThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'function')
-  const spacesBeforeMsg = spaces(document, lineOfSelectedVar);
+  const indentBeforeMsg = indentation(document, lineOfSelectedVar)
   const debuggingMsg = `console.log('\u200b${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
   if(wrapLogMessage) {
     // 16 represents the length of console.log('');
     const wrappingMsg = `console.log('\u200b${'-'.repeat(debuggingMsg.length - 16)}');`
-    return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
+    return `${indentBeforeMsg}${wrappingMsg}\n${indentBeforeMsg}${debuggingMsg}\n${indentBeforeMsg}${wrappingMsg}\n`
   }
-  return `${spacesBeforeMsg}${debuggingMsg}\n`
+  return `${indentBeforeMsg}${debuggingMsg}\n`
 }
 
 /**
- * Spaces to insert before the log message
+ * Characters to insert before the log message
  * @function
  * @param {TextDocument} document
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @param {number} currentSelectionLine
- * @returns {string} Tabs
+ * @returns {string} Spaces or Tabs, depending on settings
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function spaces (document, currentSelectionLine) {
-  let nbrOfSpaces = 0
+function indentation (document, currentSelectionLine) {
+  let indentationCount = 0
   if (document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).isEmptyOrWhitespace) {
-    nbrOfSpaces = document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex
+    indentationCount = document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex
   } else {
     if(document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).firstNonWhitespaceCharacterIndex 
           > document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex) {
-      nbrOfSpaces = (document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).firstNonWhitespaceCharacterIndex)
+      indentationCount = (document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).firstNonWhitespaceCharacterIndex)
     } else {
-      nbrOfSpaces = (document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex)
+      indentationCount = (document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex)
     }
   }
-  return ' '.repeat(nbrOfSpaces)
+
+  if (vscode.window.activeTextEditor.options.insertSpaces) {
+    return ' '.repeat(indentationCount)
+  }
+
+  return '	'.repeat(indentationCount)
 }
 /**
  * Return the name of the enclosing block whether if it's a class or a function
@@ -139,5 +144,6 @@ function detectAll(document) {
     return logMessagesRanges
 }
 
-module.exports.message   = message
-module.exports.detectAll = detectAll
+module.exports.message     = message
+module.exports.indentation = indentation
+module.exports.detectAll   = detectAll
