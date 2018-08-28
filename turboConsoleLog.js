@@ -11,8 +11,8 @@ function activate (context) {
     const selection = editor.selection
     const selectedVar = document.getText(selection)
     const lineOfSelectedVar = selection.active.line
-    // Check if the selection line is not the last line in the document
-    if (!(lineOfSelectedVar === (document.lineCount - 1))) {
+    // Check if the selection line is not the last one in the document and the selected variable is not empty
+    if (!(lineOfSelectedVar === (document.lineCount - 1)) && selectedVar.trim().length !== 0) {
       editor.edit(editBuilder => {
         const wrapLogMessage = vscode.workspace.getConfiguration().wrapLogMessage || false;
         editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage))
