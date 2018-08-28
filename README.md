@@ -1,48 +1,51 @@
 ## Main Functionality
+
 ---
 
 This extension make debugging much easier by automating the operation of writing meaningful log message.
 
 ## Features
+
 ---
 
-I) Insert meaningful log message automatically 
+I) Insert meaningful log message automatically
 
 Two steps:
 
-* Selecting the variable which is the subject of the debugging
+- Selecting the variable which is the subject of the debugging
 
-* Pressing Ctrl + Alt + l
+- Pressing Ctrl + Alt + l
 
-The log message will be inserted in the next line relative to the selected variable like this: 
+The log message will be inserted in the next line relative to the selected variable like this:
 
-console.log('SelectedVariableEnclosingClassName -> SelectVariableEnclosingFunctionName -> SelectedVariable', SelectedVariable)
+console.log('TCL: SelectedVariableEnclosingClassName -> SelectedVariableEnclosingFunctionName -> SelectedVariable', SelectedVariable)
 
-![alt text](https://image.ibb.co/mG1SXn/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
+![alt text](https://image.ibb.co/dysw7p/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
 
 The log message can be wrapped by changing the value of wrapLogMessage to true in settings.json
 
-![alt text](https://image.ibb.co/kLed57/wrap_log_message.gif "Wrapping The log message")
+![alt text](https://image.ibb.co/h9yfYU/wrap_log_message.gif "Wrapping The log message")
 
 II) Comment all log messages, inserted by the extension, from the current document
 
 All it takes to comment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + q
 
-![alt text](https://image.ibb.co/j7EN7x/comment_all_log_messages.gif "Comment all log messages, inserted by the extension, from the current file")
+![alt text](https://image.ibb.co/eVwTL9/comment_log_messages.gif "Comment all log messages, inserted by the extension, from the current file")
 
 III) Uncomment all log messages, inserted by the extension, from the current document
 
 All it takes to uncomment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + u
 
-![alt text](https://image.ibb.co/bKRr0H/uncomment_all_log_messages.gif "Uncomment all log messages, inserted by the extension, from the current file")
+![alt text](https://image.ibb.co/cp9q09/uncomment_log_messages.gif "Uncomment all log messages, inserted by the extension, from the current file")
 
 IV) Delete all log messages, inserted by the extension, from the current document
 
 All it takes to delete all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + d
 
-![alt text](https://image.ibb.co/jkoKdS/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
+![alt text](https://image.ibb.co/jv9UtU/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
 
 ## Release Notes
+
 ---
 
 ### 1.0.0
@@ -60,16 +63,19 @@ Initial release of Turbo Console Log
 - When requested, only the log messages inserted by the extension will be commented, uncommented or deleted
 
 ## Participate
+
 ---
 
 You're more than welcome to participate in the development of the extension by creating pull requests and submitting issues, link of the project in github: https://github.com/Chakroun-Anas/turbo-console-log
 
 ## Contact
+
 ---
 
 You can contact me on the following mail: chakroun.anas@outlook.com
 
 ## License
+
 ---
 
 MIT &copy; Chakroun Anas
