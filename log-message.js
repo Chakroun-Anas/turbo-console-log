@@ -17,10 +17,10 @@ function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage) {
   const classThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'function')
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar);
-  const debuggingMsg = `console.log('TCL -> ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
+  const debuggingMsg = `console.log('TCL: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
   if(wrapLogMessage) {
     // 16 represents the length of console.log('');
-    const wrappingMsg = `console.log('TCL -> ${'-'.repeat(debuggingMsg.length - 16)}');`
+    const wrappingMsg = `console.log('TCL: ${'-'.repeat(debuggingMsg.length - 16)}');`
     return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
   }
   return `${spacesBeforeMsg}${debuggingMsg}\n`
