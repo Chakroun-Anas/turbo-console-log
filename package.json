@@ -27,6 +27,11 @@
           "type": "boolean",
           "default": false,
           "description": "Determine if the log message should be wrapped or not."
+        },
+        "logMessagePrefix": {
+          "type": "string",
+          "default": "TCL: ",
+          "description": "The prefix of the log message that will be inserted by turbo console log."
         }
       }
     },

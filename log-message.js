@@ -9,22 +9,24 @@ const lineCodeProcessing = require('./line-code-processing')
  * @param {string} selectedVar
  * @param {number} lineOfSelectedVar
  * @param {boolean} wrapLogMessage
+ * @param {string} logMessagePrefix
  * @returns {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage) {
+function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, logMessagePrefix) {
   const classThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'function')
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar);
-  const debuggingMsg = `console.log('TCL: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
+  const debuggingMsg = `console.log('${logMessagePrefix}${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
   if(wrapLogMessage) {
     // 16 represents the length of console.log('');
-    const wrappingMsg = `console.log('TCL: ${'-'.repeat(debuggingMsg.length - 16)}');`
+    const wrappingMsg = `console.log('${logMessagePrefix}${'-'.repeat(debuggingMsg.length - 16)}');`
     return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
   }
   return `${spacesBeforeMsg}${debuggingMsg}\n`
 }
+
 
 /**
  * Spaces to insert before the log message
@@ -121,17 +123,22 @@ function blockClosingBraceLineNum (document, lineNum) {
  * Detect all log messages inserted by this extension and then return their ranges 
  * @function
  * @param {TextDocument} document
+ * @param {string} logMessagePrefix
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @returns {Range[]}
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#Range}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.2
 */
-function detectAll(document) {
+function detectAll(document, logMessagePrefix) {
   const documentNbrOfLines = document.lineCount
     const logMessagesRanges = []
     for (let i = 0; i < documentNbrOfLines; i++) {
-      if (/console\.log\('TCL.*\)/.test(document.lineAt(i).text)) {
+      // if (/console\.log\('TCL.*\)/.test(document.lineAt(i).text)) {
+      //   logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
+      // }
+      const turboConsoleLogMessage = new RegExp(`console\.log\\('${logMessagePrefix}.*\\)`)
+      if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
         logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
       }
     }

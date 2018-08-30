@@ -20,6 +20,9 @@ The log message will be inserted in the next line relative to the selected varia
 
 console.log('TCL: SelectedVariableEnclosingClassName -> SelectedVariableEnclosingFunctionName -> SelectedVariable', SelectedVariable)
 
+The default prefix of the log message is "TCL: ", you can change it as you like by editing the logMessagePrefix is settings.json (An empty prefix
+will resolve to the default one).
+
 ![alt text](https://image.ibb.co/dysw7p/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
 
 The log message can be wrapped by changing the value of wrapLogMessage to true in settings.json

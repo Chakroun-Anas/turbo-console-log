@@ -14,8 +14,10 @@ function activate (context) {
     // Check if the selection line is not the last one in the document and the selected variable is not empty
     if (!(lineOfSelectedVar === (document.lineCount - 1)) && selectedVar.trim().length !== 0) {
       editor.edit(editBuilder => {
-        const wrapLogMessage = vscode.workspace.getConfiguration().wrapLogMessage || false;
-        editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage))
+        const wrapLogMessage   = vscode.workspace.getConfiguration().wrapLogMessage || false;
+        const logMessagePrefix = vscode.workspace.getConfiguration().logMessagePrefix || "TCL: ";
+        editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), 
+              logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage, logMessagePrefix))
       })
     }
   })
@@ -25,7 +27,8 @@ function activate (context) {
       return
     }
     const document = editor.document
-    const logMessagesRanges = logMessage.detectAll(document)
+    const logMessagePrefix = vscode.workspace.getConfiguration().logMessagePrefix || "TCL: ";
+    const logMessagesRanges = logMessage.detectAll(document, logMessagePrefix)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
         let nbrOfSpaces = 0
@@ -41,7 +44,8 @@ function activate (context) {
       return
     }
     const document = editor.document
-    const logMessagesRanges = logMessage.detectAll(document)
+    const logMessagePrefix = vscode.workspace.getConfiguration().logMessagePrefix || "TCL: ";
+    const logMessagesRanges = logMessage.detectAll(document, logMessagePrefix)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
         let nbrOfSpaces = 0
@@ -56,7 +60,8 @@ function activate (context) {
     if (!editor) {
       return
     }
-    const logMessagesRanges = logMessage.detectAll(editor.document)
+    const logMessagePrefix = vscode.workspace.getConfiguration().logMessagePrefix || "TCL: ";
+    const logMessagesRanges = logMessage.detectAll(editor.document, logMessagePrefix)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
         editBuilder.delete(logMessageRange)
