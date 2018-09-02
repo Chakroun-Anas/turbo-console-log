@@ -80,7 +80,7 @@ function functionName (lineCode) {
       const textInTheLeftOfTheParams = lineCode.split(/\(.*\)/)[0]
       if (/=/.test(textInTheLeftOfTheParams)) {
         if (textInTheLeftOfTheParams.split('=').length > 0) {
-          return textInTheLeftOfTheParams.split('=')[0].replace(/const |var |let |=|(\s*)/g, '')
+          return textInTheLeftOfTheParams.split('=')[0].replace(/export |const |var |let |=|(\s*)/g, '')
         }
       } else {
         return textInTheLeftOfTheParams.replace(/(\s*)/g, '')

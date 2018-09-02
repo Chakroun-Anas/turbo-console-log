@@ -17,7 +17,8 @@ describe('Source Code Processing', () => {
   ]
   const namedFunctions = [
     'function functionName(){', 'function functionName (arg1, arg2) {', 'functionName (arg1, arg2, arg3) {', 'functionName = function (arg1, arg2) {',
-    'functionName = (arg1, arg2) => {', 'functionName = function otherName (arg1, arg2) => {', 'array.forEach(function functionName() {'
+    'functionName = (arg1, arg2) => {', 'functionName = function otherName (arg1, arg2) => {', 'array.forEach(function functionName() {',
+    'export const functionName = (arg1, arg2) => {'
   ]
   const nonNamedFunctions = [
     'function() {', 'function(arg1, arg2) {', '() => {', '(arg1, arg2) => {'
