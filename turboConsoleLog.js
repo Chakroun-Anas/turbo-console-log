@@ -26,14 +26,13 @@ function activate (context) {
     if (!editor) {
       return
     }
+    const tabSize = editor.options.tabSize
     const document = editor.document
     const logMessagesRanges = logMessage.detectAll(document)
     editor.edit(editBuilder => {
-      logMessagesRanges.forEach(logMessageRange => {
-        let nbrOfSpaces = 0
-        nbrOfSpaces = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex
-        editBuilder.delete(logMessageRange)
-        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${' '.repeat(nbrOfSpaces)}// ${document.getText(logMessageRange).trim()}\n`)
+      logMessagesRanges.forEach(({line, range}) => {
+        editBuilder.delete(range)
+        editBuilder.insert(new vscode.Position(range.start.line, 0), `${logMessage.spaces(document, line, tabSize )}// ${document.getText(range).trim()}\n`)
       })
     })
   })
@@ -42,14 +41,13 @@ function activate (context) {
     if (!editor) {
       return
     }
+    const tabSize = editor.options.tabSize
     const document = editor.document
     const logMessagesRanges = logMessage.detectAll(document)
     editor.edit(editBuilder => {
-      logMessagesRanges.forEach(logMessageRange => {
-        let nbrOfSpaces = 0
-        nbrOfSpaces = document.lineAt(logMessageRange.start).firstNonWhitespaceCharacterIndex
-        editBuilder.delete(logMessageRange)
-        editBuilder.insert(new vscode.Position(logMessageRange.start.line, 0), `${' '.repeat(nbrOfSpaces)}${document.getText(logMessageRange).replace(/\//g, '').trim()}\n`)
+      logMessagesRanges.forEach(({line, range}) => {
+        editBuilder.delete(range)
+        editBuilder.insert(new vscode.Position(range.start.line, 0), `${logMessage.spaces(document, line, tabSize )}${document.getText(range).replace(/\//g, '').trim()}\n`)
       })
     })
   })

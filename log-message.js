@@ -151,11 +151,12 @@ function detectAll(document) {
       // }
       const turboConsoleLogMessage = new RegExp(`console\.log\\(('|")\u200b.*\\)`)
       if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
-        logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
+        logMessagesRanges.push({line: document.lineAt(i).lineNumber, range: document.lineAt(i).rangeIncludingLineBreak })
       }
     }
     return logMessagesRanges
 }
 
 module.exports.message                      = message
+module.exports.spaces                       = spaces
 module.exports.detectAll                    = detectAll
