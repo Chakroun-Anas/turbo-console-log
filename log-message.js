@@ -29,22 +29,19 @@ function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, tabS
 
 
 /**
- * Spaces to insert before the log message
+ * Line Spaces
  * @function
  * @param {TextDocument} document
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @param {number} currentSelectionLine
  * @param {number} tabSize
- * @returns {string} Tabs
+ * @returns {string} Spaces
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function spaces (document, currentSelectionLine, tabSize) {
+function spaces (document, line, tabSize) {
   let selectionLineNbrOfSpaces = 0
-  let lineNextToSelectionLineNbrOfSpaces = 0
-  let selectionLineChars = document.lineAt(currentSelectionLine).text.split('');
-  console.log(selectionLineChars);
-  let lineNextToSelectionLineChars = document.lineAt(currentSelectionLine + 1).text.split('');
+  let selectionLineChars = document.lineAt(line).text.split('');
   for (const char of selectionLineChars) {
     if(char === " ") {
       selectionLineNbrOfSpaces++;
@@ -54,16 +51,32 @@ function spaces (document, currentSelectionLine, tabSize) {
       break;
     }
   }
-  for (const char of lineNextToSelectionLineChars) {
-    if(char === " ") {
-      lineNextToSelectionLineNbrOfSpaces++;
-    } else if (char === "\t") {
-      lineNextToSelectionLineNbrOfSpaces+=tabSize
-    } else {
-      break;
+  if (/{/.test(document.lineAt(line).text)) {
+    let lineNextToSelectionLineNbrOfSpaces = 0
+    let lineNextToSelectionLineChars = document.lineAt(line + 1).text.split('');
+    for (const char of lineNextToSelectionLineChars) {
+      if(char === " ") {
+        lineNextToSelectionLineNbrOfSpaces++;
+      } else if (char === "\t") {
+        lineNextToSelectionLineNbrOfSpaces+=tabSize
+      } else {
+        break;
+      }
     }
+    if(selectionLineNbrOfSpaces % tabSize === 0 && lineNextToSelectionLineNbrOfSpaces % tabSize === 0) {
+      selectionLineNbrOfSpaces = selectionLineNbrOfSpaces / tabSize;
+      lineNextToSelectionLineNbrOfSpaces = lineNextToSelectionLineNbrOfSpaces / tabSize;
+      return selectionLineNbrOfSpaces > lineNextToSelectionLineNbrOfSpaces ? '\t'.repeat(selectionLineNbrOfSpaces) : '\t'.repeat(lineNextToSelectionLineNbrOfSpaces);
+    } else {
+      return selectionLineNbrOfSpaces > lineNextToSelectionLineNbrOfSpaces ? ' '.repeat(selectionLineNbrOfSpaces) : ' '.repeat(lineNextToSelectionLineNbrOfSpaces);
+    }
+  } else {
+    if(selectionLineNbrOfSpaces % tabSize === 0) {
+      selectionLineNbrOfSpaces = selectionLineNbrOfSpaces / tabSize;
+      return '\t'.repeat(selectionLineNbrOfSpaces);
+    }
+    return ' '.repeat(selectionLineNbrOfSpaces);
   }
-  return selectionLineNbrOfSpaces > lineNextToSelectionLineNbrOfSpaces ? ' '.repeat(selectionLineNbrOfSpaces) : ' '.repeat(lineNextToSelectionLineNbrOfSpaces);
 }
 /**
  * Return the name of the enclosing block whether if it's a class or a function
@@ -142,19 +155,20 @@ function blockClosingBraceLineNum (document, lineNum) {
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.2
 */
-function detectAll(document) {
+function detectAll(document, tabSize) {
   const documentNbrOfLines = document.lineCount
     const logMessages = []
     for (let i = 0; i < documentNbrOfLines; i++) {
       const turboConsoleLogMessage = new RegExp(`('|")\u200b.*`)
       if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
-        const logMessageLines = [];
+        const logMessageLines = {spaces: 0, lines: []};
         for (let j = i; j >= 0; j--) {
           let numberOfOpenParenthesis = 0;
           let numberOfCloseParenthesis = 0;
           if(/console\.log/.test(document.lineAt(j).text)) {
+            logMessageLines.spaces = spaces(document, j, tabSize)
             for (let k = j; k <= documentNbrOfLines; k++) {
-              logMessageLines.push({line: k, range: document.lineAt(k).rangeIncludingLineBreak})
+              logMessageLines.lines.push({range: document.lineAt(k).rangeIncludingLineBreak})
               if (document.lineAt(k).text.match(/\(/g)) {
                 numberOfOpenParenthesis+= document.lineAt(k).text.match(/\(/g).length
               }
