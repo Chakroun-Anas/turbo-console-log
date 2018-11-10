@@ -16,9 +16,8 @@ function activate (context) {
     if (!(lineOfSelectedVar === (document.lineCount - 1)) && selectedVar.trim().length !== 0) {
       editor.edit(editBuilder => {
         const wrapLogMessage   = vscode.workspace.getConfiguration().wrapLogMessage || false;
-        const logMessagePrefix = vscode.workspace.getConfiguration().logMessagePrefix || "TCL: ";
         editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), 
-              logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage, logMessagePrefix, tabSize))
+              logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage, tabSize))
       })
     }
   })
@@ -28,8 +27,7 @@ function activate (context) {
       return
     }
     const document = editor.document
-    const logMessagePrefix = vscode.workspace.getConfiguration().logMessagePrefix || "TCL: ";
-    const logMessagesRanges = logMessage.detectAll(document, logMessagePrefix)
+    const logMessagesRanges = logMessage.detectAll(document)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
         let nbrOfSpaces = 0
@@ -45,8 +43,7 @@ function activate (context) {
       return
     }
     const document = editor.document
-    const logMessagePrefix = vscode.workspace.getConfiguration().logMessagePrefix || "TCL: ";
-    const logMessagesRanges = logMessage.detectAll(document, logMessagePrefix)
+    const logMessagesRanges = logMessage.detectAll(document)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
         let nbrOfSpaces = 0
@@ -61,8 +58,7 @@ function activate (context) {
     if (!editor) {
       return
     }
-    const logMessagePrefix = vscode.workspace.getConfiguration().logMessagePrefix || "TCL: ";
-    const logMessagesRanges = logMessage.detectAll(editor.document, logMessagePrefix)
+    const logMessagesRanges = logMessage.detectAll(editor.document)
     editor.edit(editBuilder => {
       logMessagesRanges.forEach(logMessageRange => {
         editBuilder.delete(logMessageRange)
