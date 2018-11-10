@@ -144,17 +144,32 @@ function blockClosingBraceLineNum (document, lineNum) {
 */
 function detectAll(document) {
   const documentNbrOfLines = document.lineCount
-    const logMessagesRanges = []
+    const logMessages = []
     for (let i = 0; i < documentNbrOfLines; i++) {
-      // if (/console\.log\('TCL.*\)/.test(document.lineAt(i).text)) {
-      //   logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
-      // }
-      const turboConsoleLogMessage = new RegExp(`console\.log\\(('|")\u200b.*\\)`)
+      const turboConsoleLogMessage = new RegExp(`('|")\u200b.*`)
       if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
-        logMessagesRanges.push({line: document.lineAt(i).lineNumber, range: document.lineAt(i).rangeIncludingLineBreak })
+        const logMessageLines = [];
+        for (let j = i; j >= 0; j--) {
+          let numberOfOpenParenthesis = 0;
+          let numberOfCloseParenthesis = 0;
+          if(/console\.log/.test(document.lineAt(j).text)) {
+            for (let k = j; k <= documentNbrOfLines; k++) {
+              logMessageLines.push({line: k, range: document.lineAt(k).rangeIncludingLineBreak})
+              if (document.lineAt(k).text.match(/\(/g)) {
+                numberOfOpenParenthesis+= document.lineAt(k).text.match(/\(/g).length
+              }
+              if (document.lineAt(k).text.match(/\)/g)) {
+                numberOfCloseParenthesis+= document.lineAt(k).text.match(/\)/g).length
+              }
+              if(numberOfOpenParenthesis === numberOfCloseParenthesis && numberOfOpenParenthesis !== 0) break;
+            }
+          }
+          if(numberOfOpenParenthesis === numberOfCloseParenthesis && numberOfOpenParenthesis !== 0) break;
+        }
+        logMessages.push(logMessageLines)
       }
     }
-    return logMessagesRanges
+    return logMessages
 }
 
 module.exports.message                      = message

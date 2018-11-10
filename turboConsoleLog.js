@@ -28,11 +28,13 @@ function activate (context) {
     }
     const tabSize = editor.options.tabSize
     const document = editor.document
-    const logMessagesRanges = logMessage.detectAll(document)
+    const logMessages = logMessage.detectAll(document)
     editor.edit(editBuilder => {
-      logMessagesRanges.forEach(({line, range}) => {
-        editBuilder.delete(range)
-        editBuilder.insert(new vscode.Position(range.start.line, 0), `${logMessage.spaces(document, line, tabSize )}// ${document.getText(range).trim()}\n`)
+      logMessages.forEach(logMessageLines => {
+        logMessageLines.forEach(({line, range}) => {
+          editBuilder.delete(range)
+          editBuilder.insert(new vscode.Position(range.start.line, 0), `${logMessage.spaces(document, line, tabSize )}// ${document.getText(range).trim()}\n`)
+        });
       })
     })
   })
@@ -43,11 +45,13 @@ function activate (context) {
     }
     const tabSize = editor.options.tabSize
     const document = editor.document
-    const logMessagesRanges = logMessage.detectAll(document)
+    const logMessages = logMessage.detectAll(document)
     editor.edit(editBuilder => {
-      logMessagesRanges.forEach(({line, range}) => {
-        editBuilder.delete(range)
-        editBuilder.insert(new vscode.Position(range.start.line, 0), `${logMessage.spaces(document, line, tabSize )}${document.getText(range).replace(/\//g, '').trim()}\n`)
+      logMessages.forEach(logMessageLines => {
+        logMessageLines.forEach(({line, range}) => {
+          editBuilder.delete(range)
+          editBuilder.insert(new vscode.Position(range.start.line, 0), `${logMessage.spaces(document, line, tabSize )}${document.getText(range).replace(/\//g, '').trim()}\n`)
+        });
       })
     })
   })
@@ -56,10 +60,12 @@ function activate (context) {
     if (!editor) {
       return
     }
-    const logMessagesRanges = logMessage.detectAll(editor.document)
+    const logMessages = logMessage.detectAll(editor.document)
     editor.edit(editBuilder => {
-      logMessagesRanges.forEach(logMessageRange => {
-        editBuilder.delete(logMessageRange)
+      logMessages.forEach(logMessageLines => {
+        logMessageLines.forEach(({range}) => {
+          editBuilder.delete(range)
+        });ç
       })
     })
   })
