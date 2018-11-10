@@ -7,6 +7,7 @@ function activate (context) {
     if (!editor) {
       return
     }
+    const tabSize = editor.options.tabSize
     const document = editor.document
     const selection = editor.selection
     const selectedVar = document.getText(selection)
@@ -17,7 +18,7 @@ function activate (context) {
         const wrapLogMessage   = vscode.workspace.getConfiguration().wrapLogMessage || false;
         const logMessagePrefix = vscode.workspace.getConfiguration().logMessagePrefix || "TCL: ";
         editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), 
-              logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage, logMessagePrefix))
+              logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage, logMessagePrefix, tabSize))
       })
     }
   })

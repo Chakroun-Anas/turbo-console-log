@@ -10,14 +10,15 @@ const lineCodeProcessing = require('./line-code-processing')
  * @param {number} lineOfSelectedVar
  * @param {boolean} wrapLogMessage
  * @param {string} logMessagePrefix
+ * @param {number} tabSize
  * @returns {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, logMessagePrefix) {
+function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, logMessagePrefix, tabSize) {
   const classThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'function')
-  const spacesBeforeMsg = spaces(document, lineOfSelectedVar);
+  const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const debuggingMsg = `console.log('${logMessagePrefix}${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
   if(wrapLogMessage) {
     // 16 represents the length of console.log('');
@@ -34,23 +35,36 @@ function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, logM
  * @param {TextDocument} document
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @param {number} currentSelectionLine
+ * @param {number} tabSize
  * @returns {string} Tabs
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function spaces (document, currentSelectionLine) {
-  let nbrOfSpaces = 0
-  if (document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).isEmptyOrWhitespace) {
-    nbrOfSpaces = document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex
-  } else {
-    if(document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).firstNonWhitespaceCharacterIndex 
-          > document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex) {
-      nbrOfSpaces = (document.lineAt(new vscode.Position(currentSelectionLine + 1, 0)).firstNonWhitespaceCharacterIndex)
+function spaces (document, currentSelectionLine, tabSize) {
+  let selectionLineNbrOfSpaces = 0
+  let lineNextToSelectionLineNbrOfSpaces = 0
+  let selectionLineChars = document.lineAt(currentSelectionLine).text.split('');
+  console.log(selectionLineChars);
+  let lineNextToSelectionLineChars = document.lineAt(currentSelectionLine + 1).text.split('');
+  for (const char of selectionLineChars) {
+    if(char === " ") {
+      selectionLineNbrOfSpaces++;
+    } else if (char === "\t") {
+      selectionLineNbrOfSpaces+=tabSize
     } else {
-      nbrOfSpaces = (document.lineAt(new vscode.Position(currentSelectionLine, 0)).firstNonWhitespaceCharacterIndex)
+      break;
     }
   }
-  return ' '.repeat(nbrOfSpaces)
+  for (const char of lineNextToSelectionLineChars) {
+    if(char === " ") {
+      lineNextToSelectionLineNbrOfSpaces++;
+    } else if (char === "\t") {
+      lineNextToSelectionLineNbrOfSpaces+=tabSize
+    } else {
+      break;
+    }
+  }
+  return selectionLineNbrOfSpaces > lineNextToSelectionLineNbrOfSpaces ? ' '.repeat(selectionLineNbrOfSpaces) : ' '.repeat(lineNextToSelectionLineNbrOfSpaces);
 }
 /**
  * Return the name of the enclosing block whether if it's a class or a function
@@ -137,7 +151,7 @@ function detectAll(document, logMessagePrefix) {
       // if (/console\.log\('TCL.*\)/.test(document.lineAt(i).text)) {
       //   logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
       // }
-      const turboConsoleLogMessage = new RegExp(`console\.log\\('${logMessagePrefix}.*\\)`)
+      const turboConsoleLogMessage = new RegExp(`console\.log\\(('|")${logMessagePrefix}.*\\)`)
       if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
         logMessagesRanges.push(document.lineAt(i).rangeIncludingLineBreak)
       }
