@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.19.0"
@@ -28,10 +28,10 @@
           "default": false,
           "description": "Determine if the log message should be wrapped or not."
         },
-        "logMessagePrefix": {
-          "type": "string",
-          "default": "TCL: ",
-          "description": "The prefix of the log message that will be inserted by turbo console log."
+        "addSemicolonInTheEnd": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to add or not a semicolon in the end of the log message."
         }
       }
     },
@@ -56,23 +56,23 @@
     "keybindings": [
       {
         "command": "turboConsoleLog.displayLogMessage",
-        "key": "Ctrl+Alt+l",
-        "mac": "Ctrl+Alt+l"
+        "key": "ctrl+alt+l",
+        "mac": "ctrl+alt+l"
       },
       {
         "command": "turboConsoleLog.commentAllLogMessages",
-        "key": "Ctrl+Alt+q",
-        "mac": "Ctrl+Alt+q"
+        "key": "alt+shift+c",
+        "mac": "alt+shift+c"
       },
       {
         "command": "turboConsoleLog.uncommentAllLogMessages",
-        "key": "Ctrl+Alt+u",
-        "mac": "Ctrl+Alt+u"
+        "key": "alt+shift+u",
+        "mac": "alt+shift+u"
       },
       {
         "command": "turboConsoleLog.deleteAllLogMessages",
-        "key": "Ctrl+Alt+d",
-        "mac": "Ctrl+Alt+d"
+        "key": "alt+shift+d",
+        "mac": "alt+shift+d"
       }
     ]
   },

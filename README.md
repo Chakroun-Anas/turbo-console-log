@@ -14,36 +14,35 @@ Two steps:
 
 - Selecting the variable which is the subject of the debugging
 
-- Pressing Ctrl + Alt + l
+- Pressing ctrl + alt + l
 
 The log message will be inserted in the next line relative to the selected variable like this:
 
-console.log('TCL: SelectedVariableEnclosingClassName -> SelectedVariableEnclosingFunctionName -> SelectedVariable', SelectedVariable)
-
-The default prefix of the log message is "TCL: ", you can change it as you like by editing the logMessagePrefix is settings.json (An empty prefix
-will resolve to the default one).
+console.log("SelectedVariableEnclosingClassName -> SelectedVariableEnclosingFunctionName -> SelectedVariable", SelectedVariable)
 
 ![alt text](https://image.ibb.co/dysw7p/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
 
 The log message can be wrapped by changing the value of wrapLogMessage to true in settings.json
 
+If you want the log message to end with a semicolon all you need to do is to set addSemicolonInTheEnd to true in settings.json.
+
 ![alt text](https://image.ibb.co/h9yfYU/wrap_log_message.gif "Wrapping The log message")
 
 II) Comment all log messages, inserted by the extension, from the current document
 
-All it takes to comment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + q
+All it takes to comment all log messages, inserted by the extension, from the current document is to press alt + shift + c
 
 ![alt text](https://image.ibb.co/eVwTL9/comment_log_messages.gif "Comment all log messages, inserted by the extension, from the current file")
 
 III) Uncomment all log messages, inserted by the extension, from the current document
 
-All it takes to uncomment all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + u
+All it takes to uncomment all log messages, inserted by the extension, from the current document is to press alt + shift + u
 
 ![alt text](https://image.ibb.co/cp9q09/uncomment_log_messages.gif "Uncomment all log messages, inserted by the extension, from the current file")
 
 IV) Delete all log messages, inserted by the extension, from the current document
 
-All it takes to delete all log messages, inserted by the extension, from the current document is to press Ctrl + Alt + d
+All it takes to delete all log messages, inserted by the extension, from the current document is to press alt + shift + d
 
 ![alt text](https://image.ibb.co/jv9UtU/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
 
