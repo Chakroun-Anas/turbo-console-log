@@ -14,14 +14,15 @@ const lineCodeProcessing = require('./line-code-processing')
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, tabSize) {
+function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, addSemicolonInTheEnd, tabSize) {
   const classThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'function')
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
-  const debuggingMsg = `console.log('\u200b${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}', ${selectedVar});`
+  const semicolon = addSemicolonInTheEnd  ? ';' : '';
+  const debuggingMsg = `console.log("\u200b${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}", ${selectedVar})${semicolon}`
   if(wrapLogMessage) {
-    // 16 represents the length of console.log('');
-    const wrappingMsg = `console.log('\u200b${'-'.repeat(debuggingMsg.length - 16)}');`
+    // 16 represents the length of console.log("");
+    const wrappingMsg = `console.log("\u200b${"-".repeat(debuggingMsg.length - 16)}")${semicolon}`
     return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
   }
   return `${spacesBeforeMsg}${debuggingMsg}\n`
@@ -104,7 +105,10 @@ function enclosingBlockName (document, lineOfSelectedVar, blockType) {
       case 'function':
         if (lineCodeProcessing.checkIfNamedFunction(currentLineText) && !lineCodeProcessing.checkIfJSBuiltInStatement(currentLineText)) {
           if (lineOfSelectedVar >= currentLineNum && lineOfSelectedVar < blockClosingBraceLineNum(document, currentLineNum)) {
-            return `${lineCodeProcessing.functionName(currentLineText)} -> `
+            if (lineCodeProcessing.functionName(currentLineText).length !== 0) {
+              return `${lineCodeProcessing.functionName(currentLineText)} -> `
+            }
+            return '';
           }
         }
         break
