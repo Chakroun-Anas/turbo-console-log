@@ -32,6 +32,11 @@
           "type": "boolean",
           "default": false,
           "description": "Whether to add or not a semicolon in the end of the log message."
+        },
+        "useSingleQuotes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to use single quotes to wrap logged strings."
         }
       }
     },

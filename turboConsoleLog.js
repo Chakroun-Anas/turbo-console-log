@@ -17,8 +17,9 @@ function activate (context) {
       editor.edit(editBuilder => {
         const wrapLogMessage   = vscode.workspace.getConfiguration().wrapLogMessage || false;
         const addSemicolonInTheEnd   = vscode.workspace.getConfiguration().addSemicolonInTheEnd || false;
+        const useSingleQuotes   = vscode.workspace.getConfiguration().useSingleQuotes || false;
         editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), 
-              logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage, addSemicolonInTheEnd, tabSize))
+              logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage, addSemicolonInTheEnd, tabSize, useSingleQuotes))
       })
     }
   })

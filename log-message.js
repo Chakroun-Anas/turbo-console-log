@@ -10,19 +10,21 @@ const lineCodeProcessing = require('./line-code-processing')
  * @param {number} lineOfSelectedVar
  * @param {boolean} wrapLogMessage
  * @param {number} tabSize
+ * @param {number} useSingleQuotes
  * @returns {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, addSemicolonInTheEnd, tabSize) {
+function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, addSemicolonInTheEnd, tabSize, useSingleQuotes) {
   const classThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'function')
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd  ? ';' : '';
+  const delimiter = useSingleQuotes ? "'" : '"'; 
   const debuggingMsg = `console.log("\u200b${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}", ${selectedVar})${semicolon}`
   if(wrapLogMessage) {
     // 16 represents the length of console.log("");
-    const wrappingMsg = `console.log("\u200b${"-".repeat(debuggingMsg.length - 16)}")${semicolon}`
+    const wrappingMsg = `console.log(${delimiter}\u200b${"-".repeat(debuggingMsg.length - 16)}${delimiter})${semicolon}`
     return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
   }
   return `${spacesBeforeMsg}${debuggingMsg}\n`
