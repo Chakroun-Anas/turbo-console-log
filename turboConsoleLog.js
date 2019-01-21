@@ -16,9 +16,10 @@ function activate (context) {
     if (!(lineOfSelectedVar === (document.lineCount - 1)) && selectedVar.trim().length !== 0) {
       editor.edit(editBuilder => {
         const wrapLogMessage   = vscode.workspace.getConfiguration().wrapLogMessage || false;
+        const useDoubleQuote   = vscode.workspace.getConfiguration().useDoubleQuote || false;
         const addSemicolonInTheEnd   = vscode.workspace.getConfiguration().addSemicolonInTheEnd || false;
         editBuilder.insert(new vscode.Position(lineOfSelectedVar + 1, 0), 
-              logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage, addSemicolonInTheEnd, tabSize))
+              logMessage.message(document, selectedVar, lineOfSelectedVar, wrapLogMessage, useDoubleQuote, addSemicolonInTheEnd, tabSize))
       })
     }
   })
