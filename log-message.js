@@ -9,20 +9,22 @@ const lineCodeProcessing = require('./line-code-processing')
  * @param {string} selectedVar
  * @param {number} lineOfSelectedVar
  * @param {boolean} wrapLogMessage
+ * @param {boolean} useDoubleQuote
  * @param {number} tabSize
  * @returns {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, addSemicolonInTheEnd, tabSize) {
+function message (document, selectedVar, lineOfSelectedVar, wrapLogMessage, useDoubleQuote, addSemicolonInTheEnd, tabSize) {
   const classThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'class')
   const funcThatEncloseTheVar = enclosingBlockName(document, lineOfSelectedVar, 'function')
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd  ? ';' : '';
-  const debuggingMsg = `console.log("\u200b${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}", ${selectedVar})${semicolon}`
+  const quote = useDoubleQuote ? `"` : `'`;
+  const debuggingMsg = `console.log(${quote}\u200b${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`
   if(wrapLogMessage) {
     // 16 represents the length of console.log("");
-    const wrappingMsg = `console.log("\u200b${"-".repeat(debuggingMsg.length - 16)}")${semicolon}`
+    const wrappingMsg = `console.log(${quote}\u200b${"-".repeat(debuggingMsg.length - 16)}${quote})${semicolon}`
     return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
   }
   return `${spacesBeforeMsg}${debuggingMsg}\n`

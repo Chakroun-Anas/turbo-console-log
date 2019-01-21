@@ -22,9 +22,15 @@ console.log("SelectedVariableEnclosingClassName -> SelectedVariableEnclosingFunc
 
 ![alt text](https://image.ibb.co/dysw7p/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
 
-The log message can be wrapped by changing the value of wrapLogMessage to true in settings.json
+Properties:
 
-If you want the log message to end with a semicolon all you need to do is to set addSemicolonInTheEnd to true in settings.json.
+- wrapLogMessage (boolean): Whether to wrap the log message or not.
+
+- addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
+
+- useDoubleQuote (boolean): Whether to use double quotes or single quotes.
+
+A wrapped log message :
 
 ![alt text](https://image.ibb.co/h9yfYU/wrap_log_message.gif "Wrapping The log message")
 
