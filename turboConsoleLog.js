@@ -15,8 +15,27 @@ function activate(context) {
     const tabSize = editor.options.tabSize;
     const document = editor.document;
     const selection = editor.selection;
-    const selectedVar = document.getText(selection);
+    let selectedVar = document.getText(selection);
     const lineOfSelectedVar = selection.active.line;
+
+    // If selected range is empty, then select whole word
+    if (!selectedVar) {
+      const wordRangeAtSelection = document.getWordRangeAtPosition(
+        selection.active
+      );
+
+      if (wordRangeAtSelection) {
+        const selectedWordRange = new vscode.Selection(
+          wordRangeAtSelection.start.line,
+          wordRangeAtSelection.start.character,
+          wordRangeAtSelection.end.line,
+          wordRangeAtSelection.end.character
+        );
+        editor.selection = selectedWordRange;
+        selectedVar = document.getText(selectedWordRange);
+      }
+    }
+
     // Check if the selection line is not the last one in the document and the selected variable is not empty
     if (
       !(lineOfSelectedVar === document.lineCount - 1) &&
