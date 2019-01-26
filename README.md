@@ -26,6 +26,8 @@ Properties:
 
 - wrapLogMessage (boolean): Whether to wrap the log message or not.
 
+- logMessagePrefix (string): The prefix of the log message, default one is TCL.
+
 - addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
 
 - useDoubleQuote (boolean): Whether to use double quotes or single quotes.

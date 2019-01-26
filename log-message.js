@@ -9,6 +9,7 @@ const lineCodeProcessing = require("./line-code-processing");
  * @param {string} selectedVar
  * @param {number} lineOfSelectedVar
  * @param {boolean} wrapLogMessage
+ * @param {string} logMessagePrefix
  * @param {boolean} useDoubleQuote
  * @param {boolean} addSemicolonInTheEnd
  * @param {number} tabSize
@@ -21,6 +22,7 @@ function message(
   selectedVar,
   lineOfSelectedVar,
   wrapLogMessage,
+  logMessagePrefix,
   useDoubleQuote,
   addSemicolonInTheEnd,
   tabSize
@@ -38,10 +40,10 @@ function message(
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
   const quote = useDoubleQuote ? `"` : `'`;
-  const debuggingMsg = `console.log(${quote}\u200b${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
-    const wrappingMsg = `console.log(${quote}\u200b${"-".repeat(
+    const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
       debuggingMsg.length - 16
     )}${quote})${semicolon}`;
     return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`;
@@ -195,17 +197,18 @@ function blockClosingBraceLineNum(document, lineNum) {
  * @function
  * @param {TextDocument} document
  * @param {number} tabSize
+ * @param {string} logMessagePrefix
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @return {Range[]}
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#Range}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.2
  */
-function detectAll(document, tabSize) {
+function detectAll(document, tabSize, logMessagePrefix) {
   const documentNbrOfLines = document.lineCount;
   const logMessages = [];
   for (let i = 0; i < documentNbrOfLines; i++) {
-    const turboConsoleLogMessage = new RegExp(`('|")\u200b.*`);
+    const turboConsoleLogMessage = new RegExp(`('|")${logMessagePrefix}.*`);
     if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
       const logMessageLines = { spaces: 0, lines: [] };
       for (let j = i; j >= 0; j--) {
