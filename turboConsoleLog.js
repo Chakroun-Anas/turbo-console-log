@@ -25,10 +25,9 @@ function activate(context) {
       editor.edit(editBuilder => {
         const wrapLogMessage =
           vscode.workspace.getConfiguration().wrapLogMessage || false;
-        const logMessagePrefix =
-          vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
-        const useDoubleQuote =
-          vscode.workspace.getConfiguration().useDoubleQuote || false;
+        const logMessagePrefix = vscode.workspace.getConfiguration()
+          .logMessagePrefix;
+        const quote = vscode.workspace.getConfiguration().quote;
         const addSemicolonInTheEnd =
           vscode.workspace.getConfiguration().addSemicolonInTheEnd || false;
         editBuilder.insert(
@@ -39,7 +38,7 @@ function activate(context) {
             lineOfSelectedVar,
             wrapLogMessage,
             logMessagePrefix,
-            useDoubleQuote,
+            quote,
             addSemicolonInTheEnd,
             tabSize
           )

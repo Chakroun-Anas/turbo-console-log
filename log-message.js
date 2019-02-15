@@ -10,7 +10,7 @@ const lineCodeProcessing = require("./line-code-processing");
  * @param {number} lineOfSelectedVar
  * @param {boolean} wrapLogMessage
  * @param {string} logMessagePrefix
- * @param {boolean} useDoubleQuote
+ * @param {string} quote
  * @param {boolean} addSemicolonInTheEnd
  * @param {number} tabSize
  * @return {string}
@@ -23,7 +23,7 @@ function message(
   lineOfSelectedVar,
   wrapLogMessage,
   logMessagePrefix,
-  useDoubleQuote,
+  quote,
   addSemicolonInTheEnd,
   tabSize
 ) {
@@ -39,7 +39,6 @@ function message(
   );
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const quote = useDoubleQuote ? `"` : `'`;
   const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");

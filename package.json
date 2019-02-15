@@ -38,10 +38,11 @@
           "default": false,
           "description": "Whether to add or not a semicolon in the end of the log message."
         },
-        "useDoubleQuote": {
-          "type": "boolean",
-          "default": false,
-          "description": "Whether to wrap the log message with double quote or not (single quote)."
+        "quote": {
+          "type": "string",
+          "enum": ["\"", "'", "`"],
+          "default": "\"",
+          "description": "Double quotes, single quotes or backtick"
         }
       }
     },

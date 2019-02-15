@@ -30,7 +30,7 @@ Properties:
 
 - addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
 
-- useDoubleQuote (boolean): Whether to use double quotes or single quotes.
+- quote (enum): Double quotes (""), single quotes ('') or backtick(``). 
 
 A wrapped log message :
 
