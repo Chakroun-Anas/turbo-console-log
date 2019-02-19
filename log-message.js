@@ -39,7 +39,13 @@ function message(
   );
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+  let turboLogIdentifier = '';
+  if (logMessagePrefix.trim() === "" ) {
+    turboLogIdentifier = `${spacesBeforeMsg}// Turbo console logs`;
+  } else {
+    logMessagePrefix +=': ';
+  }
+  const debuggingMsg = `console.log(${quote}${logMessagePrefix}${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}${turboLogIdentifier}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
     const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
@@ -206,8 +212,10 @@ function blockClosingBraceLineNum(document, lineNum) {
 function detectAll(document, tabSize, logMessagePrefix) {
   const documentNbrOfLines = document.lineCount;
   const logMessages = [];
+  const turboLogIdentifier = (logMessagePrefix.trim() === "") ? ` Turbo console logs`
+  : `('|")${logMessagePrefix}.*`;
+  const turboConsoleLogMessage = new RegExp(turboLogIdentifier);
   for (let i = 0; i < documentNbrOfLines; i++) {
-    const turboConsoleLogMessage = new RegExp(`('|")${logMessagePrefix}.*`);
     if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
       const logMessageLines = { spaces: 0, lines: [] };
       for (let j = i; j >= 0; j--) {

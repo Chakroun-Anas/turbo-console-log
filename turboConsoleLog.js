@@ -56,7 +56,7 @@ function activate(context) {
       const tabSize = editor.options.tabSize;
       const document = editor.document;
       const logMessagePrefix =
-        vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
+        vscode.workspace.getConfiguration().logMessagePrefix;
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
@@ -86,7 +86,7 @@ function activate(context) {
       const tabSize = editor.options.tabSize;
       const document = editor.document;
       const logMessagePrefix =
-        vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
+        vscode.workspace.getConfiguration().logMessagePrefix;
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
@@ -118,7 +118,7 @@ function activate(context) {
       const tabSize = editor.options.tabSize;
       const document = editor.document;
       const logMessagePrefix =
-        vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
+        vscode.workspace.getConfiguration().logMessagePrefix;
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
