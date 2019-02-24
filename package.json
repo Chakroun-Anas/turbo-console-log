@@ -43,6 +43,12 @@
           "enum": ["\"", "'", "`"],
           "default": "\"",
           "description": "Double quotes, single quotes or backtick"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["log", "debug"],
+          "default": "log",
+          "description": "To change the console.log to console.debug"
         }
       }
     },

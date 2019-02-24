@@ -30,6 +30,7 @@ function activate(context) {
         const quote = vscode.workspace.getConfiguration().quote;
         const addSemicolonInTheEnd =
           vscode.workspace.getConfiguration().addSemicolonInTheEnd || false;
+        const consoleType = vscode.workspace.getConfiguration().type;
         editBuilder.insert(
           new vscode.Position(lineOfSelectedVar + 1, 0),
           logMessage.message(
@@ -40,7 +41,8 @@ function activate(context) {
             logMessagePrefix,
             quote,
             addSemicolonInTheEnd,
-            tabSize
+            tabSize,
+            consoleType
           )
         );
       });
@@ -57,15 +59,17 @@ function activate(context) {
       const document = editor.document;
       const logMessagePrefix =
         vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
+      const consoleType = vscode.workspace.getConfiguration().type;
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
-        logMessagePrefix
+        logMessagePrefix,
+        consoleType
       );
       editor.edit(editBuilder => {
         logMessages.forEach(({ spaces, lines }) => {
           lines.forEach(({ range }) => {
-            editBuilder.delete(range);
+			      editBuilder.delete(range);
             editBuilder.insert(
               new vscode.Position(range.start.line, 0),
               `${spaces}// ${document.getText(range).trim()}\n`
@@ -87,10 +91,12 @@ function activate(context) {
       const document = editor.document;
       const logMessagePrefix =
         vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
+      const consoleType = vscode.workspace.getConfiguration().type;
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
-        logMessagePrefix
+        logMessagePrefix,
+        consoleType
       );
       editor.edit(editBuilder => {
         logMessages.forEach(({ spaces, lines }) => {
@@ -119,10 +125,12 @@ function activate(context) {
       const document = editor.document;
       const logMessagePrefix =
         vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
+      const consoleType = vscode.workspace.getConfiguration().type;
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
-        logMessagePrefix
+        logMessagePrefix,
+        consoleType
       );
       editor.edit(editBuilder => {
         logMessages.forEach(({ lines }) => {

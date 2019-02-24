@@ -25,7 +25,8 @@ function message(
   logMessagePrefix,
   quote,
   addSemicolonInTheEnd,
-  tabSize
+  tabSize,
+  consoleType
 ) {
   const classThatEncloseTheVar = enclosingBlockName(
     document,
@@ -39,10 +40,10 @@ function message(
   );
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+  const debuggingMsg = `console.${consoleType}(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
-    const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
+    const wrappingMsg = `console.${consoleType}(${quote}${logMessagePrefix}: ${"-".repeat(
       debuggingMsg.length - 16
     )}${quote})${semicolon}`;
     return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`;
@@ -203,7 +204,7 @@ function blockClosingBraceLineNum(document, lineNum) {
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.2
  */
-function detectAll(document, tabSize, logMessagePrefix) {
+function detectAll(document, tabSize, logMessagePrefix, consoleType) {
   const documentNbrOfLines = document.lineCount;
   const logMessages = [];
   for (let i = 0; i < documentNbrOfLines; i++) {
@@ -213,7 +214,8 @@ function detectAll(document, tabSize, logMessagePrefix) {
       for (let j = i; j >= 0; j--) {
         let numberOfOpenParenthesis = 0;
         let numberOfCloseParenthesis = 0;
-        if (/console\.log/.test(document.lineAt(j).text)) {
+        const pattern = new RegExp(`console.${consoleType}`);
+        if (pattern.test(document.lineAt(j).text)) {
           logMessageLines.spaces = spaces(document, j, tabSize);
           for (let k = j; k <= documentNbrOfLines; k++) {
             logMessageLines.lines.push({
