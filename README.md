@@ -2,7 +2,7 @@
 
 ---
 
-This extension make debugging much easier by automating the operation of writing meaningful log message.
+This extension makes debugging much easier by automating the operation of writing meaningful log messages.
 
 ## Features
 
@@ -12,9 +12,9 @@ I) Insert meaningful log message automatically
 
 Two steps:
 
-- Selecting the variable which is the subject of the debugging
+- Select the variable which is the subject of the debugging
 
-- Pressing ctrl + alt + l
+- Press ctrl + alt + l
 
 The log message will be inserted in the next line relative to the selected variable like this:
 
