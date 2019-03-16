@@ -1,5 +1,6 @@
 const vscode = require("vscode");
 const logMessage = require("./log-message");
+const autoSelectVariable = require("./line-code-processing").autoSelectVariable;
 
 /**
  * Activation method
@@ -14,14 +15,26 @@ function activate(context) {
     }
     const tabSize = editor.options.tabSize;
     const document = editor.document;
-    const selection = editor.selection;
-    const selectedVar = document.getText(selection);
+    let selection = editor.selection;
+    let selectedVar = document.getText(selection);
     const lineOfSelectedVar = selection.active.line;
-    // Check if the selection line is not the last one in the document and the selected variable is not empty
-    if (
-      !(lineOfSelectedVar === document.lineCount - 1) &&
-      selectedVar.trim().length !== 0
-    ) {
+    // select variable in current cursor.
+    if (selectedVar.trim().length === 0) {
+      const currentLine = document.lineAt(lineOfSelectedVar);
+      const autoSelectVar = autoSelectVariable(
+        currentLine.text,
+        selection.start.character
+      );
+      if (autoSelectVar && autoSelectVar.text) {
+        selectedVar = autoSelectVar.text;
+        selection = new vscode.Selection(
+          new vscode.Position(currentLine.lineNumber, autoSelectVar.begin),
+          new vscode.Position(autoSelectVar.end)
+        );
+      }
+    }
+    // Check if the selection line is not the last one in the document
+    if (!(lineOfSelectedVar === document.lineCount - 1)) {
       editor.edit(editBuilder => {
         const wrapLogMessage =
           vscode.workspace.getConfiguration().wrapLogMessage || false;

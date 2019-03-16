@@ -101,7 +101,49 @@ function functionName(lineCode) {
   }
   return "";
 }
+/**
+ * select current variable for logger
+ * @function
+ * @param {string} lineText line text
+ * @param {number} currentPos current cursor position
+ * @return {{begin:number,end:number,text:string}}
+ */
+function autoSelectVariable(lineText, currentPos) {
+  const allowWordReg = /[\w\.\[\]]/;
+  const bracketReg = /[\(\)]/;
+  const result = {
+    begin: 0,
+    end: 0,
+    text: ""
+  };
+  for (let i = currentPos; i >= 0; i--) {
+    const char = lineText[i];
+    if (!allowWordReg.test(char)) {
+      result.begin = i + 1;
+      break;
+    }
+  }
+  let lastDotPos = 0;
+  for (let j = currentPos; j <= lineText.length; j++) {
+    const char = lineText[j];
+    if (char === ".") lastDotPos = j;
+    if (bracketReg.test(char) && lastDotPos !== 0) {
+      result.end = lastDotPos;
+      break;
+    }
+    if (!allowWordReg.test(char)) {
+      if (!allowWordReg.test(char) || j == lineText.length) {
+        result.end = j;
+        break;
+      }
+    }
+  }
+  if (result.begin > result.end) return;
+  result.text = lineText.substring(result.begin, result.end);
+  return result;
+}
 
+module.exports.autoSelectVariable = autoSelectVariable;
 module.exports.checkClassDeclaration = checkClassDeclaration;
 module.exports.className = className;
 module.exports.checkIfNamedFunction = checkIfNamedFunction;
