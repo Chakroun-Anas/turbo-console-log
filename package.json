@@ -23,24 +23,28 @@
       "type": "object",
       "title": "Turbo Console Log Configuration",
       "properties": {
-        "wrapLogMessage": {
+        "turboConsoleLog.wrapLogMessage": {
           "type": "boolean",
           "default": false,
           "description": "Determine if the log message should be wrapped or not."
         },
-        "logMessagePrefix": {
+        "turboConsoleLog.logMessagePrefix": {
           "type": "string",
           "default": "TCL",
           "description": "The prefix of the log message."
         },
-        "addSemicolonInTheEnd": {
+        "turboConsoleLog.addSemicolonInTheEnd": {
           "type": "boolean",
           "default": false,
           "description": "Whether to add or not a semicolon in the end of the log message."
         },
-        "quote": {
+        "turboConsoleLog.quote": {
           "type": "string",
-          "enum": ["\"", "'", "`"],
+          "enum": [
+            "\"",
+            "'",
+            "`"
+          ],
           "default": "\"",
           "description": "Double quotes, single quotes or backtick"
         }
