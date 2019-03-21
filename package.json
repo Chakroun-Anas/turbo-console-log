@@ -93,12 +93,10 @@
   },
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "node ./node_modules/vscode/bin/test"
+    "test": "jest --config jest.config.json"
   },
   "devDependencies": {
-    "@types/mocha": "^2.2.42",
     "@types/node": "^7.0.43",
-    "chai": "^4.1.2",
     "eslint": "^5.12.1",
     "eslint-config-google": "^0.11.0",
     "eslint-config-prettier": "^3.6.0",
@@ -108,8 +106,8 @@
     "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
+    "jest": "^24.5.0",
     "jsdoc": "^3.5.5",
-    "mocha": "^5.0.0",
     "prettier": "^1.16.0",
     "typescript": "^2.6.1",
     "vscode": "^1.1.6"

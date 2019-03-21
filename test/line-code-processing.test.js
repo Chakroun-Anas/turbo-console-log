@@ -1,10 +1,5 @@
 const lineCodeProcessing = require("../line-code-processing");
 
-const mocha = require("mocha");
-const describe = mocha.describe;
-const chai = require("chai");
-const expect = chai.expect;
-
 describe("Source Code Processing", () => {
   const classesDeclarations = [
     "class HelloWorld{",
@@ -41,23 +36,24 @@ describe("Source Code Processing", () => {
     "if (a > 0)  {",
     "switch (n) {",
     "for(let i=0; i < 10; i++) {",
-    "while(true) {"
+    "while(true) {",
+    "catch(error)"
   ];
   it("Check if the line code represents a class declaration", () => {
     classesDeclarations.forEach(classDeclaration => {
-      expect(
-        lineCodeProcessing.checkClassDeclaration(classDeclaration)
-      ).to.equal(true);
+      expect(lineCodeProcessing.checkClassDeclaration(classDeclaration)).toBe(
+        true
+      );
     });
     cssClassesDeclarations.forEach(cssClassDeclaration => {
       expect(
         lineCodeProcessing.checkClassDeclaration(cssClassDeclaration)
-      ).to.equal(false);
+      ).toBe(false);
     });
   }),
     it("Get class name from a line code representing a class declaration", () => {
       classesDeclarations.forEach(classDeclaration => {
-        expect(lineCodeProcessing.className(classDeclaration)).to.equal(
+        expect(lineCodeProcessing.className(classDeclaration)).toBe(
           "HelloWorld"
         );
       });
@@ -65,28 +61,28 @@ describe("Source Code Processing", () => {
     it("Check if the code line represents a named function declaration", () => {
       namedFunctions.forEach(namedFunction => {
         // console.log('Function Declaration: ', namedFunction);
-        expect(lineCodeProcessing.checkIfNamedFunction(namedFunction)).to.equal(
+        expect(lineCodeProcessing.checkIfNamedFunction(namedFunction)).toBe(
           true
         );
       });
       nonNamedFunctions.forEach(nonNamedFunction => {
         // console.log('Non Named Function: ', nonNamedFunction);
-        expect(
-          lineCodeProcessing.checkIfNamedFunction(nonNamedFunction)
-        ).to.equal(false);
+        expect(lineCodeProcessing.checkIfNamedFunction(nonNamedFunction)).toBe(
+          false
+        );
       });
     });
-  it("Check if the code line represents an if, switch, while or for statement", () => {
+  it("Check if the code line represents an if, switch, while, for or catch statement", () => {
     jSBuiltInStatements.forEach(jSBuiltInStatement => {
       // console.log('If Or Switch Statement: ', ifOrSwitchStatement);
       expect(
         lineCodeProcessing.checkIfJSBuiltInStatement(jSBuiltInStatement)
-      ).to.equal(true);
+      ).toBe(true);
     });
   });
   it("Get function name from a line code representing a function declaration", () => {
     namedFunctions.forEach(namedFunction => {
-      expect(lineCodeProcessing.functionName(namedFunction)).to.equal(
+      expect(lineCodeProcessing.functionName(namedFunction)).toBe(
         "functionName"
       );
     });
