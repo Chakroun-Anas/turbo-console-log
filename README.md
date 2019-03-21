@@ -14,7 +14,7 @@ Two steps:
 
 - Selecting the variable which is the subject of the debugging
 
-- Pressing ctrl + alt + l
+- Pressing ctrl + alt + L
 
 The log message will be inserted in the next line relative to the selected variable like this:
 
