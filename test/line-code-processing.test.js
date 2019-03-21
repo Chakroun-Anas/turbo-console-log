@@ -37,7 +37,7 @@ describe("Source Code Processing", () => {
     "switch (n) {",
     "for(let i=0; i < 10; i++) {",
     "while(true) {",
-    "catch(error)"
+    "catch(error) {"
   ];
   it("Check if the line code represents a class declaration", () => {
     classesDeclarations.forEach(classDeclaration => {
