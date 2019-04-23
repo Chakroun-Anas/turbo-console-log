@@ -14,7 +14,7 @@ Two steps:
 
 - Selecting the variable which is the subject of the debugging
 
-- Pressing ctrl + alt + l
+- Pressing ctrl + alt + L
 
 The log message will be inserted in the next line relative to the selected variable like this:
 
@@ -24,13 +24,13 @@ console.log("SelectedVariableEnclosingClassName -> SelectedVariableEnclosingFunc
 
 Properties:
 
-- wrapLogMessage (boolean): Whether to wrap the log message or not.
+- turboConsoleLog.wrapLogMessage (boolean): Whether to wrap the log message or not.
 
-- logMessagePrefix (string): The prefix of the log message, default one is TCL.
+- turboConsoleLog.logMessagePrefix (string): The prefix of the log message, default one is TCL.
 
-- addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
+- turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
 
-- quote (enum): Double quotes (""), single quotes ('') or backtick(``). 
+- turboConsoleLog.quote (enum): Double quotes (""), single quotes ('') or backtick(``).
 
 A wrapped log message :
 

@@ -36,13 +36,12 @@ function activate(context) {
     // Check if the selection line is not the last one in the document
     if (!(lineOfSelectedVar === document.lineCount - 1)) {
       editor.edit(editBuilder => {
-        const wrapLogMessage =
-          vscode.workspace.getConfiguration().wrapLogMessage || false;
-        const logMessagePrefix = vscode.workspace.getConfiguration()
-          .logMessagePrefix;
-        const quote = vscode.workspace.getConfiguration().quote;
-        const addSemicolonInTheEnd =
-          vscode.workspace.getConfiguration().addSemicolonInTheEnd || false;
+        const config = vscode.workspace.getConfiguration("turboConsoleLog");
+        const wrapLogMessage = config.wrapLogMessage || false;
+        const logMessagePrefix = config.logMessagePrefix;
+        const quote = config.quote;
+        const addSemicolonInTheEnd = config.addSemicolonInTheEnd || false;
+
         editBuilder.insert(
           new vscode.Position(lineOfSelectedVar + 1, 0),
           logMessage.message(
@@ -69,7 +68,7 @@ function activate(context) {
       const tabSize = editor.options.tabSize;
       const document = editor.document;
       const logMessagePrefix =
-        vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
+        vscode.workspace.getConfiguration("turboConsoleLog").logMessagePrefix || "TCL";
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
@@ -99,7 +98,7 @@ function activate(context) {
       const tabSize = editor.options.tabSize;
       const document = editor.document;
       const logMessagePrefix =
-        vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
+        vscode.workspace.getConfiguration("turboConsoleLog").logMessagePrefix || "TCL";
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
@@ -131,7 +130,7 @@ function activate(context) {
       const tabSize = editor.options.tabSize;
       const document = editor.document;
       const logMessagePrefix =
-        vscode.workspace.getConfiguration().logMessagePrefix || "TCL";
+        vscode.workspace.getConfiguration("turboConsoleLog").logMessagePrefix || "TCL";
       const logMessages = logMessage.detectAll(
         document,
         tabSize,

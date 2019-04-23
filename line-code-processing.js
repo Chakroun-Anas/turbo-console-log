@@ -57,7 +57,7 @@ function checkIfNamedFunction(lineCode) {
 }
 
 /**
- * Return a boolean indicating if the line code represents an if, switch, while or for statement
+ * Return a boolean indicating if the line code represents an if, switch, while, for or catch statement
  * @function
  * @param {string} lineCode
  * @return {boolean}
@@ -65,7 +65,7 @@ function checkIfNamedFunction(lineCode) {
  * @since 1.0
  */
 function checkIfJSBuiltInStatement(lineCode) {
-  const jSBuiltInStatement = /(if|switch|while|for)(\s*)\(.*\)(\s*){/;
+  const jSBuiltInStatement = /(if|switch|while|for|catch)(\s*)\(.*\)(\s*){/;
   return jSBuiltInStatement.test(lineCode);
 }
 
