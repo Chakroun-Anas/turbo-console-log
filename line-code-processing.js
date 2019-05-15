@@ -40,7 +40,7 @@ function className(lineCode) {
  * @since 1.0
  */
 function checkIfNamedFunction(lineCode) {
-  const namedFunctionDeclarationRegex = /[a-zA-Z]+(\s*)\(.*\)(\s*){/;
+  const namedFunctionDeclarationRegex = /[a-zA-Z]+(\s*)\(.*\)(.*){/;
   const nonNamedFunctionDeclaration = /(function)(\s*)\(.*\)(\s*){/;
   const namedFunctionExpressionRegex = /[a-zA-Z]+(\s*)=(\s*)(function)?(\s*)[a-zA-Z]*(\s*)\(.*\)(\s*)(=>)?(\s*){/;
   const isNamedFunctionDeclaration = namedFunctionDeclarationRegex.test(
@@ -95,7 +95,7 @@ function functionName(lineCode) {
             .replace(/export |module.exports |const |var |let |=|(\s*)/g, "");
         }
       } else {
-        return textInTheLeftOfTheParams.replace(/async |(\s*)/g, "");
+        return textInTheLeftOfTheParams.replace(/async|public|private|protected|static|export |(\s*)/g, "");
       }
     }
   }
