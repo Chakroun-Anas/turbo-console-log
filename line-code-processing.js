@@ -95,7 +95,7 @@ function functionName(lineCode) {
             .replace(/export |module.exports |const |var |let |=|(\s*)/g, "");
         }
       } else {
-        return textInTheLeftOfTheParams.replace(/async |(\s*)/g, "");
+        return textInTheLeftOfTheParams.replace(/async|public|private|protected|static|export |(\s*)/g, "");
       }
     }
   }
