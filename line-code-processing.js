@@ -39,8 +39,8 @@ function className(lineCode) {
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function checkIfNamedFunction(lineCode) {
-  const namedFunctionDeclarationRegex = /[a-zA-Z]+(\s*)\(.*\)(.*){/;
+function checkIfFunction(lineCode) {
+  const namedFunctionDeclarationRegex = /[a-zA-Z]+(\s*)\(.*\)(\s*){/;
   const nonNamedFunctionDeclaration = /(function)(\s*)\(.*\)(\s*){/;
   const namedFunctionExpressionRegex = /[a-zA-Z]+(\s*)=(\s*)(function)?(\s*)[a-zA-Z]*(\s*)\(.*\)(\s*)(=>)?(\s*){/;
   const isNamedFunctionDeclaration = namedFunctionDeclarationRegex.test(
@@ -104,6 +104,6 @@ function functionName(lineCode) {
 
 module.exports.checkClassDeclaration = checkClassDeclaration;
 module.exports.className = className;
-module.exports.checkIfNamedFunction = checkIfNamedFunction;
+module.exports.checkIfFunction = checkIfFunction;
 module.exports.checkIfJSBuiltInStatement = checkIfJSBuiltInStatement;
 module.exports.functionName = functionName;
