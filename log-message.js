@@ -62,53 +62,9 @@ function message(
  * @since 1.0
  */
 function spaces(document, line, tabSize) {
-  let selectionLineNbrOfSpaces = 0;
-  const selectionLineChars = document.lineAt(line).text.split("");
-  for (const char of selectionLineChars) {
-    if (char === " ") {
-      selectionLineNbrOfSpaces++;
-    } else if (char === "\t") {
-      selectionLineNbrOfSpaces += tabSize;
-    } else {
-      break;
-    }
-  }
-  if (/{/.test(document.lineAt(line).text)) {
-    let lineNextToSelectionLineNbrOfSpaces = 0;
-    const lineNextToSelectionLineChars = document
-      .lineAt(line + 1)
-      .text.split("");
-    for (const char of lineNextToSelectionLineChars) {
-      if (char === " ") {
-        lineNextToSelectionLineNbrOfSpaces++;
-      } else if (char === "\t") {
-        lineNextToSelectionLineNbrOfSpaces += tabSize;
-      } else {
-        break;
-      }
-    }
-    if (
-      selectionLineNbrOfSpaces % tabSize === 0 &&
-      lineNextToSelectionLineNbrOfSpaces % tabSize === 0
-    ) {
-      selectionLineNbrOfSpaces = selectionLineNbrOfSpaces / tabSize;
-      lineNextToSelectionLineNbrOfSpaces =
-        lineNextToSelectionLineNbrOfSpaces / tabSize;
-      return selectionLineNbrOfSpaces > lineNextToSelectionLineNbrOfSpaces
-        ? "\t".repeat(selectionLineNbrOfSpaces)
-        : "\t".repeat(lineNextToSelectionLineNbrOfSpaces);
-    } else {
-      return selectionLineNbrOfSpaces > lineNextToSelectionLineNbrOfSpaces
-        ? " ".repeat(selectionLineNbrOfSpaces)
-        : " ".repeat(lineNextToSelectionLineNbrOfSpaces);
-    }
-  } else {
-    if (selectionLineNbrOfSpaces % tabSize === 0) {
-      selectionLineNbrOfSpaces = selectionLineNbrOfSpaces / tabSize;
-      return "\t".repeat(selectionLineNbrOfSpaces);
-    }
-    return " ".repeat(selectionLineNbrOfSpaces);
-  }
+  return /{/.test(document.lineAt(line).text) 
+    ? " ".repeat(document.lineAt(line + 1).firstNonWhitespaceCharacterIndex) 
+    : " ".repeat(document.lineAt(line).firstNonWhitespaceCharacterIndex);
 }
 /**
  * Return the name of the enclosing block whether if it's a class or a function
