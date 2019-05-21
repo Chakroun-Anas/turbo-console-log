@@ -114,9 +114,23 @@ function logMessageLine(document, selectionLine) {
  * @since 1.0
  */
 function spaces(document, line, tabSize) {
-  return lineCodeProcessing.checkIfFunction(document.lineAt(line).text)
-    ? " ".repeat(document.lineAt(line + 1).firstNonWhitespaceCharacterIndex) 
-    : " ".repeat(document.lineAt(line).firstNonWhitespaceCharacterIndex);
+  const currentLine = document.lineAt(line);
+  if(lineCodeProcessing.checkIfFunction(currentLine.text)) {
+    const nextLine = document.lineAt(line + 1);
+    const nextLineTextChars = currentLine.text.split("");
+    if(nextLineTextChars[currentLine.firstNonWhitespaceCharacterIndex - 1] === "\t") {
+      return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex * tabSize);
+    } else {
+      return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex);
+    }
+  } else {
+    const currentLineTextChars = currentLine.text.split("");
+    if(currentLineTextChars[currentLine.firstNonWhitespaceCharacterIndex - 1] === "\t") {
+      return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex * tabSize);
+    } else {
+      return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
+    }
+  }
 }
 /**
  * Return the name of the enclosing block whether if it's a class or a function
