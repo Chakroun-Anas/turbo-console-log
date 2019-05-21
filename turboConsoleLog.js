@@ -30,7 +30,7 @@ function activate(context) {
         const addSemicolonInTheEnd = config.addSemicolonInTheEnd || false;
 
         editBuilder.insert(
-          new vscode.Position(lineOfSelectedVar + 1, 0),
+          new vscode.Position(logMessage.logMessageLine(document, lineOfSelectedVar), 0),
           logMessage.message(
             document,
             selectedVar,
