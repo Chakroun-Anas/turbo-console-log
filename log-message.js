@@ -54,49 +54,49 @@ function logMessageLine(document, selectionLine) {
   const currentLineText = document.lineAt(selectionLine).text;
   if(!lineCodeProcessing.checkIfFunction(currentLineText) && /{/.test(currentLineText)) {
     // Selected varibale is an object
-    let nbrOfOpenedBrackets = 1;
-    let nbrOfClosedBrackets = 0;
-    let currentLineNum = selectionLine;
+    let nbrOfOpenedBrackets = (currentLineText.match(/{/g) || []).length;
+    let nbrOfClosedBrackets = (currentLineText.match(/}/g) || []).length;
+    let currentLineNum = selectionLine + 1;
     while (currentLineNum < document.lineCount) {
       const currentLineText = document.lineAt(currentLineNum).text;
       if(/{/.test(currentLineText)) {
-        nbrOfOpenedBrackets+=1;
+        nbrOfOpenedBrackets+= (currentLineText.match(/{/g) || []).length;
       } else if(/}/.test(currentLineText)) {
-        nbrOfClosedBrackets+=1;
+        nbrOfClosedBrackets+= (currentLineText.match(/}/g) || []).length;
       }
       currentLineNum++;
       if(nbrOfOpenedBrackets === nbrOfClosedBrackets) break;
     }
-    return nbrOfClosedBrackets === nbrOfOpenedBrackets ? currentLineNum - 1 : selectionLine + 1;
+    return nbrOfClosedBrackets === nbrOfOpenedBrackets ? currentLineNum : selectionLine + 1;
   } else if(!lineCodeProcessing.checkIfFunction(currentLineText) && /\(/.test(currentLineText)) {
     // Selected variable get it's value from a function call
-    let nbrOfOpenedParenthesis = 1;
-    let nbrOfClosedParenthesis = 0;
-    let currentLineNum = selectionLine;
+    let nbrOfOpenedParenthesis = (currentLineText.match(/\(/g) || []).length;
+    let nbrOfClosedParenthesis = (currentLineText.match(/\)/g) || []).length;
+    let currentLineNum = selectionLine + 1;
     while (currentLineNum < document.lineCount) {
       const currentLineText = document.lineAt(currentLineNum).text;
-      if(/{/.test(currentLineText)) {
-        nbrOfOpenedParenthesis+=1;
-      } else if(/}/.test(currentLineText)) {
-        nbrOfClosedParenthesis+=1;
+      if(/\(/.test(currentLineText)) {
+        nbrOfOpenedParenthesis+=(currentLineText.match(/\(/g) || []).length;
+      } else if(/\)/.test(currentLineText)) {
+        nbrOfClosedParenthesis+=(currentLineText.match(/\)/g) || []).length;
       }
       currentLineNum++;
       if(nbrOfOpenedParenthesis === nbrOfClosedParenthesis) break;
     }
-    return nbrOfOpenedParenthesis === nbrOfClosedParenthesis ? currentLineNum - 1 : selectionLine + 1;
+    return nbrOfOpenedParenthesis === nbrOfClosedParenthesis ? currentLineNum: selectionLine + 1;
   } else if(/`/.test(currentLineText)){
     // Template string
     let currentLineNum = selectionLine + 1;
-    let closingBacktickFound = false;
+    let nbrOfBackticks = (currentLineText.match(/`/g) || []).length;
     while (currentLineNum < document.lineCount) {
       const currentLineText = document.lineAt(currentLineNum).text;
-      if(/`/.test(currentLineText)) {
-        closingBacktickFound = true;
+      nbrOfBackticks+=(currentLineText.match(/`/g) || []).length;
+      if(nbrOfBackticks%2 === 0) {
         break;
       }
       currentLineNum++;
     }
-    return closingBacktickFound ? currentLineNum + 1: selectionLine + 1;
+    return nbrOfBackticks %2 === 0 ? currentLineNum + 1: selectionLine + 1;
   } else {
     return selectionLine + 1;
   }
