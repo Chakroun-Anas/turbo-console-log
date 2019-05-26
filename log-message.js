@@ -37,7 +37,7 @@ function message(
     lineOfSelectedVar,
     "function"
   );
-  const spacesBeforeMsg = spaces(document, logMessageLine(document, lineOfSelectedVar) - 1, tabSize);
+  const spacesBeforeMsg = spaces(document, logMessageLine(document, lineOfSelectedVar, selectedVar) - 1, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
   const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
@@ -50,7 +50,7 @@ function message(
   return `${spacesBeforeMsg}${debuggingMsg}\n`;
 }
 
-function logMessageLine(document, selectionLine) {
+function logMessageLine(document, selectionLine, selectedVar) {
   const currentLineText = document.lineAt(selectionLine).text;
   if(lineCodeProcessing.checkObjectDeclaration(currentLineText)) {
     // Selected varibale is an object
@@ -67,6 +67,9 @@ function logMessageLine(document, selectionLine) {
     return nbrOfClosedBrackets === nbrOfOpenedBrackets ? currentLineNum : selectionLine + 1;
   } else if(lineCodeProcessing.checkFunctionCallDeclaration(currentLineText)) {
     // Selected variable get it's value from a function call
+    if((/\((\s*)$/).test(currentLineText.split(selectedVar)[0]) ||  (/,(\s*)$/).test(currentLineText.split(selectedVar)[0])) {
+      return selectionLine + 1;
+    }
     let nbrOfOpenedParenthesis = (currentLineText.match(/\(/g) || []).length;
     let nbrOfClosedParenthesis = (currentLineText.match(/\)/g) || []).length;
     let currentLineNum = selectionLine + 1;
