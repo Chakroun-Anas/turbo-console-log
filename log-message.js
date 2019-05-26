@@ -37,7 +37,7 @@ function message(
     lineOfSelectedVar,
     "function"
   );
-  const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
+  const spacesBeforeMsg = spaces(document, logMessageLine(document, lineOfSelectedVar) - 1, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
   const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
