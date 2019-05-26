@@ -11,6 +11,16 @@ function checkClassDeclaration(lineCode) {
   return classNameRegex.test(lineCode);
 }
 
+function checkObjectDeclaration(lineCode) {
+  const objectRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*){/;
+  return objectRejex.test(lineCode);
+}
+
+function checkFunctionCallDeclaration(lineCode) {
+  const functionCallDeclarationRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*)[a-zA-Z0-9]*\(/;
+  return functionCallDeclarationRejex.test(lineCode);
+}
+
 /**
  * Return the class name in case if the line code represents a class declaration
  * @function
@@ -103,6 +113,8 @@ function functionName(lineCode) {
 }
 
 module.exports.checkClassDeclaration = checkClassDeclaration;
+module.exports.checkObjectDeclaration = checkObjectDeclaration;
+module.exports.checkFunctionCallDeclaration = checkFunctionCallDeclaration
 module.exports.className = className;
 module.exports.checkIfFunction = checkIfFunction;
 module.exports.checkIfJSBuiltInStatement = checkIfJSBuiltInStatement;

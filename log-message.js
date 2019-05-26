@@ -52,7 +52,7 @@ function message(
 
 function logMessageLine(document, selectionLine) {
   const currentLineText = document.lineAt(selectionLine).text;
-  if(!lineCodeProcessing.checkIfFunction(currentLineText) && /{/.test(currentLineText)) {
+  if(lineCodeProcessing.checkObjectDeclaration(currentLineText)) {
     // Selected varibale is an object
     let nbrOfOpenedBrackets = (currentLineText.match(/{/g) || []).length;
     let nbrOfClosedBrackets = (currentLineText.match(/}/g) || []).length;
@@ -68,7 +68,7 @@ function logMessageLine(document, selectionLine) {
       if(nbrOfOpenedBrackets === nbrOfClosedBrackets) break;
     }
     return nbrOfClosedBrackets === nbrOfOpenedBrackets ? currentLineNum : selectionLine + 1;
-  } else if(!lineCodeProcessing.checkIfFunction(currentLineText) && /\(/.test(currentLineText)) {
+  } else if(lineCodeProcessing.checkFunctionCallDeclaration(currentLineText)) {
     // Selected variable get it's value from a function call
     let nbrOfOpenedParenthesis = (currentLineText.match(/\(/g) || []).length;
     let nbrOfClosedParenthesis = (currentLineText.match(/\)/g) || []).length;
@@ -115,16 +115,24 @@ function logMessageLine(document, selectionLine) {
  */
 function spaces(document, line, tabSize) {
   const currentLine = document.lineAt(line);
-  if(lineCodeProcessing.checkIfFunction(currentLine.text)) {
-    const nextLine = document.lineAt(line + 1);
-    const nextLineTextChars = currentLine.text.split("");
-    if(nextLineTextChars[currentLine.firstNonWhitespaceCharacterIndex - 1] === "\t") {
-      return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex * tabSize);
-    } else {
-      return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex);
+  const currentLineTextChars = currentLine.text.split("");
+  const nextLine = document.lineAt(line + 1);
+  const nextLineTextChars = nextLine.text.split("");
+  if(nextLineTextChars.filter(char => char !== " ").length !== 0) {
+    if(nextLine.firstNonWhitespaceCharacterIndex > currentLine.firstNonWhitespaceCharacterIndex) {
+      if(nextLineTextChars[nextLine.firstNonWhitespaceCharacterIndex - 1] === "\t") {
+        return " ".repeat(nextLineTextChars.firstNonWhitespaceCharacterIndex * tabSize);
+      } else {
+        return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex);
+      }
+    }  else {
+      if(currentLineTextChars[currentLine.firstNonWhitespaceCharacterIndex - 1] === "\t") {
+        return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex * tabSize);
+      } else {
+        return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
+      }
     }
   } else {
-    const currentLineTextChars = currentLine.text.split("");
     if(currentLineTextChars[currentLine.firstNonWhitespaceCharacterIndex - 1] === "\t") {
       return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex * tabSize);
     } else {
