@@ -17,7 +17,7 @@ function checkObjectDeclaration(lineCode) {
 }
 
 function checkFunctionCallDeclaration(lineCode) {
-  const functionCallDeclarationRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*)[a-zA-Z0-9]*\(/;
+  const functionCallDeclarationRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*\(.*/;
   return functionCallDeclarationRejex.test(lineCode);
 }
 
