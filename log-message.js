@@ -59,11 +59,8 @@ function logMessageLine(document, selectionLine) {
     let currentLineNum = selectionLine + 1;
     while (currentLineNum < document.lineCount) {
       const currentLineText = document.lineAt(currentLineNum).text;
-      if(/{/.test(currentLineText)) {
-        nbrOfOpenedBrackets+= (currentLineText.match(/{/g) || []).length;
-      } else if(/}/.test(currentLineText)) {
+      nbrOfOpenedBrackets+= (currentLineText.match(/{/g) || []).length;
         nbrOfClosedBrackets+= (currentLineText.match(/}/g) || []).length;
-      }
       currentLineNum++;
       if(nbrOfOpenedBrackets === nbrOfClosedBrackets) break;
     }
@@ -75,11 +72,8 @@ function logMessageLine(document, selectionLine) {
     let currentLineNum = selectionLine + 1;
     while (currentLineNum < document.lineCount) {
       const currentLineText = document.lineAt(currentLineNum).text;
-      if(/\(/.test(currentLineText)) {
-        nbrOfOpenedParenthesis+=(currentLineText.match(/\(/g) || []).length;
-      } else if(/\)/.test(currentLineText)) {
-        nbrOfClosedParenthesis+=(currentLineText.match(/\)/g) || []).length;
-      }
+      nbrOfOpenedParenthesis+=(currentLineText.match(/\(/g) || []).length;
+      nbrOfClosedParenthesis+=(currentLineText.match(/\)/g) || []).length;
       currentLineNum++;
       if(nbrOfOpenedParenthesis === nbrOfClosedParenthesis) break;
     }
@@ -121,7 +115,7 @@ function spaces(document, line, tabSize) {
   if(nextLineTextChars.filter(char => char !== " ").length !== 0) {
     if(nextLine.firstNonWhitespaceCharacterIndex > currentLine.firstNonWhitespaceCharacterIndex) {
       if(nextLineTextChars[nextLine.firstNonWhitespaceCharacterIndex - 1] === "\t") {
-        return " ".repeat(nextLineTextChars.firstNonWhitespaceCharacterIndex * tabSize);
+        return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex * tabSize);
       } else {
         return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex);
       }
