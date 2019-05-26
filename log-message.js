@@ -70,12 +70,14 @@ function logMessageLine(document, selectionLine) {
     let nbrOfOpenedParenthesis = (currentLineText.match(/\(/g) || []).length;
     let nbrOfClosedParenthesis = (currentLineText.match(/\)/g) || []).length;
     let currentLineNum = selectionLine + 1;
-    while (currentLineNum < document.lineCount) {
-      const currentLineText = document.lineAt(currentLineNum).text;
-      nbrOfOpenedParenthesis+=(currentLineText.match(/\(/g) || []).length;
-      nbrOfClosedParenthesis+=(currentLineText.match(/\)/g) || []).length;
-      currentLineNum++;
-      if(nbrOfOpenedParenthesis === nbrOfClosedParenthesis) break;
+    if(nbrOfOpenedParenthesis !== nbrOfClosedParenthesis) {
+      while (currentLineNum < document.lineCount) {
+        const currentLineText = document.lineAt(currentLineNum).text;
+        nbrOfOpenedParenthesis+=(currentLineText.match(/\(/g) || []).length;
+        nbrOfClosedParenthesis+=(currentLineText.match(/\)/g) || []).length;
+        currentLineNum++;
+        if(nbrOfOpenedParenthesis === nbrOfClosedParenthesis) break;
+      }
     }
     return nbrOfOpenedParenthesis === nbrOfClosedParenthesis ? currentLineNum: selectionLine + 1;
   } else if(/`/.test(currentLineText)){
