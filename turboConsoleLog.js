@@ -28,6 +28,7 @@ function activate(context) {
         const logMessagePrefix = config.logMessagePrefix;
         const quote = config.quote;
         const addSemicolonInTheEnd = config.addSemicolonInTheEnd || false;
+        const disableESlintNoConsole = config.disableESlintNoConsole || false;
 
         editBuilder.insert(
           new vscode.Position(logMessage.logMessageLine(document, lineOfSelectedVar, selectedVar), 0),
@@ -39,7 +40,8 @@ function activate(context) {
             logMessagePrefix,
             quote,
             addSemicolonInTheEnd,
-            tabSize
+            tabSize,
+            disableESlintNoConsole
           )
         );
       });
