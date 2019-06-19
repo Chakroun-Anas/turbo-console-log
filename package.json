@@ -47,6 +47,11 @@
           ],
           "default": "\"",
           "description": "Double quotes, single quotes or backtick"
+        },
+        "turboConsoleLog.disableESlintNoConsole": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to add or not a comment to disable 'no-console' ESlint rule in the end of the log message."
         }
       }
     },

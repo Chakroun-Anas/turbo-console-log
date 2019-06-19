@@ -13,6 +13,7 @@ const lineCodeProcessing = require("./line-code-processing");
  * @param {string} quote
  * @param {boolean} addSemicolonInTheEnd
  * @param {number} tabSize
+ * @param {boolean} disableESlintNoConsole
  * @return {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
@@ -26,6 +27,7 @@ function message(
   quote,
   addSemicolonInTheEnd,
   tabSize
+  disableESlintNoConsole,
 ) {
   const classThatEncloseTheVar = enclosingBlockName(
     document,
@@ -39,7 +41,8 @@ function message(
   );
   const spacesBeforeMsg = spaces(document, logMessageLine(document, lineOfSelectedVar, selectedVar) - 1, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+  const eslintNoConsoleComment = disableESlintNoConsole ? "//eslint-disable-line no-console" : "";
+  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}${eslintNoConsoleComment}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
     const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
