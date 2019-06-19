@@ -26,8 +26,8 @@ function message(
   logMessagePrefix,
   quote,
   addSemicolonInTheEnd,
-  tabSize
-  disableESlintNoConsole,
+  tabSize,
+  disableESlintNoConsole
 ) {
   const classThatEncloseTheVar = enclosingBlockName(
     document,
