@@ -89,7 +89,15 @@
         "key": "alt+shift+d",
         "mac": "alt+shift+d"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "turboConsoleLog.displayLogMessage",
+          "group": "Logger"
+        }
+      ]
+    }
   },
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install",
