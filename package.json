@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "1.2.24",
+  "version": "1.2.25",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.19.0"
@@ -37,6 +37,16 @@
           "type": "boolean",
           "default": false,
           "description": "Whether to add or not a semicolon in the end of the log message."
+        },
+        "turboConsoleLog.insertEnclosingClass": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to insert or not the enclosing class of the selected variable in the log message."
+        },
+        "turboConsoleLog.insertEnclosingFunction": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to insert or not the enclosing function of the selected variable in the log message."
         },
         "turboConsoleLog.quote": {
           "type": "string",

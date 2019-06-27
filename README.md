@@ -30,6 +30,10 @@ Properties:
 
 - turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
 
+- turboConsoleLog.insertEnclosingClass (boolean): Whether to insert or not the enclosing class of the selected variable in the log message.
+
+- turboConsoleLog.insertEnclosingFunction (boolean): Whether to insert or not the enclosing function of the selected variable in the log message.
+
 - turboConsoleLog.quote (enum): Double quotes (""), single quotes ('') or backtick(``).
 
 A wrapped log message :

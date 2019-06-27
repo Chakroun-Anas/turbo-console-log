@@ -28,6 +28,8 @@ function activate(context) {
         const quote = config.quote;
         const addSemicolonInTheEnd = config.addSemicolonInTheEnd || false;
         const logMessageLine = logMessage.logMessageLine(document, lineOfSelectedVar, selectedVar);
+        const insertEnclosingClass = config.insertEnclosingClass;
+        const insertEnclosingFunction = config.insertEnclosingFunction;
         editBuilder.insert(
           new vscode.Position( logMessageLine >= document.lineCount ? document.lineCount : logMessageLine, 0),
           logMessage.message(
@@ -38,6 +40,8 @@ function activate(context) {
             logMessagePrefix,
             quote,
             addSemicolonInTheEnd,
+            insertEnclosingClass,
+            insertEnclosingFunction,
             tabSize
           )
         );

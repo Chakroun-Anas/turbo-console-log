@@ -25,6 +25,8 @@ function message(
   logMessagePrefix,
   quote,
   addSemicolonInTheEnd,
+  insertEnclosingClass,
+  insertEnclosingFunction,
   tabSize
 ) {
   const classThatEncloseTheVar = enclosingBlockName(
@@ -40,7 +42,7 @@ function message(
   const lineOfLogMsg =  logMessageLine(document, lineOfSelectedVar, selectedVar);
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${insertEnclosingClass ? classThatEncloseTheVar : ""}${insertEnclosingFunction ? funcThatEncloseTheVar : ""}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
     const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
