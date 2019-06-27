@@ -16,9 +16,19 @@ function checkObjectDeclaration(lineCode) {
   return objectRejex.test(lineCode);
 }
 
+function checkArrayDeclaration(lineCodeSelectionLine, lineCodeSelectionNextLine) {
+  const arrayDeclarationRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*)\[/;
+  return arrayDeclarationRejex.test(lineCodeSelectionLine) || (/(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*/.test(lineCodeSelectionLine) && lineCodeSelectionNextLine.startsWith("["));
+}
+
 function checkFunctionCallDeclaration(lineCode) {
   const functionCallDeclarationRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*\(.*/;
   return functionCallDeclarationRejex.test(lineCode);
+}
+
+function checkObjectFunctionCallDeclaration(lineCodeSelectionLine, lineCodeSelectionNextLine) {
+  const objectFunctionCallDeclaration = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*\./;
+  return objectFunctionCallDeclaration.test(lineCodeSelectionLine) || (/(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*/.test(lineCodeSelectionLine) && lineCodeSelectionNextLine.startsWith("."));
 }
 
 /**
@@ -114,7 +124,9 @@ function functionName(lineCode) {
 
 module.exports.checkClassDeclaration = checkClassDeclaration;
 module.exports.checkObjectDeclaration = checkObjectDeclaration;
+module.exports.checkArrayDeclaration = checkArrayDeclaration;
 module.exports.checkFunctionCallDeclaration = checkFunctionCallDeclaration
+module.exports.checkObjectFunctionCallDeclaration = checkObjectFunctionCallDeclaration;
 module.exports.className = className;
 module.exports.checkIfFunction = checkIfFunction;
 module.exports.checkIfJSBuiltInStatement = checkIfJSBuiltInStatement;

@@ -19,7 +19,6 @@ function activate(context) {
     const lineOfSelectedVar = selection.active.line;
     // Check if the selection line is not the last one in the document and the selected variable is not empty
     if (
-      !(lineOfSelectedVar === document.lineCount - 1) &&
       selectedVar.trim().length !== 0
     ) {
       editor.edit(editBuilder => {
@@ -28,9 +27,9 @@ function activate(context) {
         const logMessagePrefix = config.logMessagePrefix;
         const quote = config.quote;
         const addSemicolonInTheEnd = config.addSemicolonInTheEnd || false;
-
+        const logMessageLine = logMessage.logMessageLine(document, lineOfSelectedVar, selectedVar);
         editBuilder.insert(
-          new vscode.Position(logMessage.logMessageLine(document, lineOfSelectedVar, selectedVar), 0),
+          new vscode.Position( logMessageLine >= document.lineCount ? document.lineCount : logMessageLine, 0),
           logMessage.message(
             document,
             selectedVar,
