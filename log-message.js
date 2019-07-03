@@ -88,7 +88,7 @@ function logMessageLine(document, selectionLine, selectedVar) {
       closedParenthesisNatches.push(closedParenthesisMatch.index);
     }
     let currentLineNum = selectionLine + 1;
-    if(openedParenthesisMatches.length !== closedParenthesisNatches.length || currentLineText.charAt(closedParenthesisNatches[closedParenthesisNatches.length - 1] === ".") || nextLineText.startsWith(".")) {
+    if(openedParenthesisMatches.length !== closedParenthesisNatches.length || currentLineText.charAt(closedParenthesisNatches[closedParenthesisNatches.length - 1]) === "." || nextLineText.startsWith(".")) {
       while (currentLineNum < document.lineCount) {
         currentLineText = document.lineAt(currentLineNum).text;
         while ((openedParenthesisMatch = openedParenthesRegex.exec(currentLineText)) != null) {
@@ -103,7 +103,7 @@ function logMessageLine(document, selectionLine, selectedVar) {
         currentLineNum++;
       }
     }
-    return openedParenthesisMatches.length === closedParenthesisNatches.length ? currentLineNum + 1: selectionLine + 1;
+    return openedParenthesisMatches.length === closedParenthesisNatches.length ? currentLineNum: selectionLine + 1;
   } else if(lineCodeProcessing.checkFunctionCallDeclaration(currentLineText)) {
     // Selected variable get it's value from a direct function call
     if((/\((\s*)$/).test(currentLineText.split(selectedVar)[0]) ||  (/,(\s*)$/).test(currentLineText.split(selectedVar)[0])) {
