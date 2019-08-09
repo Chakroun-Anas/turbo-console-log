@@ -210,6 +210,7 @@ function logMessageLine(document, selectionLine, selectedVar) {
       ? currentLineNum
       : selectionLine + 1;
   } else {
+    if (currentLineText.trim().startsWith("return")) return selectionLine;
     return selectionLine + 1;
   }
 }
