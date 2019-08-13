@@ -21,6 +21,7 @@ function activate(context) {
     if (selectedVar.trim().length !== 0) {
       editor.edit(editBuilder => {
         const config = vscode.workspace.getConfiguration("turboConsoleLog");
+        const logCode = config.logCode || "console.log";
         const wrapLogMessage = config.wrapLogMessage || false;
         const logMessagePrefix =
           config.logMessagePrefix.length > 0 ? config.logMessagePrefix : "TCL";
@@ -41,6 +42,7 @@ function activate(context) {
             0
           ),
           logMessage.message(
+            logCode,
             document,
             selectedVar,
             lineOfSelectedVar,

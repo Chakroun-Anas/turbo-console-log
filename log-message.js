@@ -4,6 +4,7 @@ const lineCodeProcessing = require("./line-code-processing");
 /**
  * Return a log message on the following format: ClassThatEncloseTheSelectedVar -> FunctionThatEncloseTheSelectedVar -> TheSelectedVar, SelectedVarValue
  * @function
+ * @param {string} logCode
  * @param {TextDocument} document
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @param {string} selectedVar
@@ -18,6 +19,7 @@ const lineCodeProcessing = require("./line-code-processing");
  * @since 1.0
  */
 function message(
+  logCode,
   document,
   selectedVar,
   lineOfSelectedVar,
@@ -42,15 +44,15 @@ function message(
   const lineOfLogMsg = logMessageLine(document, lineOfSelectedVar, selectedVar);
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${
+  const debuggingMsg = `${logCode}(${quote}${logMessagePrefix}: ${
     insertEnclosingClass ? classThatEncloseTheVar : ""
   }${
     insertEnclosingFunction ? funcThatEncloseTheVar : ""
   }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
-    // 16 represents the length of console.log("");
-    const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
-      debuggingMsg.length - 16
+    // 5 represents the length of ("") which comes after the logCode;
+    const wrappingMsg = `${logCode}(${quote}${logMessagePrefix}: ${"-".repeat(
+      debuggingMsg.length - (logCode.length + 5)
     )}${quote})${semicolon}`;
     return `${
       lineOfLogMsg === document.lineCount ? "\n" : ""
@@ -97,10 +99,12 @@ function logMessageLine(document, selectionLine, selectedVar) {
     }
     const openedParenthesRegex = /\(/g;
     const closedParenthesRegex = /\)/g;
-    let openedParenthesisMatch,
-      openedParenthesisMatches = [];
-    let closedParenthesisMatch,
-      closedParenthesisNatches = [];
+    let openedParenthesisMatch;
+
+    const openedParenthesisMatches = [];
+    let closedParenthesisMatch;
+
+    const closedParenthesisNatches = [];
     while (
       (openedParenthesisMatch = openedParenthesRegex.exec(currentLineText)) !=
       null

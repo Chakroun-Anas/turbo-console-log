@@ -23,6 +23,11 @@
       "type": "object",
       "title": "Turbo Console Log Configuration",
       "properties": {
+        "turboConsoleLog.logCode": {
+          "type": "string",
+          "default": "console.log",
+          "description": "Specifies the custom code that logs the message."
+        },
         "turboConsoleLog.wrapLogMessage": {
           "type": "boolean",
           "default": false,
