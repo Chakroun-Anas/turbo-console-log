@@ -385,7 +385,7 @@ function detectAll(document, tabSize, logMessagePrefix) {
   const documentNbrOfLines = document.lineCount;
   const logMessages = [];
   for (let i = 0; i < documentNbrOfLines; i++) {
-    const turboConsoleLogMessage = new RegExp(`('|")${logMessagePrefix}.*`);
+    const turboConsoleLogMessage = new RegExp(`('|"|\`)${logMessagePrefix}.*`);
     if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
       const logMessageLines = { spaces: 0, lines: [] };
       for (let j = i; j >= 0; j--) {
