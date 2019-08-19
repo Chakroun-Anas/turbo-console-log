@@ -22,6 +22,10 @@ console.log("SelectedVariableEnclosingClassName -> SelectedVariableEnclosingFunc
 
 ![alt text](https://image.ibb.co/dysw7p/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
 
+Multiple cursor support:
+
+![alt text](https://i.ibb.co/Jk2pmRG/tcl-multiple-selections.gif "Multiple cursor support")
+
 Properties:
 
 - turboConsoleLog.wrapLogMessage (boolean): Whether to wrap the log message or not.
@@ -39,10 +43,6 @@ Properties:
 A wrapped log message :
 
 ![alt text](https://image.ibb.co/h9yfYU/wrap_log_message.gif "Wrapping The log message")
-
-Multiple cursor support:
-
-![alt text](https://i.ibb.co/Jk2pmRG/tcl-multiple-selections.gif "Multiple cursor support")
 
 II) Comment all log messages, inserted by the extension, from the current document
 
