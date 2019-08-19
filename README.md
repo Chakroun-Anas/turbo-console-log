@@ -40,6 +40,10 @@ A wrapped log message :
 
 ![alt text](https://image.ibb.co/h9yfYU/wrap_log_message.gif "Wrapping The log message")
 
+Multiple cursor support:
+
+![alt text](https://i.ibb.co/Jk2pmRG/tcl-multiple-selections.gif "Multiple cursor support")
+
 II) Comment all log messages, inserted by the extension, from the current document
 
 All it takes to comment all log messages, inserted by the extension, from the current document is to press alt + shift + c
@@ -74,11 +78,15 @@ Initial release of Turbo Console Log
 
 - New feature: The possibility of wrapping the log message is added
 
-## 1.2.0
+### 1.2.0
 
 - New feature: Comment all log messages inserted by the extension
 - New feature: Uncomment all log messages inserted by the extension
 - When requested, only the log messages inserted by the extension will be commented, uncommented or deleted
+
+### 1.3.0
+
+- Multiple cursor support
 
 ## Participate
 

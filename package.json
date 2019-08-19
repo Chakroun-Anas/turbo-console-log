@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "1.2.31",
+  "version": "1.3.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.19.0"
