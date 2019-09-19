@@ -5,6 +5,7 @@ const lineCodeProcessing = require("./line-code-processing");
  * Return a log message on the following format: ClassThatEncloseTheSelectedVar -> FunctionThatEncloseTheSelectedVar -> TheSelectedVar, SelectedVarValue
  * @function
  * @param {string} logCode
+ * @param {boolean} concatSelection
  * @param {TextDocument} document
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @param {string} selectedVar
@@ -20,6 +21,7 @@ const lineCodeProcessing = require("./line-code-processing");
  */
 function message(
   logCode,
+  concatSelection,
   document,
   selectedVar,
   lineOfSelectedVar,
@@ -48,7 +50,9 @@ function message(
     insertEnclosingClass ? classThatEncloseTheVar : ""
   }${
     insertEnclosingFunction ? funcThatEncloseTheVar : ""
-  }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+  }${selectedVar}: ${quote}${
+    concatSelection ? " +" : ","
+  } ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
     // 5 represents the length of ("") which comes after the logCode;
     const wrappingMsg = `${logCode}(${quote}${logMessagePrefix}: ${"-".repeat(

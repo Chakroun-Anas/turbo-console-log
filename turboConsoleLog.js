@@ -9,6 +9,8 @@ const logMessage = require("./log-message");
 function activate(context) {
   vscode.commands.registerCommand("turboConsoleLog.displayLogMessage", () => {
     const editor = vscode.window.activeTextEditor;
+    const { languageId } = vscode.window.activeTextEditor.document;
+
     if (!editor) {
       return;
     }
@@ -21,7 +23,18 @@ function activate(context) {
     if (selectedVar.trim().length !== 0) {
       editor.edit(editBuilder => {
         const config = vscode.workspace.getConfiguration("turboConsoleLog");
-        const logCode = config.logCode || "console.log";
+        const logCodeMappings = config.logCode || { javascript: "console.log" };
+        const logCode = logCodeMappings[languageId];
+        let concatSelection = config.concatSelection;
+
+        if (
+          // in the case of not setting concat in csharp set it to true;
+          languageId === "csharp" &&
+          (concatSelection === undefined || concatSelection === null)
+        ) {
+          concatSelection = true;
+        }
+
         const wrapLogMessage = config.wrapLogMessage || false;
         const logMessagePrefix =
           config.logMessagePrefix.length > 0 ? config.logMessagePrefix : "TCL";
@@ -43,6 +56,7 @@ function activate(context) {
           ),
           logMessage.message(
             logCode,
+            concatSelection,
             document,
             selectedVar,
             lineOfSelectedVar,

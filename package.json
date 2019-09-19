@@ -24,9 +24,14 @@
       "title": "Turbo Console Log Configuration",
       "properties": {
         "turboConsoleLog.logCode": {
-          "type": "string",
-          "default": "console.log",
-          "description": "Specifies the custom code that logs the message."
+          "type": "object",
+          "default": {"javascript": "console.log"},
+          "description": "Maps language to custom log code. e.g. {\"languageId\": \"Debug.Log\"}. For a list of languageIds see https://code.visualstudio.com/docs/languages/identifiers"
+        },
+        "turboConsoleLog.concatSelection": {
+          "type": "boolean",
+          "default": null,
+          "description": "Specifies wether or not to concatenate the selected item with a '+' operator to the prefix. Defaults to using a comma as console.log('prefix'(,) selectedItem)"
         },
         "turboConsoleLog.wrapLogMessage": {
           "type": "boolean",
