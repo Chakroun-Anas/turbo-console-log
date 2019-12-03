@@ -66,6 +66,10 @@ All it takes to delete all log messages, inserted by the extension, from the cur
 
 The extension rely on the log message prefix in order to detect the generated log messages, missing up the prefix will result on the failure of the detection and hence the failure of commenting, uncommenting and deleting the log messages.
 
+## Related plugins
+
+- [**dont-care-log**](https://github.com/zthxxx/dont-care-log): git plugin with npm, to ignore turbo-console-log in `git add/diff` and `lint-staged eslint` etc.
+
 ## Release Notes
 
 ---
