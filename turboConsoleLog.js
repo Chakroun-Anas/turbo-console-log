@@ -24,6 +24,7 @@ function activate(context) {
       const addSemicolonInTheEnd = config.addSemicolonInTheEnd || false;
       const insertEnclosingClass = config.insertEnclosingClass;
       const insertEnclosingFunction = config.insertEnclosingFunction;
+      const styleArray = config.styleArray;
       for (let index = 0; index < editor.selections.length; index++) {
         const selection = editor.selections[index];
         const selectedVar = document.getText(selection);
@@ -53,7 +54,8 @@ function activate(context) {
                 addSemicolonInTheEnd,
                 insertEnclosingClass,
                 insertEnclosingFunction,
-                tabSize
+                tabSize,
+                styleArray
               )
             );
           });
@@ -70,9 +72,11 @@ function activate(context) {
       }
       const tabSize = editor.options.tabSize;
       const document = editor.document;
+      const config = vscode.workspace.getConfiguration("turboConsoleLog");
       const logMessagePrefix =
-        vscode.workspace.getConfiguration("turboConsoleLog").logMessagePrefix ||
-        "TCL";
+        (config.styleArray.length ? "%c" : "") +
+        (vscode.workspace.getConfiguration("turboConsoleLog")
+          .logMessagePrefix || "TCL");
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
@@ -101,9 +105,11 @@ function activate(context) {
       }
       const tabSize = editor.options.tabSize;
       const document = editor.document;
+      const config = vscode.workspace.getConfiguration("turboConsoleLog");
       const logMessagePrefix =
-        vscode.workspace.getConfiguration("turboConsoleLog").logMessagePrefix ||
-        "TCL";
+        (config.styleArray.length ? "%c" : "") +
+        (vscode.workspace.getConfiguration("turboConsoleLog")
+          .logMessagePrefix || "TCL");
       const logMessages = logMessage.detectAll(
         document,
         tabSize,
@@ -134,9 +140,11 @@ function activate(context) {
       }
       const tabSize = editor.options.tabSize;
       const document = editor.document;
+      const config = vscode.workspace.getConfiguration("turboConsoleLog");
       const logMessagePrefix =
-        vscode.workspace.getConfiguration("turboConsoleLog").logMessagePrefix ||
-        "TCL";
+        (config.styleArray.length ? "%c" : "") +
+        (vscode.workspace.getConfiguration("turboConsoleLog")
+          .logMessagePrefix || "TCL");
       const logMessages = logMessage.detectAll(
         document,
         tabSize,

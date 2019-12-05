@@ -57,6 +57,15 @@
           ],
           "default": "\"",
           "description": "Double quotes, single quotes or backtick"
+        },
+        "turboConsoleLog.styleArray": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "An inline CSS style definition.\nMore info: https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style"
+          },
+          "default": [],
+          "description": "Each CSS style will be applied to a part of the selector (max 3 items).\nMore info: https://developer.mozilla.org/en-US/docs/Web/API/console"
         }
       }
     },

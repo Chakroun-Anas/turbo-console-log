@@ -13,6 +13,7 @@ const lineCodeProcessing = require("./line-code-processing");
  * @param {string} quote
  * @param {boolean} addSemicolonInTheEnd
  * @param {number} tabSize
+ * @param {array} styleArray
  * @return {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
@@ -27,26 +28,41 @@ function message(
   addSemicolonInTheEnd,
   insertEnclosingClass,
   insertEnclosingFunction,
-  tabSize
+  tabSize,
+  styleArray
 ) {
+  const optionalStyleDirective = styleArray.length ? "%c" : "";
   const classThatEncloseTheVar = enclosingBlockName(
     document,
     lineOfSelectedVar,
-    "class"
+    "class",
+    optionalStyleDirective
   );
   const funcThatEncloseTheVar = enclosingBlockName(
     document,
     lineOfSelectedVar,
-    "function"
+    "function",
+    optionalStyleDirective
   );
+  const formattedStyleArray =
+    (styleArray.length ? ", " : "") +
+    styleArray
+      .slice(
+        0,
+        2 +
+          (insertEnclosingClass && !!classThatEncloseTheVar) +
+          (insertEnclosingFunction && !!funcThatEncloseTheVar)
+      )
+      .map(value => `${quote}${value}${quote}`)
+      .join(", ");
   const lineOfLogMsg = logMessageLine(document, lineOfSelectedVar, selectedVar);
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${
+  const debuggingMsg = `console.log(${quote}${optionalStyleDirective}${logMessagePrefix}: ${
     insertEnclosingClass ? classThatEncloseTheVar : ""
   }${
     insertEnclosingFunction ? funcThatEncloseTheVar : ""
-  }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+  }${optionalStyleDirective}${selectedVar}${quote}${formattedStyleArray}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
     const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
@@ -295,11 +311,12 @@ function spaces(document, line, tabSize) {
  * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
  * @param {number} lineOfSelectedVar
  * @param {string} blockType
+ * @param {string} prefix
  * @return {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function enclosingBlockName(document, lineOfSelectedVar, blockType) {
+function enclosingBlockName(document, lineOfSelectedVar, blockType, prefix) {
   let currentLineNum = lineOfSelectedVar;
   while (currentLineNum >= 0) {
     const currentLineText = document.lineAt(currentLineNum).text;
@@ -311,7 +328,9 @@ function enclosingBlockName(document, lineOfSelectedVar, blockType) {
             lineOfSelectedVar <
               blockClosingBraceLineNum(document, currentLineNum)
           ) {
-            return `${lineCodeProcessing.className(currentLineText)} -> `;
+            return `${prefix}${lineCodeProcessing.className(
+              currentLineText
+            )} -> `;
           }
         }
         break;
@@ -326,7 +345,9 @@ function enclosingBlockName(document, lineOfSelectedVar, blockType) {
               blockClosingBraceLineNum(document, currentLineNum)
           ) {
             if (lineCodeProcessing.functionName(currentLineText).length !== 0) {
-              return `${lineCodeProcessing.functionName(currentLineText)} -> `;
+              return `${prefix}${lineCodeProcessing.functionName(
+                currentLineText
+              )} -> `;
             }
             return "";
           }
