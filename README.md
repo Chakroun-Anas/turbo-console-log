@@ -1,6 +1,8 @@
 Fork of Turbo console log and update feature
 
- * autoselect variable when it empty
+- autoselect variable when it empty
+- support dart,php,java,go,cshapr,fsharp
+
 ## Main Functionality
 
 ---
@@ -25,6 +27,10 @@ console.log("SelectedVariableEnclosingClassName -> SelectedVariableEnclosingFunc
 
 ![alt text](https://image.ibb.co/dysw7p/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
 
+Multiple cursor support:
+
+![alt text](https://i.ibb.co/Jk2pmRG/tcl-multiple-selections.gif "Multiple cursor support")
+
 Properties:
 
 - turboConsoleLog.wrapLogMessage (boolean): Whether to wrap the log message or not.
@@ -32,6 +38,10 @@ Properties:
 - turboConsoleLog.logMessagePrefix (string): The prefix of the log message, default one is TCL.
 
 - turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
+
+- turboConsoleLog.insertEnclosingClass (boolean): Whether to insert or not the enclosing class of the selected variable in the log message.
+
+- turboConsoleLog.insertEnclosingFunction (boolean): Whether to insert or not the enclosing function of the selected variable in the log message.
 
 - turboConsoleLog.quote (enum): Double quotes (""), single quotes ('') or backtick(``).
 
@@ -57,6 +67,10 @@ All it takes to delete all log messages, inserted by the extension, from the cur
 
 ![alt text](https://image.ibb.co/jv9UtU/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
 
+**_Warning:_**
+
+The extension rely on the log message prefix in order to detect the generated log messages, missing up the prefix will result on the failure of the detection and hence the failure of commenting, uncommenting and deleting the log messages.
+
 ## Release Notes
 
 ---
@@ -69,11 +83,15 @@ Initial release of Turbo Console Log
 
 - New feature: The possibility of wrapping the log message is added
 
-## 1.2.0
+### 1.2.0
 
 - New feature: Comment all log messages inserted by the extension
 - New feature: Uncomment all log messages inserted by the extension
 - When requested, only the log messages inserted by the extension will be commented, uncommented or deleted
+
+### 1.3.0
+
+- Multiple cursor support
 
 ## Participate
 

@@ -25,7 +25,10 @@ function message(
   logMessagePrefix,
   quote,
   addSemicolonInTheEnd,
-  tabSize
+  insertEnclosingClass,
+  insertEnclosingFunction,
+  tabSize,
+  languageConfig
 ) {
   const classThatEncloseTheVar = enclosingBlockName(
     document,
@@ -37,17 +40,180 @@ function message(
     lineOfSelectedVar,
     "function"
   );
+  const lineOfLogMsg = logMessageLine(document, lineOfSelectedVar, selectedVar);
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+  const debuggingMsg = `${languageConfig.logMessage}(${quote}${logMessagePrefix}: ${
+    insertEnclosingClass ? classThatEncloseTheVar : ""
+    }${
+    insertEnclosingFunction ? funcThatEncloseTheVar : ""
+    }${selectedVar}${quote}${languageConfig.separateText} ${selectedVar}${languageConfig.endVariable})${semicolon}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
-    const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
+    const wrappingMsg = `${languageConfig.logMessage}(${quote}${logMessagePrefix}: ${"-".repeat(
       debuggingMsg.length - 16
     )}${quote})${semicolon}`;
-    return `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`;
+    return `${
+      lineOfLogMsg === document.lineCount ? "\n" : ""
+      }${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`;
   }
-  return `${spacesBeforeMsg}${debuggingMsg}\n`;
+  return `${
+    lineOfLogMsg === document.lineCount ? "\n" : ""
+    }${spacesBeforeMsg}${debuggingMsg}\n`;
+}
+
+function logMessageLine(document, selectionLine, selectedVar) {
+  if (selectionLine === document.lineCount - 1) {
+    return selectionLine;
+  }
+  let currentLineText = document.lineAt(selectionLine).text;
+  let nextLineText = document.lineAt(selectionLine + 1).text.replace(/\s/g, "");
+  if (lineCodeProcessing.checkObjectDeclaration(currentLineText)) {
+    // Selected varibale is an object
+    let nbrOfOpenedBrackets = (currentLineText.match(/{/g) || []).length;
+    let nbrOfClosedBrackets = (currentLineText.match(/}/g) || []).length;
+    let currentLineNum = selectionLine + 1;
+    while (currentLineNum < document.lineCount) {
+      const currentLineText = document.lineAt(currentLineNum).text;
+      nbrOfOpenedBrackets += (currentLineText.match(/{/g) || []).length;
+      nbrOfClosedBrackets += (currentLineText.match(/}/g) || []).length;
+      currentLineNum++;
+      if (nbrOfOpenedBrackets === nbrOfClosedBrackets) break;
+    }
+    return nbrOfClosedBrackets === nbrOfOpenedBrackets
+      ? currentLineNum
+      : selectionLine + 1;
+  } else if (
+    lineCodeProcessing.checkObjectFunctionCallDeclaration(
+      currentLineText,
+      nextLineText
+    )
+  ) {
+    // Selected variable get it's value from an object function call
+    if (
+      /\((\s*)$/.test(currentLineText.split(selectedVar)[0]) ||
+      /,(\s*)$/.test(currentLineText.split(selectedVar)[0])
+    ) {
+      return selectionLine + 1;
+    }
+    const openedParenthesRegex = /\(/g;
+    const closedParenthesRegex = /\)/g;
+    let openedParenthesisMatch,
+      openedParenthesisMatches = [];
+    let closedParenthesisMatch,
+      closedParenthesisNatches = [];
+    while (
+      (openedParenthesisMatch = openedParenthesRegex.exec(currentLineText)) !=
+      null
+    ) {
+      openedParenthesisMatches.push(openedParenthesisMatch.index);
+    }
+    while (
+      (closedParenthesisMatch = closedParenthesRegex.exec(currentLineText)) !=
+      null
+    ) {
+      closedParenthesisNatches.push(closedParenthesisMatch.index);
+    }
+    let currentLineNum = selectionLine + 1;
+    if (
+      openedParenthesisMatches.length !== closedParenthesisNatches.length ||
+      currentLineText.charAt(
+        closedParenthesisNatches[closedParenthesisNatches.length - 1]
+      ) === "." ||
+      nextLineText.trim().startsWith(".")
+    ) {
+      while (currentLineNum < document.lineCount) {
+        currentLineText = document.lineAt(currentLineNum).text;
+        while (
+          (openedParenthesisMatch = openedParenthesRegex.exec(
+            currentLineText
+          )) != null
+        ) {
+          openedParenthesisMatches.push(openedParenthesisMatch.index);
+        }
+        while (
+          (closedParenthesisMatch = closedParenthesRegex.exec(
+            currentLineText
+          )) != null
+        ) {
+          closedParenthesisNatches.push(closedParenthesisMatch.index);
+        }
+        if (currentLineNum === document.lineCount - 1) break;
+        nextLineText = document.lineAt(currentLineNum + 1).text;
+        currentLineNum++;
+        if (
+          openedParenthesisMatches.length === closedParenthesisNatches.length &&
+          !(
+            currentLineText.charAt(
+              closedParenthesisNatches[closedParenthesisNatches.length - 1]
+            ) === "."
+          ) &&
+          !nextLineText.trim().startsWith(".")
+        )
+          break;
+      }
+    }
+    return openedParenthesisMatches.length === closedParenthesisNatches.length
+      ? currentLineNum
+      : selectionLine + 1;
+  } else if (lineCodeProcessing.checkFunctionCallDeclaration(currentLineText)) {
+    // Selected variable get it's value from a direct function call
+    if (
+      /\((\s*)$/.test(currentLineText.split(selectedVar)[0]) ||
+      /,(\s*)$/.test(currentLineText.split(selectedVar)[0])
+    ) {
+      return selectionLine + 1;
+    }
+    let nbrOfOpenedParenthesis = (currentLineText.match(/\(/g) || []).length;
+    let nbrOfClosedParenthesis = (currentLineText.match(/\)/g) || []).length;
+    let currentLineNum = selectionLine + 1;
+    if (nbrOfOpenedParenthesis !== nbrOfClosedParenthesis) {
+      while (currentLineNum < document.lineCount) {
+        const currentLineText = document.lineAt(currentLineNum).text;
+        nbrOfOpenedParenthesis += (currentLineText.match(/\(/g) || []).length;
+        nbrOfClosedParenthesis += (currentLineText.match(/\)/g) || []).length;
+        currentLineNum++;
+        if (nbrOfOpenedParenthesis === nbrOfClosedParenthesis) break;
+      }
+    }
+    return nbrOfOpenedParenthesis === nbrOfClosedParenthesis
+      ? currentLineNum
+      : selectionLine + 1;
+  } else if (/`/.test(currentLineText)) {
+    // Template string
+    let currentLineNum = selectionLine + 1;
+    let nbrOfBackticks = (currentLineText.match(/`/g) || []).length;
+    while (currentLineNum < document.lineCount) {
+      const currentLineText = document.lineAt(currentLineNum).text;
+      nbrOfBackticks += (currentLineText.match(/`/g) || []).length;
+      if (nbrOfBackticks % 2 === 0) {
+        break;
+      }
+      currentLineNum++;
+    }
+    return nbrOfBackticks % 2 === 0 ? currentLineNum + 1 : selectionLine + 1;
+  } else if (
+    lineCodeProcessing.checkArrayDeclaration(currentLineText, nextLineText)
+  ) {
+    let nbrOfOpenedBrackets = (currentLineText.match(/\[/g) || []).length;
+    let nbrOfClosedBrackets = (currentLineText.match(/\]/g) || []).length;
+    let currentLineNum = selectionLine + 1;
+    if (nbrOfOpenedBrackets !== nbrOfClosedBrackets) {
+      while (currentLineNum < document.lineCount) {
+        const currentLineText = document.lineAt(currentLineNum).text;
+        nbrOfOpenedBrackets += (currentLineText.match(/\[/g) || []).length;
+        nbrOfClosedBrackets += (currentLineText.match(/\]/g) || []).length;
+        currentLineNum++;
+        if (nbrOfOpenedBrackets === nbrOfClosedBrackets) break;
+      }
+    }
+    return nbrOfOpenedBrackets === nbrOfClosedBrackets
+      ? currentLineNum
+      : selectionLine + 1;
+  } else {
+    if (currentLineText.trim().startsWith("return")) return selectionLine;
+    return selectionLine + 1;
+  }
 }
 
 /**
@@ -62,52 +228,65 @@ function message(
  * @since 1.0
  */
 function spaces(document, line, tabSize) {
-  let selectionLineNbrOfSpaces = 0;
-  const selectionLineChars = document.lineAt(line).text.split("");
-  for (const char of selectionLineChars) {
-    if (char === " ") {
-      selectionLineNbrOfSpaces++;
-    } else if (char === "\t") {
-      selectionLineNbrOfSpaces += tabSize;
-    } else {
-      break;
-    }
-  }
-  if (/{/.test(document.lineAt(line).text)) {
-    let lineNextToSelectionLineNbrOfSpaces = 0;
-    const lineNextToSelectionLineChars = document
-      .lineAt(line + 1)
-      .text.split("");
-    for (const char of lineNextToSelectionLineChars) {
-      if (char === " ") {
-        lineNextToSelectionLineNbrOfSpaces++;
-      } else if (char === "\t") {
-        lineNextToSelectionLineNbrOfSpaces += tabSize;
+  const currentLine = document.lineAt(line);
+  const currentLineTextChars = currentLine.text.split("");
+  if (
+    lineCodeProcessing.checkIfFunction(currentLine.text) ||
+    lineCodeProcessing.checkIfJSBuiltInStatement(currentLine.text) ||
+    lineCodeProcessing.checkClassDeclaration(currentLine.text)
+  ) {
+    const nextLine = document.lineAt(line + 1);
+    const nextLineTextChars = nextLine.text.split("");
+    if (nextLineTextChars.filter(char => char !== " ").length !== 0) {
+      if (
+        nextLine.firstNonWhitespaceCharacterIndex >
+        currentLine.firstNonWhitespaceCharacterIndex
+      ) {
+        if (
+          nextLineTextChars[nextLine.firstNonWhitespaceCharacterIndex - 1] ===
+          "\t"
+        ) {
+          return " ".repeat(
+            nextLine.firstNonWhitespaceCharacterIndex * tabSize
+          );
+        } else {
+          return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex);
+        }
       } else {
-        break;
+        if (
+          currentLineTextChars[
+          currentLine.firstNonWhitespaceCharacterIndex - 1
+          ] === "\t"
+        ) {
+          return " ".repeat(
+            currentLine.firstNonWhitespaceCharacterIndex * tabSize
+          );
+        } else {
+          return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
+        }
+      }
+    } else {
+      if (
+        currentLineTextChars[
+        currentLine.firstNonWhitespaceCharacterIndex - 1
+        ] === "\t"
+      ) {
+        return " ".repeat(
+          currentLine.firstNonWhitespaceCharacterIndex * tabSize
+        );
+      } else {
+        return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
       }
     }
-    if (
-      selectionLineNbrOfSpaces % tabSize === 0 &&
-      lineNextToSelectionLineNbrOfSpaces % tabSize === 0
-    ) {
-      selectionLineNbrOfSpaces = selectionLineNbrOfSpaces / tabSize;
-      lineNextToSelectionLineNbrOfSpaces =
-        lineNextToSelectionLineNbrOfSpaces / tabSize;
-      return selectionLineNbrOfSpaces > lineNextToSelectionLineNbrOfSpaces
-        ? "\t".repeat(selectionLineNbrOfSpaces)
-        : "\t".repeat(lineNextToSelectionLineNbrOfSpaces);
-    } else {
-      return selectionLineNbrOfSpaces > lineNextToSelectionLineNbrOfSpaces
-        ? " ".repeat(selectionLineNbrOfSpaces)
-        : " ".repeat(lineNextToSelectionLineNbrOfSpaces);
-    }
   } else {
-    if (selectionLineNbrOfSpaces % tabSize === 0) {
-      selectionLineNbrOfSpaces = selectionLineNbrOfSpaces / tabSize;
-      return "\t".repeat(selectionLineNbrOfSpaces);
+    if (
+      currentLineTextChars[currentLine.firstNonWhitespaceCharacterIndex - 1] ===
+      "\t"
+    ) {
+      return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex * tabSize);
+    } else {
+      return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
     }
-    return " ".repeat(selectionLineNbrOfSpaces);
   }
 }
 /**
@@ -131,7 +310,7 @@ function enclosingBlockName(document, lineOfSelectedVar, blockType) {
           if (
             lineOfSelectedVar > currentLineNum &&
             lineOfSelectedVar <
-              blockClosingBraceLineNum(document, currentLineNum)
+            blockClosingBraceLineNum(document, currentLineNum)
           ) {
             return `${lineCodeProcessing.className(currentLineText)} -> `;
           }
@@ -139,13 +318,13 @@ function enclosingBlockName(document, lineOfSelectedVar, blockType) {
         break;
       case "function":
         if (
-          lineCodeProcessing.checkIfNamedFunction(currentLineText) &&
+          lineCodeProcessing.checkIfFunction(currentLineText) &&
           !lineCodeProcessing.checkIfJSBuiltInStatement(currentLineText)
         ) {
           if (
             lineOfSelectedVar >= currentLineNum &&
             lineOfSelectedVar <
-              blockClosingBraceLineNum(document, currentLineNum)
+            blockClosingBraceLineNum(document, currentLineNum)
           ) {
             if (lineCodeProcessing.functionName(currentLineText).length !== 0) {
               return `${lineCodeProcessing.functionName(currentLineText)} -> `;
@@ -207,7 +386,7 @@ function detectAll(document, tabSize, logMessagePrefix) {
   const documentNbrOfLines = document.lineCount;
   const logMessages = [];
   for (let i = 0; i < documentNbrOfLines; i++) {
-    const turboConsoleLogMessage = new RegExp(`('|")${logMessagePrefix}.*`);
+    const turboConsoleLogMessage = new RegExp(`('|"|\`)${logMessagePrefix}.*`);
     if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
       const logMessageLines = { spaces: 0, lines: [] };
       for (let j = i; j >= 0; j--) {
@@ -247,5 +426,6 @@ function detectAll(document, tabSize, logMessagePrefix) {
 }
 
 module.exports.message = message;
+module.exports.logMessageLine = logMessageLine;
 module.exports.spaces = spaces;
 module.exports.detectAll = detectAll;

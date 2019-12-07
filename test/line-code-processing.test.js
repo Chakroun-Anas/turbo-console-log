@@ -24,7 +24,16 @@ describe("Source Code Processing", () => {
     "functionName = (arg1, arg2) => {",
     "functionName = function otherName (arg1, arg2) => {",
     "array.forEach(function functionName() {",
-    "export const functionName = (arg1, arg2) => {"
+    "export const functionName = (arg1, arg2) => {",
+    "functionName(arg1: any): any {",
+    "async functionName(arg1: any): any {",
+    "public functionName(arg1: any): any {",
+    "public async functionName(arg1: any): any {",
+    "public static functionName(arg1: any): any {",
+    "private functionName(arg1: any): any {",
+    "protected functionName(arg1: any): any {",
+    "static functionName(arg1: any): any {",
+    "export functionName(arg1: any): any {",
   ];
   const nonNamedFunctions = [
     "function() {",

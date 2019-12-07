@@ -11,6 +11,26 @@ function checkClassDeclaration(lineCode) {
   return classNameRegex.test(lineCode);
 }
 
+function checkObjectDeclaration(lineCode) {
+  const objectRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*){/;
+  return objectRejex.test(lineCode);
+}
+
+function checkArrayDeclaration(lineCodeSelectionLine, lineCodeSelectionNextLine) {
+  const arrayDeclarationRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*)\[/;
+  return arrayDeclarationRejex.test(lineCodeSelectionLine) || (/(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*/.test(lineCodeSelectionLine) && lineCodeSelectionNextLine.startsWith("["));
+}
+
+function checkFunctionCallDeclaration(lineCode) {
+  const functionCallDeclarationRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*\(.*/;
+  return functionCallDeclarationRejex.test(lineCode);
+}
+
+function checkObjectFunctionCallDeclaration(lineCodeSelectionLine, lineCodeSelectionNextLine) {
+  const objectFunctionCallDeclaration = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*\./;
+  return objectFunctionCallDeclaration.test(lineCodeSelectionLine) || (/(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*/.test(lineCodeSelectionLine) && lineCodeSelectionNextLine.startsWith("."));
+}
+
 /**
  * Return the class name in case if the line code represents a class declaration
  * @function
@@ -39,7 +59,7 @@ function className(lineCode) {
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  * @since 1.0
  */
-function checkIfNamedFunction(lineCode) {
+function checkIfFunction(lineCode) {
   const namedFunctionDeclarationRegex = /[a-zA-Z]+(\s*)\(.*\)(\s*){/;
   const nonNamedFunctionDeclaration = /(function)(\s*)\(.*\)(\s*){/;
   const namedFunctionExpressionRegex = /[a-zA-Z]+(\s*)=(\s*)(function)?(\s*)[a-zA-Z]*(\s*)\(.*\)(\s*)(=>)?(\s*){/;
@@ -95,7 +115,7 @@ function functionName(lineCode) {
             .replace(/export |module.exports |const |var |let |=|(\s*)/g, "");
         }
       } else {
-        return textInTheLeftOfTheParams.replace(/async |(\s*)/g, "");
+        return textInTheLeftOfTheParams.replace(/async|public|private|protected|static|export |(\s*)/g, "");
       }
     }
   }
@@ -109,7 +129,9 @@ function functionName(lineCode) {
  * @return {{begin:number,end:number,text:string}}
  */
 function autoSelectVariable(lineText, currentPos) {
+  // eslint-disable-next-line no-useless-escape
   const allowWordReg = /[\w\.\[\]]/;
+  // eslint-disable-next-line no-useless-escape
   const bracketReg = /[\(\)]/;
   const result = {
     begin: 0,
@@ -145,7 +167,11 @@ function autoSelectVariable(lineText, currentPos) {
 
 module.exports.autoSelectVariable = autoSelectVariable;
 module.exports.checkClassDeclaration = checkClassDeclaration;
+module.exports.checkObjectDeclaration = checkObjectDeclaration;
+module.exports.checkArrayDeclaration = checkArrayDeclaration;
+module.exports.checkFunctionCallDeclaration = checkFunctionCallDeclaration
+module.exports.checkObjectFunctionCallDeclaration = checkObjectFunctionCallDeclaration;
 module.exports.className = className;
-module.exports.checkIfNamedFunction = checkIfNamedFunction;
+module.exports.checkIfFunction = checkIfFunction;
 module.exports.checkIfJSBuiltInStatement = checkIfJSBuiltInStatement;
 module.exports.functionName = functionName;
