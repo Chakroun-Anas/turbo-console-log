@@ -1,3 +1,6 @@
+Fork of Turbo console log and update feature
+
+ * autoselect variable when it empty
 ## Main Functionality
 
 ---
