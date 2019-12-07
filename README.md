@@ -62,6 +62,12 @@ All it takes to delete all log messages, inserted by the extension, from the cur
 
 ![alt text](https://image.ibb.co/jv9UtU/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
 
+V) Add styling options for each part of the variable's path definition.
+
+Properties:
+
+- turboConsoleLog.styleArray (string[], max 3): a list of CSS stylings, to be applied to prefix, class/function and variable name.
+
 **_Warning:_**
 
 The extension rely on the log message prefix in order to detect the generated log messages, missing up the prefix will result on the failure of the detection and hence the failure of commenting, uncommenting and deleting the log messages.
