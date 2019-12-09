@@ -31,7 +31,7 @@ function message(
   tabSize,
   styleArray
 ) {
-  const optionalStyleDirective = styleArray.length ? "%c" : "";
+  const optionalStyleDirective = styleArray.length ? "%c " : "";
   const classThatEncloseTheVar = enclosingBlockName(
     document,
     lineOfSelectedVar,
@@ -44,17 +44,26 @@ function message(
     "function",
     optionalStyleDirective
   );
-  const formattedStyleArray =
-    (styleArray.length ? ", " : "") +
-    styleArray
-      .slice(
-        0,
-        2 +
-          (insertEnclosingClass && !!classThatEncloseTheVar) +
-          (insertEnclosingFunction && !!funcThatEncloseTheVar)
-      )
-      .map(value => `${quote}${value}${quote}`)
-      .join(", ");
+
+  const necessaryStyleCount =
+    (insertEnclosingClass && !!classThatEncloseTheVar) +
+    (insertEnclosingFunction && !!funcThatEncloseTheVar) +
+    1;
+  let formattedStylesString = "";
+  if (styleArray.length > 0) {
+    formattedStylesString += ", ";
+    if (styleArray.length > 1) {
+      formattedStylesString += styleArray
+        .slice(0, necessaryStyleCount + 1)
+        .map(value => `${quote}${value}${quote}`)
+        .join(", ");
+    } else {
+      formattedStylesString += `...Array(${necessaryStyleCount + 1}).fill("${
+        styleArray[0]
+      }")`;
+    }
+  }
+
   const lineOfLogMsg = logMessageLine(document, lineOfSelectedVar, selectedVar);
   const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
@@ -62,7 +71,9 @@ function message(
     insertEnclosingClass ? classThatEncloseTheVar : ""
   }${
     insertEnclosingFunction ? funcThatEncloseTheVar : ""
-  }${optionalStyleDirective}${selectedVar}${quote}${formattedStyleArray}, ${selectedVar})${semicolon}`;
+  }${optionalStyleDirective}${selectedVar}${
+    formattedStylesString ? " " : ""
+  }${quote}${formattedStylesString}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
     const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
