@@ -1,55 +1,50 @@
+// @flow
+
 const vscode = require("vscode");
-const lineCodeProcessing = require("./line-code-processing");
+const lineCodeProcessing = require("./lineCodeProcessing");
+import type { JSBlockType, LogMessage } from "./Types";
 
 /**
  * Return a log message on the following format: ClassThatEncloseTheSelectedVar -> FunctionThatEncloseTheSelectedVar -> TheSelectedVar, SelectedVarValue
- * @function
- * @param {TextDocument} document
- * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
- * @param {string} selectedVar
- * @param {number} lineOfSelectedVar
- * @param {boolean} wrapLogMessage
- * @param {string} logMessagePrefix
- * @param {string} quote
- * @param {boolean} addSemicolonInTheEnd
- * @param {number} tabSize
- * @return {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @since 1.0
  */
 function message(
-  document,
-  selectedVar,
-  lineOfSelectedVar,
-  wrapLogMessage,
-  logMessagePrefix,
-  quote,
-  addSemicolonInTheEnd,
-  insertEnclosingClass,
-  insertEnclosingFunction,
-  tabSize
-) {
-  const classThatEncloseTheVar = enclosingBlockName(
+  document: vscode.TextDocument,
+  selectedVar: string,
+  lineOfSelectedVar: number,
+  wrapLogMessage: boolean,
+  logMessagePrefix: string,
+  quote: string,
+  addSemicolonInTheEnd: boolean,
+  insertEnclosingClass: boolean,
+  insertEnclosingFunction: boolean,
+  tabSize: number
+): string {
+  const classThatEncloseTheVar: string = enclosingBlockName(
     document,
     lineOfSelectedVar,
     "class"
   );
-  const funcThatEncloseTheVar = enclosingBlockName(
+  const funcThatEncloseTheVar: string = enclosingBlockName(
     document,
     lineOfSelectedVar,
     "function"
   );
-  const lineOfLogMsg = logMessageLine(document, lineOfSelectedVar, selectedVar);
-  const spacesBeforeMsg = spaces(document, lineOfSelectedVar, tabSize);
-  const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${
+  const lineOfLogMsg: number = logMessageLine(
+    document,
+    lineOfSelectedVar,
+    selectedVar
+  );
+  const spacesBeforeMsg: string = spaces(document, lineOfSelectedVar, tabSize);
+  const semicolon: string = addSemicolonInTheEnd ? ";" : "";
+  const debuggingMsg: string = `console.log(${quote}${logMessagePrefix}: ${
     insertEnclosingClass ? classThatEncloseTheVar : ""
   }${
     insertEnclosingFunction ? funcThatEncloseTheVar : ""
   }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
-    const wrappingMsg = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
+    const wrappingMsg: string = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
       debuggingMsg.length - 16
     )}${quote})${semicolon}`;
     return `${
@@ -61,19 +56,31 @@ function message(
   }${spacesBeforeMsg}${debuggingMsg}\n`;
 }
 
-function logMessageLine(document, selectionLine, selectedVar) {
+/**
+ * Line of the log message to insert
+ * @author Chakroun Anas <chakroun.anas@outlook.com>
+ */
+function logMessageLine(
+  document: vscode.TextDocument,
+  selectionLine: number,
+  selectedVar: string
+): number {
   if (selectionLine === document.lineCount - 1) {
     return selectionLine;
   }
-  let currentLineText = document.lineAt(selectionLine).text;
-  let nextLineText = document.lineAt(selectionLine + 1).text.replace(/\s/g, "");
+  let currentLineText: string = document.lineAt(selectionLine).text;
+  let nextLineText: string = document
+    .lineAt(selectionLine + 1)
+    .text.replace(/\s/g, "");
   if (lineCodeProcessing.checkObjectDeclaration(currentLineText)) {
-    // Selected varibale is an object
-    let nbrOfOpenedBrackets = (currentLineText.match(/{/g) || []).length;
-    let nbrOfClosedBrackets = (currentLineText.match(/}/g) || []).length;
-    let currentLineNum = selectionLine + 1;
+    // Selected variable is an object
+    let nbrOfOpenedBrackets: number = (currentLineText.match(/{/g) || [])
+      .length;
+    let nbrOfClosedBrackets: number = (currentLineText.match(/}/g) || [])
+      .length;
+    let currentLineNum: number = selectionLine + 1;
     while (currentLineNum < document.lineCount) {
-      const currentLineText = document.lineAt(currentLineNum).text;
+      const currentLineText: string = document.lineAt(currentLineNum).text;
       nbrOfOpenedBrackets += (currentLineText.match(/{/g) || []).length;
       nbrOfClosedBrackets += (currentLineText.match(/}/g) || []).length;
       currentLineNum++;
@@ -95,64 +102,46 @@ function logMessageLine(document, selectionLine, selectedVar) {
     ) {
       return selectionLine + 1;
     }
-    const openedParenthesRegex = /\(/g;
-    const closedParenthesRegex = /\)/g;
-    let openedParenthesisMatch,
-      openedParenthesisMatches = [];
-    let closedParenthesisMatch,
-      closedParenthesisNatches = [];
-    while (
-      (openedParenthesisMatch = openedParenthesRegex.exec(currentLineText)) !=
-      null
-    ) {
-      openedParenthesisMatches.push(openedParenthesisMatch.index);
+    const openedParenthesisRegex: RegExp = /\(/g;
+    const closedParenthesisRegex: RegExp = /\)/g;
+    let nbrOfOpenedParenthesis: number = 0;
+    let nbrOfClosedParenthesis: number = 0;
+    let openedParenthesis: any = openedParenthesisRegex.exec(currentLineText);
+    if (openedParenthesis) {
+      nbrOfOpenedParenthesis += openedParenthesis.length;
     }
-    while (
-      (closedParenthesisMatch = closedParenthesRegex.exec(currentLineText)) !=
-      null
-    ) {
-      closedParenthesisNatches.push(closedParenthesisMatch.index);
+    let closedParenthesis: any = closedParenthesisRegex.exec(currentLineText);
+    if (closedParenthesis) {
+      nbrOfClosedParenthesis += 1;
     }
     let currentLineNum = selectionLine + 1;
     if (
-      openedParenthesisMatches.length !== closedParenthesisNatches.length ||
-      currentLineText.charAt(
-        closedParenthesisNatches[closedParenthesisNatches.length - 1]
-      ) === "." ||
+      nbrOfOpenedParenthesis !== nbrOfClosedParenthesis ||
+      currentLineText.endsWith(".") ||
       nextLineText.trim().startsWith(".")
     ) {
       while (currentLineNum < document.lineCount) {
         currentLineText = document.lineAt(currentLineNum).text;
-        while (
-          (openedParenthesisMatch = openedParenthesRegex.exec(
-            currentLineText
-          )) != null
-        ) {
-          openedParenthesisMatches.push(openedParenthesisMatch.index);
+        openedParenthesis = openedParenthesisRegex.exec(currentLineText);
+        if (openedParenthesis) {
+          nbrOfOpenedParenthesis += openedParenthesis.length;
         }
-        while (
-          (closedParenthesisMatch = closedParenthesRegex.exec(
-            currentLineText
-          )) != null
-        ) {
-          closedParenthesisNatches.push(closedParenthesisMatch.index);
+        closedParenthesis = closedParenthesisRegex.exec(currentLineText);
+        if (closedParenthesis) {
+          nbrOfClosedParenthesis += closedParenthesis.length;
         }
         if (currentLineNum === document.lineCount - 1) break;
         nextLineText = document.lineAt(currentLineNum + 1).text;
         currentLineNum++;
         if (
-          openedParenthesisMatches.length === closedParenthesisNatches.length &&
-          !(
-            currentLineText.charAt(
-              closedParenthesisNatches[closedParenthesisNatches.length - 1]
-            ) === "."
-          ) &&
+          nbrOfOpenedParenthesis === nbrOfClosedParenthesis &&
+          !currentLineText.endsWith(".") &&
           !nextLineText.trim().startsWith(".")
         )
           break;
       }
     }
-    return openedParenthesisMatches.length === closedParenthesisNatches.length
+    return nbrOfOpenedParenthesis === nbrOfClosedParenthesis
       ? currentLineNum
       : selectionLine + 1;
   } else if (lineCodeProcessing.checkFunctionCallDeclaration(currentLineText)) {
@@ -163,12 +152,14 @@ function logMessageLine(document, selectionLine, selectedVar) {
     ) {
       return selectionLine + 1;
     }
-    let nbrOfOpenedParenthesis = (currentLineText.match(/\(/g) || []).length;
-    let nbrOfClosedParenthesis = (currentLineText.match(/\)/g) || []).length;
-    let currentLineNum = selectionLine + 1;
+    let nbrOfOpenedParenthesis: number = (currentLineText.match(/\(/g) || [])
+      .length;
+    let nbrOfClosedParenthesis: number = (currentLineText.match(/\)/g) || [])
+      .length;
+    let currentLineNum: number = selectionLine + 1;
     if (nbrOfOpenedParenthesis !== nbrOfClosedParenthesis) {
       while (currentLineNum < document.lineCount) {
-        const currentLineText = document.lineAt(currentLineNum).text;
+        const currentLineText: string = document.lineAt(currentLineNum).text;
         nbrOfOpenedParenthesis += (currentLineText.match(/\(/g) || []).length;
         nbrOfClosedParenthesis += (currentLineText.match(/\)/g) || []).length;
         currentLineNum++;
@@ -180,10 +171,10 @@ function logMessageLine(document, selectionLine, selectedVar) {
       : selectionLine + 1;
   } else if (/`/.test(currentLineText)) {
     // Template string
-    let currentLineNum = selectionLine + 1;
-    let nbrOfBackticks = (currentLineText.match(/`/g) || []).length;
+    let currentLineNum: number = selectionLine + 1;
+    let nbrOfBackticks: number = (currentLineText.match(/`/g) || []).length;
     while (currentLineNum < document.lineCount) {
-      const currentLineText = document.lineAt(currentLineNum).text;
+      const currentLineText: string = document.lineAt(currentLineNum).text;
       nbrOfBackticks += (currentLineText.match(/`/g) || []).length;
       if (nbrOfBackticks % 2 === 0) {
         break;
@@ -194,12 +185,14 @@ function logMessageLine(document, selectionLine, selectedVar) {
   } else if (
     lineCodeProcessing.checkArrayDeclaration(currentLineText, nextLineText)
   ) {
-    let nbrOfOpenedBrackets = (currentLineText.match(/\[/g) || []).length;
-    let nbrOfClosedBrackets = (currentLineText.match(/\]/g) || []).length;
-    let currentLineNum = selectionLine + 1;
+    let nbrOfOpenedBrackets: number = (currentLineText.match(/\[/g) || [])
+      .length;
+    let nbrOfClosedBrackets: number = (currentLineText.match(/\]/g) || [])
+      .length;
+    let currentLineNum: number = selectionLine + 1;
     if (nbrOfOpenedBrackets !== nbrOfClosedBrackets) {
       while (currentLineNum < document.lineCount) {
-        const currentLineText = document.lineAt(currentLineNum).text;
+        const currentLineText: string = document.lineAt(currentLineNum).text;
         nbrOfOpenedBrackets += (currentLineText.match(/\[/g) || []).length;
         nbrOfClosedBrackets += (currentLineText.match(/\]/g) || []).length;
         currentLineNum++;
@@ -216,26 +209,23 @@ function logMessageLine(document, selectionLine, selectedVar) {
 }
 
 /**
- * Line Spaces
- * @function
- * @param {TextDocument} document
- * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
- * @param {number} line
- * @param {number} tabSize
- * @return {string} Spaces
+ * Spaces to insert before the log message
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @since 1.0
  */
-function spaces(document, line, tabSize) {
-  const currentLine = document.lineAt(line);
-  const currentLineTextChars = currentLine.text.split("");
+function spaces(
+  document: vscode.TextDocument,
+  line: number,
+  tabSize: number
+): string {
+  const currentLine: vscode.TextLine = document.lineAt(line);
+  const currentLineTextChars: string[] = currentLine.text.split("");
   if (
     lineCodeProcessing.checkIfFunction(currentLine.text) ||
     lineCodeProcessing.checkIfJSBuiltInStatement(currentLine.text) ||
     lineCodeProcessing.checkClassDeclaration(currentLine.text)
   ) {
-    const nextLine = document.lineAt(line + 1);
-    const nextLineTextChars = nextLine.text.split("");
+    const nextLine: vscode.TextLine = document.lineAt(line + 1);
+    const nextLineTextChars: string[] = nextLine.text.split("");
     if (nextLineTextChars.filter(char => char !== " ").length !== 0) {
       if (
         nextLine.firstNonWhitespaceCharacterIndex >
@@ -290,19 +280,16 @@ function spaces(document, line, tabSize) {
 }
 /**
  * Return the name of the enclosing block whether if it's a class or a function
- * @function
- * @param {TextDocument} document
- * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
- * @param {number} lineOfSelectedVar
- * @param {string} blockType
- * @return {string}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @since 1.0
  */
-function enclosingBlockName(document, lineOfSelectedVar, blockType) {
-  let currentLineNum = lineOfSelectedVar;
+function enclosingBlockName(
+  document: vscode.TextDocument,
+  lineOfSelectedVar: number,
+  blockType: JSBlockType
+): string {
+  let currentLineNum: number = lineOfSelectedVar;
   while (currentLineNum >= 0) {
-    const currentLineText = document.lineAt(currentLineNum).text;
+    const currentLineText: string = document.lineAt(currentLineNum).text;
     switch (blockType) {
       case "class":
         if (lineCodeProcessing.checkClassDeclaration(currentLineText)) {
@@ -340,22 +327,19 @@ function enclosingBlockName(document, lineOfSelectedVar, blockType) {
 
 /**
  * Return the number line of the block's closing brace
- * @function
- * @param {TextDocument} document
- * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
- * @param {number} lineNum
- * @return {number}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @since 1.0
  */
-function blockClosingBraceLineNum(document, lineNum) {
-  const docNbrOfLines = document.lineCount;
-  let enclosingBracketFounded = false;
-  let nbrOfOpeningBrackets = 1;
-  let nbrOfClosingBrackets = 0;
+function blockClosingBraceLineNum(
+  document: vscode.TextDocument,
+  lineNum: number
+): number {
+  const docNbrOfLines: number = document.lineCount;
+  let enclosingBracketFounded: boolean = false;
+  let nbrOfOpeningBrackets: number = 1;
+  let nbrOfClosingBrackets: number = 0;
   while (!enclosingBracketFounded && lineNum < docNbrOfLines - 1) {
     lineNum++;
-    const currentLineText = document.lineAt(lineNum).text;
+    const currentLineText: string = document.lineAt(lineNum).text;
     if (/{/.test(currentLineText)) {
       nbrOfOpeningBrackets++;
     }
@@ -367,58 +351,49 @@ function blockClosingBraceLineNum(document, lineNum) {
       return lineNum;
     }
   }
+  return lineNum;
 }
 
 /**
  * Detect all log messages inserted by this extension and then return their ranges
- * @function
- * @param {TextDocument} document
- * @param {number} tabSize
- * @param {string} logMessagePrefix
- * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#TextDocument}
- * @return {Range[]}
- * @see {@link https://code.visualstudio.com/docs/extensionAPI/vscode-api#Range}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @since 1.2
  */
-function detectAll(document, tabSize, logMessagePrefix) {
-  const documentNbrOfLines = document.lineCount;
-  const logMessages = [];
+function detectAll(
+  document: vscode.TextDocument,
+  tabSize: number,
+  logMessagePrefix: string
+): LogMessage[] {
+  const documentNbrOfLines: number = document.lineCount;
+  const logMessages: LogMessage[] = [];
   for (let i = 0; i < documentNbrOfLines; i++) {
-    const turboConsoleLogMessage = new RegExp(`('|"|\`)${logMessagePrefix}.*`);
+    const turboConsoleLogMessage: RegExp = new RegExp(
+      `console\.log\(('|"|\`)${logMessagePrefix}.*`
+    );
     if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
-      const logMessageLines = { spaces: 0, lines: [] };
-      for (let j = i; j >= 0; j--) {
-        let numberOfOpenParenthesis = 0;
-        let numberOfCloseParenthesis = 0;
-        if (/console\.log/.test(document.lineAt(j).text)) {
-          logMessageLines.spaces = spaces(document, j, tabSize);
-          for (let k = j; k <= documentNbrOfLines; k++) {
-            logMessageLines.lines.push({
-              range: document.lineAt(k).rangeIncludingLineBreak
-            });
-            if (document.lineAt(k).text.match(/\(/g)) {
-              numberOfOpenParenthesis += document.lineAt(k).text.match(/\(/g)
-                .length;
-            }
-            if (document.lineAt(k).text.match(/\)/g)) {
-              numberOfCloseParenthesis += document.lineAt(k).text.match(/\)/g)
-                .length;
-            }
-            if (
-              numberOfOpenParenthesis === numberOfCloseParenthesis &&
-              numberOfOpenParenthesis !== 0
-            )
-              break;
-          }
+      const logMessage: LogMessage = {};
+      let nbrOfOpenParenthesis: number = 0;
+      let nbrOfCloseParenthesis: number = 0;
+      logMessage.spaces = spaces(document, i, tabSize);
+      for (let j = i; j <= documentNbrOfLines; j++) {
+        logMessage.lines.push(document.lineAt(j).rangeIncludingLineBreak);
+        const currentLineText: string = document.lineAt(j).text;
+        const openedParenthesisRegex: RegExp = /\(/g;
+        const closedParenthesisRegex: RegExp = /\)/g;
+        const openedParenthesis: any = openedParenthesisRegex.exec(
+          currentLineText
+        );
+        const closedParenthesis: any = closedParenthesisRegex.exec(
+          currentLineText
+        );
+        if (openedParenthesis) {
+          nbrOfOpenParenthesis += openedParenthesis.length;
         }
-        if (
-          numberOfOpenParenthesis === numberOfCloseParenthesis &&
-          numberOfOpenParenthesis !== 0
-        )
-          break;
+        if (closedParenthesis) {
+          nbrOfCloseParenthesis += closedParenthesis.length;
+        }
+        if (nbrOfOpenParenthesis === nbrOfCloseParenthesis) break;
       }
-      logMessages.push(logMessageLines);
+      logMessages.push(logMessage);
     }
   }
   return logMessages;

@@ -1,5 +1,11 @@
 {
   "extends": ["google", "plugin:prettier/recommended"],
+  "parser": "babel-eslint",
+  "plugins": ["flowtype"],
+  "rules": {
+    "require-jsdoc": 0,
+    "valid-jsdoc": 0
+  },
   "env": {
     "es6": true
   }

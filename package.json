@@ -17,7 +17,7 @@
     "onCommand:turboConsoleLog.uncommentAllLogMessages",
     "onCommand:turboConsoleLog.deleteAllLogMessages"
   ],
-  "main": "./turboConsoleLog",
+  "main": "./build/turboConsoleLog",
   "contributes": {
     "configuration": {
       "type": "object",
@@ -102,20 +102,28 @@
     ]
   },
   "scripts": {
+    "build": "babel ./src/ -d ./build/",
+    "flow": "flow",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "test": "jest --config jest.config.json"
+    "test": "npm run build && jest --config jest.config.json"
   },
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.4",
+    "@babel/preset-flow": "^7.8.3",
     "@types/node": "^7.0.43",
+    "babel-eslint": "^10.0.3",
     "eslint": "^5.12.1",
     "eslint-config-google": "^0.11.0",
     "eslint-config-prettier": "^3.6.0",
     "eslint-config-standard": "^11.0.0-beta.0",
+    "eslint-plugin-flowtype": "^4.6.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^6.0.0",
     "eslint-plugin-prettier": "^3.0.1",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-standard": "^3.0.1",
+    "flow-bin": "^0.118.0",
     "jest": "^24.5.0",
     "jsdoc": "^3.5.5",
     "prettier": "^1.16.0",

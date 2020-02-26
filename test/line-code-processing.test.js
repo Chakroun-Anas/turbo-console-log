@@ -1,4 +1,4 @@
-const lineCodeProcessing = require("../line-code-processing");
+const lineCodeProcessing = require("../build/lineCodeProcessing");
 
 describe("Source Code Processing", () => {
   const classesDeclarations = [
@@ -33,7 +33,7 @@ describe("Source Code Processing", () => {
     "private functionName(arg1: any): any {",
     "protected functionName(arg1: any): any {",
     "static functionName(arg1: any): any {",
-    "export functionName(arg1: any): any {",
+    "export functionName(arg1: any): any {"
   ];
   const nonNamedFunctions = [
     "function() {",
@@ -69,14 +69,12 @@ describe("Source Code Processing", () => {
     }),
     it("Check if the code line represents a named function declaration", () => {
       namedFunctions.forEach(namedFunction => {
-        // console.log('Function Declaration: ', namedFunction);
-        expect(lineCodeProcessing.checkIfNamedFunction(namedFunction)).toBe(
-          true
-        );
+        console.log("Function Declaration: ", namedFunction);
+        expect(lineCodeProcessing.checkIfFunction(namedFunction)).toBe(true);
       });
       nonNamedFunctions.forEach(nonNamedFunction => {
         // console.log('Non Named Function: ', nonNamedFunction);
-        expect(lineCodeProcessing.checkIfNamedFunction(nonNamedFunction)).toBe(
+        expect(lineCodeProcessing.checkIfFunction(nonNamedFunction)).toBe(
           false
         );
       });

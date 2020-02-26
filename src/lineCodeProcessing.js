@@ -1,45 +1,73 @@
+// @flow
+
 /**
- * Return a boolean indicating if the line code represents a class declaration or not
- * @function
- * @param {string} lineCode
+ * Check if line code represents a class declaration
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @return {boolean}
- * @since 1.0
  */
-function checkClassDeclaration(lineCode) {
+function checkClassDeclaration(lineCode: string): boolean {
   const classNameRegex = /class(\s+)[a-zA-Z]+(.*){/;
   return classNameRegex.test(lineCode);
 }
 
-function checkObjectDeclaration(lineCode) {
+/**
+ * Check if line code represents an object declaration
+ * @author Chakroun Anas <chakroun.anas@outlook.com>
+ */
+function checkObjectDeclaration(lineCode: string): boolean {
   const objectRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*){/;
   return objectRejex.test(lineCode);
 }
 
-function checkArrayDeclaration(lineCodeSelectionLine, lineCodeSelectionNextLine) {
-  const arrayDeclarationRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*)\[/;
-  return arrayDeclarationRejex.test(lineCodeSelectionLine) || (/(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*/.test(lineCodeSelectionLine) && lineCodeSelectionNextLine.startsWith("["));
+/**
+ * Check if the line code represents an array declaration
+ * @author Chakroun Anas <chakroun.anas@outlook.com>
+ */
+function checkArrayDeclaration(
+  lineCodeSelectionLine: string,
+  lineCodeSelectionNextLine: string
+): boolean {
+  const arrayDeclarationRegex: RegExp = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*)\[/;
+  return (
+    arrayDeclarationRegex.test(lineCodeSelectionLine) ||
+    (/(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*/.test(
+      lineCodeSelectionLine
+    ) &&
+      lineCodeSelectionNextLine.startsWith("["))
+  );
 }
 
-function checkFunctionCallDeclaration(lineCode) {
-  const functionCallDeclarationRejex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*\(.*/;
-  return functionCallDeclarationRejex.test(lineCode);
+/**
+ * Check if line code represents a function call
+ * @author Chakroun Anas <chakroun.anas@outlook.com>
+ */
+function checkFunctionCallDeclaration(lineCode: string): boolean {
+  const functionCallDeclarationRegex = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*\(.*/;
+  return functionCallDeclarationRegex.test(lineCode);
 }
 
-function checkObjectFunctionCallDeclaration(lineCodeSelectionLine, lineCodeSelectionNextLine) {
-  const objectFunctionCallDeclaration = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*\./;
-  return objectFunctionCallDeclaration.test(lineCodeSelectionLine) || (/(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*/.test(lineCodeSelectionLine) && lineCodeSelectionNextLine.startsWith("."));
+/**
+ * Check if line code represents a function call related to an object (obj.func)
+ * @author Chakroun Anas <chakroun.anas@outlook.com>
+ */
+function checkObjectFunctionCallDeclaration(
+  lineCodeSelectionLine: string,
+  lineCodeSelectionNextLine: string
+): boolean {
+  const objectFunctionCallDeclaration: RegExp = /(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*\./;
+  return (
+    objectFunctionCallDeclaration.test(lineCodeSelectionLine) ||
+    (/(const|let|var)?(\s*)[a-zA-Z0-9]*(\s*)=(\s*).*[a-zA-Z0-9]*/.test(
+      lineCodeSelectionLine
+    ) &&
+      lineCodeSelectionNextLine.startsWith("."))
+  );
 }
 
 /**
  * Return the class name in case if the line code represents a class declaration
- * @function
- * @param {string} lineCode
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @return {string}
- * @since 1.0
  */
-function className(lineCode) {
+function className(lineCode: string): string {
   if (lineCode.split(/class /).length >= 2) {
     const textInTheRightOfClassKeyword = lineCode.split(/class /)[1].trim();
     if (textInTheRightOfClassKeyword.split(" ").length > 0) {
@@ -53,13 +81,9 @@ function className(lineCode) {
 
 /**
  * Return a boolean indicating if the line code represents a named function declaration
- * @function
- * @param {string} lineCode
- * @return {boolean}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @since 1.0
  */
-function checkIfFunction(lineCode) {
+function checkIfFunction(lineCode: string): boolean {
   const namedFunctionDeclarationRegex = /[a-zA-Z]+(\s*)\(.*\)(\s*){/;
   const nonNamedFunctionDeclaration = /(function)(\s*)\(.*\)(\s*){/;
   const namedFunctionExpressionRegex = /[a-zA-Z]+(\s*)=(\s*)(function)?(\s*)[a-zA-Z]*(\s*)\(.*\)(\s*)(=>)?(\s*){/;
@@ -78,26 +102,18 @@ function checkIfFunction(lineCode) {
 
 /**
  * Return a boolean indicating if the line code represents an if, switch, while, for or catch statement
- * @function
- * @param {string} lineCode
- * @return {boolean}
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @since 1.0
  */
-function checkIfJSBuiltInStatement(lineCode) {
+function checkIfJSBuiltInStatement(lineCode: string): boolean {
   const jSBuiltInStatement = /(if|switch|while|for|catch)(\s*)\(.*\)(\s*){/;
   return jSBuiltInStatement.test(lineCode);
 }
 
 /**
  * Return the function name in case if the line code represents a named function declaration
- * @function
- * @param {string} lineCode
- * @return {string} The name of the function that the line code represents
  * @author Chakroun Anas <chakroun.anas@outlook.com>
- * @since 1.0
  */
-function functionName(lineCode) {
+function functionName(lineCode: string): string {
   if (/function(\s+)[a-zA-Z]+(\s*)\(.*\)(\s*){/.test(lineCode)) {
     if (lineCode.split("function ").length > 1) {
       return lineCode
@@ -115,7 +131,10 @@ function functionName(lineCode) {
             .replace(/export |module.exports |const |var |let |=|(\s*)/g, "");
         }
       } else {
-        return textInTheLeftOfTheParams.replace(/async|public|private|protected|static|export |(\s*)/g, "");
+        return textInTheLeftOfTheParams.replace(
+          /async|public|private|protected|static|export |(\s*)/g,
+          ""
+        );
       }
     }
   }
@@ -125,7 +144,7 @@ function functionName(lineCode) {
 module.exports.checkClassDeclaration = checkClassDeclaration;
 module.exports.checkObjectDeclaration = checkObjectDeclaration;
 module.exports.checkArrayDeclaration = checkArrayDeclaration;
-module.exports.checkFunctionCallDeclaration = checkFunctionCallDeclaration
+module.exports.checkFunctionCallDeclaration = checkFunctionCallDeclaration;
 module.exports.checkObjectFunctionCallDeclaration = checkObjectFunctionCallDeclaration;
 module.exports.className = className;
 module.exports.checkIfFunction = checkIfFunction;
