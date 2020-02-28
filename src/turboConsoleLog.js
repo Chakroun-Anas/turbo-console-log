@@ -166,7 +166,7 @@ function extensionProperties(
     // $FlowFixMe
     workspaceConfig.logMessagePrefix && workspaceConfig.logMessagePrefix
       ? workspaceConfig.logMessagePrefix
-      : "TCL";
+      : "";
   // $FlowFixMe
   extensionProperties.addSemicolonInTheEnd =
     // $FlowFixMe

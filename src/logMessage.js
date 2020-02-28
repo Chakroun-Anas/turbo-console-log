@@ -37,9 +37,9 @@ function message(
   );
   const spacesBeforeMsg: string = spaces(document, lineOfSelectedVar, tabSize);
   const semicolon: string = addSemicolonInTheEnd ? ";" : "";
-  const debuggingMsg: string = `console.log(${quote}${logMessagePrefix}: ${
-    insertEnclosingClass ? classThatEncloseTheVar : ""
-  }${
+  const debuggingMsg: string = `console.log(${quote}${logMessagePrefix}${
+    logMessagePrefix.length !== 0 ? ": " : ""
+  }${insertEnclosingClass ? classThatEncloseTheVar : ""}${
     insertEnclosingFunction ? funcThatEncloseTheVar : ""
   }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
   if (wrapLogMessage) {
@@ -366,11 +366,11 @@ function detectAll(
   const documentNbrOfLines: number = document.lineCount;
   const logMessages: LogMessage[] = [];
   for (let i = 0; i < documentNbrOfLines; i++) {
-    const turboConsoleLogMessage: RegExp = new RegExp(
-      `console\.log\(('|"|\`)${logMessagePrefix}.*`
-    );
+    const turboConsoleLogMessage: RegExp = /console\.log\(('|"|`).*/;
     if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
-      const logMessage: LogMessage = {};
+      const logMessage: LogMessage = {
+        lines: []
+      };
       let nbrOfOpenParenthesis: number = 0;
       let nbrOfCloseParenthesis: number = 0;
       logMessage.spaces = spaces(document, i, tabSize);

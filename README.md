@@ -30,7 +30,7 @@ Properties:
 
 - turboConsoleLog.wrapLogMessage (boolean): Whether to wrap the log message or not.
 
-- turboConsoleLog.logMessagePrefix (string): The prefix of the log message, default one is TCL.
+- turboConsoleLog.logMessagePrefix (string): The prefix of the log message.
 
 - turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
 
@@ -62,10 +62,6 @@ All it takes to delete all log messages, inserted by the extension, from the cur
 
 ![alt text](https://image.ibb.co/jv9UtU/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
 
-**_Warning:_**
-
-The extension rely on the log message prefix in order to detect the generated log messages, missing up the prefix will result on the failure of the detection and hence the failure of commenting, uncommenting and deleting the log messages.
-
 ## Release Notes
 
 ---
@@ -87,6 +83,10 @@ Initial release of Turbo Console Log
 ### 1.3.0
 
 - Multiple cursor support
+
+### 1.4.0
+
+- The extension will comment, uncomment and delete all log messages in the current file whether they have been inserted by it or not
 
 ## Participate
 
