@@ -84,7 +84,7 @@ function className(lineCode: string): string {
  * @author Chakroun Anas <chakroun.anas@outlook.com>
  */
 function checkIfFunction(lineCode: string): boolean {
-  const namedFunctionDeclarationRegex = /[a-zA-Z]+(\s*)\(.*\)(\s*){/;
+  const namedFunctionDeclarationRegex = /(function)?(\s*)[a-zA-Z]+(\s*)\(.*\):?(\s*)[a-zA-Z]*(\s*){/;
   const nonNamedFunctionDeclaration = /(function)(\s*)\(.*\)(\s*){/;
   const namedFunctionExpressionRegex = /[a-zA-Z]+(\s*)=(\s*)(function)?(\s*)[a-zA-Z]*(\s*)\(.*\)(\s*)(=>)?(\s*){/;
   const isNamedFunctionDeclaration = namedFunctionDeclarationRegex.test(

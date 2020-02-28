@@ -1,3 +1,4 @@
 jsconfig.json
 node_modules
 build
+./vscode-test
