@@ -41,7 +41,7 @@ function message(
   );
   const spacesBeforeMsg = spaces(document, logMessageLine(document, lineOfSelectedVar, selectedVar) - 1, tabSize);
   const semicolon = addSemicolonInTheEnd ? ";" : "";
-  const eslintNoConsoleComment = disableESlintNoConsole ? "//eslint-disable-line no-console" : "";
+  const eslintNoConsoleComment = disableESlintNoConsole ? "//eslint-disable-line" : "";
   const debuggingMsg = `console.log(${quote}${logMessagePrefix}: ${classThatEncloseTheVar}${funcThatEncloseTheVar}${selectedVar}${quote}, ${selectedVar})${semicolon}${eslintNoConsoleComment}`;
   if (wrapLogMessage) {
     // 16 represents the length of console.log("");
