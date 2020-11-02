@@ -1,35 +1,36 @@
-// @flow
+import * as vscode from "vscode";
+import { DebugMessage } from "./debug-message";
+import { JSDebugMessage } from "./debug-message/js";
+import { ExtensionProperties, Message } from "./entities";
+import { LineCodeProcessing } from "./line-code-processing";
+import { JSLineCodeProcessing } from "./line-code-processing/js";
 
-const vscode = require("vscode");
-const logMessage = require("./logMessage");
-import type { LogMessage, ExtensionProperties } from "./Types";
-
-/**
- * Activation method
- * @author Chakroun Anas <chakroun.anas@outlook.com>
- */
-function activate(context: vscode.ExtensionContext) {
+export function activate(context: vscode.ExtensionContext) {
+  const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
+  const jsDebugMessage: DebugMessage = new JSDebugMessage(jsLineCodeProcessing);
+  // Insert debug message
   vscode.commands.registerCommand(
     "turboConsoleLog.displayLogMessage",
     async () => {
-      const editor: vscode.TextEditor = vscode.window.activeTextEditor;
+      const editor: vscode.TextEditor | undefined =
+        vscode.window.activeTextEditor;
       if (!editor) {
         return;
       }
-      const tabSize: number = editor.options.tabSize;
+      const tabSize: number | string = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
       const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(
         "turboConsoleLog"
       );
-      const properties: ExtensionProperties = extensionProperties(config);
+      const properties: ExtensionProperties = getExtensionProperties(config);
       for (let index = 0; index < editor.selections.length; index++) {
         const selection: vscode.Selection = editor.selections[index];
         const selectedVar: string = document.getText(selection);
         const lineOfSelectedVar: number = selection.active.line;
         // Check if the selection line is not the last one in the document and the selected variable is not empty
         if (selectedVar.trim().length !== 0) {
-          await editor.edit(editBuilder => {
-            const logMessageLine = logMessage.logMessageLine(
+          await editor.edit((editBuilder) => {
+            const logMessageLine = jsDebugMessage.line(
               document,
               lineOfSelectedVar,
               selectedVar
@@ -41,7 +42,7 @@ function activate(context: vscode.ExtensionContext) {
                   : logMessageLine,
                 0
               ),
-              logMessage.message(
+              jsDebugMessage.content(
                 document,
                 selectedVar,
                 lineOfSelectedVar,
@@ -59,25 +60,27 @@ function activate(context: vscode.ExtensionContext) {
       }
     }
   );
+  // Comment all debug messages
   vscode.commands.registerCommand(
     "turboConsoleLog.commentAllLogMessages",
     () => {
-      const editor: vscode.TextEditor = vscode.window.activeTextEditor;
+      const editor: vscode.TextEditor | undefined =
+        vscode.window.activeTextEditor;
       if (!editor) {
         return;
       }
-      const tabSize: number = editor.options.tabSize;
+      const tabSize: number = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
       const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(
         "turboConsoleLog"
       );
-      const properties: ExtensionProperties = extensionProperties(config);
-      const logMessages: LogMessage[] = logMessage.detectAll(
+      const properties: ExtensionProperties = getExtensionProperties(config);
+      const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         tabSize,
         properties.logMessagePrefix
       );
-      editor.edit(editBuilder => {
+      editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
           lines.forEach((line: vscode.Range) => {
             editBuilder.delete(line);
@@ -85,65 +88,65 @@ function activate(context: vscode.ExtensionContext) {
               new vscode.Position(line.start.line, 0),
               `${spaces}// ${document.getText(line).trim()}\n`
             );
-            // editBuilder.insert(new vscode.Position(range.start.line, 80), `Good`)
           });
         });
       });
     }
   );
+  // Uncomment all debug messages
   vscode.commands.registerCommand(
     "turboConsoleLog.uncommentAllLogMessages",
     () => {
-      const editor: vscode.TextEditor = vscode.window.activeTextEditor;
+      const editor: vscode.TextEditor | undefined =
+        vscode.window.activeTextEditor;
       if (!editor) {
         return;
       }
-      const tabSize: number = editor.options.tabSize;
+      const tabSize: number = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
       const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(
         "turboConsoleLog"
       );
-      const properties: ExtensionProperties = extensionProperties(config);
-      const logMessages: LogMessage[] = logMessage.detectAll(
+      const properties: ExtensionProperties = getExtensionProperties(config);
+      const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         tabSize,
         properties.logMessagePrefix
       );
-      editor.edit(editBuilder => {
+      editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
           lines.forEach((line: vscode.Range) => {
             editBuilder.delete(line);
             editBuilder.insert(
               new vscode.Position(line.start.line, 0),
-              `${spaces}${document
-                .getText(line)
-                .replace(/\//g, "")
-                .trim()}\n`
+              `${spaces}${document.getText(line).replace(/\//g, "").trim()}\n`
             );
           });
         });
       });
     }
   );
+  // Delete all debug messages
   vscode.commands.registerCommand(
     "turboConsoleLog.deleteAllLogMessages",
     () => {
-      const editor: vscode.TextEditor = vscode.window.activeTextEditor;
+      const editor: vscode.TextEditor | undefined =
+        vscode.window.activeTextEditor;
       if (!editor) {
         return;
       }
-      const tabSize: number = editor.options.tabSize;
+      const tabSize: number = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
       const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(
         "turboConsoleLog"
       );
-      const properties: ExtensionProperties = extensionProperties(config);
-      const logMessages: LogMessage[] = logMessage.detectAll(
+      const properties: ExtensionProperties = getExtensionProperties(config);
+      const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         tabSize,
         properties.logMessagePrefix
       );
-      editor.edit(editBuilder => {
+      editor.edit((editBuilder) => {
         logMessages.forEach(({ lines }) => {
           lines.forEach((line: vscode.Range) => {
             editBuilder.delete(line);
@@ -154,34 +157,37 @@ function activate(context: vscode.ExtensionContext) {
   );
 }
 
-// TODO: Fix flow issues later
-function extensionProperties(
+export function deactivate() {}
+
+function getExtensionProperties(
   workspaceConfig: vscode.WorkspaceConfiguration
-): ExtensionProperties {
-  const extensionProperties: ExtensionProperties = {};
-  // $FlowFixMe
-  extensionProperties.wrapLogMessage = workspaceConfig.wrapLogMessage || false;
-  // $FlowFixMe
-  extensionProperties.logMessagePrefix =
-    // $FlowFixMe
-    workspaceConfig.logMessagePrefix && workspaceConfig.logMessagePrefix
-      ? workspaceConfig.logMessagePrefix
-      : "";
-  // $FlowFixMe
-  extensionProperties.addSemicolonInTheEnd =
-    // $FlowFixMe
-    workspaceConfig.addSemicolonInTheEnd || false;
-  // $FlowFixMe
-  extensionProperties.insertEnclosingClass =
-    // $FlowFixMe
-    workspaceConfig.insertEnclosingClass || true;
-  // $FlowFixMe
-  extensionProperties.insertEnclosingFunction =
-    // $FlowFixMe
+) {
+  const wrapLogMessage = workspaceConfig.wrapLogMessage || false;
+  const logMessagePrefix = workspaceConfig.logMessagePrefix
+    ? workspaceConfig.logMessagePrefix
+    : "";
+  const addSemicolonInTheEnd = workspaceConfig.addSemicolonInTheEnd || false;
+  const insertEnclosingClass = workspaceConfig.insertEnclosingClass || true;
+  const insertEnclosingFunction =
     workspaceConfig.insertEnclosingFunction || true;
-  // $FlowFixMe
-  extensionProperties.quote = workspaceConfig.quote || '"';
+  const quote = workspaceConfig.quote || '"';
+  const extensionProperties: ExtensionProperties = {
+    wrapLogMessage,
+    logMessagePrefix,
+    addSemicolonInTheEnd,
+    insertEnclosingClass,
+    insertEnclosingFunction,
+    quote,
+  };
   return extensionProperties;
 }
 
-exports.activate = activate;
+function getTabSize(tabSize: string | number | undefined): number {
+  if (tabSize && typeof tabSize === "number") {
+    return tabSize;
+  } else if (tabSize && typeof tabSize === "string") {
+    return parseInt(tabSize);
+  } else {
+    return 4;
+  }
+}

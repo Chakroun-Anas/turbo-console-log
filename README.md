@@ -88,6 +88,10 @@ Initial release of Turbo Console Log
 
 - The extension will comment, uncomment and delete all log messages in the current file whether they have been inserted by it or not
 
+### 2.0.0
+
+- The extension is rewrited with Typescript with a whole new architecture
+
 ## Participate
 
 ---

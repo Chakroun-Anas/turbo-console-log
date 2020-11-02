@@ -1,4 +1,4 @@
-jsconfig.json
+out
 node_modules
-build
-./vscode-test
+.vscode-test/
+*.vsix

@@ -1,12 +1,17 @@
 {
-  "extends": ["google", "plugin:prettier/recommended"],
-  "parser": "babel-eslint",
-  "plugins": ["flowtype"],
-  "rules": {
-    "require-jsdoc": 0,
-    "valid-jsdoc": 0
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
   },
-  "env": {
-    "es6": true
+  "plugins": ["@typescript-eslint", "prettier"],
+  "rules": {
+    "@typescript-eslint/naming-convention": "warn",
+    "@typescript-eslint/semi": "warn",
+    "curly": "warn",
+    "eqeqeq": "warn",
+    "no-throw-literal": "warn",
+    "semi": "off"
   }
 }
