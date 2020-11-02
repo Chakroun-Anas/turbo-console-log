@@ -167,9 +167,8 @@ function getExtensionProperties(
     ? workspaceConfig.logMessagePrefix
     : "";
   const addSemicolonInTheEnd = workspaceConfig.addSemicolonInTheEnd || false;
-  const insertEnclosingClass = workspaceConfig.insertEnclosingClass || true;
-  const insertEnclosingFunction =
-    workspaceConfig.insertEnclosingFunction || true;
+  const insertEnclosingClass = workspaceConfig.insertEnclosingClass;
+  const insertEnclosingFunction = workspaceConfig.insertEnclosingFunction;
   const quote = workspaceConfig.quote || '"';
   const extensionProperties: ExtensionProperties = {
     wrapLogMessage,
