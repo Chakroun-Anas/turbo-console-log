@@ -14,7 +14,7 @@ suite("Turbo Console Log: JavaScript", () => {
     );
   });
   test("Insert log message related to a primitive variable", async () => {
-    await openDocument("./files/primitiveVariable.js");
+    await openDocument("../files/js/primitiveVariable.js");
     const { activeTextEditor } = vscode.window;
     if (activeTextEditor) {
       activeTextEditor.selections = [
@@ -33,7 +33,7 @@ suite("Turbo Console Log: JavaScript", () => {
     }
   });
   test("Insert log message related to an object variable", async () => {
-    await openDocument("./files/objectVariable.js");
+    await openDocument("../files/js/objectVariable.js");
     const { activeTextEditor } = vscode.window;
     if (activeTextEditor) {
       activeTextEditor.selections = [
@@ -52,7 +52,7 @@ suite("Turbo Console Log: JavaScript", () => {
     }
   });
   test("Insert log message related to a function parameter", async () => {
-    await openDocument("./files/function.js");
+    await openDocument("../files/js/function.js");
     const { activeTextEditor } = vscode.window;
     if (activeTextEditor) {
       activeTextEditor.selections = [
@@ -72,7 +72,7 @@ suite("Turbo Console Log: JavaScript", () => {
     }
   });
   test("Insert log message related to a class constructor parameter", async () => {
-    await openDocument("./files/classConstructor.js");
+    await openDocument("../files/js/classConstructor.js");
     const { activeTextEditor } = vscode.window;
     if (activeTextEditor) {
       activeTextEditor.selections = [
@@ -95,7 +95,7 @@ suite("Turbo Console Log: JavaScript", () => {
     }
   });
   test("Insert log message related to a class function parameter", async () => {
-    await openDocument("./files/classFunction.js");
+    await openDocument("../files/js/classFunction.js");
     const { activeTextEditor } = vscode.window;
     if (activeTextEditor) {
       activeTextEditor.selections = [
@@ -118,7 +118,7 @@ suite("Turbo Console Log: JavaScript", () => {
     }
   });
   test("Insert log message related to a function parameter within a class function", async () => {
-    await openDocument("./files/classNestedFunction.js");
+    await openDocument("../files/js/classNestedFunction.js");
     const { activeTextEditor } = vscode.window;
     if (activeTextEditor) {
       activeTextEditor.selections = [

@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { JSLineCodeProcessing } from "../../../line-code-processing/js";
+import { JSLineCodeProcessing } from "../../line-code-processing/js";
 
 const jsLineCodeProcessing: JSLineCodeProcessing = new JSLineCodeProcessing();
 

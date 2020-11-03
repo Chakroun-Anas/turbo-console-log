@@ -103,7 +103,7 @@
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
-    "compile": "tsc -p ./ && mkdir out/test/suite/js/files && cp -r src/test/suite/js/files/ out/test/suite/js/files",
+    "compile": "tsc -p ./ && mkdir -p out/test/files/js && cp -r src/test/files/js out/test/files",
     "lint": "eslint src --ext ts",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
