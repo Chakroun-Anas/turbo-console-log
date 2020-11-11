@@ -25,6 +25,7 @@ suite("JS Line Code Processing", () => {
                   age: 50,
                   eyeColor: "blue"
                 };`,
+        `function classicMoves() {`,
       ];
       classLOCs.forEach((classLOC) => {
         assert.strictEqual(

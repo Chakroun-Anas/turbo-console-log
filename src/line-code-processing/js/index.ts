@@ -10,8 +10,7 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
     return /\[.*/.test(locWithoutWhiteSpaces);
   }
   doesContainClassDeclaration(loc: string): boolean {
-    const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
-    return /class.*{/.test(locWithoutWhiteSpaces);
+    return /class(\s+).*{/.test(loc);
   }
   getClassName(loc: string): string {
     if (this.doesContainClassDeclaration(loc)) {
