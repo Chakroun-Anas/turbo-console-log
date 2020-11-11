@@ -2,8 +2,14 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import * as path from "path";
 import * as Mocha from "mocha";
+import { LineCodeProcessing } from "../../line-code-processing";
+import { DebugMessage } from "../../debug-message";
+import { JSLineCodeProcessing } from "../../line-code-processing/js";
+import { JSDebugMessage } from "../../debug-message/js";
 
 suite("Turbo Console Log: JavaScript", () => {
+  const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
+  const jsDebugMessage: DebugMessage = new JSDebugMessage(jsLineCodeProcessing);
   Mocha.before(async () => {
     vscode.window.showInformationMessage("Running integration tests");
   });
@@ -12,6 +18,17 @@ suite("Turbo Console Log: JavaScript", () => {
       "workbench.action.closeActiveEditor",
       []
     );
+  });
+  test("Block closing brace line num", async () => {
+    await openDocument("../files/js/functionParamWithType.ts");
+    const { activeTextEditor } = vscode.window;
+    if (activeTextEditor) {
+      const lineNum: number = jsDebugMessage.blockClosingBraceLine(
+        activeTextEditor.document,
+        0
+      );
+      assert.strictEqual(lineNum, 7);
+    }
   });
   test("Insert log message related to a primitive variable", async () => {
     await openDocument("../files/js/primitiveVariable.js");

@@ -3,10 +3,9 @@ import { DebugMessage } from "..";
 import { BlockType, Message } from "../../entities";
 import { LineCodeProcessing } from "../../line-code-processing";
 
-export class JSDebugMessage implements DebugMessage {
-  lineCodeProcessing: LineCodeProcessing;
+export class JSDebugMessage extends DebugMessage {
   constructor(lineCodeProcessing: LineCodeProcessing) {
-    this.lineCodeProcessing = lineCodeProcessing;
+    super(lineCodeProcessing);
   }
   content(
     document: TextDocument,
@@ -376,27 +375,6 @@ export class JSDebugMessage implements DebugMessage {
       currentLineNum--;
     }
     return "";
-  }
-  blockClosingBraceLine(document: TextDocument, lineNum: number): number {
-    const docNbrOfLines: number = document.lineCount;
-    let enclosingBracketFounded: boolean = false;
-    let nbrOfOpeningBrackets: number = 1;
-    let nbrOfClosingBrackets: number = 0;
-    while (!enclosingBracketFounded && lineNum < docNbrOfLines - 1) {
-      lineNum++;
-      const currentLineText: string = document.lineAt(lineNum).text;
-      if (/{/.test(currentLineText)) {
-        nbrOfOpeningBrackets++;
-      }
-      if (/}/.test(currentLineText)) {
-        nbrOfClosingBrackets++;
-      }
-      if (nbrOfOpeningBrackets === nbrOfClosingBrackets) {
-        enclosingBracketFounded = true;
-        return lineNum;
-      }
-    }
-    return lineNum;
   }
   detectAll(document: TextDocument, tabSize: number): Message[] {
     const documentNbrOfLines: number = document.lineCount;
