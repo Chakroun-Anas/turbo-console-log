@@ -1,13 +1,17 @@
 import { LineCodeProcessing } from "..";
 
 export class JSLineCodeProcessing implements LineCodeProcessing {
-  doesContainsObjectLiteralDeclaration(loc: string): boolean {
+  isObjectLiteralAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
-    return /{.+:.+/.test(locWithoutWhiteSpaces);
+    return /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=\s*{.+:.+/.test(
+      locWithoutWhiteSpaces
+    );
   }
-  doesContainsArrayDeclaration(loc: string): boolean {
+  isArrayAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
-    return /\[.*/.test(locWithoutWhiteSpaces);
+    return /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=\s*\[.*/.test(
+      locWithoutWhiteSpaces
+    );
   }
   doesContainClassDeclaration(loc: string): boolean {
     return /class(\s+).*{/.test(loc);

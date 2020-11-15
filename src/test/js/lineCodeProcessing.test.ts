@@ -248,8 +248,8 @@ suite("JS Line Code Processing", () => {
       });
     });
   });
-  test("Object Literal Declaration", () => {
-    const objLiteralsLOCs = [
+  test("Assignment of object literal to a variable", () => {
+    const objLiteralAssignmentLOCs = [
       `var myObject = {
                 sProp: 'some string value',
                 numProp: 2,
@@ -276,45 +276,46 @@ suite("JS Line Code Processing", () => {
                 eyeColor: "blue"
               };`,
     ];
-    const nonObjLiteralsLOCs = [
+    const nonObjLiteralAssignmentLOCs = [
       `var myVar = 1;`,
       `var myVar = false`,
       `var myVar = [1, 'hello', false];`,
       `var myVar = [1, 'hello', false];`,
       `let someVar = function sayHello() {
                 return true;
-            }`,
+       }`,
+      `sayHello(someObj: { someProp: string }): number {`,
     ];
-    objLiteralsLOCs.forEach((objLiteralsLOC) => {
+    objLiteralAssignmentLOCs.forEach((objLiteralAssignmentLOC) => {
       assert.strictEqual(
-        jsLineCodeProcessing.doesContainsObjectLiteralDeclaration(
-          objLiteralsLOC
+        jsLineCodeProcessing.isObjectLiteralAssignedToVariable(
+          objLiteralAssignmentLOC
         ),
         true
       );
     });
-    nonObjLiteralsLOCs.forEach((nonObjLiteralsLOC) => {
+    nonObjLiteralAssignmentLOCs.forEach((nonObjLiteralAssignmentLOC) => {
       assert.strictEqual(
-        jsLineCodeProcessing.doesContainsObjectLiteralDeclaration(
-          nonObjLiteralsLOC
+        jsLineCodeProcessing.isObjectLiteralAssignedToVariable(
+          nonObjLiteralAssignmentLOC
         ),
         false
       );
     });
   });
-  test("Array Declaration", () => {
-    const arrayLOCs = [
-      `var myArray = [
+  test("Assignment of an array to a variable", () => {
+    const arrayAssignmentLOCs = [
+      `let    myArray =   [
                 1,
                 2,
                 3
             ];`,
       `var someArray = ['one', true, {someProp: false}];`,
-      `var someArray = [function sayHello() {
+      `const someArray =  [function sayHello()   {
                 return true;
             }, true, false, 'hie'];`,
     ];
-    const nonArrayLOCs = [
+    const nonArrayAssignmentLOCs = [
       `var myVar = 1;`,
       `var myVar = false`,
       `let someVar = function sayHello() {
@@ -326,17 +327,19 @@ suite("JS Line Code Processing", () => {
                 lastName: "Doe",
                 age: 50,
                 eyeColor: "blue"
-              };`,
+        };
+        `,
+      `someFunc(someArray: Array<number> = [1, 2, 3]) {}`,
     ];
-    arrayLOCs.forEach((arrayLOC) => {
+    arrayAssignmentLOCs.forEach((arrayAssignmentLOC) => {
       assert.strictEqual(
-        jsLineCodeProcessing.doesContainsArrayDeclaration(arrayLOC),
+        jsLineCodeProcessing.isArrayAssignedToVariable(arrayAssignmentLOC),
         true
       );
     });
-    nonArrayLOCs.forEach((nonArrayLOC) => {
+    nonArrayAssignmentLOCs.forEach((nonArrayAssignmentLOC) => {
       assert.strictEqual(
-        jsLineCodeProcessing.doesContainsArrayDeclaration(nonArrayLOC),
+        jsLineCodeProcessing.isArrayAssignedToVariable(nonArrayAssignmentLOC),
         false
       );
     });

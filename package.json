@@ -107,7 +107,8 @@
     "lint": "eslint src --ext ts",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "generateTest": "ts-node ./src/test/generator.ts"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
@@ -116,6 +117,7 @@
     "@types/vscode": "^1.50.0",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
     "@typescript-eslint/parser": "^4.1.1",
+    "chalk": "^4.1.0",
     "eslint": "^7.9.0",
     "eslint-plugin-prettier": "^3.1.4",
     "glob": "^7.1.6",

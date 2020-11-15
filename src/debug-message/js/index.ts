@@ -71,7 +71,7 @@ export class JSDebugMessage extends DebugMessage {
       .lineAt(selectionLine + 1)
       .text.replace(/\s/g, "");
     if (
-      this.lineCodeProcessing.doesContainsObjectLiteralDeclaration(
+      this.lineCodeProcessing.isObjectLiteralAssignedToVariable(
         `${currentLineText}\n${nextLineText}`
       )
     ) {
@@ -89,7 +89,7 @@ export class JSDebugMessage extends DebugMessage {
     } else if (/`/.test(currentLineText)) {
       return this.templateStringLine(document, selectionLine);
     } else if (
-      this.lineCodeProcessing.doesContainsArrayDeclaration(
+      this.lineCodeProcessing.isArrayAssignedToVariable(
         `${currentLineText}\n${currentLineText}`
       )
     ) {

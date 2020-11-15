@@ -4,6 +4,6 @@ import { LineCodeFunctionProcessing } from "./lineCodeFunctionProcessing";
 export interface LineCodeProcessing
   extends LineCodeClassProcessing,
     LineCodeFunctionProcessing {
-  doesContainsObjectLiteralDeclaration(loc: string): boolean;
-  doesContainsArrayDeclaration(loc: string): boolean;
+  isObjectLiteralAssignedToVariable(loc: string): boolean;
+  isArrayAssignedToVariable(loc: string): boolean;
 }
