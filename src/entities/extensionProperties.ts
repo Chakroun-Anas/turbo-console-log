@@ -4,5 +4,6 @@ export type ExtensionProperties = {
   addSemicolonInTheEnd: boolean;
   insertEnclosingClass: boolean;
   insertEnclosingFunction: boolean;
+  delimiterInsideMessage: string;
   quote: string;
 };

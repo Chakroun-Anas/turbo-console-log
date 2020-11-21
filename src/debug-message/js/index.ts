@@ -17,6 +17,7 @@ export class JSDebugMessage extends DebugMessage {
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
+    delemiterInsideMessage: string,
     tabSize: number
   ): string {
     const classThatEncloseTheVar: string = this.enclosingBlockName(
@@ -42,8 +43,14 @@ export class JSDebugMessage extends DebugMessage {
     const semicolon: string = addSemicolonInTheEnd ? ";" : "";
     const debuggingMsg: string = `console.log(${quote}${logMessagePrefix}${
       logMessagePrefix.length !== 0 ? ": " : ""
-    }${insertEnclosingClass ? classThatEncloseTheVar : ""}${
-      insertEnclosingFunction ? funcThatEncloseTheVar : ""
+    }${
+      insertEnclosingClass
+        ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+        : ""
+    }${
+      insertEnclosingFunction
+        ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+        : ""
     }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
     if (wrapLogMessage) {
       // 16 represents the length of console.log("");
@@ -404,9 +411,7 @@ export class JSDebugMessage extends DebugMessage {
                   LocElement.Braces
                 )
             ) {
-              return `${this.lineCodeProcessing.getClassName(
-                currentLineText
-              )} -> `;
+              return `${this.lineCodeProcessing.getClassName(currentLineText)}`;
             }
           }
           break;
@@ -434,7 +439,7 @@ export class JSDebugMessage extends DebugMessage {
               ) {
                 return `${this.lineCodeProcessing.getFunctionName(
                   currentLineText
-                )} -> `;
+                )}`;
               }
               return "";
             }

@@ -18,6 +18,7 @@ export abstract class DebugMessage {
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
+    delemiterInsideMessage: string,
     tabSize: number
   ): string;
   abstract line(

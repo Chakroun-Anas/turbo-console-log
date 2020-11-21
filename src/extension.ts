@@ -52,6 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
                 properties.addSemicolonInTheEnd,
                 properties.insertEnclosingClass,
                 properties.insertEnclosingFunction,
+                properties.delimiterInsideMessage,
                 tabSize
               )
             );
@@ -170,6 +171,7 @@ function getExtensionProperties(
   const insertEnclosingClass = workspaceConfig.insertEnclosingClass;
   const insertEnclosingFunction = workspaceConfig.insertEnclosingFunction;
   const quote = workspaceConfig.quote || '"';
+  const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "~";
   const extensionProperties: ExtensionProperties = {
     wrapLogMessage,
     logMessagePrefix,
@@ -177,6 +179,7 @@ function getExtensionProperties(
     insertEnclosingClass,
     insertEnclosingFunction,
     quote,
+    delimiterInsideMessage,
   };
   return extensionProperties;
 }

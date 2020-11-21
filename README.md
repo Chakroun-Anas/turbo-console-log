@@ -38,6 +38,8 @@ Properties:
 
 - turboConsoleLog.insertEnclosingFunction (boolean): Whether to insert or not the enclosing function of the selected variable in the log message.
 
+- turboConsoleLog.delemiterInsideMessage (string): The delemiter that will separate the selected variable from it's function and class.
+
 - turboConsoleLog.quote (enum): Double quotes (""), single quotes ('') or backtick(``).
 
 A wrapped log message :

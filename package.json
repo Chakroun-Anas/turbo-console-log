@@ -48,6 +48,11 @@
           "default": true,
           "description": "Whether to insert or not the enclosing function of the selected variable in the log message."
         },
+        "turboConsoleLog.delimiterInsideMessage": {
+          "type": "string",
+          "default": "~",
+          "description": "The delimiter that will separate the selected variable from it's function and class."
+        },
         "turboConsoleLog.quote": {
           "type": "string",
           "enum": [
