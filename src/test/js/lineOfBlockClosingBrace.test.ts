@@ -6,6 +6,7 @@ import { DebugMessage } from "../../debug-message";
 import { JSDebugMessage } from "../../debug-message/js";
 import { LineCodeProcessing } from "../../line-code-processing";
 import { JSLineCodeProcessing } from "../../line-code-processing/js";
+import { LocElement } from "../../entities";
 
 test("Determine the closing brace line num", async () => {
   const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
@@ -14,11 +15,19 @@ test("Determine the closing brace line num", async () => {
   const { activeTextEditor } = vscode.window;
   if (activeTextEditor) {
     assert.strictEqual(
-      jsDebugMessage.blockClosingBraceLine(activeTextEditor.document, 0),
+      jsDebugMessage.closingElementLine(
+        activeTextEditor.document,
+        0,
+        LocElement.Braces
+      ),
       4
     );
     assert.strictEqual(
-      jsDebugMessage.blockClosingBraceLine(activeTextEditor.document, 1),
+      jsDebugMessage.closingElementLine(
+        activeTextEditor.document,
+        1,
+        LocElement.Braces
+      ),
       3
     );
   }

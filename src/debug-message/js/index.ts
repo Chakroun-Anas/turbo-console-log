@@ -1,6 +1,6 @@
 import { TextDocument, TextLine } from "vscode";
 import { DebugMessage } from "..";
-import { BlockType, Message } from "../../entities";
+import { BlockType, LocElement, Message } from "../../entities";
 import { LineCodeProcessing } from "../../line-code-processing";
 
 export class JSDebugMessage extends DebugMessage {
@@ -66,6 +66,11 @@ export class JSDebugMessage extends DebugMessage {
     if (selectionLine === document.lineCount - 1) {
       return selectionLine;
     }
+    const lineOfFunctionParam = this.functionParamLine(
+      document,
+      selectionLine,
+      selectedVar
+    );
     let currentLineText: string = document.lineAt(selectionLine).text;
     let nextLineText: string = document
       .lineAt(selectionLine + 1)
@@ -94,6 +99,8 @@ export class JSDebugMessage extends DebugMessage {
       )
     ) {
       return this.arrayLine(document, selectionLine);
+    } else if (lineOfFunctionParam !== -1) {
+      return lineOfFunctionParam;
     } else if (currentLineText.trim().startsWith("return")) {
       return selectionLine;
     }
@@ -254,6 +261,60 @@ export class JSDebugMessage extends DebugMessage {
       ? currentLineNum
       : selectionLine + 1;
   }
+  private functionParamLine(
+    document: TextDocument,
+    lineNum: number,
+    selectedVar: string
+  ) {
+    let currentLineNum = lineNum;
+    const {
+      openedElementOccurrences,
+      closedElementOccurrences,
+    } = this.locOpenedClosedElementOccurrences(
+      document.lineAt(currentLineNum).text,
+      LocElement.Parenthesis
+    );
+    if (
+      !document
+        .lineAt(currentLineNum)
+        .text.split(selectedVar)[1]
+        .includes("(") &&
+      openedElementOccurrences &&
+      closedElementOccurrences &&
+      openedElementOccurrences === closedElementOccurrences
+    ) {
+      return currentLineNum + 1;
+    }
+    let nbrOfOpenedParenthesis: number = 0;
+    let nbrOfClosedParenthesis: number = 1; // Closing parenthesis of the function
+    while (currentLineNum >= 0) {
+      const currentLineText: string = document.lineAt(currentLineNum).text;
+      const currentLineParenthesis = this.locOpenedClosedElementOccurrences(
+        currentLineText,
+        LocElement.Parenthesis
+      );
+      if (
+        currentLineNum === lineNum &&
+        document.lineAt(currentLineNum).text.split(selectedVar)[1].includes("(")
+      ) {
+        currentLineParenthesis.openedElementOccurrences = 0;
+        currentLineParenthesis.closedElementOccurrences = 0;
+      }
+      nbrOfOpenedParenthesis += currentLineParenthesis.openedElementOccurrences;
+      nbrOfClosedParenthesis += currentLineParenthesis.closedElementOccurrences;
+      if (nbrOfOpenedParenthesis === nbrOfClosedParenthesis) {
+        return (
+          this.closingElementLine(
+            document,
+            currentLineNum,
+            LocElement.Parenthesis
+          ) + 1
+        );
+      }
+      currentLineNum--;
+    }
+    return -1;
+  }
   spacesBefore(document: TextDocument, line: number, tabSize: number): string {
     const currentLine: TextLine = document.lineAt(line);
     const currentLineTextChars: string[] = currentLine.text.split("");
@@ -337,7 +398,11 @@ export class JSDebugMessage extends DebugMessage {
             if (
               lineOfSelectedVar > currentLineNum &&
               lineOfSelectedVar <
-                this.blockClosingBraceLine(document, currentLineNum)
+                this.closingElementLine(
+                  document,
+                  currentLineNum,
+                  LocElement.Braces
+                )
             ) {
               return `${this.lineCodeProcessing.getClassName(
                 currentLineText
@@ -357,7 +422,11 @@ export class JSDebugMessage extends DebugMessage {
             if (
               lineOfSelectedVar >= currentLineNum &&
               lineOfSelectedVar <
-                this.blockClosingBraceLine(document, currentLineNum)
+                this.closingElementLine(
+                  document,
+                  currentLineNum,
+                  LocElement.Braces
+                )
             ) {
               if (
                 this.lineCodeProcessing.getFunctionName(currentLineText)

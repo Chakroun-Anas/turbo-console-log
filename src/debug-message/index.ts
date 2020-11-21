@@ -1,5 +1,6 @@
+import { open } from "fs";
 import { TextDocument } from "vscode";
-import { BlockType, Message } from "../entities";
+import { BlockType, LocElement, Message } from "../entities";
 import { LineCodeProcessing } from "../line-code-processing";
 
 export abstract class DebugMessage {
@@ -39,27 +40,49 @@ export abstract class DebugMessage {
     lineOfSelectedVar: number,
     blockType: BlockType
   ): string;
-  blockClosingBraceLine(document: TextDocument, lineNum: number): number {
+  closingElementLine(
+    document: TextDocument,
+    lineNum: number,
+    locElement: LocElement
+  ): number {
     const docNbrOfLines: number = document.lineCount;
-    let enclosingBracketFounded: boolean = false;
-    let nbrOfOpeningBrackets: number = 1;
-    let nbrOfClosingBrackets: number = 0;
-    while (!enclosingBracketFounded && lineNum < docNbrOfLines - 1) {
+    let closingElementFound: boolean = false;
+    let openedElementOccurrences: number = 1;
+    let closedElementOccurrences: number = 0;
+    while (!closingElementFound && lineNum < docNbrOfLines - 1) {
       lineNum++;
       const currentLineText: string = document.lineAt(lineNum).text;
-      const openedBrackets: RegExp = /{/g;
-      while (openedBrackets.exec(currentLineText)) {
-        nbrOfOpeningBrackets++;
-      }
-      const closedBrackets: RegExp = /}/g;
-      while (closedBrackets.exec(currentLineText)) {
-        nbrOfClosingBrackets++;
-      }
-      if (nbrOfOpeningBrackets === nbrOfClosingBrackets) {
-        enclosingBracketFounded = true;
+      const openedClosedElementOccurrences = this.locOpenedClosedElementOccurrences(
+        currentLineText,
+        locElement
+      );
+      openedElementOccurrences +=
+        openedClosedElementOccurrences.openedElementOccurrences;
+      closedElementOccurrences +=
+        openedClosedElementOccurrences.closedElementOccurrences;
+      if (openedElementOccurrences === closedElementOccurrences) {
+        closingElementFound = true;
         return lineNum;
       }
     }
     return lineNum;
+  }
+  locOpenedClosedElementOccurrences(loc: string, locElement: LocElement) {
+    let openedElementOccurrences: number = 0;
+    let closedElementOccurrences: number = 0;
+    const openedElement: RegExp =
+      locElement === LocElement.Parenthesis ? /\(/g : /{/g;
+    const closedElement: RegExp =
+      locElement === LocElement.Parenthesis ? /\)/g : /}/g;
+    while (openedElement.exec(loc)) {
+      openedElementOccurrences++;
+    }
+    while (closedElement.exec(loc)) {
+      closedElementOccurrences++;
+    }
+    return {
+      openedElementOccurrences,
+      closedElementOccurrences,
+    };
   }
 }
