@@ -123,7 +123,7 @@ suite("JS Line Code Processing", () => {
       "function( {",
       "function) {",
     ];
-    const functionsCallsLOCs = [
+    const functionsAssignmentsLOCs = [
       `const x = someFunc();`,
       `const x = someFunc()`,
       `const myVar = someFunc(1, true, false);`,
@@ -132,10 +132,11 @@ suite("JS Line Code Processing", () => {
         true, 
         false
       );`,
-    ];
-    const nonFunctionsCallsLOCs = [
       `const x = function () {`,
       `const myVar = function sayHello(fullName) {
+        return 'hello';
+      }`,
+      `const myVar =  (fullName) => {
         return 'hello';
       }`,
     ];
@@ -198,17 +199,13 @@ suite("JS Line Code Processing", () => {
         );
       });
     });
-    test("Check function call", () => {
-      functionsCallsLOCs.forEach((functionCallLOC) => {
+    test("Assignment of function to a variable", () => {
+      functionsAssignmentsLOCs.forEach((functionsAssignmentsLOC) => {
         assert.strictEqual(
-          jsLineCodeProcessing.doesContainsFunctionCall(functionCallLOC),
+          jsLineCodeProcessing.isFunctionAssignedToVariable(
+            functionsAssignmentsLOC
+          ),
           true
-        );
-      });
-      nonFunctionsCallsLOCs.forEach((nonFunctionCallLOC) => {
-        assert.strictEqual(
-          jsLineCodeProcessing.doesContainsFunctionCall(nonFunctionCallLOC),
-          false
         );
       });
     });
@@ -234,15 +231,17 @@ suite("JS Line Code Processing", () => {
       ];
       objectFunctionCallLOCs.forEach((objectFunctionCallLOC) => {
         assert.strictEqual(
-          jsLineCodeProcessing.doesContainsObjectFunctionCall(
+          jsLineCodeProcessing.isObjectFunctionCallAssignedToVariable(
             objectFunctionCallLOC
           ),
           true
         );
       });
-      functionsCallsLOCs.forEach((functionsCallLOC) => {
+      functionsAssignmentsLOCs.forEach((functionsAssignmentsLOC) => {
         assert.strictEqual(
-          jsLineCodeProcessing.doesContainsObjectFunctionCall(functionsCallLOC),
+          jsLineCodeProcessing.isObjectFunctionCallAssignedToVariable(
+            functionsAssignmentsLOC
+          ),
           false
         );
       });

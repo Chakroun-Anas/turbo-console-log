@@ -82,10 +82,9 @@ export class JSDebugMessage extends DebugMessage {
     if (selectionLine === document.lineCount - 1) {
       return selectionLine;
     }
-    const lineOfFunctionParam = this.functionParamLine(
+    const lineOfFunctionParam = this.lineOfMultilineFunctionParam(
       document,
-      selectionLine,
-      selectedVar
+      selectionLine
     );
     let currentLineText: string = document.lineAt(selectionLine).text;
     let nextLineText: string = document
@@ -98,15 +97,17 @@ export class JSDebugMessage extends DebugMessage {
     ) {
       return this.objectLiteralLine(document, selectionLine);
     } else if (
-      this.lineCodeProcessing.doesContainsObjectFunctionCall(
+      this.lineCodeProcessing.isFunctionAssignedToVariable(
         `${currentLineText}\n${nextLineText}`
       )
     ) {
-      return this.objectFunctionCallLine(document, selectionLine, selectedVar);
+      return this.functionAssignmentLine(document, selectionLine);
     } else if (
-      this.lineCodeProcessing.doesContainsFunctionCall(currentLineText)
+      this.lineCodeProcessing.isObjectFunctionCallAssignedToVariable(
+        currentLineText
+      )
     ) {
-      return this.functionCallLine(document, selectionLine, selectedVar);
+      return this.objectFunctionCallLine(document, selectionLine, selectedVar);
     } else if (/`/.test(currentLineText)) {
       return this.templateStringLine(document, selectionLine);
     } else if (
@@ -206,37 +207,29 @@ export class JSDebugMessage extends DebugMessage {
       ? currentLineNum
       : selectionLine + 1;
   }
-  private functionCallLine(
+  private functionAssignmentLine(
     document: TextDocument,
-    selectionLine: number,
-    selectedVar: string
+    selectionLine: number
   ): number {
-    let currentLineText: string = document.lineAt(selectionLine).text;
-    if (
-      /\((\s*)$/.test(currentLineText.split(selectedVar)[0]) ||
-      /,(\s*)$/.test(currentLineText.split(selectedVar)[0])
-    ) {
-      return selectionLine + 1;
+    const currentLineText = document.lineAt(selectionLine).text;
+    if (/{/.test(currentLineText)) {
+      return (
+        this.closingElementLine(document, selectionLine, LocElement.Braces) + 1
+      );
+    } else {
+      const closedParenthesisLine = this.closingElementLine(
+        document,
+        selectionLine,
+        LocElement.Parenthesis
+      );
+      return (
+        this.closingElementLine(
+          document,
+          closedParenthesisLine,
+          LocElement.Braces
+        ) + 1
+      );
     }
-    let nbrOfOpenedParenthesis: number = (currentLineText.match(/\(/g) || [])
-      .length;
-    let nbrOfClosedParenthesis: number = (currentLineText.match(/\)/g) || [])
-      .length;
-    let currentLineNum: number = selectionLine + 1;
-    if (nbrOfOpenedParenthesis !== nbrOfClosedParenthesis) {
-      while (currentLineNum < document.lineCount) {
-        const currentLineText: string = document.lineAt(currentLineNum).text;
-        nbrOfOpenedParenthesis += (currentLineText.match(/\(/g) || []).length;
-        nbrOfClosedParenthesis += (currentLineText.match(/\)/g) || []).length;
-        currentLineNum++;
-        if (nbrOfOpenedParenthesis === nbrOfClosedParenthesis) {
-          break;
-        }
-      }
-    }
-    return nbrOfOpenedParenthesis === nbrOfClosedParenthesis
-      ? currentLineNum
-      : selectionLine + 1;
   }
   private templateStringLine(
     document: TextDocument,
@@ -277,30 +270,11 @@ export class JSDebugMessage extends DebugMessage {
       ? currentLineNum
       : selectionLine + 1;
   }
-  private functionParamLine(
+  private lineOfMultilineFunctionParam(
     document: TextDocument,
-    lineNum: number,
-    selectedVar: string
+    lineNum: number
   ) {
-    let currentLineNum = lineNum;
-    const {
-      openedElementOccurrences,
-      closedElementOccurrences,
-    } = this.locOpenedClosedElementOccurrences(
-      document.lineAt(currentLineNum).text,
-      LocElement.Parenthesis
-    );
-    if (
-      !document
-        .lineAt(currentLineNum)
-        .text.split(selectedVar)[1]
-        .includes("(") &&
-      openedElementOccurrences &&
-      closedElementOccurrences &&
-      openedElementOccurrences === closedElementOccurrences
-    ) {
-      return currentLineNum + 1;
-    }
+    let currentLineNum = lineNum - 1;
     let nbrOfOpenedParenthesis: number = 0;
     let nbrOfClosedParenthesis: number = 1; // Closing parenthesis of the function
     while (currentLineNum >= 0) {
@@ -309,13 +283,6 @@ export class JSDebugMessage extends DebugMessage {
         currentLineText,
         LocElement.Parenthesis
       );
-      if (
-        currentLineNum === lineNum &&
-        document.lineAt(currentLineNum).text.split(selectedVar)[1].includes("(")
-      ) {
-        currentLineParenthesis.openedElementOccurrences = 0;
-        currentLineParenthesis.closedElementOccurrences = 0;
-      }
       nbrOfOpenedParenthesis += currentLineParenthesis.openedElementOccurrences;
       nbrOfClosedParenthesis += currentLineParenthesis.closedElementOccurrences;
       if (nbrOfOpenedParenthesis === nbrOfClosedParenthesis) {
@@ -335,9 +302,12 @@ export class JSDebugMessage extends DebugMessage {
     const currentLine: TextLine = document.lineAt(line);
     const currentLineTextChars: string[] = currentLine.text.split("");
     if (
-      this.lineCodeProcessing.doesContainsNamedFunctionDeclaration(
+      (!this.lineCodeProcessing.isFunctionAssignedToVariable(
         currentLine.text
-      ) ||
+      ) &&
+        this.lineCodeProcessing.doesContainsNamedFunctionDeclaration(
+          currentLine.text
+        )) ||
       this.lineCodeProcessing.doesContainsBuiltInFunction(currentLine.text) ||
       this.lineCodeProcessing.doesContainClassDeclaration(currentLine.text)
     ) {

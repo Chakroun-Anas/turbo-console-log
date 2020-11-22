@@ -16,5 +16,8 @@
     ".vscode-test",
     "src/test/files",
     "out/test/files"
-  ]
+  ],
+  "linterOptions": {
+    "exclude": ["src/test/files/js/**"]
+  }
 }

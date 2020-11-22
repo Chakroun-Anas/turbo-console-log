@@ -44,12 +44,14 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
       arrowFunctionAssignedToVariableRegex.test(loc)
     );
   }
-  doesContainsFunctionCall(loc: string): boolean {
-    return /[a-zA-Z0-9]+\s*\(.*/.test(loc) && !/{/.test(loc);
+  isFunctionAssignedToVariable(loc: string): boolean {
+    return /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=.*\(.*/.test(loc);
   }
-  doesContainsObjectFunctionCall(loc: string): boolean {
+  isObjectFunctionCallAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
-    return /[a-zA-Z0-9]\.[a-zA-Z0-9]+\s*\(.*/.test(locWithoutWhiteSpaces);
+    return /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=\s*[a-zA-Z0-9]+\.[a-zA-Z0-9]+\s*\(.*/.test(
+      locWithoutWhiteSpaces
+    );
   }
   getFunctionName(loc: string): string {
     if (this.doesContainsNamedFunctionDeclaration(loc)) {
