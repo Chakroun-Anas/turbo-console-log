@@ -88,6 +88,8 @@ suite("JS Line Code Processing", () => {
       "export functionName(arg1: any): any {",
       "export default async function functionName(arg1) {",
       "  constructor(fullName) {",
+      " async sayHello(somePram: any): Promise<void> {",
+      "  unitsValidation( scriptId ): any[] {",
     ];
     const namedFunctionsNames = [
       "functionName",
@@ -113,6 +115,8 @@ suite("JS Line Code Processing", () => {
       "functionName",
       "functionName",
       "constructor",
+      "sayHello",
+      "unitsValidation",
     ];
     const nonNamedFunctionsLOCs = [
       "function() {",

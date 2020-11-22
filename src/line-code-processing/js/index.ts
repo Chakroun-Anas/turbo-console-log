@@ -30,7 +30,7 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   doesContainsNamedFunctionDeclaration(loc: string): boolean {
     const locWithoutFunctionKeyword = loc.replace("function", "");
     const regularNamedFunctionRegex = new RegExp(
-      /\s*[a-zA-Z0-9]+\s*\(.*\):?\s*[a-zA-Z0-9]*\s*{/
+      /\s*[a-zA-Z0-9]+\s*\(.*\):?.*{/
     );
     const regularFunctionAssignedToVariableRegex = new RegExp(
       /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=(\s*)\(.*\)(\s*){/
