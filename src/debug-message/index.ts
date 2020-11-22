@@ -15,6 +15,7 @@ export abstract class DebugMessage {
     wrapLogMessage: boolean,
     logMessagePrefix: string,
     quote: string,
+    includeFileNameAndLineNum: boolean,
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,

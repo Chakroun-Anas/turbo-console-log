@@ -33,6 +33,11 @@
           "default": "",
           "description": "The prefix of the log message."
         },
+        "turboConsoleLog.includeFileNameAndLineNum": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to include or not the file name and the line number of the log message."
+        },
         "turboConsoleLog.addSemicolonInTheEnd": {
           "type": "boolean",
           "default": false,
@@ -51,7 +56,7 @@
         "turboConsoleLog.delimiterInsideMessage": {
           "type": "string",
           "default": "~",
-          "description": "The delimiter that will separate the selected variable from it's function and class."
+          "description": "The delimiter that will separate the different log message elements (file name, line number, class, function and variable)"
         },
         "turboConsoleLog.quote": {
           "type": "string",

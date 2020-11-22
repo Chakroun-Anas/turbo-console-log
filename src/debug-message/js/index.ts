@@ -14,6 +14,7 @@ export class JSDebugMessage extends DebugMessage {
     wrapLogMessage: boolean,
     logMessagePrefix: string,
     quote: string,
+    includeFileNameAndLineNum: boolean,
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
@@ -41,8 +42,17 @@ export class JSDebugMessage extends DebugMessage {
       tabSize
     );
     const semicolon: string = addSemicolonInTheEnd ? ";" : "";
+    const fileName = document.fileName.includes("/")
+      ? document.fileName.split("/")[document.fileName.split("/").length - 1]
+      : document.fileName.split("\\")[document.fileName.split("\\").length - 1];
     const debuggingMsg: string = `console.log(${quote}${logMessagePrefix}${
       logMessagePrefix.length !== 0 ? ": " : ""
+    }${
+      includeFileNameAndLineNum
+        ? `file: ${fileName} ${delemiterInsideMessage} line ${
+            lineOfLogMsg + 1
+          } ${delemiterInsideMessage} `
+        : ""
     }${
       insertEnclosingClass
         ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
