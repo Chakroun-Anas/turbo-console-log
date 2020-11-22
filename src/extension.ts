@@ -53,6 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
                 properties.insertEnclosingClass,
                 properties.insertEnclosingFunction,
                 properties.delimiterInsideMessage,
+                properties.includeFileNameAndLineNum,
                 tabSize
               )
             );
@@ -79,7 +80,8 @@ export function activate(context: vscode.ExtensionContext) {
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         tabSize,
-        properties.logMessagePrefix
+        properties.delimiterInsideMessage,
+        properties.quote
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
@@ -112,7 +114,8 @@ export function activate(context: vscode.ExtensionContext) {
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         tabSize,
-        properties.logMessagePrefix
+        properties.delimiterInsideMessage,
+        properties.quote
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
@@ -145,7 +148,8 @@ export function activate(context: vscode.ExtensionContext) {
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         tabSize,
-        properties.logMessagePrefix
+        properties.delimiterInsideMessage,
+        properties.quote
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ lines }) => {
@@ -172,6 +176,8 @@ function getExtensionProperties(
   const insertEnclosingFunction = workspaceConfig.insertEnclosingFunction;
   const quote = workspaceConfig.quote || '"';
   const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "~";
+  const includeFileNameAndLineNum =
+    workspaceConfig.includeFileNameAndLineNum || false;
   const extensionProperties: ExtensionProperties = {
     wrapLogMessage,
     logMessagePrefix,
@@ -180,6 +186,7 @@ function getExtensionProperties(
     insertEnclosingFunction,
     quote,
     delimiterInsideMessage,
+    includeFileNameAndLineNum,
   };
   return extensionProperties;
 }

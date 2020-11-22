@@ -18,6 +18,7 @@ export class JSDebugMessage extends DebugMessage {
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
     delemiterInsideMessage: string,
+    includeFileNameAndLineNum: boolean,
     tabSize: number
   ): string {
     const classThatEncloseTheVar: string = this.enclosingBlockName(
@@ -44,11 +45,26 @@ export class JSDebugMessage extends DebugMessage {
     const fileName = document.fileName.includes("/")
       ? document.fileName.split("/")[document.fileName.split("/").length - 1]
       : document.fileName.split("\\")[document.fileName.split("\\").length - 1];
+    if (
+      !includeFileNameAndLineNum &&
+      !insertEnclosingFunction &&
+      !insertEnclosingClass &&
+      logMessagePrefix.length === 0
+    ) {
+      logMessagePrefix = `${delemiterInsideMessage} `;
+    }
     const debuggingMsg: string = `console.log(${quote}${logMessagePrefix}${
-      logMessagePrefix.length !== 0 ? ` ${delemiterInsideMessage} ` : ""
-    }${`file: ${fileName} ${delemiterInsideMessage} line ${
-      lineOfLogMsg + 1
-    } ${delemiterInsideMessage} `}${
+      logMessagePrefix.length !== 0 &&
+      logMessagePrefix !== `${delemiterInsideMessage} `
+        ? ` ${delemiterInsideMessage} `
+        : ""
+    }${
+      includeFileNameAndLineNum
+        ? `file: ${fileName} ${delemiterInsideMessage} line ${
+            lineOfLogMsg + 1
+          } ${delemiterInsideMessage} `
+        : ""
+    }${
       insertEnclosingClass
         ? classThatEncloseTheVar.length > 0
           ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
@@ -432,7 +448,8 @@ export class JSDebugMessage extends DebugMessage {
   detectAll(
     document: TextDocument,
     tabSize: number,
-    logMessagePrefix: string
+    delemiterInsideMessage: string,
+    quote: string
   ): Message[] {
     const documentNbrOfLines: number = document.lineCount;
     const logMessages: Message[] = [];
@@ -454,7 +471,11 @@ export class JSDebugMessage extends DebugMessage {
           msg += document.lineAt(j).text;
           logMessage.lines.push(document.lineAt(j).rangeIncludingLineBreak);
         }
-        if (/file:.*line[0-9]{1,}/.test(msg.replace(/\s/g, ""))) {
+        if (
+          new RegExp(
+            `${delemiterInsideMessage}[a-zA-Z0-9]+${quote},(//)?[a-zA-Z0-9]+`
+          ).test(msg.replace(/\s/g, ""))
+        ) {
           logMessages.push(logMessage);
         }
       }

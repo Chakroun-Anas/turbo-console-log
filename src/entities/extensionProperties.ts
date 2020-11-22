@@ -5,5 +5,6 @@ export type ExtensionProperties = {
   insertEnclosingClass: boolean;
   insertEnclosingFunction: boolean;
   delimiterInsideMessage: string;
+  includeFileNameAndLineNum: boolean;
   quote: string;
 };

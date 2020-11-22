@@ -19,6 +19,7 @@ export abstract class DebugMessage {
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
     delemiterInsideMessage: string,
+    includeFileNameAndLineNum: boolean,
     tabSize: number
   ): string;
   abstract line(
@@ -34,7 +35,8 @@ export abstract class DebugMessage {
   abstract detectAll(
     document: TextDocument,
     tabSize: number,
-    logMessagePrefix: string
+    delemiterInsideMessage: string,
+    quote: string
   ): Message[];
   abstract enclosingBlockName(
     document: TextDocument,
