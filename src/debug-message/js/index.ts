@@ -14,7 +14,6 @@ export class JSDebugMessage extends DebugMessage {
     wrapLogMessage: boolean,
     logMessagePrefix: string,
     quote: string,
-    includeFileNameAndLineNum: boolean,
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
@@ -46,25 +45,25 @@ export class JSDebugMessage extends DebugMessage {
       ? document.fileName.split("/")[document.fileName.split("/").length - 1]
       : document.fileName.split("\\")[document.fileName.split("\\").length - 1];
     const debuggingMsg: string = `console.log(${quote}${logMessagePrefix}${
-      logMessagePrefix.length !== 0 ? ": " : ""
-    }${
-      includeFileNameAndLineNum
-        ? `file: ${fileName} ${delemiterInsideMessage} line ${
-            lineOfLogMsg + 1
-          } ${delemiterInsideMessage} `
-        : ""
-    }${
+      logMessagePrefix.length !== 0 ? ` ${delemiterInsideMessage} ` : ""
+    }${`file: ${fileName} ${delemiterInsideMessage} line ${
+      lineOfLogMsg + 1
+    } ${delemiterInsideMessage} `}${
       insertEnclosingClass
-        ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+        ? classThatEncloseTheVar.length > 0
+          ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+          : ``
         : ""
     }${
       insertEnclosingFunction
-        ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+        ? funcThatEncloseTheVar.length > 0
+          ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+          : ""
         : ""
     }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
     if (wrapLogMessage) {
       // 16 represents the length of console.log("");
-      const wrappingMsg: string = `console.log(${quote}${logMessagePrefix}: ${"-".repeat(
+      const wrappingMsg: string = `console.log(${quote}${logMessagePrefix} ${"-".repeat(
         debuggingMsg.length - 16
       )}${quote})${semicolon}`;
       return `${
@@ -460,41 +459,34 @@ export class JSDebugMessage extends DebugMessage {
     }
     return "";
   }
-  detectAll(document: TextDocument, tabSize: number): Message[] {
+  detectAll(
+    document: TextDocument,
+    tabSize: number,
+    logMessagePrefix: string
+  ): Message[] {
     const documentNbrOfLines: number = document.lineCount;
     const logMessages: Message[] = [];
     for (let i = 0; i < documentNbrOfLines; i++) {
-      const turboConsoleLogMessage: RegExp = /console\.log\(('|"|`).*/;
+      const turboConsoleLogMessage: RegExp = /console\.log\(/;
       if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
         const logMessage: Message = {
           spaces: "",
           lines: [],
         };
-        let nbrOfOpenParenthesis: number = 0;
-        let nbrOfCloseParenthesis: number = 0;
         logMessage.spaces = this.spacesBefore(document, i, tabSize);
-        for (let j = i; j <= documentNbrOfLines; j++) {
+        const closedParenthesisLine = this.closingElementLine(
+          document,
+          i,
+          LocElement.Parenthesis
+        );
+        let msg = "";
+        for (let j = i; j <= closedParenthesisLine; j++) {
+          msg += document.lineAt(j).text;
           logMessage.lines.push(document.lineAt(j).rangeIncludingLineBreak);
-          const currentLineText: string = document.lineAt(j).text;
-          const openedParenthesisRegex: RegExp = /\(/g;
-          const closedParenthesisRegex: RegExp = /\)/g;
-          const openedParenthesis: any = openedParenthesisRegex.exec(
-            currentLineText
-          );
-          const closedParenthesis: any = closedParenthesisRegex.exec(
-            currentLineText
-          );
-          if (openedParenthesis) {
-            nbrOfOpenParenthesis += openedParenthesis.length;
-          }
-          if (closedParenthesis) {
-            nbrOfCloseParenthesis += closedParenthesis.length;
-          }
-          if (nbrOfOpenParenthesis === nbrOfCloseParenthesis) {
-            break;
-          }
         }
-        logMessages.push(logMessage);
+        if (/file:.*line[0-9]{1,}/.test(msg.replace(/\s/g, ""))) {
+          logMessages.push(logMessage);
+        }
       }
     }
     return logMessages;

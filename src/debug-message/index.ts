@@ -15,7 +15,6 @@ export abstract class DebugMessage {
     wrapLogMessage: boolean,
     logMessagePrefix: string,
     quote: string,
-    includeFileNameAndLineNum: boolean,
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
@@ -49,10 +48,9 @@ export abstract class DebugMessage {
   ): number {
     const docNbrOfLines: number = document.lineCount;
     let closingElementFound: boolean = false;
-    let openedElementOccurrences: number = 1;
+    let openedElementOccurrences: number = 0;
     let closedElementOccurrences: number = 0;
     while (!closingElementFound && lineNum < docNbrOfLines - 1) {
-      lineNum++;
       const currentLineText: string = document.lineAt(lineNum).text;
       const openedClosedElementOccurrences = this.locOpenedClosedElementOccurrences(
         currentLineText,
@@ -66,6 +64,7 @@ export abstract class DebugMessage {
         closingElementFound = true;
         return lineNum;
       }
+      lineNum++;
     }
     return lineNum;
   }

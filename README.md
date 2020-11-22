@@ -30,7 +30,7 @@ Properties:
 
 - turboConsoleLog.wrapLogMessage (boolean): Whether to wrap the log message or not.
 
-- turboConsoleLog.logMessagePrefix (string): The prefix of the log message.
+- turboConsoleLog.logMessagePrefix (string): The prefix of the log message (default one is 🚀 ).
 
 - turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
 
@@ -39,8 +39,6 @@ Properties:
 - turboConsoleLog.insertEnclosingFunction (boolean): Whether to insert or not the enclosing function of the selected variable in the log message.
 
 - turboConsoleLog.delemiterInsideMessage (string): The delimiter that will separate the different log message elements (file name, line number, class, function and variable)
-
-- turboConsoleLog.includeFileNameAndLineNum (boolean): Whether to include or not the file name and the line number of the log message..
 
 - turboConsoleLog.quote (enum): Double quotes (""), single quotes ('') or backtick(``).
 
