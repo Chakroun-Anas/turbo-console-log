@@ -94,6 +94,12 @@ Initial release of Turbo Console Log
 
 - The extension is rewrited with Typescript with a whole new architecture
 
+### 2.1.0
+
+- File name and line number are added to the log message
+- The delimiter of elements inside the log message can be customised
+- Comment, uncomment and delete only the log messages inserted by the extension
+
 ## Participate
 
 ---
