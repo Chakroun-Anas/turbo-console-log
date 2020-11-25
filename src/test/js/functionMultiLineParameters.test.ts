@@ -10,7 +10,7 @@ test("Insert log message related to a multilines function parameter ", async () 
     activeTextEditor.selections = [
       new vscode.Selection(
         new vscode.Position(1, 2),
-        new vscode.Position(1, 12)
+        new vscode.Position(1, 13)
       ),
     ];
     await vscode.commands.executeCommand(
@@ -18,20 +18,20 @@ test("Insert log message related to a multilines function parameter ", async () 
       []
     );
     const textDocument = activeTextEditor.document;
-    const logMessage = textDocument.lineAt(11).text;
+    const logMessage = textDocument.lineAt(13).text;
     assert.strictEqual(/console\.log\(.*/.test(logMessage), true);
     assert.strictEqual(/firstParam/.test(logMessage), true);
     activeTextEditor.selections = [
       new vscode.Selection(
         new vscode.Position(2, 2),
-        new vscode.Position(2, 14)
+        new vscode.Position(2, 13)
       ),
     ];
     await vscode.commands.executeCommand(
       "turboConsoleLog.displayLogMessage",
       []
     );
-    assert.strictEqual(/secondParam/.test(textDocument.lineAt(11).text), true);
+    assert.strictEqual(/secondParam/.test(textDocument.lineAt(13).text), true);
   }
   Mocha.afterEach(async () => {
     await vscode.commands.executeCommand(

@@ -88,4 +88,7 @@ export abstract class DebugMessage {
       closedElementOccurrences,
     };
   }
+  lineText(document: TextDocument, line: number): string {
+    return document.lineAt(line).text;
+  }
 }

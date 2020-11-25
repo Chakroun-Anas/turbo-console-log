@@ -98,7 +98,7 @@ export class JSDebugMessage extends DebugMessage {
     if (selectionLine === document.lineCount - 1) {
       return selectionLine;
     }
-    const lineOfFunctionParam = this.lineOfMultilineFunctionParam(
+    const multilinesParamsParamLine = this.multilinesParamsFuncParamLine(
       document,
       selectionLine
     );
@@ -124,6 +124,21 @@ export class JSDebugMessage extends DebugMessage {
       )
     ) {
       return this.objectFunctionCallLine(document, selectionLine, selectedVar);
+    } else if (this.lineCodeProcessing.isFunctionDeclaration(currentLineText)) {
+      if (
+        multilinesParamsParamLine !== -1 &&
+        this.lineText(document, multilinesParamsParamLine - 1).includes("{")
+      ) {
+        return multilinesParamsParamLine;
+      } else {
+        const lineOfOpenedBrace = this.functionOpenedBraceLine(
+          document,
+          selectionLine
+        );
+        if (lineOfOpenedBrace !== -1) {
+          return lineOfOpenedBrace + 1;
+        }
+      }
     } else if (/`/.test(currentLineText)) {
       return this.templateStringLine(document, selectionLine);
     } else if (
@@ -132,8 +147,8 @@ export class JSDebugMessage extends DebugMessage {
       )
     ) {
       return this.arrayLine(document, selectionLine);
-    } else if (lineOfFunctionParam !== -1) {
-      return lineOfFunctionParam;
+    } else if (multilinesParamsParamLine !== -1) {
+      return multilinesParamsParamLine;
     } else if (currentLineText.trim().startsWith("return")) {
       return selectionLine;
     }
@@ -286,7 +301,8 @@ export class JSDebugMessage extends DebugMessage {
       ? currentLineNum
       : selectionLine + 1;
   }
-  private lineOfMultilineFunctionParam(
+  // Line of a parameter related to a function which parameters are declared in multilines
+  private multilinesParamsFuncParamLine(
     document: TextDocument,
     lineNum: number
   ) {
@@ -311,6 +327,26 @@ export class JSDebugMessage extends DebugMessage {
         );
       }
       currentLineNum--;
+    }
+    return -1;
+  }
+  private functionOpenedBraceLine(docuemt: TextDocument, line: number) {
+    let nbrOfOpenedBraces = 0;
+    let nbrOfClosedBraces = 0;
+    while (line < docuemt.lineCount) {
+      const {
+        openedElementOccurrences,
+        closedElementOccurrences,
+      } = this.locOpenedClosedElementOccurrences(
+        this.lineText(docuemt, line),
+        LocElement.Braces
+      );
+      nbrOfOpenedBraces += openedElementOccurrences;
+      nbrOfClosedBraces += closedElementOccurrences;
+      if (nbrOfOpenedBraces - nbrOfClosedBraces === 1) {
+        return line;
+      }
+      line++;
     }
     return -1;
   }

@@ -47,6 +47,10 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   isFunctionAssignedToVariable(loc: string): boolean {
     return /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=.*\(.*/.test(loc);
   }
+  isFunctionDeclaration(loc: string): boolean {
+    const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
+    return /.*\(.*/.test(locWithoutWhiteSpaces);
+  }
   isObjectFunctionCallAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
     return /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=\s*[a-zA-Z0-9]+\.[a-zA-Z0-9]+\s*\(.*/.test(
