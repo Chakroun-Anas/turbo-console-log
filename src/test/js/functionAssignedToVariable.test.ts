@@ -50,6 +50,20 @@ test("Insert log message related to a variable which value is a function", async
       /console\.log\(.*/.test(textDocument.lineAt(18).text),
       true
     );
+    activeTextEditor.selections = [
+      new vscode.Selection(
+        new vscode.Position(20, 23),
+        new vscode.Position(20, 29)
+      ),
+    ];
+    await vscode.commands.executeCommand(
+      "turboConsoleLog.displayLogMessage",
+      []
+    );
+    assert.strictEqual(
+      /console\.log\(.*/.test(textDocument.lineAt(21).text),
+      true
+    );
   }
   Mocha.afterEach(async () => {
     await vscode.commands.executeCommand(

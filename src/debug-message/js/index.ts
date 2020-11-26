@@ -117,7 +117,11 @@ export class JSDebugMessage extends DebugMessage {
         `${currentLineText}\n${nextLineText}`
       )
     ) {
-      return this.functionAssignmentLine(document, selectionLine);
+      if (currentLineText.split("=")[0].includes(selectedVar)) {
+        return this.functionAssignmentLine(document, selectionLine);
+      } else {
+        return this.functionOpenedBraceLine(document, selectionLine) + 1;
+      }
     } else if (
       this.lineCodeProcessing.isObjectFunctionCallAssignedToVariable(
         currentLineText

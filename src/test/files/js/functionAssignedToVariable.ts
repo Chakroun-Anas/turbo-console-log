@@ -14,3 +14,8 @@ const specialVar = (
 ) => {
   return "hello";
 };
+
+const submit = async (values: any) => {
+  try {
+  } catch (error) {}
+};
