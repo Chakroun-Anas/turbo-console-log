@@ -175,7 +175,7 @@ function getExtensionProperties(
   const insertEnclosingClass = workspaceConfig.insertEnclosingClass;
   const insertEnclosingFunction = workspaceConfig.insertEnclosingFunction;
   const quote = workspaceConfig.quote || '"';
-  const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "~";
+  const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "";
   const includeFileNameAndLineNum =
     workspaceConfig.includeFileNameAndLineNum || false;
   const extensionProperties: ExtensionProperties = {
