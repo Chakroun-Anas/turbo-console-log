@@ -98,7 +98,7 @@ export class JSDebugMessage extends DebugMessage {
     if (selectionLine === document.lineCount - 1) {
       return selectionLine;
     }
-    const multilinesParamsParamLine = this.multilinesParamsFuncParamLine(
+    const multilineVariableLine = this.getMultiLineVariableLine(
       document,
       selectionLine
     );
@@ -140,10 +140,10 @@ export class JSDebugMessage extends DebugMessage {
       return selectionLine + 1;
     } else if (this.lineCodeProcessing.isFunctionDeclaration(currentLineText)) {
       if (
-        multilinesParamsParamLine !== -1 &&
-        this.lineText(document, multilinesParamsParamLine - 1).includes("{")
+        multilineVariableLine !== -1 &&
+        this.lineText(document, multilineVariableLine - 1).includes("{")
       ) {
-        return multilinesParamsParamLine;
+        return multilineVariableLine;
       } else {
         const lineOfOpenedBrace = this.functionOpenedBraceLine(
           document,
@@ -155,8 +155,8 @@ export class JSDebugMessage extends DebugMessage {
       }
     } else if (/`/.test(currentLineText)) {
       return this.templateStringLine(document, selectionLine);
-    } else if (multilinesParamsParamLine !== -1) {
-      return multilinesParamsParamLine;
+    } else if (multilineVariableLine !== -1) {
+      return multilineVariableLine;
     } else if (currentLineText.trim().startsWith("return")) {
       return selectionLine;
     }
@@ -309,14 +309,11 @@ export class JSDebugMessage extends DebugMessage {
       ? currentLineNum
       : selectionLine + 1;
   }
-  // Line of a parameter related to a function which parameters are declared in multilines
-  private multilinesParamsFuncParamLine(
-    document: TextDocument,
-    lineNum: number
-  ) {
+  // Line for a variable which is in multiline context (function paramter, or deconstructred object)
+  private getMultiLineVariableLine(document: TextDocument, lineNum: number) {
     let currentLineNum = lineNum - 1;
     let nbrOfOpenedParenthesis: number = 0;
-    let nbrOfClosedParenthesis: number = 1; // Closing parenthesis of the function
+    let nbrOfClosedParenthesis: number = 1; // Closing parenthesis
     while (currentLineNum >= 0) {
       const currentLineText: string = document.lineAt(currentLineNum).text;
       const currentLineParenthesis = this.locOpenedClosedElementOccurrences(
@@ -332,6 +329,25 @@ export class JSDebugMessage extends DebugMessage {
             currentLineNum,
             LocElement.Parenthesis
           ) + 1
+        );
+      }
+      currentLineNum--;
+    }
+    currentLineNum = lineNum - 1;
+    let nbrOfOpenedBraces: number = 0;
+    let nbrOfClosedBraces: number = 1; // Closing brace
+    while (currentLineNum >= 0) {
+      const currentLineText: string = document.lineAt(currentLineNum).text;
+      const currentLineParenthesis = this.locOpenedClosedElementOccurrences(
+        currentLineText,
+        LocElement.Braces
+      );
+      nbrOfOpenedBraces += currentLineParenthesis.openedElementOccurrences;
+      nbrOfClosedBraces += currentLineParenthesis.closedElementOccurrences;
+      if (nbrOfOpenedBraces === nbrOfClosedBraces) {
+        return (
+          this.closingElementLine(document, currentLineNum, LocElement.Braces) +
+          1
         );
       }
       currentLineNum--;
