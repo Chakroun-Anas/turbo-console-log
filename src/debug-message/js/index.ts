@@ -113,9 +113,7 @@ export class JSDebugMessage extends DebugMessage {
     ) {
       return this.objectLiteralLine(document, selectionLine);
     } else if (
-      this.lineCodeProcessing.isFunctionAssignedToVariable(
-        `${currentLineText}\n${nextLineText}`
-      )
+      this.lineCodeProcessing.isFunctionAssignedToVariable(`${currentLineText}`)
     ) {
       if (currentLineText.split("=")[0].includes(selectedVar)) {
         return this.functionAssignmentLine(document, selectionLine);
@@ -128,6 +126,18 @@ export class JSDebugMessage extends DebugMessage {
       )
     ) {
       return this.objectFunctionCallLine(document, selectionLine, selectedVar);
+    } else if (
+      this.lineCodeProcessing.isArrayAssignedToVariable(
+        `${currentLineText}\n${currentLineText}`
+      )
+    ) {
+      return this.arrayLine(document, selectionLine);
+    } else if (
+      this.lineCodeProcessing.isValueAssignedToVariable(
+        `${currentLineText}\n${currentLineText}`
+      )
+    ) {
+      return selectionLine + 1;
     } else if (this.lineCodeProcessing.isFunctionDeclaration(currentLineText)) {
       if (
         multilinesParamsParamLine !== -1 &&
@@ -145,12 +155,6 @@ export class JSDebugMessage extends DebugMessage {
       }
     } else if (/`/.test(currentLineText)) {
       return this.templateStringLine(document, selectionLine);
-    } else if (
-      this.lineCodeProcessing.isArrayAssignedToVariable(
-        `${currentLineText}\n${currentLineText}`
-      )
-    ) {
-      return this.arrayLine(document, selectionLine);
     } else if (multilinesParamsParamLine !== -1) {
       return multilinesParamsParamLine;
     } else if (currentLineText.trim().startsWith("return")) {

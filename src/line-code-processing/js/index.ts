@@ -1,6 +1,12 @@
 import { LineCodeProcessing } from "..";
 
 export class JSLineCodeProcessing implements LineCodeProcessing {
+  isValueAssignedToVariable(loc: string): boolean {
+    const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
+    return /(const|let|var){?([a-zA-Z0-9]*,?){1,}}=.*/.test(
+      locWithoutWhiteSpaces
+    );
+  }
   isObjectLiteralAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
     return /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=\s*{.+:.+/.test(
