@@ -20,3 +20,12 @@ function logPersonInfo(person: Person) {
   } = person;
   return true;
 }
+
+const something = Object.call((props) => {
+  const { coms } = props;
+  return (
+    <div>
+      <p>Hello</p>
+    </div>
+  );
+});

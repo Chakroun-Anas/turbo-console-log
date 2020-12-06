@@ -2,10 +2,7 @@ import { LineCodeProcessing } from "..";
 
 export class JSLineCodeProcessing implements LineCodeProcessing {
   isValueAssignedToVariable(loc: string): boolean {
-    const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
-    return /(const|let|var){?([a-zA-Z0-9]*,?){1,}}=.*/.test(
-      locWithoutWhiteSpaces
-    );
+    return /.*=.*/.test(loc) && !/=>/.test(loc);
   }
   isObjectLiteralAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
@@ -55,13 +52,13 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   }
   isFunctionDeclaration(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
-    return /.*\(.*/.test(locWithoutWhiteSpaces);
+    return (
+      /.*\(.*/.test(locWithoutWhiteSpaces) || /=>/.test(locWithoutWhiteSpaces)
+    );
   }
   isObjectFunctionCallAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
-    return /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=\s*[a-zA-Z0-9]+\.[a-zA-Z0-9]+\s*\(.*/.test(
-      locWithoutWhiteSpaces
-    );
+    return /.*=\s*([a-zA-Z0-9]+\.){1,}/.test(locWithoutWhiteSpaces);
   }
   getFunctionName(loc: string): string {
     if (this.doesContainsNamedFunctionDeclaration(loc)) {

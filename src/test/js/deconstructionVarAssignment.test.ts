@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 import { openDocument } from "../helpers";
 
 test("Insert log message related to a deconstructred property assigned to a variable", async () => {
-  await openDocument("../files/js/deconstructionVarAssignment.ts");
+  await openDocument("../files/js/deconstructionVarAssignment.tsx");
   const { activeTextEditor } = vscode.window;
   if (activeTextEditor) {
     activeTextEditor.selections = [
@@ -17,9 +17,24 @@ test("Insert log message related to a deconstructred property assigned to a vari
       "turboConsoleLog.displayLogMessage",
       []
     );
-    const textDocument = activeTextEditor.document;
-    const logMessage = textDocument.lineAt(20).text;
-    assert.strictEqual(/console\.log\(.*/.test(logMessage), true);
+    assert.strictEqual(
+      /console\.log\(.*/.test(activeTextEditor.document.lineAt(20).text),
+      true
+    );
+    activeTextEditor.selections = [
+      new vscode.Selection(
+        new vscode.Position(25, 11),
+        new vscode.Position(25, 15)
+      ),
+    ];
+    await vscode.commands.executeCommand(
+      "turboConsoleLog.displayLogMessage",
+      []
+    );
+    assert.strictEqual(
+      /console\.log\(.*/.test(activeTextEditor.document.lineAt(26).text),
+      true
+    );
   }
   Mocha.afterEach(async () => {
     await vscode.commands.executeCommand(

@@ -98,9 +98,15 @@ export class JSDebugMessage extends DebugMessage {
     if (selectionLine === document.lineCount - 1) {
       return selectionLine;
     }
-    const multilineVariableLine = this.getMultiLineVariableLine(
+    const multilineParenthesisVariableLine = this.getMultiLineVariableLine(
       document,
-      selectionLine
+      selectionLine,
+      LocElement.Parenthesis
+    );
+    const multilineBracesVariableLine = this.getMultiLineVariableLine(
+      document,
+      selectionLine,
+      LocElement.Braces
     );
     let currentLineText: string = document.lineAt(selectionLine).text;
     let nextLineText: string = document
@@ -122,7 +128,10 @@ export class JSDebugMessage extends DebugMessage {
       }
     } else if (
       this.lineCodeProcessing.isObjectFunctionCallAssignedToVariable(
-        currentLineText
+        `${currentLineText}\n${nextLineText}`
+      ) &&
+      !this.lineCodeProcessing.isObjectFunctionCallAssignedToVariable(
+        `${nextLineText}`
       )
     ) {
       return this.objectFunctionCallLine(document, selectionLine, selectedVar);
@@ -137,13 +146,20 @@ export class JSDebugMessage extends DebugMessage {
         `${currentLineText}\n${currentLineText}`
       )
     ) {
-      return selectionLine + 1;
+      return multilineParenthesisVariableLine !== null &&
+        this.lineText(document, multilineParenthesisVariableLine - 1).includes(
+          "{"
+        )
+        ? multilineParenthesisVariableLine
+        : selectionLine + 1;
     } else if (this.lineCodeProcessing.isFunctionDeclaration(currentLineText)) {
       if (
-        multilineVariableLine !== -1 &&
-        this.lineText(document, multilineVariableLine - 1).includes("{")
+        multilineParenthesisVariableLine !== null &&
+        this.lineText(document, multilineParenthesisVariableLine - 1).includes(
+          "{"
+        )
       ) {
-        return multilineVariableLine;
+        return multilineParenthesisVariableLine;
       } else {
         const lineOfOpenedBrace = this.functionOpenedBraceLine(
           document,
@@ -155,8 +171,15 @@ export class JSDebugMessage extends DebugMessage {
       }
     } else if (/`/.test(currentLineText)) {
       return this.templateStringLine(document, selectionLine);
-    } else if (multilineVariableLine !== -1) {
-      return multilineVariableLine;
+    } else if (
+      multilineParenthesisVariableLine !== null &&
+      this.lineText(document, multilineParenthesisVariableLine - 1).includes(
+        "{"
+      )
+    ) {
+      return multilineParenthesisVariableLine;
+    } else if (multilineBracesVariableLine !== null) {
+      return multilineBracesVariableLine;
     } else if (currentLineText.trim().startsWith("return")) {
       return selectionLine;
     }
@@ -200,41 +223,41 @@ export class JSDebugMessage extends DebugMessage {
     ) {
       return selectionLine + 1;
     }
-    const openedParenthesisRegex: RegExp = /\(/g;
-    const closedParenthesisRegex: RegExp = /\)/g;
-    let nbrOfOpenedParenthesis: number = 0;
-    let nbrOfClosedParenthesis: number = 0;
-    let openedParenthesis: any = openedParenthesisRegex.exec(currentLineText);
-    if (openedParenthesis) {
-      nbrOfOpenedParenthesis += openedParenthesis.length;
-    }
-    let closedParenthesis: any = closedParenthesisRegex.exec(currentLineText);
-    if (closedParenthesis) {
-      nbrOfClosedParenthesis += 1;
-    }
+    let totalOpenedParenthesis = 0;
+    let totalClosedParenthesis = 0;
+    const {
+      openedElementOccurrences,
+      closedElementOccurrences,
+    } = this.locOpenedClosedElementOccurrences(
+      currentLineText,
+      LocElement.Parenthesis
+    );
+    totalOpenedParenthesis += openedElementOccurrences;
+    totalClosedParenthesis += closedElementOccurrences;
     let currentLineNum = selectionLine + 1;
     if (
-      nbrOfOpenedParenthesis !== nbrOfClosedParenthesis ||
+      totalOpenedParenthesis !== totalClosedParenthesis ||
       currentLineText.endsWith(".") ||
       nextLineText.trim().startsWith(".")
     ) {
       while (currentLineNum < document.lineCount) {
         currentLineText = document.lineAt(currentLineNum).text;
-        openedParenthesis = openedParenthesisRegex.exec(currentLineText);
-        if (openedParenthesis) {
-          nbrOfOpenedParenthesis += openedParenthesis.length;
-        }
-        closedParenthesis = closedParenthesisRegex.exec(currentLineText);
-        if (closedParenthesis) {
-          nbrOfClosedParenthesis += closedParenthesis.length;
-        }
+        const {
+          openedElementOccurrences,
+          closedElementOccurrences,
+        } = this.locOpenedClosedElementOccurrences(
+          currentLineText,
+          LocElement.Parenthesis
+        );
+        totalOpenedParenthesis += openedElementOccurrences;
+        totalClosedParenthesis += closedElementOccurrences;
         if (currentLineNum === document.lineCount - 1) {
           break;
         }
         nextLineText = document.lineAt(currentLineNum + 1).text;
         currentLineNum++;
         if (
-          nbrOfOpenedParenthesis === nbrOfClosedParenthesis &&
+          totalOpenedParenthesis === totalClosedParenthesis &&
           !currentLineText.endsWith(".") &&
           !nextLineText.trim().startsWith(".")
         ) {
@@ -242,7 +265,7 @@ export class JSDebugMessage extends DebugMessage {
         }
       }
     }
-    return nbrOfOpenedParenthesis === nbrOfClosedParenthesis
+    return totalOpenedParenthesis === totalClosedParenthesis
       ? currentLineNum
       : selectionLine + 1;
   }
@@ -310,49 +333,28 @@ export class JSDebugMessage extends DebugMessage {
       : selectionLine + 1;
   }
   // Line for a variable which is in multiline context (function paramter, or deconstructred object)
-  private getMultiLineVariableLine(document: TextDocument, lineNum: number) {
+  private getMultiLineVariableLine(
+    document: TextDocument,
+    lineNum: number,
+    blockType: LocElement
+  ): number | null {
     let currentLineNum = lineNum - 1;
-    let nbrOfOpenedParenthesis: number = 0;
-    let nbrOfClosedParenthesis: number = 1; // Closing parenthesis
+    let nbrOfOpenedBlockType: number = 0;
+    let nbrOfClosedBlockType: number = 1; // Closing parenthesis
     while (currentLineNum >= 0) {
       const currentLineText: string = document.lineAt(currentLineNum).text;
       const currentLineParenthesis = this.locOpenedClosedElementOccurrences(
         currentLineText,
-        LocElement.Parenthesis
+        blockType
       );
-      nbrOfOpenedParenthesis += currentLineParenthesis.openedElementOccurrences;
-      nbrOfClosedParenthesis += currentLineParenthesis.closedElementOccurrences;
-      if (nbrOfOpenedParenthesis === nbrOfClosedParenthesis) {
-        return (
-          this.closingElementLine(
-            document,
-            currentLineNum,
-            LocElement.Parenthesis
-          ) + 1
-        );
+      nbrOfOpenedBlockType += currentLineParenthesis.openedElementOccurrences;
+      nbrOfClosedBlockType += currentLineParenthesis.closedElementOccurrences;
+      if (nbrOfOpenedBlockType === nbrOfClosedBlockType) {
+        return this.closingElementLine(document, currentLineNum, blockType) + 1;
       }
       currentLineNum--;
     }
-    currentLineNum = lineNum - 1;
-    let nbrOfOpenedBraces: number = 0;
-    let nbrOfClosedBraces: number = 1; // Closing brace
-    while (currentLineNum >= 0) {
-      const currentLineText: string = document.lineAt(currentLineNum).text;
-      const currentLineParenthesis = this.locOpenedClosedElementOccurrences(
-        currentLineText,
-        LocElement.Braces
-      );
-      nbrOfOpenedBraces += currentLineParenthesis.openedElementOccurrences;
-      nbrOfClosedBraces += currentLineParenthesis.closedElementOccurrences;
-      if (nbrOfOpenedBraces === nbrOfClosedBraces) {
-        return (
-          this.closingElementLine(document, currentLineNum, LocElement.Braces) +
-          1
-        );
-      }
-      currentLineNum--;
-    }
-    return -1;
+    return null;
   }
   private functionOpenedBraceLine(docuemt: TextDocument, line: number) {
     let nbrOfOpenedBraces = 0;

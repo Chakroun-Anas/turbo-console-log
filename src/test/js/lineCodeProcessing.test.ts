@@ -232,6 +232,8 @@ suite("JS Line Code Processing", () => {
             false
           );
         `,
+        `const subscription = this.userService.currentUser.subscribe(`,
+        `this.subscription = this.userService.currentUser.subscribe(`,
       ];
       objectFunctionCallLOCs.forEach((objectFunctionCallLOC) => {
         assert.strictEqual(
