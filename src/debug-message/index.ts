@@ -18,6 +18,7 @@ export abstract class DebugMessage {
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
+    insertTypeof: boolean,
     delemiterInsideMessage: string,
     includeFileNameAndLineNum: boolean,
     tabSize: number

@@ -52,6 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
                 properties.addSemicolonInTheEnd,
                 properties.insertEnclosingClass,
                 properties.insertEnclosingFunction,
+                properties.insertTypeof,
                 properties.delimiterInsideMessage,
                 properties.includeFileNameAndLineNum,
                 tabSize
@@ -174,6 +175,7 @@ function getExtensionProperties(
   const addSemicolonInTheEnd = workspaceConfig.addSemicolonInTheEnd || false;
   const insertEnclosingClass = workspaceConfig.insertEnclosingClass;
   const insertEnclosingFunction = workspaceConfig.insertEnclosingFunction;
+  const insertTypeof = workspaceConfig.insertTypeof;
   const quote = workspaceConfig.quote || '"';
   const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "~";
   const includeFileNameAndLineNum =
@@ -184,6 +186,7 @@ function getExtensionProperties(
     addSemicolonInTheEnd,
     insertEnclosingClass,
     insertEnclosingFunction,
+    insertTypeof,
     quote,
     delimiterInsideMessage,
     includeFileNameAndLineNum,

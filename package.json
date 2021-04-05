@@ -53,6 +53,11 @@
           "default": true,
           "description": "Whether to insert or not the enclosing function of the selected variable in the log message."
         },
+        "turboConsoleLog.insertTypeof": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether to include the typeof the logged expression as an extra argument between the log message and the expression."
+        },
         "turboConsoleLog.delimiterInsideMessage": {
           "type": "string",
           "default": "~",
