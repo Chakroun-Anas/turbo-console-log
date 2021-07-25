@@ -6,5 +6,6 @@ export type ExtensionProperties = {
   insertEnclosingFunction: boolean;
   delimiterInsideMessage: string;
   includeFileNameAndLineNum: boolean;
+  includeFilePathAndLineNum: boolean;
   quote: string;
 };

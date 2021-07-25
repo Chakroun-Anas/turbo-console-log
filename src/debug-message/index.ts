@@ -20,6 +20,7 @@ export abstract class DebugMessage {
     insertEnclosingFunction: boolean,
     delemiterInsideMessage: string,
     includeFileNameAndLineNum: boolean,
+    includeFilePathAndLineNum: boolean,
     tabSize: number
   ): string;
   abstract line(

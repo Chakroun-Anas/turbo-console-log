@@ -54,6 +54,7 @@ export function activate(context: vscode.ExtensionContext) {
                 properties.insertEnclosingFunction,
                 properties.delimiterInsideMessage,
                 properties.includeFileNameAndLineNum,
+                properties.includeFilePathAndLineNum,
                 tabSize
               )
             );
@@ -178,6 +179,8 @@ function getExtensionProperties(
   const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "~";
   const includeFileNameAndLineNum =
     workspaceConfig.includeFileNameAndLineNum || false;
+  const includeFilePathAndLineNum =
+    workspaceConfig.includeFilePathAndLineNum || false;
   const extensionProperties: ExtensionProperties = {
     wrapLogMessage,
     logMessagePrefix,
@@ -187,6 +190,7 @@ function getExtensionProperties(
     quote,
     delimiterInsideMessage,
     includeFileNameAndLineNum,
+    includeFilePathAndLineNum,
   };
   return extensionProperties;
 }

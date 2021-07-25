@@ -42,6 +42,8 @@ Properties:
 
 - turboConsoleLog.includeFileNameAndLineNum (boolean): Whether to include the file name and the line number of the log message.
 
+- turboConsoleLog.includeFilePathAndLineNum (boolean): Whether to include the file path and the line number together that can be opened in the editor.
+
 - turboConsoleLog.quote (enum): Double quotes (""), single quotes ('') or backtick(``).
 
 A wrapped log message :

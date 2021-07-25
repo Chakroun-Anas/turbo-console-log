@@ -1,4 +1,4 @@
-import { TextDocument, TextLine } from "vscode";
+import { TextDocument, TextLine, workspace } from "vscode";
 import { DebugMessage } from "..";
 import { BlockType, LocElement, Message } from "../../entities";
 import { LineCodeProcessing } from "../../line-code-processing";
@@ -19,6 +19,7 @@ export class JSDebugMessage extends DebugMessage {
     insertEnclosingFunction: boolean,
     delemiterInsideMessage: string,
     includeFileNameAndLineNum: boolean,
+    includeFilePathAndLineNum: boolean,
     tabSize: number
   ): string {
     const classThatEncloseTheVar: string = this.enclosingBlockName(
@@ -61,6 +62,12 @@ export class JSDebugMessage extends DebugMessage {
     }${
       includeFileNameAndLineNum
         ? `file: ${fileName} ${delemiterInsideMessage} line ${
+            lineOfLogMsg + 1
+          } ${delemiterInsideMessage} `
+        : ""
+    }${
+      includeFilePathAndLineNum
+        ? `${workspace.asRelativePath(document.fileName)}:${
             lineOfLogMsg + 1
           } ${delemiterInsideMessage} `
         : ""
