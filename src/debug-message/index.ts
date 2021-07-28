@@ -19,6 +19,7 @@ export abstract class DebugMessage {
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
     delemiterInsideMessage: string,
+    includeFileName: boolean,
     includeFileNameAndLineNum: boolean,
     tabSize: number
   ): string;
