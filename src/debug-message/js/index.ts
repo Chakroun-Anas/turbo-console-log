@@ -1,4 +1,4 @@
-import { TextDocument, TextLine } from "vscode";
+import { TextDocument, TextLine, workspace } from "vscode";
 import { DebugMessage } from "..";
 import { BlockType, LocElement, Message } from "../../entities";
 import { LineCodeProcessing } from "../../line-code-processing";
@@ -42,9 +42,7 @@ export class JSDebugMessage extends DebugMessage {
       tabSize
     );
     const semicolon: string = addSemicolonInTheEnd ? ";" : "";
-    const fileName = document.fileName.includes("/")
-      ? document.fileName.split("/")[document.fileName.split("/").length - 1]
-      : document.fileName.split("\\")[document.fileName.split("\\").length - 1];
+    const fileName = workspace.asRelativePath(document.fileName)
     if (
       !includeFileNameAndLineNum &&
       !insertEnclosingFunction &&
