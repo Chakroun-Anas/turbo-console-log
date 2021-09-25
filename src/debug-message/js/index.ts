@@ -96,12 +96,11 @@ export class JSDebugMessage extends DebugMessage {
         }${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
       );
     }
-    if (
-      /\){.*}/.test(document.lineAt(lineOfLogMsg - 1).text.replace(/\s/g, ""))
-    ) {
-      textEditor.delete(
-        document.lineAt(lineOfLogMsg - 1).rangeIncludingLineBreak
-      );
+    const previousMsgLogLine = document.lineAt(lineOfLogMsg - 1);
+    if (/\){.*}/.test(previousMsgLogLine.text.replace(/\s/g, ""))) {
+      const textBeforeClosedFunctionParenthesis =
+        previousMsgLogLine.text.split(")")[0];
+      textEditor.delete(previousMsgLogLine.rangeIncludingLineBreak);
       textEditor.insert(
         new vscode.Position(
           lineOfLogMsg >= document.lineCount
@@ -109,7 +108,7 @@ export class JSDebugMessage extends DebugMessage {
             : lineOfLogMsg,
           0
         ),
-        `){\n${
+        `${textBeforeClosedFunctionParenthesis}){\n${
           lineOfLogMsg === document.lineCount ? "\n" : ""
         }${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}}\n`
       );
@@ -400,7 +399,10 @@ export class JSDebugMessage extends DebugMessage {
         );
       nbrOfOpenedBraces += openedElementOccurrences;
       nbrOfClosedBraces += closedElementOccurrences;
-      if (nbrOfOpenedBraces - nbrOfClosedBraces === 1) {
+      if (
+        nbrOfOpenedBraces - nbrOfClosedBraces === 1 ||
+        nbrOfOpenedBraces - nbrOfClosedBraces === 0
+      ) {
         return line;
       }
       line++;
