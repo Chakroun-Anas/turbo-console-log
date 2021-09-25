@@ -10,9 +10,7 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   }
   isArrayAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
-    return /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=\s*\[.*/.test(
-      locWithoutWhiteSpaces
-    );
+    return /(const|let|var).*=\[.*/.test(locWithoutWhiteSpaces);
   }
   doesContainClassDeclaration(loc: string): boolean {
     return /class(\s+).*{/.test(loc);

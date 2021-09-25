@@ -325,6 +325,7 @@ suite("JS Line Code Processing", () => {
       `const someArray =  [function sayHello()   {
                 return true;
             }, true, false, 'hie'];`,
+      `export const SLIDE_LEFT_ANIMATION = [`,
     ];
     const nonArrayAssignmentLOCs = [
       `var myVar = 1;`,
