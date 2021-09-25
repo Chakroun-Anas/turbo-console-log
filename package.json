@@ -116,7 +116,7 @@
     "compile": "tsc -p ./ && mkdir -p out/test/files/js && cp -r src/test/files/js out/test/files",
     "lint": "eslint src --ext ts",
     "watch": "tsc -watch -p ./",
-    "pretest": "yarn run compile && yarn run lint",
+    "pretest": "yarn run compile",
     "test": "node ./out/test/runTest.js",
     "generateTest": "ts-node ./src/test/generator.ts"
   },
