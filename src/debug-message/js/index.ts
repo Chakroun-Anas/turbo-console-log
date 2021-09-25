@@ -163,11 +163,8 @@ export class JSDebugMessage extends DebugMessage {
         return this.functionOpenedBraceLine(document, selectionLine) + 1;
       }
     } else if (
-      this.lineCodeProcessing.isObjectFunctionCallAssignedToVariable(
+      this.lineCodeProcessing.isObjectFunctionCall(
         `${currentLineText}\n${nextLineText}`
-      ) &&
-      !this.lineCodeProcessing.isObjectFunctionCallAssignedToVariable(
-        `${nextLineText}`
       )
     ) {
       return this.objectFunctionCallLine(document, selectionLine, selectedVar);

@@ -3,6 +3,6 @@ export interface LineCodeFunctionProcessing {
   doesContainsNamedFunctionDeclaration(loc: string): boolean;
   isFunctionAssignedToVariable(loc: string): boolean;
   isFunctionDeclaration(loc: string): boolean;
-  isObjectFunctionCallAssignedToVariable(loc: string): boolean;
+  isObjectFunctionCall(loc: string): boolean;
   getFunctionName(loc: string): string;
 }

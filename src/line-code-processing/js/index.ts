@@ -54,9 +54,9 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
       /.*\(.*/.test(locWithoutWhiteSpaces) || /=>/.test(locWithoutWhiteSpaces)
     );
   }
-  isObjectFunctionCallAssignedToVariable(loc: string): boolean {
+  isObjectFunctionCall(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, "");
-    return /.*=\s*([a-zA-Z0-9]+\.){1,}/.test(locWithoutWhiteSpaces);
+    return /([a-zA-Z0-9]+\.){1,}/.test(locWithoutWhiteSpaces);
   }
   getFunctionName(loc: string): string {
     if (this.doesContainsNamedFunctionDeclaration(loc)) {

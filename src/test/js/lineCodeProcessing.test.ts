@@ -234,20 +234,17 @@ suite("JS Line Code Processing", () => {
         `,
         `const subscription = this.userService.currentUser.subscribe(`,
         `this.subscription = this.userService.currentUser.subscribe(`,
+        `this.subscription.add(`,
       ];
       objectFunctionCallLOCs.forEach((objectFunctionCallLOC) => {
         assert.strictEqual(
-          jsLineCodeProcessing.isObjectFunctionCallAssignedToVariable(
-            objectFunctionCallLOC
-          ),
+          jsLineCodeProcessing.isObjectFunctionCall(objectFunctionCallLOC),
           true
         );
       });
       functionsAssignmentsLOCs.forEach((functionsAssignmentsLOC) => {
         assert.strictEqual(
-          jsLineCodeProcessing.isObjectFunctionCallAssignedToVariable(
-            functionsAssignmentsLOC
-          ),
+          jsLineCodeProcessing.isObjectFunctionCall(functionsAssignmentsLOC),
           false
         );
       });
