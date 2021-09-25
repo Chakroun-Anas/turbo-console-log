@@ -19,9 +19,8 @@ export function activate(context: vscode.ExtensionContext) {
       }
       const tabSize: number | string = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
-      const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(
-        "turboConsoleLog"
-      );
+      const config: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration("turboConsoleLog");
       const properties: ExtensionProperties = getExtensionProperties(config);
       for (let index = 0; index < editor.selections.length; index++) {
         const selection: vscode.Selection = editor.selections[index];
@@ -35,27 +34,20 @@ export function activate(context: vscode.ExtensionContext) {
               lineOfSelectedVar,
               selectedVar
             );
-            editBuilder.insert(
-              new vscode.Position(
-                logMessageLine >= document.lineCount
-                  ? document.lineCount
-                  : logMessageLine,
-                0
-              ),
-              jsDebugMessage.content(
-                document,
-                selectedVar,
-                lineOfSelectedVar,
-                properties.wrapLogMessage,
-                properties.logMessagePrefix,
-                properties.quote,
-                properties.addSemicolonInTheEnd,
-                properties.insertEnclosingClass,
-                properties.insertEnclosingFunction,
-                properties.delimiterInsideMessage,
-                properties.includeFileNameAndLineNum,
-                tabSize
-              )
+            jsDebugMessage.msg(
+              editBuilder,
+              document,
+              selectedVar,
+              lineOfSelectedVar,
+              properties.wrapLogMessage,
+              properties.logMessagePrefix,
+              properties.quote,
+              properties.addSemicolonInTheEnd,
+              properties.insertEnclosingClass,
+              properties.insertEnclosingFunction,
+              properties.delimiterInsideMessage,
+              properties.includeFileNameAndLineNum,
+              tabSize
             );
           });
         }
@@ -73,9 +65,8 @@ export function activate(context: vscode.ExtensionContext) {
       }
       const tabSize: number = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
-      const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(
-        "turboConsoleLog"
-      );
+      const config: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration("turboConsoleLog");
       const properties: ExtensionProperties = getExtensionProperties(config);
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
@@ -107,9 +98,8 @@ export function activate(context: vscode.ExtensionContext) {
       }
       const tabSize: number = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
-      const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(
-        "turboConsoleLog"
-      );
+      const config: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration("turboConsoleLog");
       const properties: ExtensionProperties = getExtensionProperties(config);
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
@@ -141,9 +131,8 @@ export function activate(context: vscode.ExtensionContext) {
       }
       const tabSize: number = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
-      const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(
-        "turboConsoleLog"
-      );
+      const config: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration("turboConsoleLog");
       const properties: ExtensionProperties = getExtensionProperties(config);
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,

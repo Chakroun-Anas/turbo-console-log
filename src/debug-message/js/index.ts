@@ -1,4 +1,5 @@
-import { TextDocument, TextLine } from "vscode";
+import * as vscode from "vscode";
+import { TextDocument, TextEditorEdit, TextLine } from "vscode";
 import { DebugMessage } from "..";
 import { BlockType, LocElement, Message } from "../../entities";
 import { LineCodeProcessing } from "../../line-code-processing";
@@ -7,7 +8,8 @@ export class JSDebugMessage extends DebugMessage {
   constructor(lineCodeProcessing: LineCodeProcessing) {
     super(lineCodeProcessing);
   }
-  content(
+  msg(
+    textEditor: TextEditorEdit,
     document: TextDocument,
     selectedVar: string,
     lineOfSelectedVar: number,
@@ -20,7 +22,7 @@ export class JSDebugMessage extends DebugMessage {
     delemiterInsideMessage: string,
     includeFileNameAndLineNum: boolean,
     tabSize: number
-  ): string {
+  ): void {
     const classThatEncloseTheVar: string = this.enclosingBlockName(
       document,
       lineOfSelectedVar,
@@ -82,13 +84,48 @@ export class JSDebugMessage extends DebugMessage {
       const wrappingMsg: string = `console.log(${quote}${logMessagePrefix} ${"-".repeat(
         debuggingMsg.length - 16
       )}${quote})${semicolon}`;
-      return `${
-        lineOfLogMsg === document.lineCount ? "\n" : ""
-      }${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`;
+      textEditor.insert(
+        new vscode.Position(
+          lineOfLogMsg >= document.lineCount
+            ? document.lineCount
+            : lineOfLogMsg,
+          0
+        ),
+        `${
+          lineOfLogMsg === document.lineCount ? "\n" : ""
+        }${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
+      );
     }
-    return `${
-      lineOfLogMsg === document.lineCount ? "\n" : ""
-    }${spacesBeforeMsg}${debuggingMsg}\n`;
+    if (
+      /\){.*}/.test(document.lineAt(lineOfLogMsg - 1).text.replace(/\s/g, ""))
+    ) {
+      textEditor.delete(
+        document.lineAt(lineOfLogMsg - 1).rangeIncludingLineBreak
+      );
+      textEditor.insert(
+        new vscode.Position(
+          lineOfLogMsg >= document.lineCount
+            ? document.lineCount
+            : lineOfLogMsg,
+          0
+        ),
+        `){\n${
+          lineOfLogMsg === document.lineCount ? "\n" : ""
+        }${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}}\n`
+      );
+    } else {
+      textEditor.insert(
+        new vscode.Position(
+          lineOfLogMsg >= document.lineCount
+            ? document.lineCount
+            : lineOfLogMsg,
+          0
+        ),
+        `${
+          lineOfLogMsg === document.lineCount ? "\n" : ""
+        }${spacesBeforeMsg}${debuggingMsg}\n`
+      );
+    }
   }
   line(
     document: TextDocument,
@@ -225,13 +262,11 @@ export class JSDebugMessage extends DebugMessage {
     }
     let totalOpenedParenthesis = 0;
     let totalClosedParenthesis = 0;
-    const {
-      openedElementOccurrences,
-      closedElementOccurrences,
-    } = this.locOpenedClosedElementOccurrences(
-      currentLineText,
-      LocElement.Parenthesis
-    );
+    const { openedElementOccurrences, closedElementOccurrences } =
+      this.locOpenedClosedElementOccurrences(
+        currentLineText,
+        LocElement.Parenthesis
+      );
     totalOpenedParenthesis += openedElementOccurrences;
     totalClosedParenthesis += closedElementOccurrences;
     let currentLineNum = selectionLine + 1;
@@ -242,13 +277,11 @@ export class JSDebugMessage extends DebugMessage {
     ) {
       while (currentLineNum < document.lineCount) {
         currentLineText = document.lineAt(currentLineNum).text;
-        const {
-          openedElementOccurrences,
-          closedElementOccurrences,
-        } = this.locOpenedClosedElementOccurrences(
-          currentLineText,
-          LocElement.Parenthesis
-        );
+        const { openedElementOccurrences, closedElementOccurrences } =
+          this.locOpenedClosedElementOccurrences(
+            currentLineText,
+            LocElement.Parenthesis
+          );
         totalOpenedParenthesis += openedElementOccurrences;
         totalClosedParenthesis += closedElementOccurrences;
         if (currentLineNum === document.lineCount - 1) {
@@ -360,13 +393,11 @@ export class JSDebugMessage extends DebugMessage {
     let nbrOfOpenedBraces = 0;
     let nbrOfClosedBraces = 0;
     while (line < docuemt.lineCount) {
-      const {
-        openedElementOccurrences,
-        closedElementOccurrences,
-      } = this.locOpenedClosedElementOccurrences(
-        this.lineText(docuemt, line),
-        LocElement.Braces
-      );
+      const { openedElementOccurrences, closedElementOccurrences } =
+        this.locOpenedClosedElementOccurrences(
+          this.lineText(docuemt, line),
+          LocElement.Braces
+        );
       nbrOfOpenedBraces += openedElementOccurrences;
       nbrOfClosedBraces += closedElementOccurrences;
       if (nbrOfOpenedBraces - nbrOfClosedBraces === 1) {

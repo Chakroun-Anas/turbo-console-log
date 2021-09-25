@@ -1,5 +1,5 @@
 import { open } from "fs";
-import { TextDocument } from "vscode";
+import { TextDocument, TextEditorEdit } from "vscode";
 import { BlockType, LocElement, Message } from "../entities";
 import { LineCodeProcessing } from "../line-code-processing";
 
@@ -8,7 +8,8 @@ export abstract class DebugMessage {
   constructor(lineCodeProcessing: LineCodeProcessing) {
     this.lineCodeProcessing = lineCodeProcessing;
   }
-  abstract content(
+  abstract msg(
+    textEditor: TextEditorEdit,
     document: TextDocument,
     selectedVar: string,
     lineOfSelectedVar: number,
@@ -21,7 +22,7 @@ export abstract class DebugMessage {
     delemiterInsideMessage: string,
     includeFileNameAndLineNum: boolean,
     tabSize: number
-  ): string;
+  ): void;
   abstract line(
     document: TextDocument,
     selectionLine: number,
@@ -54,10 +55,8 @@ export abstract class DebugMessage {
     let closedElementOccurrences: number = 0;
     while (!closingElementFound && lineNum < docNbrOfLines - 1) {
       const currentLineText: string = document.lineAt(lineNum).text;
-      const openedClosedElementOccurrences = this.locOpenedClosedElementOccurrences(
-        currentLineText,
-        locElement
-      );
+      const openedClosedElementOccurrences =
+        this.locOpenedClosedElementOccurrences(currentLineText, locElement);
       openedElementOccurrences +=
         openedClosedElementOccurrences.openedElementOccurrences;
       closedElementOccurrences +=
