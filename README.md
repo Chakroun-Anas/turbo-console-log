@@ -38,7 +38,7 @@ Properties:
 
 - turboConsoleLog.insertEnclosingFunction (boolean): Whether to insert or not the enclosing function of the selected variable in the log message.
 
-- turboConsoleLog.delemiterInsideMessage (string): The delimiter that will separate the different log message elements (file name, line number, class, function and variable)
+- turboConsoleLog.delimiterInsideMessage (string): The delimiter that will separate the different log message elements (file name, line number, class, function and variable)
 
 - turboConsoleLog.includeFileNameAndLineNum (boolean): Whether to include the file name and the line number of the log message.
 
