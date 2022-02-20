@@ -23,6 +23,16 @@
       "type": "object",
       "title": "Turbo Console Log Configuration",
       "properties": {
+        "turboConsoleLog.language": {
+          "type": "string",
+          "enum": [
+            "JS",
+            "C#",
+            "Unity3D"
+          ],
+          "default": "JS",
+          "description": "Javascript, C# (Console.WriteLine), or Unity3D (Debug.Log)"
+        },
         "turboConsoleLog.wrapLogMessage": {
           "type": "boolean",
           "default": false,

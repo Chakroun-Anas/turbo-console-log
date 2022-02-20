@@ -9,6 +9,7 @@ export class JSDebugMessage extends DebugMessage {
     super(lineCodeProcessing);
   }
   msg(
+    language: string,
     textEditor: TextEditorEdit,
     document: TextDocument,
     selectedVar: string,
@@ -55,30 +56,90 @@ export class JSDebugMessage extends DebugMessage {
     ) {
       logMessagePrefix = `${delemiterInsideMessage} `;
     }
-    const debuggingMsg: string = `console.log(${quote}${logMessagePrefix}${
-      logMessagePrefix.length !== 0 &&
-      logMessagePrefix !== `${delemiterInsideMessage} `
-        ? ` ${delemiterInsideMessage} `
-        : ""
-    }${
-      includeFileNameAndLineNum
-        ? `file: ${fileName} ${delemiterInsideMessage} line ${
-            lineOfLogMsg + 1
-          } ${delemiterInsideMessage} `
-        : ""
-    }${
-      insertEnclosingClass
-        ? classThatEncloseTheVar.length > 0
-          ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
-          : ``
-        : ""
-    }${
-      insertEnclosingFunction
-        ? funcThatEncloseTheVar.length > 0
-          ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+
+    var debuggingMsg: string = "";
+    if(language == "JS")
+    {
+      debuggingMsg = `console.log(${quote}${logMessagePrefix}${
+        logMessagePrefix.length !== 0 &&
+        logMessagePrefix !== `${delemiterInsideMessage} `
+          ? ` ${delemiterInsideMessage} `
           : ""
-        : ""
-    }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+      }${
+        includeFileNameAndLineNum
+          ? `file: ${fileName} ${delemiterInsideMessage} line ${
+              lineOfLogMsg + 1
+            } ${delemiterInsideMessage} `
+          : ""
+      }${
+        insertEnclosingClass
+          ? classThatEncloseTheVar.length > 0
+            ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ``
+          : ""
+      }${
+        insertEnclosingFunction
+          ? funcThatEncloseTheVar.length > 0
+            ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ""
+          : ""
+      }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+    }
+    else if(language == "C#")
+    {
+      debuggingMsg = `Console.WriteLine(${quote}${logMessagePrefix}${
+        logMessagePrefix.length !== 0 &&
+        logMessagePrefix !== `${delemiterInsideMessage} `
+          ? ` ${delemiterInsideMessage} `
+          : ""
+      }${
+        includeFileNameAndLineNum
+          ? `file: ${fileName} ${delemiterInsideMessage} line ${
+              lineOfLogMsg + 1
+            } ${delemiterInsideMessage} `
+          : ""
+      }${
+        insertEnclosingClass
+          ? classThatEncloseTheVar.length > 0
+            ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ``
+          : ""
+      }${
+        insertEnclosingFunction
+          ? funcThatEncloseTheVar.length > 0
+            ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ""
+          : ""
+      }${selectedVar} {0}${quote}, ${selectedVar});`;
+    }
+    else if(language == "Unity3D")
+    {
+      debuggingMsg = `Debug.Log(${quote}${logMessagePrefix}${
+        logMessagePrefix.length !== 0 &&
+        logMessagePrefix !== `${delemiterInsideMessage} `
+          ? ` ${delemiterInsideMessage} `
+          : ""
+      }${
+        includeFileNameAndLineNum
+          ? `file: ${fileName} ${delemiterInsideMessage} line ${
+              lineOfLogMsg + 1
+            } ${delemiterInsideMessage} `
+          : ""
+      }${
+        insertEnclosingClass
+          ? classThatEncloseTheVar.length > 0
+            ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ``
+          : ""
+      }${
+        insertEnclosingFunction
+          ? funcThatEncloseTheVar.length > 0
+            ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ""
+          : ""
+      }${selectedVar} : ${quote} \+ ${selectedVar});`;
+    }
+    
     if (wrapLogMessage) {
       // 16 represents the length of console.log("");
       const wrappingMsg: string = `console.log(${quote}${logMessagePrefix} ${"-".repeat(

@@ -35,6 +35,7 @@ export function activate(context: vscode.ExtensionContext) {
               selectedVar
             );
             jsDebugMessage.msg(
+              properties.language,
               editBuilder,
               document,
               selectedVar,
@@ -156,6 +157,7 @@ export function deactivate() {}
 function getExtensionProperties(
   workspaceConfig: vscode.WorkspaceConfiguration
 ) {
+  const language = workspaceConfig.language;
   const wrapLogMessage = workspaceConfig.wrapLogMessage || false;
   const logMessagePrefix = workspaceConfig.logMessagePrefix
     ? workspaceConfig.logMessagePrefix
@@ -168,6 +170,7 @@ function getExtensionProperties(
   const includeFileNameAndLineNum =
     workspaceConfig.includeFileNameAndLineNum || false;
   const extensionProperties: ExtensionProperties = {
+    language,
     wrapLogMessage,
     logMessagePrefix,
     addSemicolonInTheEnd,

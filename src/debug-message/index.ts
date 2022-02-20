@@ -9,6 +9,7 @@ export abstract class DebugMessage {
     this.lineCodeProcessing = lineCodeProcessing;
   }
   abstract msg(
+    language: string,
     textEditor: TextEditorEdit,
     document: TextDocument,
     selectedVar: string,
