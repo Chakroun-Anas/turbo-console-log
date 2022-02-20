@@ -57,88 +57,10 @@ export class JSDebugMessage extends DebugMessage {
       logMessagePrefix = `${delemiterInsideMessage} `;
     }
 
-    var debuggingMsg: string = "";
-    if(language == "JS")
-    {
-      debuggingMsg = `console.log(${quote}${logMessagePrefix}${
-        logMessagePrefix.length !== 0 &&
-        logMessagePrefix !== `${delemiterInsideMessage} `
-          ? ` ${delemiterInsideMessage} `
-          : ""
-      }${
-        includeFileNameAndLineNum
-          ? `file: ${fileName} ${delemiterInsideMessage} line ${
-              lineOfLogMsg + 1
-            } ${delemiterInsideMessage} `
-          : ""
-      }${
-        insertEnclosingClass
-          ? classThatEncloseTheVar.length > 0
-            ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
-            : ``
-          : ""
-      }${
-        insertEnclosingFunction
-          ? funcThatEncloseTheVar.length > 0
-            ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
-            : ""
-          : ""
-      }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
-    }
-    else if(language == "C#")
-    {
-      debuggingMsg = `Console.WriteLine(${quote}${logMessagePrefix}${
-        logMessagePrefix.length !== 0 &&
-        logMessagePrefix !== `${delemiterInsideMessage} `
-          ? ` ${delemiterInsideMessage} `
-          : ""
-      }${
-        includeFileNameAndLineNum
-          ? `file: ${fileName} ${delemiterInsideMessage} line ${
-              lineOfLogMsg + 1
-            } ${delemiterInsideMessage} `
-          : ""
-      }${
-        insertEnclosingClass
-          ? classThatEncloseTheVar.length > 0
-            ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
-            : ``
-          : ""
-      }${
-        insertEnclosingFunction
-          ? funcThatEncloseTheVar.length > 0
-            ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
-            : ""
-          : ""
-      }${selectedVar} {0}${quote}, ${selectedVar});`;
-    }
-    else if(language == "Unity3D")
-    {
-      debuggingMsg = `Debug.Log(${quote}${logMessagePrefix}${
-        logMessagePrefix.length !== 0 &&
-        logMessagePrefix !== `${delemiterInsideMessage} `
-          ? ` ${delemiterInsideMessage} `
-          : ""
-      }${
-        includeFileNameAndLineNum
-          ? `file: ${fileName} ${delemiterInsideMessage} line ${
-              lineOfLogMsg + 1
-            } ${delemiterInsideMessage} `
-          : ""
-      }${
-        insertEnclosingClass
-          ? classThatEncloseTheVar.length > 0
-            ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
-            : ``
-          : ""
-      }${
-        insertEnclosingFunction
-          ? funcThatEncloseTheVar.length > 0
-            ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
-            : ""
-          : ""
-      }${selectedVar}${quote} \+ ${selectedVar});`;
-    }
+    const debuggingMsg: string = this.getDebugMessage(language, quote, logMessagePrefix, 
+                            delemiterInsideMessage, includeFileNameAndLineNum, fileName, 
+                            lineOfLogMsg, insertEnclosingClass, classThatEncloseTheVar, 
+                            insertEnclosingFunction, funcThatEncloseTheVar, selectedVar, semicolon);
     
     if (wrapLogMessage) {
       // 16 represents the length of console.log("");
@@ -619,10 +541,8 @@ export class JSDebugMessage extends DebugMessage {
     const documentNbrOfLines: number = document.lineCount;
     const logMessages: Message[] = [];
     for (let i = 0; i < documentNbrOfLines; i++) {
-      console.log("Line ", i, " Line Contains ", document.lineAt(i).text);
       const turboConsoleLogMessage: RegExp = this.getLogCommand(language);
       if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
-        console.log("Line is Debug Message");
         const logMessage: Message = {
           spaces: "",
           lines: [],
@@ -637,7 +557,6 @@ export class JSDebugMessage extends DebugMessage {
         for (let j = i; j <= closedParenthesisLine; j++) {
           msg += document.lineAt(j).text;
           logMessage.lines.push(document.lineAt(j).rangeIncludingLineBreak);
-          console.log("Adding multiline")
         }
         if (
           new RegExp(
@@ -645,12 +564,77 @@ export class JSDebugMessage extends DebugMessage {
           ).test(msg.replace(/\s/g, ""))
         ) {
           logMessages.push(logMessage);
-          console.log("Adding message")
         }
       }
     }
-    console.log("🚀 ~ file: index.ts ~ line 651 ~ JSDebugMessage ~ logMessages : ", logMessages.length);
     return logMessages;
   }
-    
+  getDebugMessage(
+    language: string, 
+    quote: string, 
+    logMessagePrefix: string, 
+    delemiterInsideMessage: string, 
+    includeFileNameAndLineNum: boolean, 
+    fileName: string, 
+    lineOfLogMsg: number, 
+    insertEnclosingClass: boolean, 
+    classThatEncloseTheVar: string, 
+    insertEnclosingFunction: boolean, 
+    funcThatEncloseTheVar: string, 
+    selectedVar: string, 
+    semicolon: string): string 
+  {
+    var debuggingMsg: string = "";
+    if (language == "JS") {
+      debuggingMsg = `console.log(${quote}${logMessagePrefix}${logMessagePrefix.length !== 0 &&
+          logMessagePrefix !== `${delemiterInsideMessage} `
+          ? ` ${delemiterInsideMessage} `
+          : ""}${includeFileNameAndLineNum
+          ? `file: ${fileName} ${delemiterInsideMessage} line ${lineOfLogMsg + 1} ${delemiterInsideMessage} `
+          : ""}${insertEnclosingClass
+          ? classThatEncloseTheVar.length > 0
+            ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ``
+          : ""}${insertEnclosingFunction
+          ? funcThatEncloseTheVar.length > 0
+            ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ""
+          : ""}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+    }
+    else if (language == "C#") {
+      debuggingMsg = `Console.WriteLine(${quote}${logMessagePrefix}${logMessagePrefix.length !== 0 &&
+          logMessagePrefix !== `${delemiterInsideMessage} `
+          ? ` ${delemiterInsideMessage} `
+          : ""}${includeFileNameAndLineNum
+          ? `file: ${fileName} ${delemiterInsideMessage} line ${lineOfLogMsg + 1} ${delemiterInsideMessage} `
+          : ""}${insertEnclosingClass
+          ? classThatEncloseTheVar.length > 0
+            ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ``
+          : ""}${insertEnclosingFunction
+          ? funcThatEncloseTheVar.length > 0
+            ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ""
+          : ""}${selectedVar} {0}${quote}, ${selectedVar});`;
+    }
+    else if (language == "Unity3D") {
+      debuggingMsg = `Debug.Log(${quote}${logMessagePrefix}${logMessagePrefix.length !== 0 &&
+          logMessagePrefix !== `${delemiterInsideMessage} `
+          ? ` ${delemiterInsideMessage} `
+          : ""}${includeFileNameAndLineNum
+          ? `file: ${fileName} ${delemiterInsideMessage} line ${lineOfLogMsg + 1} ${delemiterInsideMessage} `
+          : ""}${insertEnclosingClass
+          ? classThatEncloseTheVar.length > 0
+            ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ``
+          : ""}${insertEnclosingFunction
+          ? funcThatEncloseTheVar.length > 0
+            ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+            : ""
+          : ""}${selectedVar} ${quote} \+ ${selectedVar});`;
+    }
+    return debuggingMsg;
+  }
 }
+
+
