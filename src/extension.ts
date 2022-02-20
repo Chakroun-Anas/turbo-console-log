@@ -73,7 +73,8 @@ export function activate(context: vscode.ExtensionContext) {
         document,
         tabSize,
         properties.delimiterInsideMessage,
-        properties.quote
+        properties.quote,
+        properties.language
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
@@ -106,7 +107,8 @@ export function activate(context: vscode.ExtensionContext) {
         document,
         tabSize,
         properties.delimiterInsideMessage,
-        properties.quote
+        properties.quote,
+        properties.language
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
@@ -139,7 +141,8 @@ export function activate(context: vscode.ExtensionContext) {
         document,
         tabSize,
         properties.delimiterInsideMessage,
-        properties.quote
+        properties.quote,
+        properties.language
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ lines }) => {

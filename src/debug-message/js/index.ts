@@ -137,7 +137,7 @@ export class JSDebugMessage extends DebugMessage {
             ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
             : ""
           : ""
-      }${selectedVar} : ${quote} \+ ${selectedVar});`;
+      }${selectedVar}${quote} \+ ${selectedVar});`;
     }
     
     if (wrapLogMessage) {
@@ -598,17 +598,31 @@ export class JSDebugMessage extends DebugMessage {
     }
     return "";
   }
+  getLogCommand(language: string): RegExp
+  {
+    if(language == "JS")
+      return /console\.log\(/;
+    else if(language == "C#")
+      return /Console\.WriteLine\(/;
+    else if(language == "Unity3D")
+      return /Debug\.Log\(/;
+    else
+      return /console\.log\(/;
+  }
   detectAll(
     document: TextDocument,
     tabSize: number,
     delemiterInsideMessage: string,
-    quote: string
+    quote: string,
+    language: string
   ): Message[] {
     const documentNbrOfLines: number = document.lineCount;
     const logMessages: Message[] = [];
     for (let i = 0; i < documentNbrOfLines; i++) {
-      const turboConsoleLogMessage: RegExp = /console\.log\(/;
+      console.log("Line ", i, " Line Contains ", document.lineAt(i).text);
+      const turboConsoleLogMessage: RegExp = this.getLogCommand(language);
       if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
+        console.log("Line is Debug Message");
         const logMessage: Message = {
           spaces: "",
           lines: [],
@@ -623,16 +637,20 @@ export class JSDebugMessage extends DebugMessage {
         for (let j = i; j <= closedParenthesisLine; j++) {
           msg += document.lineAt(j).text;
           logMessage.lines.push(document.lineAt(j).rangeIncludingLineBreak);
+          console.log("Adding multiline")
         }
         if (
           new RegExp(
-            `${delemiterInsideMessage}[a-zA-Z0-9]+${quote},(//)?[a-zA-Z0-9]+`
+            `${delemiterInsideMessage}{1}[a-zA-Z0-9]+[0-9{}]*${quote}(,|\\+)[a-zA-Z0-9.]+\\){1}`
           ).test(msg.replace(/\s/g, ""))
         ) {
           logMessages.push(logMessage);
+          console.log("Adding message")
         }
       }
     }
+    console.log("🚀 ~ file: index.ts ~ line 651 ~ JSDebugMessage ~ logMessages : ", logMessages.length);
     return logMessages;
   }
+    
 }
