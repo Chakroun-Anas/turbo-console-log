@@ -24,7 +24,16 @@ export function activate(context: vscode.ExtensionContext) {
       const properties: ExtensionProperties = getExtensionProperties(config);
       for (let index = 0; index < editor.selections.length; index++) {
         const selection: vscode.Selection = editor.selections[index];
-        const selectedVar: string = document.getText(selection);
+        
+        let wordUnderCursor = "";
+        const rangeUnderCursor: vscode.Range | undefined = document.getWordRangeAtPosition(
+            selection.active
+        );
+        // if rangeUnderCursor is undefined, `document.getText(undefined)` will return the entire file.
+        if (rangeUnderCursor) {
+            wordUnderCursor = document.getText(rangeUnderCursor);
+        }
+        const selectedVar: string = document.getText(selection) || wordUnderCursor;
         const lineOfSelectedVar: number = selection.active.line;
         // Check if the selection line is not the last one in the document and the selected variable is not empty
         if (selectedVar.trim().length !== 0) {
