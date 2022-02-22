@@ -57,10 +57,30 @@ export class JSDebugMessage extends DebugMessage {
       logMessagePrefix = `${delemiterInsideMessage} `;
     }
 
-    const debuggingMsg: string = this.getDebugMessage(language, quote, logMessagePrefix, 
-                            delemiterInsideMessage, includeFileNameAndLineNum, fileName, 
-                            lineOfLogMsg, insertEnclosingClass, classThatEncloseTheVar, 
-                            insertEnclosingFunction, funcThatEncloseTheVar, selectedVar, semicolon);
+    const debuggingMsg: string = this.getCommand(language) + `${quote}${logMessagePrefix}${
+      logMessagePrefix.length !== 0 &&
+      logMessagePrefix !== `${delemiterInsideMessage} `
+        ? ` ${delemiterInsideMessage} `
+        : ""
+    }${
+      includeFileNameAndLineNum
+        ? `file: ${fileName} ${delemiterInsideMessage} line ${
+            lineOfLogMsg + 1
+          } ${delemiterInsideMessage} `
+        : ""
+    }${
+      insertEnclosingClass
+        ? classThatEncloseTheVar.length > 0
+          ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
+          : ``
+        : ""
+    }${
+      insertEnclosingFunction
+        ? funcThatEncloseTheVar.length > 0
+          ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
+          : ""
+        : ""
+    }` + this.getProlog(language, quote, selectedVar, semicolon);
     
     if (wrapLogMessage) {
       // 16 represents the length of console.log("");
@@ -569,6 +589,37 @@ export class JSDebugMessage extends DebugMessage {
     }
     return logMessages;
   }
+
+  getCommand(language: string): string
+  {
+    var debuggingMsg: string = "";
+    if (language == "JS") {
+        debuggingMsg = "console.log(";
+    }
+    else if (language == "C#") {
+        debuggingMsg = "Console.WriteLine(";
+    }
+    else if (language == "Unity3D") {
+        debuggingMsg = "Debug.Log(";
+    }
+    return debuggingMsg;
+  }
+
+  getProlog(language: string, quote: string, selectedVar: string, semicolon: string): string
+  {
+    var prolog : string = "";
+    if (language == "JS") {
+        prolog = ` ${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+    }
+    else if (language == "C#") {
+        prolog = ` ${selectedVar} {0}${quote}, ${selectedVar});`;
+    }
+    else if (language == "Unity3D") {
+        prolog = ` ${selectedVar} ${quote} \+ ${selectedVar});`;
+    }
+    return prolog;
+  }
+
   getDebugMessage(
     language: string, 
     quote: string, 
