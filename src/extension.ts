@@ -1,13 +1,24 @@
 import * as vscode from "vscode";
-import { DebugMessage } from "./debug-message";
-import { JSDebugMessage } from "./debug-message/js";
 import { ExtensionProperties, Message } from "./entities";
+
+import { DebugMessage } from "./debug-message";
 import { LineCodeProcessing } from "./line-code-processing";
+
+import { JSDebugMessage } from "./debug-message/js";
 import { JSLineCodeProcessing } from "./line-code-processing/js";
 
+import { CSDebugMessage } from "./debug-message/cs";
+import { CSLineCodeProcessing } from "./line-code-processing/cs";
+import { CSUnityDebugMessage } from "./debug-message/csunity";
+import { runInThisContext } from "vm";
+
+var lineCodeProcessing: LineCodeProcessing;
+var debugMessage: DebugMessage;
+
 export function activate(context: vscode.ExtensionContext) {
-  const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
-  const jsDebugMessage: DebugMessage = new JSDebugMessage(jsLineCodeProcessing);
+  lineCodeProcessing = getLineCodeProcessing()
+  debugMessage = getDebugMessage(lineCodeProcessing);
+
   // Insert debug message
   vscode.commands.registerCommand(
     "turboConsoleLog.displayLogMessage",
@@ -17,6 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
       if (!editor) {
         return;
       }
+      updateLanguage();
       const tabSize: number | string = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
       const config: vscode.WorkspaceConfiguration =
@@ -29,13 +41,12 @@ export function activate(context: vscode.ExtensionContext) {
         // Check if the selection line is not the last one in the document and the selected variable is not empty
         if (selectedVar.trim().length !== 0) {
           await editor.edit((editBuilder) => {
-            const logMessageLine = jsDebugMessage.line(
+            const logMessageLine = debugMessage.line(
               document,
               lineOfSelectedVar,
               selectedVar
             );
-            jsDebugMessage.msg(
-              properties.language,
+            debugMessage.msg(
               editBuilder,
               document,
               selectedVar,
@@ -69,12 +80,11 @@ export function activate(context: vscode.ExtensionContext) {
       const config: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration("turboConsoleLog");
       const properties: ExtensionProperties = getExtensionProperties(config);
-      const logMessages: Message[] = jsDebugMessage.detectAll(
+      const logMessages: Message[] = debugMessage.detectAll(
         document,
         tabSize,
         properties.delimiterInsideMessage,
-        properties.quote,
-        properties.language
+        properties.quote
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
@@ -103,12 +113,11 @@ export function activate(context: vscode.ExtensionContext) {
       const config: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration("turboConsoleLog");
       const properties: ExtensionProperties = getExtensionProperties(config);
-      const logMessages: Message[] = jsDebugMessage.detectAll(
+      const logMessages: Message[] = debugMessage.detectAll(
         document,
         tabSize,
         properties.delimiterInsideMessage,
-        properties.quote,
-        properties.language
+        properties.quote
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
@@ -137,12 +146,11 @@ export function activate(context: vscode.ExtensionContext) {
       const config: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration("turboConsoleLog");
       const properties: ExtensionProperties = getExtensionProperties(config);
-      const logMessages: Message[] = jsDebugMessage.detectAll(
+      const logMessages: Message[] = debugMessage.detectAll(
         document,
         tabSize,
         properties.delimiterInsideMessage,
-        properties.quote,
-        properties.language
+        properties.quote
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ lines }) => {
@@ -160,7 +168,7 @@ export function deactivate() {}
 function getExtensionProperties(
   workspaceConfig: vscode.WorkspaceConfiguration
 ) {
-  const language = workspaceConfig.language;
+  const unity3d = workspaceConfig.unity3d || false;
   const wrapLogMessage = workspaceConfig.wrapLogMessage || false;
   const logMessagePrefix = workspaceConfig.logMessagePrefix
     ? workspaceConfig.logMessagePrefix
@@ -170,10 +178,9 @@ function getExtensionProperties(
   const insertEnclosingFunction = workspaceConfig.insertEnclosingFunction;
   const quote = workspaceConfig.quote || '"';
   const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "~";
-  const includeFileNameAndLineNum =
-    workspaceConfig.includeFileNameAndLineNum || false;
+  const includeFileNameAndLineNum = workspaceConfig.includeFileNameAndLineNum || false;
   const extensionProperties: ExtensionProperties = {
-    language,
+    unity3d,
     wrapLogMessage,
     logMessagePrefix,
     addSemicolonInTheEnd,
@@ -193,5 +200,47 @@ function getTabSize(tabSize: string | number | undefined): number {
     return parseInt(tabSize);
   } else {
     return 4;
+  }
+}
+
+function updateLanguage() {
+  console.log(vscode.window.activeTextEditor?.document.languageId);
+  lineCodeProcessing = getLineCodeProcessing();
+  debugMessage = getDebugMessage(lineCodeProcessing);
+}
+
+function getLineCodeProcessing(){  
+  if(vscode.window.activeTextEditor?.document.languageId == "csharp")
+  {
+    return new CSLineCodeProcessing();
+  }
+  else if(vscode.window.activeTextEditor?.document.languageId == "TypeScript" || vscode.window.activeTextEditor?.document.languageId == "javascript")
+  {
+    return new JSLineCodeProcessing();
+  }
+  else
+  {
+    return new JSLineCodeProcessing();
+  }
+}
+
+function getDebugMessage(lcp :LineCodeProcessing) {
+  const config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration("turboConsoleLog");
+  const properties: ExtensionProperties = getExtensionProperties(config);
+
+  if(vscode.window.activeTextEditor?.document.languageId == "csharp")
+  {
+    if(properties.unity3d)
+      return new CSUnityDebugMessage(lcp);
+    else
+      return new CSDebugMessage(lcp);
+  }
+  else if(vscode.window.activeTextEditor?.document.languageId == "typescript" || vscode.window.activeTextEditor?.document.languageId == "javascript")
+  {
+    return new JSDebugMessage(lcp);
+  }
+  else
+  {
+    return new JSDebugMessage(lcp);
   }
 }

@@ -1,5 +1,5 @@
 export type ExtensionProperties = {
-  language: string;
+  unity3d: boolean;
   wrapLogMessage: boolean;
   logMessagePrefix: string;
   addSemicolonInTheEnd: boolean;

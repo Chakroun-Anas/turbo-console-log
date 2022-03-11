@@ -4,7 +4,7 @@ import { DebugMessage } from "..";
 import { BlockType, LocElement, Message } from "../../entities";
 import { LineCodeProcessing } from "../../line-code-processing";
 
-export class JSDebugMessage extends DebugMessage {
+export class CSDebugMessage extends DebugMessage {
   constructor(lineCodeProcessing: LineCodeProcessing) {
     super(lineCodeProcessing);
   }
@@ -56,7 +56,7 @@ export class JSDebugMessage extends DebugMessage {
       logMessagePrefix = `${delemiterInsideMessage} `;
     }
 
-    const debuggingMsg: string = `console.log(${quote}${logMessagePrefix}${logMessagePrefix.length !== 0 &&
+    const debuggingMsg: string = `Console.WriteLine(${quote}${logMessagePrefix}${logMessagePrefix.length !== 0 &&
       logMessagePrefix !== `${delemiterInsideMessage} `
       ? ` ${delemiterInsideMessage} `
       : ""}${includeFileNameAndLineNum
@@ -69,12 +69,12 @@ export class JSDebugMessage extends DebugMessage {
       ? funcThatEncloseTheVar.length > 0
         ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
         : ""
-      : ""}${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+      : ""}{0}${quote}, ${selectedVar});`;
     
     if (wrapLogMessage) {
-      // 16 represents the length of console.log("");
-      const wrappingMsg: string = `console.log(${quote}${logMessagePrefix} ${"-".repeat(
-        debuggingMsg.length - 16
+      // 21 represents the length of console.log("");
+      const wrappingMsg: string = `Console.WriteLine(${quote}${logMessagePrefix} ${"-".repeat(
+        debuggingMsg.length - 21
       )}${quote})${semicolon}`;
       textEditor.insert(
         new vscode.Position(
@@ -529,17 +529,6 @@ export class JSDebugMessage extends DebugMessage {
     }
     return "";
   }
-  getLogCommand(language: string): RegExp
-  {
-    if(language == "JS")
-      return /console\.log\(/;
-    else if(language == "C#")
-      return /Console\.WriteLine\(/;
-    else if(language == "Unity3D")
-      return /Debug\.Log\(/;
-    else
-      return /console\.log\(/;
-  }
   detectAll(
     document: TextDocument,
     tabSize: number,
@@ -549,7 +538,7 @@ export class JSDebugMessage extends DebugMessage {
     const documentNbrOfLines: number = document.lineCount;
     const logMessages: Message[] = [];
     for (let i = 0; i < documentNbrOfLines; i++) {
-      const turboConsoleLogMessage: RegExp = /console\.log\(/;
+      const turboConsoleLogMessage: RegExp = /Console\.WriteLine\(/;
       if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
         const logMessage: Message = {
           spaces: "",

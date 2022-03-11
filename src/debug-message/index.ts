@@ -9,7 +9,6 @@ export abstract class DebugMessage {
     this.lineCodeProcessing = lineCodeProcessing;
   }
   abstract msg(
-    language: string,
     textEditor: TextEditorEdit,
     document: TextDocument,
     selectedVar: string,
@@ -39,7 +38,6 @@ export abstract class DebugMessage {
     tabSize: number,
     delemiterInsideMessage: string,
     quote: string,
-    language: string
   ): Message[];
   abstract enclosingBlockName(
     document: TextDocument,
