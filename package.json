@@ -23,6 +23,11 @@
       "type": "object",
       "title": "Turbo Console Log Configuration",
       "properties": {
+        "turboConsoleLog.unity3d": {
+          "type": "boolean",
+          "default": false,
+          "description": "Debug messages as Debug.Log for Unity 3d C#."
+        },
         "turboConsoleLog.wrapLogMessage": {
           "type": "boolean",
           "default": false,
