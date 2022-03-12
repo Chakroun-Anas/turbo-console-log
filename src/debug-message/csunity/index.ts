@@ -557,7 +557,7 @@ export class CSUnityDebugMessage extends DebugMessage {
         }
         if (
           new RegExp(
-            `${delemiterInsideMessage}{1}[a-zA-Z0-9]+[0-9{}]*${quote}(,|\\+)[a-zA-Z0-9.]+\\){1}`
+            `${delemiterInsideMessage}{1}"\\+[a-zA-Z0-9_-]\\);`
           ).test(msg.replace(/\s/g, ""))
         ) {
           logMessages.push(logMessage);
