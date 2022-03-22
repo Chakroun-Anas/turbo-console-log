@@ -427,24 +427,18 @@ export class JSDebugMessage extends DebugMessage {
           currentLine.firstNonWhitespaceCharacterIndex
         ) {
           if (
-            nextLineTextChars[nextLine.firstNonWhitespaceCharacterIndex - 1] ===
-            "\t"
+            nextLineTextChars[nextLine.firstNonWhitespaceCharacterIndex - 1] === "\t"
           ) {
-            return " ".repeat(
-              nextLine.firstNonWhitespaceCharacterIndex * tabSize
-            );
+            return "\t".repeat(nextLine.firstNonWhitespaceCharacterIndex);
           } else {
             return " ".repeat(nextLine.firstNonWhitespaceCharacterIndex);
           }
         } else {
           if (
             currentLineTextChars[
-              currentLine.firstNonWhitespaceCharacterIndex - 1
-            ] === "\t"
+              currentLine.firstNonWhitespaceCharacterIndex - 1] === "\t"
           ) {
-            return " ".repeat(
-              currentLine.firstNonWhitespaceCharacterIndex * tabSize
-            );
+            return "\t".repeat(currentLine.firstNonWhitespaceCharacterIndex);
           } else {
             return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
           }
@@ -452,12 +446,9 @@ export class JSDebugMessage extends DebugMessage {
       } else {
         if (
           currentLineTextChars[
-            currentLine.firstNonWhitespaceCharacterIndex - 1
-          ] === "\t"
+            currentLine.firstNonWhitespaceCharacterIndex - 1] === "\t"
         ) {
-          return " ".repeat(
-            currentLine.firstNonWhitespaceCharacterIndex * tabSize
-          );
+          return "\t".repeat(currentLine.firstNonWhitespaceCharacterIndex);
         } else {
           return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
         }
@@ -465,12 +456,9 @@ export class JSDebugMessage extends DebugMessage {
     } else {
       if (
         currentLineTextChars[
-          currentLine.firstNonWhitespaceCharacterIndex - 1
-        ] === "\t"
+          currentLine.firstNonWhitespaceCharacterIndex - 1] === "\t"
       ) {
-        return " ".repeat(
-          currentLine.firstNonWhitespaceCharacterIndex * tabSize
-        );
+        return "\t".repeat(currentLine.firstNonWhitespaceCharacterIndex);
       } else {
         return " ".repeat(currentLine.firstNonWhitespaceCharacterIndex);
       }
