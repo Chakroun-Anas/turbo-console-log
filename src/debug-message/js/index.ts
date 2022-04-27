@@ -95,35 +95,36 @@ export class JSDebugMessage extends DebugMessage {
           lineOfLogMsg === document.lineCount ? "\n" : ""
         }${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`
       );
-    }
-    const previousMsgLogLine = document.lineAt(lineOfLogMsg - 1);
-    if (/\){.*}/.test(previousMsgLogLine.text.replace(/\s/g, ""))) {
-      const textBeforeClosedFunctionParenthesis =
-        previousMsgLogLine.text.split(")")[0];
-      textEditor.delete(previousMsgLogLine.rangeIncludingLineBreak);
-      textEditor.insert(
-        new vscode.Position(
-          lineOfLogMsg >= document.lineCount
-            ? document.lineCount
-            : lineOfLogMsg,
-          0
-        ),
-        `${textBeforeClosedFunctionParenthesis}){\n${
-          lineOfLogMsg === document.lineCount ? "\n" : ""
-        }${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}}\n`
-      );
     } else {
-      textEditor.insert(
-        new vscode.Position(
-          lineOfLogMsg >= document.lineCount
-            ? document.lineCount
-            : lineOfLogMsg,
-          0
-        ),
-        `${
-          lineOfLogMsg === document.lineCount ? "\n" : ""
-        }${spacesBeforeMsg}${debuggingMsg}\n`
-      );
+      const previousMsgLogLine = document.lineAt(lineOfLogMsg - 1);
+      if (/\){.*}/.test(previousMsgLogLine.text.replace(/\s/g, ""))) {
+        const textBeforeClosedFunctionParenthesis =
+          previousMsgLogLine.text.split(")")[0];
+        textEditor.delete(previousMsgLogLine.rangeIncludingLineBreak);
+        textEditor.insert(
+          new vscode.Position(
+            lineOfLogMsg >= document.lineCount
+              ? document.lineCount
+              : lineOfLogMsg,
+            0
+          ),
+          `${textBeforeClosedFunctionParenthesis}){\n${
+            lineOfLogMsg === document.lineCount ? "\n" : ""
+          }${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}}\n`
+        );
+      } else {
+        textEditor.insert(
+          new vscode.Position(
+            lineOfLogMsg >= document.lineCount
+              ? document.lineCount
+              : lineOfLogMsg,
+            0
+          ),
+          `${
+            lineOfLogMsg === document.lineCount ? "\n" : ""
+          }${spacesBeforeMsg}${debuggingMsg}\n`
+        );
+      }
     }
   }
   line(
