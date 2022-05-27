@@ -67,6 +67,18 @@
           ],
           "default": "\"",
           "description": "Double quotes, single quotes or backtick"
+        },
+        "turboConsoleLog.logType": {
+          "type": "string",
+          "enum": [
+            "log",
+            "warn",
+            "error",
+            "debug",
+            "table"
+          ],
+          "default": "log",
+          "description": "Select the log type"
         }
       }
     },
