@@ -22,7 +22,8 @@ export class JSDebugMessage extends DebugMessage {
     delemiterInsideMessage: string,
     includeFileNameAndLineNum: boolean,
     tabSize: number,
-    logType: string
+    logType: string,
+    logFunction: string
   ): void {
     const classThatEncloseTheVar: string = this.enclosingBlockName(
       document,
@@ -56,7 +57,7 @@ export class JSDebugMessage extends DebugMessage {
     ) {
       logMessagePrefix = `${delemiterInsideMessage} `;
     }
-    const debuggingMsg: string = `console.${logType}(${quote}${logMessagePrefix}${
+    const debuggingMsg: string = `${logFunction !== 'log' ? logFunction : `console.${logType}`}(${quote}${logMessagePrefix}${
       logMessagePrefix.length !== 0 &&
       logMessagePrefix !== `${delemiterInsideMessage} `
         ? ` ${delemiterInsideMessage} `

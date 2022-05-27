@@ -28,6 +28,10 @@ Multiple cursor support:
 
 Properties:
 
+- turboConsoleLog.logFunction (string): Custom log function to use in the inserted log message, when specified logType property will be ignored
+
+- turboConsoleLog.logType (enum): "log","warn", "error","debug","table"
+
 - turboConsoleLog.wrapLogMessage (boolean): Whether to wrap the log message or not.
 
 - turboConsoleLog.logMessagePrefix (string): The prefix of the log message (default one is 🚀 ).
@@ -101,6 +105,11 @@ Initial release of Turbo Console Log
 - File name and line number are added to the log message
 - The delimiter of elements inside the log message can be customised
 - Comment, uncomment and delete only the log messages inserted by the extension
+
+### 2.2.0
+
+- Specify custom log function to use instead of the default console.log
+- Specify log function type (log, warn, error, debug, table)
 
 ## Participate
 
