@@ -21,7 +21,8 @@ export abstract class DebugMessage {
     insertEnclosingFunction: boolean,
     delemiterInsideMessage: string,
     includeFileNameAndLineNum: boolean,
-    tabSize: number
+    tabSize: number,
+    logType: string
   ): void;
   abstract line(
     document: TextDocument,
