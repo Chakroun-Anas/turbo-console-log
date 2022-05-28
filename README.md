@@ -14,7 +14,7 @@ Two steps:
 
 - Selecting or hovering the variable which is the subject of the debugging (Manual selection will always take over the hover selection)
 
-- Pressing ctrl + alt + L
+- Pressing ctrl + alt + L (Windows) or ctrl + option + L (Mac)
 
 The log message will be inserted in the next line relative to the selected variable like this:
 
@@ -54,19 +54,19 @@ A wrapped log message :
 
 II) Comment all log messages, inserted by the extension, from the current document
 
-All it takes to comment all log messages, inserted by the extension, from the current document is to press alt + shift + c
+All it takes to comment all log messages, inserted by the extension, from the current document is to press alt + shift + c (Windows) or option + shift + c (Mac)
 
 ![alt text](https://image.ibb.co/eVwTL9/comment_log_messages.gif "Comment all log messages, inserted by the extension, from the current file")
 
 III) Uncomment all log messages, inserted by the extension, from the current document
 
-All it takes to uncomment all log messages, inserted by the extension, from the current document is to press alt + shift + u
+All it takes to uncomment all log messages, inserted by the extension, from the current document is to press alt + shift + u (Windows) or option + shift + u (Mac)
 
 ![alt text](https://image.ibb.co/cp9q09/uncomment_log_messages.gif "Uncomment all log messages, inserted by the extension, from the current file")
 
 IV) Delete all log messages, inserted by the extension, from the current document
 
-All it takes to delete all log messages, inserted by the extension, from the current document is to press alt + shift + d
+All it takes to delete all log messages, inserted by the extension, from the current document is to press alt + shift + d (Windows) or option + shift + d (Mac)
 
 ![alt text](https://image.ibb.co/jv9UtU/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
 
