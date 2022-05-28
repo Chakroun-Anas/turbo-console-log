@@ -12,7 +12,7 @@ I) Insert meaningful log message automatically
 
 Two steps:
 
-- Selecting the variable which is the subject of the debugging
+- Selecting or hovering the variable which is the subject of the debugging (Manual selection will always take over the hover selection)
 
 - Pressing ctrl + alt + L
 
@@ -110,6 +110,11 @@ Initial release of Turbo Console Log
 
 - Specify custom log function to use instead of the default console.log
 - Specify log function type (log, warn, error, debug, table)
+
+### 2.3.0
+
+- Possibility to insert the log message by hovering the variable 
+- Manual selection will always take over the hover selection
 
 ## Participate
 
