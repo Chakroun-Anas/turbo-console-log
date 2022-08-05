@@ -5,7 +5,8 @@ export type ExtensionProperties = {
   insertEnclosingClass: boolean;
   insertEnclosingFunction: boolean;
   delimiterInsideMessage: string;
-  includeFileNameAndLineNum: boolean;
+  includeFileName: boolean,
+  includeLineNum: boolean,
   quote: string;
   logType: enumLogType;
   logFunction: string;

@@ -20,7 +20,9 @@ export class JSDebugMessage extends DebugMessage {
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
     delemiterInsideMessage: string,
-    includeFileNameAndLineNum: boolean,
+    includeFileName: boolean,
+    includeLineNum: boolean,
+    
     tabSize: number,
     logType: string,
     logFunction: string
@@ -50,7 +52,8 @@ export class JSDebugMessage extends DebugMessage {
       ? document.fileName.split("/")[document.fileName.split("/").length - 1]
       : document.fileName.split("\\")[document.fileName.split("\\").length - 1];
     if (
-      !includeFileNameAndLineNum &&
+      !includeFileName &&
+      !includeLineNum &&
       !insertEnclosingFunction &&
       !insertEnclosingClass &&
       logMessagePrefix.length === 0
@@ -62,12 +65,8 @@ export class JSDebugMessage extends DebugMessage {
       logMessagePrefix !== `${delemiterInsideMessage} `
         ? ` ${delemiterInsideMessage} `
         : ""
-    }${
-      includeFileNameAndLineNum
-        ? `file: ${fileName} ${delemiterInsideMessage} line ${
-            lineOfLogMsg + 1
-          } ${delemiterInsideMessage} `
-        : ""
+    }${ includeFileName ? `file: ${fileName} ${delemiterInsideMessage}` : ""
+    }${ includeLineNum ? `line ${ lineOfLogMsg + 1 } ${delemiterInsideMessage} ` : ""
     }${
       insertEnclosingClass
         ? classThatEncloseTheVar.length > 0
