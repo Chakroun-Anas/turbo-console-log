@@ -42,6 +42,10 @@ Properties:
 
 - turboConsoleLog.insertEnclosingFunction (boolean): Whether to insert or not the enclosing function of the selected variable in the log message.
 
+- turboConsoleLog.insertEmptyLineBeforeLogMessage (boolean): Whether to insert an empty line before the log message or not.
+
+- turboConsoleLog.insertEmptyLineAfterLogMessage (boolean): Whether to insert an empty line after the log message or not.
+
 - turboConsoleLog.delemiterInsideMessage (string): The delimiter that will separate the different log message elements (file name, line number, class, function and variable)
 
 - turboConsoleLog.includeFileNameAndLineNum (boolean): Whether to include the file name and the line number of the log message.
@@ -115,6 +119,11 @@ Initial release of Turbo Console Log
 
 - Possibility to insert the log message by hovering the variable 
 - Manual selection will always take over the hover selection
+
+### 2.4.0
+
+- insertEmptyLineBeforeLogMessage extension property is added
+- insertEmptyLineAfterLogMessage extension property is added
 
 ## Participate
 

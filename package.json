@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "2.3.2",
+  "version": "2.4.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -52,6 +52,16 @@
           "type": "boolean",
           "default": true,
           "description": "Whether to insert or not the enclosing function of the selected variable in the log message."
+        },
+        "turboConsoleLog.insertEmptyLineBeforeLogMessage": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to insert an empty line before the log message or not."
+        },
+        "turboConsoleLog.insertEmptyLineAfterLogMessage": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to insert an empty line after the log message or not."
         },
         "turboConsoleLog.delimiterInsideMessage": {
           "type": "string",

@@ -19,6 +19,8 @@ export class JSDebugMessage extends DebugMessage {
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,
     insertEnclosingFunction: boolean,
+    insertEmptyLineBeforeLogMessage: boolean,
+    insertEmptyLineAfterLogMessage: boolean,
     delemiterInsideMessage: string,
     includeFileNameAndLineNum: boolean,
     tabSize: number,
@@ -40,6 +42,7 @@ export class JSDebugMessage extends DebugMessage {
       lineOfSelectedVar,
       selectedVar
     );
+    const linesToAdd: number = insertEmptyLineBeforeLogMessage ? 2 : 1;
     const spacesBeforeMsg: string = this.spacesBefore(
       document,
       lineOfSelectedVar,
@@ -65,7 +68,7 @@ export class JSDebugMessage extends DebugMessage {
     }${
       includeFileNameAndLineNum
         ? `file: ${fileName} ${delemiterInsideMessage} line ${
-            lineOfLogMsg + 1
+            lineOfLogMsg + linesToAdd
           } ${delemiterInsideMessage} `
         : ""
     }${
@@ -124,9 +127,9 @@ export class JSDebugMessage extends DebugMessage {
           : lineOfLogMsg,
         0
       ),
-      `${
+      `${insertEmptyLineBeforeLogMessage? "\n": ""}${
         lineOfLogMsg === document.lineCount ? "\n" : ""
-      }${spacesBeforeMsg}${debuggingMsg}\n`
+      }${spacesBeforeMsg}${debuggingMsg}\n${insertEmptyLineAfterLogMessage? "\n": ""}`
     );
   }
   line(

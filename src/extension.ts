@@ -44,6 +44,8 @@ export function activate(context: vscode.ExtensionContext) {
             addSemicolonInTheEnd,
             insertEnclosingClass,
             insertEnclosingFunction,
+            insertEmptyLineBeforeLogMessage,
+            insertEmptyLineAfterLogMessage,
             delimiterInsideMessage,
             includeFileNameAndLineNum,
             logType,
@@ -61,6 +63,8 @@ export function activate(context: vscode.ExtensionContext) {
               addSemicolonInTheEnd,
               insertEnclosingClass,
               insertEnclosingFunction,
+              insertEmptyLineBeforeLogMessage,
+              insertEmptyLineAfterLogMessage,
               delimiterInsideMessage,
               includeFileNameAndLineNum,
               tabSize,
@@ -160,6 +164,20 @@ export function activate(context: vscode.ExtensionContext) {
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ lines }) => {
+          const firstLine = lines[0];
+          const lastLine = lines[lines.length - 1];
+          const lineBeforeFirstLine = new vscode.Range(
+            new vscode.Position(firstLine.start.line - 1, 0), new vscode.Position(firstLine.end.line - 1, 0)
+          );
+          const lineAfterLastLine = new vscode.Range(
+            new vscode.Position(lastLine.start.line + 1, 0), new vscode.Position(lastLine.end.line + 1, 0)
+          );
+          if(document.lineAt(lineBeforeFirstLine.start).text === '') {
+            editBuilder.delete(lineBeforeFirstLine);
+          }
+          if(document.lineAt(lineAfterLastLine.start).text === '') {
+            editBuilder.delete(lineAfterLastLine);
+          }
           lines.forEach((line: vscode.Range) => {
             editBuilder.delete(line);
           });
@@ -181,6 +199,8 @@ function getExtensionProperties(
   const addSemicolonInTheEnd = workspaceConfig.addSemicolonInTheEnd || false;
   const insertEnclosingClass = workspaceConfig.insertEnclosingClass;
   const insertEnclosingFunction = workspaceConfig.insertEnclosingFunction;
+  const insertEmptyLineBeforeLogMessage = workspaceConfig.insertEmptyLineBeforeLogMessage;
+  const insertEmptyLineAfterLogMessage = workspaceConfig.insertEmptyLineAfterLogMessage;
   const quote = workspaceConfig.quote || '"';
   const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "~";
   const includeFileNameAndLineNum =
@@ -193,6 +213,8 @@ function getExtensionProperties(
     addSemicolonInTheEnd,
     insertEnclosingClass,
     insertEnclosingFunction,
+    insertEmptyLineBeforeLogMessage,
+    insertEmptyLineAfterLogMessage,
     quote,
     delimiterInsideMessage,
     includeFileNameAndLineNum,
