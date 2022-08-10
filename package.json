@@ -33,10 +33,15 @@
           "default": "🚀",
           "description": "The prefix of the log message."
         },
-        "turboConsoleLog.includeFileNameAndLineNum": {
+        "turboConsoleLog.includeFileName": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to include the file name and the line number of the log message."
+          "description": "Whether to include the file name in the log message."
+        },
+        "turboConsoleLog.includeLineNum": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to include line number of the log message."
         },
         "turboConsoleLog.addSemicolonInTheEnd": {
           "type": "boolean",
