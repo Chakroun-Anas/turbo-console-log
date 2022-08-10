@@ -65,7 +65,7 @@ export class JSDebugMessage extends DebugMessage {
       logMessagePrefix !== `${delemiterInsideMessage} `
         ? ` ${delemiterInsideMessage} `
         : ""
-    }${ includeFileName ? `file: ${fileName} ${delemiterInsideMessage}` : ""
+    }${ includeFileName ? `file: ${fileName} ${delemiterInsideMessage} ` : ""
     }${ includeLineNum ? `line ${ lineOfLogMsg + 1 } ${delemiterInsideMessage} ` : ""
     }${
       insertEnclosingClass
