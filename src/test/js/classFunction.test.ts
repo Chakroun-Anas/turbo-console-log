@@ -9,8 +9,8 @@ test("Insert log message related to a class function param", async () => {
   if (activeTextEditor) {
     activeTextEditor.selections = [
       new vscode.Selection(
-        new vscode.Position(1, 14),
-        new vscode.Position(1, 22)
+        new vscode.Position(1, 11),
+        new vscode.Position(1, 19)
       ),
     ];
     await vscode.commands.executeCommand(

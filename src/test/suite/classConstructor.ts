@@ -1,4 +1,3 @@
-
 import * as path from "path";
 import Mocha from "mocha";
 
@@ -16,7 +15,7 @@ export function run(): Promise<void> {
       // Run the mocha test
       mocha.run((failures) => {
         if (failures > 0) {
-          reject(new Error('Test failed'));
+          reject(new Error("Test failed"));
         } else {
           resolve();
         }

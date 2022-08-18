@@ -1,2 +1,3 @@
 import openDocument from "./openDocument";
-export { openDocument };
+import sleep from "./sleep";
+export { openDocument, sleep };

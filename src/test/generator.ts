@@ -72,6 +72,7 @@ const testLaunchConfig = {
   type: "extensionHost",
   request: "launch",
   args: [
+    "--disable-extensions",
     "--extensionDevelopmentPath=${workspaceFolder}",
     "--extensionTestsPath=${workspaceFolder}/out/test/suite/testFileName",
   ],
