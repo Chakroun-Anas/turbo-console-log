@@ -20,11 +20,11 @@ The log message will be inserted in the next line relative to the selected varia
 
 console.log("SelectedVariableEnclosingClassName -> SelectedVariableEnclosingFunctionName -> SelectedVariable", SelectedVariable)
 
-![alt text](https://image.ibb.co/dysw7p/insert_log_message.gif "Inserting meaningful log message after selecting a variable")
+![alt text](https://image.ibb.co/dysw7p/insert_log_message.gif 'Inserting meaningful log message after selecting a variable')
 
 Multiple cursor support:
 
-![alt text](https://i.ibb.co/Jk2pmRG/tcl-multiple-selections.gif "Multiple cursor support")
+![alt text](https://i.ibb.co/Jk2pmRG/tcl-multiple-selections.gif 'Multiple cursor support')
 
 Properties:
 
@@ -54,25 +54,25 @@ Properties:
 
 A wrapped log message :
 
-![alt text](https://image.ibb.co/h9yfYU/wrap_log_message.gif "Wrapping The log message")
+![alt text](https://image.ibb.co/h9yfYU/wrap_log_message.gif 'Wrapping The log message')
 
 II) Comment all log messages, inserted by the extension, from the current document
 
 All it takes to comment all log messages, inserted by the extension, from the current document is to press alt + shift + c (Windows) or option + shift + c (Mac)
 
-![alt text](https://image.ibb.co/eVwTL9/comment_log_messages.gif "Comment all log messages, inserted by the extension, from the current file")
+![alt text](https://image.ibb.co/eVwTL9/comment_log_messages.gif 'Comment all log messages, inserted by the extension, from the current file')
 
 III) Uncomment all log messages, inserted by the extension, from the current document
 
 All it takes to uncomment all log messages, inserted by the extension, from the current document is to press alt + shift + u (Windows) or option + shift + u (Mac)
 
-![alt text](https://image.ibb.co/cp9q09/uncomment_log_messages.gif "Uncomment all log messages, inserted by the extension, from the current file")
+![alt text](https://image.ibb.co/cp9q09/uncomment_log_messages.gif 'Uncomment all log messages, inserted by the extension, from the current file')
 
 IV) Delete all log messages, inserted by the extension, from the current document
 
 All it takes to delete all log messages, inserted by the extension, from the current document is to press alt + shift + d (Windows) or option + shift + d (Mac)
 
-![alt text](https://image.ibb.co/jv9UtU/delete_all_log_messages.gif "Delete all log messages, inserted by the extension, from the current file")
+![alt text](https://image.ibb.co/jv9UtU/delete_all_log_messages.gif 'Delete all log messages, inserted by the extension, from the current file')
 
 ## Release Notes
 
@@ -117,13 +117,17 @@ Initial release of Turbo Console Log
 
 ### 2.3.0
 
-- Possibility to insert the log message by hovering the variable 
+- Possibility to insert the log message by hovering the variable
 - Manual selection will always take over the hover selection
 
 ### 2.4.0
 
 - insertEmptyLineBeforeLogMessage extension property is added
 - insertEmptyLineAfterLogMessage extension property is added
+
+### 2.5.0
+
+- Support arrow function transformation
 
 ## Participate
 
