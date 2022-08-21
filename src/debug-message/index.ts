@@ -96,11 +96,8 @@ export abstract class DebugMessage {
     logMsgLine: number,
   ): string {
     const selectedVarTextLine = document.lineAt(selectedVarLine);
-    const logMsgTextLine = document.lineAt(logMsgLine);
     const selectedVarTextLineFirstNonWhitespaceCharacterIndex =
       selectedVarTextLine.firstNonWhitespaceCharacterIndex;
-    const logMsgTextLineFirstNonWhitespaceCharacterIndex =
-      logMsgTextLine.firstNonWhitespaceCharacterIndex;
     const spacesBeforeSelectedVarLine = selectedVarTextLine.text
       .split('')
       .splice(0, selectedVarTextLineFirstNonWhitespaceCharacterIndex)
@@ -108,16 +105,22 @@ export abstract class DebugMessage {
         (previousValue, currentValue) => previousValue + currentValue,
         '',
       );
-    const spacesBeforeLogMsgLine = logMsgTextLine.text
-      .split('')
-      .splice(0, logMsgTextLineFirstNonWhitespaceCharacterIndex)
-      .reduce(
-        (previousValue, currentValue) => previousValue + currentValue,
-        '',
-      );
-    return spacesBeforeSelectedVarLine.length > spacesBeforeLogMsgLine.length
-      ? spacesBeforeSelectedVarLine
-      : spacesBeforeLogMsgLine;
+    if (logMsgLine < document.lineCount) {
+      const logMsgTextLine = document.lineAt(logMsgLine);
+      const logMsgTextLineFirstNonWhitespaceCharacterIndex =
+        logMsgTextLine.firstNonWhitespaceCharacterIndex;
+      const spacesBeforeLogMsgLine = logMsgTextLine.text
+        .split('')
+        .splice(0, logMsgTextLineFirstNonWhitespaceCharacterIndex)
+        .reduce(
+          (previousValue, currentValue) => previousValue + currentValue,
+          '',
+        );
+      return spacesBeforeSelectedVarLine.length > spacesBeforeLogMsgLine.length
+        ? spacesBeforeSelectedVarLine
+        : spacesBeforeLogMsgLine;
+    }
+    return spacesBeforeSelectedVarLine;
   }
   spacesBeforeLine(document: TextDocument, lineNumber: number): string {
     const textLine = document.lineAt(lineNumber);
