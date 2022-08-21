@@ -1,88 +1,78 @@
-import Mocha from "mocha";
-import * as assert from "assert";
-import * as vscode from "vscode";
-import { openDocument } from "../helpers";
+import Mocha from 'mocha';
+import * as assert from 'assert';
+import * as vscode from 'vscode';
+import { openDocument, zeroBasedLine, ZeroBasedPosition } from '../helpers';
 
-test("Insert log message related to a variable which value is a function", async () => {
-  await openDocument("../files/js/functionAssignedToVariable.ts");
-  const { activeTextEditor } = vscode.window;
-  if (activeTextEditor) {
-    const textDocument = activeTextEditor.document;
-    activeTextEditor.selections = [
-      new vscode.Selection(
-        new vscode.Position(2, 6),
-        new vscode.Position(2, 13)
-      ),
-    ];
-    await vscode.commands.executeCommand(
-      "turboConsoleLog.displayLogMessage",
-      []
-    );
-    assert.strictEqual(
-      /console\.log\(.*/.test(textDocument.lineAt(5).text),
-      true
-    );
-    activeTextEditor.selections = [
-      new vscode.Selection(
-        new vscode.Position(7, 7),
-        new vscode.Position(7, 17)
-      ),
-    ];
-    await vscode.commands.executeCommand(
-      "turboConsoleLog.displayLogMessage",
-      []
-    );
-    assert.strictEqual(
-      /console\.log\(.*/.test(textDocument.lineAt(10).text),
-      true
-    );
-    activeTextEditor.selections = [
-      new vscode.Selection(
-        new vscode.Position(12, 7),
-        new vscode.Position(12, 17)
-      ),
-    ];
-    await vscode.commands.executeCommand(
-      "turboConsoleLog.displayLogMessage",
-      []
-    );
-    assert.strictEqual(
-      /console\.log\(.*/.test(textDocument.lineAt(18).text),
-      true
-    );
-    activeTextEditor.selections = [
-      new vscode.Selection(
-        new vscode.Position(20, 23),
-        new vscode.Position(20, 29)
-      ),
-    ];
-    await vscode.commands.executeCommand(
-      "turboConsoleLog.displayLogMessage",
-      []
-    );
-    assert.strictEqual(
-      /console\.log\(.*/.test(textDocument.lineAt(21).text),
-      true
-    );
-    activeTextEditor.selections = [
-      new vscode.Selection(
-        new vscode.Position(26, 49),
-        new vscode.Position(26, 66)
-      ),
-    ];
-    await vscode.commands.executeCommand(
-      "turboConsoleLog.displayLogMessage",
-      []
-    );
-    assert.strictEqual(
-      /console\.log\(.*/.test(textDocument.lineAt(21).text),
-      true
-    );
-  }
-  Mocha.afterEach(async () => {
-    await vscode.commands.executeCommand(
-      "workbench.action.closeActiveEditor",
-      []
-    );
-  });
-});
+suite(
+  'Insert log message related to a variable with a function as the value',
+  () => {
+    const { activeTextEditor } = vscode.window;
+    const zeroBasedLineHelper = zeroBasedLine;
+    Mocha.afterEach(async () => {
+      await openDocument('../files/js/functionAssignedToVariable.ts');
+    });
+    Mocha.afterEach(async () => {
+      await vscode.commands.executeCommand(
+        'workbench.action.closeActiveEditor',
+        [],
+      );
+    });
+    test('Example 01', async () => {
+      if (activeTextEditor) {
+        const textDocument = activeTextEditor.document;
+        activeTextEditor.selection = new vscode.Selection(
+          new ZeroBasedPosition(3, 7),
+          new ZeroBasedPosition(3, 14),
+        );
+        await vscode.commands.executeCommand(
+          'turboConsoleLog.displayLogMessage',
+          [],
+        );
+        assert.strictEqual(
+          /console\.log\(.*/.test(
+            textDocument.lineAt(zeroBasedLineHelper(6)).text,
+          ),
+          true,
+        );
+      }
+    });
+    test('Example 02', async () => {
+      if (activeTextEditor) {
+        const textDocument = activeTextEditor.document;
+        activeTextEditor.selection = new vscode.Selection(
+          new ZeroBasedPosition(7, 7),
+          new ZeroBasedPosition(3, 17),
+        );
+        await vscode.commands.executeCommand(
+          'turboConsoleLog.displayLogMessage',
+          [],
+        );
+        assert.strictEqual(
+          /console\.log\(.*/.test(
+            textDocument.lineAt(zeroBasedLineHelper(10)).text,
+          ),
+          true,
+        );
+      }
+    });
+    test('Example 03', async () => {
+      if (activeTextEditor) {
+        const textDocument = activeTextEditor.document;
+        activeTextEditor.selection = new vscode.Selection(
+          new ZeroBasedPosition(11, 7),
+          new ZeroBasedPosition(11, 34),
+        );
+        await vscode.commands.executeCommand(
+          'turboConsoleLog.displayLogMessage',
+          [],
+        );
+        assert.strictEqual(
+          /console\.log\(.*/.test(
+            textDocument.lineAt(zeroBasedLineHelper(17)).text,
+          ),
+          true,
+        );
+      }
+    });
+  },
+);

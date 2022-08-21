@@ -144,6 +144,14 @@ suite("JS Line Code Processing", () => {
         return 'hello';
       }`,
     ];
+    const anonymousFunctionsLOCs = [
+      'const sayHello = fullName => `Hello ${fullName}`',
+      'const happyBirthday = (fullName, age) => `Happy ${age} birthday ${fullName}`',
+      'fullName => `Hello ${fullName}`'
+    ];
+    const transformedAnonymousFunctions = [
+      'const sayHello = fullName => { `Hello ${fullName}`'
+    ]
     test("Check built in function invocation", () => {
       const builtInFunctionInvocationLOCs = [
         `if (a > 0)  {`,
@@ -247,6 +255,25 @@ suite("JS Line Code Processing", () => {
           jsLineCodeProcessing.isObjectFunctionCall(functionsAssignmentsLOC),
           false
         );
+      });
+    });
+    test("Anonymous functions", () => {
+      anonymousFunctionsLOCs.forEach(anonymousFunctionLOC => {
+        assert.strictEqual(jsLineCodeProcessing.isAnonymousFunction(anonymousFunctionLOC), true);
+      })
+    });
+    test("Arugment of anonymous function", () => {
+      anonymousFunctionsLOCs.forEach(anonymousFunctionLOC => {
+        assert.strictEqual(jsLineCodeProcessing.isArgumentOfAnonymousFunction(anonymousFunctionLOC, 'fullName'), true);
+      });
+      assert.strictEqual(jsLineCodeProcessing.isArgumentOfAnonymousFunction(namedFunctionsLOCs[0], 'functionName'), false);
+    });
+    test("Should transform anonymous function", () => {
+      anonymousFunctionsLOCs.forEach(anonymousFunctionLOC => {
+        assert.strictEqual(jsLineCodeProcessing.shouldTransformAnonymousFunction(anonymousFunctionLOC), true);
+      });
+      transformedAnonymousFunctions.forEach(transformedAnonymousFunction => {
+        assert.strictEqual(jsLineCodeProcessing.shouldTransformAnonymousFunction(transformedAnonymousFunction), false);
       });
     });
   });

@@ -9,7 +9,7 @@ export function run(): Promise<void> {
     color: true,
   });
 
-  const testFile = path.resolve(__dirname, "../js/emptyFuncExp2.test.js");
+  const testFile = path.resolve(__dirname, "../js/anonymousFunctions.test.js");
   mocha.addFile(testFile);
   return new Promise((resolve, reject) => {
     try {

@@ -1,9 +1,9 @@
-import fs from "fs";
-import path from "path";
-import chalk from "chalk";
-import launchJSON from "./launch.json";
+import fs from 'fs';
+import path from 'path';
+import chalk from 'chalk';
+import launchJSON from './launch.json';
 
-const testFile: string = `
+const testFile = `
 import Mocha from "mocha";
 import * as assert from "assert";
 import * as vscode from "vscode";
@@ -36,7 +36,7 @@ test("testLongName", async () => {
 });
 `;
 
-const testFileRunner: string = `
+const testFileRunner = `
 import * as path from "path";
 import Mocha from "mocha";
 
@@ -68,15 +68,15 @@ export function run(): Promise<void> {
 `;
 
 const testLaunchConfig = {
-  name: "Test: testShortName",
-  type: "extensionHost",
-  request: "launch",
+  name: 'Test: testShortName',
+  type: 'extensionHost',
+  request: 'launch',
   args: [
-    "--extensionDevelopmentPath=${workspaceFolder}",
-    "--extensionTestsPath=${workspaceFolder}/out/test/suite/testFileName",
+    '--extensionDevelopmentPath=${workspaceFolder}',
+    '--extensionTestsPath=${workspaceFolder}/out/test/suite/testFileName',
   ],
-  outFiles: ["${workspaceFolder}/out/test/**/*.js"],
-  preLaunchTask: "${defaultBuildTask}",
+  outFiles: ['${workspaceFolder}/out/test/**/*.js'],
+  preLaunchTask: '${defaultBuildTask}',
 };
 
 function generateTest() {
@@ -90,15 +90,15 @@ function generateTest() {
         .replace(/testLongName/, testLongName)
         .replace(/testFileName/, testFileName),
       () => {
-        console.log(chalk.green("Test file created"));
-      }
+        console.log(chalk.green('Test file created'));
+      },
     );
     fs.writeFile(
       `${path.join(__dirname, `./suite/${testFileName}.ts`)}`,
       testFileRunner.replace(/testFileName/, getFileName(process.argv)),
       () => {
-        console.log(chalk.green("Test file runner created"));
-      }
+        console.log(chalk.green('Test file runner created'));
+      },
     );
     launchJSON.configurations.push({
       ...testLaunchConfig,
@@ -112,23 +112,23 @@ function generateTest() {
       return firstConf.name > secondConf.name ? 1 : -1;
     });
     fs.writeFile(
-      path.join(__dirname, "./launch.json"),
+      path.join(__dirname, './launch.json'),
       JSON.stringify(launchJSON),
       () => {
-        console.log(chalk.green("Test launch config is updated locally"));
-      }
+        console.log(chalk.green('Test launch config is updated locally'));
+      },
     );
     fs.writeFile(
       path.join(
-        `${process.argv[1].replace("/src/test/generator.ts", "")}`,
-        ".vscode/launch.json"
+        `${process.argv[1].replace('/src/test/generator.ts', '')}`,
+        '.vscode/launch.json',
       ),
       JSON.stringify(launchJSON),
       () => {
         console.log(
-          chalk.green("Test launch config is updated is .vscode folder")
+          chalk.green('Test launch config is updated is .vscode folder'),
         );
-      }
+      },
     );
   } else {
     process.exit(1);
@@ -137,6 +137,7 @@ function generateTest() {
 
 function areParametersValid(): boolean {
   const commandPrams = [...process.argv];
+  console.log('🚀 ~ areParametersValid ~ commandPrams', commandPrams);
   let validParams = true;
   if (
     commandPrams.every((param) => !/--fileName=([a-zA-Z0-9(\s)])+/.test(param))
@@ -144,32 +145,32 @@ function areParametersValid(): boolean {
     validParams = false;
     console.log(
       chalk.red(
-        "You should specify a valid file name for the test using --fileName parameter."
-      )
+        'You should specify a valid file name for the test using --fileName parameter.',
+      ),
     );
   }
   if (
     commandPrams.every(
-      (param) => !/--testShortName=([a-zA-Z0-9(\s)])+/.test(param)
+      (param) => !/--testShortName=([a-zA-Z0-9(\s)])+/.test(param),
     )
   ) {
     validParams = false;
     console.log(
       chalk.red(
-        "You should specify a valid short name for the test using --testShortName parameter."
-      )
+        'You should specify a valid short name for the test using --testShortName parameter.',
+      ),
     );
   }
   if (
     commandPrams.every(
-      (param) => !/--testLongName=([a-zA-Z0-9(\s)])+/.test(param)
+      (param) => !/--testLongName=([a-zA-Z0-9(\s)])+/.test(param),
     )
   ) {
     validParams = false;
     console.log(
       chalk.red(
-        "You should specify a valid long name for the test using --testLongName parameter."
-      )
+        'You should specify a valid long name for the test using --testLongName parameter.',
+      ),
     );
   }
   return validParams;
@@ -180,31 +181,31 @@ function getFileName(params: Array<string>): string {
     return /--fileName=([a-zA-Z0-9(\s)])+/.test(value);
   });
   if (fileName) {
-    return fileName.replace("--fileName=", "");
+    return fileName.replace('--fileName=', '');
   } else {
-    throw new Error("An error occured while extracting test file name");
+    throw new Error('An error occured while extracting test file name');
   }
 }
 
 function getTestLongName(params: Array<string>): string {
   const testLongName: string | undefined = params.find((value) =>
-    /--testLongName=([a-zA-Z0-9(\s)])+/.test(value)
+    /--testLongName=([a-zA-Z0-9(\s)])+/.test(value),
   );
   if (testLongName) {
-    return testLongName.replace("--testLongName=", "");
+    return testLongName.replace('--testLongName=', '');
   } else {
-    throw new Error("An error occured while extracting test long name");
+    throw new Error('An error occured while extracting test long name');
   }
 }
 
 function getTestShortName(params: Array<string>): string {
   const testShortName: string | undefined = params.find((value) =>
-    /--testShortName=([a-zA-Z0-9(\s)])+/.test(value)
+    /--testShortName=([a-zA-Z0-9(\s)])+/.test(value),
   );
   if (testShortName) {
-    return testShortName.replace("--testShortName=", "");
+    return testShortName.replace('--testShortName=', '');
   } else {
-    throw new Error("An error occured while extracting test short name");
+    throw new Error('An error occured while extracting test short name');
   }
 }
 

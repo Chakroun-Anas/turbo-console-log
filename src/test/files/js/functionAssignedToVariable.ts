@@ -1,21 +1,21 @@
 // @ts-nocheck
 
-const someVar = function () {
+const namedFunction = function () {
   return 0;
 };
 
-const anotherVar = () => {
+const anonymousFunction = () => {
   return "hello";
 };
 
-const specialVar = (
+const anonymousFunctionWithParams = (
   somePraram: { prop1: String; prop1: Boolean },
   otherParam: string
 ) => {
   return "hello";
 };
 
-const submit = async (values: any) => {
+const asyncAnonymousFunction = async (values: any) => {
   try {
   } catch (error) {}
 };

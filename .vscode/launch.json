@@ -1,1 +1,222 @@
-{"version":"0.2.0","configurations":[{"name":"Extension","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}"],"outFiles":["${workspaceFolder}/out/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: All","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/index"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Block closing brace","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/lineOfBlockClosingBrace"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Class constructor","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/classConstructor"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Class function","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/classFunction"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Class nested functions","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/classNestedFunctions"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Deconstruction var assignment","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/deconstructionVarAssignment"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Function Multiline params","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/functionMultiLineParameters"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Function parameter","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/functionParam"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Function with decorators","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/functionWithDecorators"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: JS loc processing","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/lineOfBlockClosingBrace"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Obj function call no assignment","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/objFunctionCallNoAssignment"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Obj with type","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/objWithTest"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Object function call","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/objFunctionCall"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Object variable","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/objectVariable"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: One line function param","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/oneLineFunctionParam"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Parameter of empty function Ex1","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/emptyFunc"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Parameter of empty function Ex2","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/emptyFuncExp2"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Primitive variable","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/primitiveVariable"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"},{"name":"Test: Variable function assignment","type":"extensionHost","request":"launch","args":["--extensionDevelopmentPath=${workspaceFolder}","--extensionTestsPath=${workspaceFolder}/out/test/suite/functionAssignedToVariable"],"outFiles":["${workspaceFolder}/out/test/**/*.js"],"preLaunchTask":"${defaultBuildTask}"}]}
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+      "outFiles": ["${workspaceFolder}/out/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: All",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Anonymous functions",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/anonymousFunctions"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Block closing brace",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/lineOfBlockClosingBrace"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Class constructor",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/classConstructor"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Class function",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/classFunction"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Class nested functions",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/classNestedFunctions"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Deconstruction var assignment",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/deconstructionVarAssignment"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Function Multiline params",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/functionMultiLineParameters"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Function parameter",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/functionParam"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Function with decorators",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/functionWithDecorators"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: JS loc processing",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/lineOfBlockClosingBrace"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Obj function call no assignment",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/objFunctionCallNoAssignment"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Obj with type",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/objWithTest"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Object function call",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/objFunctionCall"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Object variable",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/objectVariable"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: One line function param",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/oneLineFunctionParam"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Parameter of empty function",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/emptyFunc"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Primitive variable",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/primitiveVariable"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
+      "name": "Test: Variable function assignment",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/functionAssignedToVariable"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    }
+  ]
+}

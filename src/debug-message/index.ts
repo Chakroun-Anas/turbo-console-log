@@ -1,7 +1,6 @@
-import { open } from "fs";
-import { TextDocument, TextEditorEdit } from "vscode";
-import { BlockType, LocElement, Message } from "../entities";
-import { LineCodeProcessing } from "../line-code-processing";
+import { TextDocument, TextEditorEdit } from 'vscode';
+import { BlockType, LocElement, Message } from '../entities';
+import { LineCodeProcessing } from '../line-code-processing';
 
 export abstract class DebugMessage {
   lineCodeProcessing: LineCodeProcessing;
@@ -25,38 +24,32 @@ export abstract class DebugMessage {
     includeFileNameAndLineNum: boolean,
     tabSize: number,
     logType: string,
-    logFunction: string
+    logFunction: string,
   ): void;
   abstract line(
     document: TextDocument,
     selectionLine: number,
-    selectedVar: string
+    selectedVar: string,
   ): number;
-  abstract spacesBefore(
-    document: TextDocument,
-    line: number,
-    tabSize: number
-  ): string;
   abstract detectAll(
     document: TextDocument,
-    tabSize: number,
     delemiterInsideMessage: string,
-    quote: string
+    quote: string,
   ): Message[];
   abstract enclosingBlockName(
     document: TextDocument,
     lineOfSelectedVar: number,
-    blockType: BlockType
+    blockType: BlockType,
   ): string;
   closingElementLine(
     document: TextDocument,
     lineNum: number,
-    locElement: LocElement
+    locElement: LocElement,
   ): number {
     const docNbrOfLines: number = document.lineCount;
-    let closingElementFound: boolean = false;
-    let openedElementOccurrences: number = 0;
-    let closedElementOccurrences: number = 0;
+    let closingElementFound = false;
+    let openedElementOccurrences = 0;
+    let closedElementOccurrences = 0;
     while (!closingElementFound && lineNum < docNbrOfLines - 1) {
       const currentLineText: string = document.lineAt(lineNum).text;
       const openedClosedElementOccurrences =
@@ -73,9 +66,12 @@ export abstract class DebugMessage {
     }
     return lineNum;
   }
-  locOpenedClosedElementOccurrences(loc: string, locElement: LocElement) {
-    let openedElementOccurrences: number = 0;
-    let closedElementOccurrences: number = 0;
+  locOpenedClosedElementOccurrences(
+    loc: string,
+    locElement: LocElement,
+  ): { openedElementOccurrences: number; closedElementOccurrences: number } {
+    let openedElementOccurrences = 0;
+    let closedElementOccurrences = 0;
     const openedElement: RegExp =
       locElement === LocElement.Parenthesis ? /\(/g : /{/g;
     const closedElement: RegExp =
@@ -93,5 +89,46 @@ export abstract class DebugMessage {
   }
   lineText(document: TextDocument, line: number): string {
     return document.lineAt(line).text;
+  }
+  spacesBeforeLogMsg(
+    document: TextDocument,
+    selectedVarLine: number,
+    logMsgLine: number,
+  ): string {
+    const selectedVarTextLine = document.lineAt(selectedVarLine);
+    const logMsgTextLine = document.lineAt(logMsgLine);
+    const selectedVarTextLineFirstNonWhitespaceCharacterIndex =
+      selectedVarTextLine.firstNonWhitespaceCharacterIndex;
+    const logMsgTextLineFirstNonWhitespaceCharacterIndex =
+      logMsgTextLine.firstNonWhitespaceCharacterIndex;
+    const spacesBeforeSelectedVarLine = selectedVarTextLine.text
+      .split('')
+      .splice(0, selectedVarTextLineFirstNonWhitespaceCharacterIndex)
+      .reduce(
+        (previousValue, currentValue) => previousValue + currentValue,
+        '',
+      );
+    const spacesBeforeLogMsgLine = logMsgTextLine.text
+      .split('')
+      .splice(0, logMsgTextLineFirstNonWhitespaceCharacterIndex)
+      .reduce(
+        (previousValue, currentValue) => previousValue + currentValue,
+        '',
+      );
+    return spacesBeforeSelectedVarLine.length > spacesBeforeLogMsgLine.length
+      ? spacesBeforeSelectedVarLine
+      : spacesBeforeLogMsgLine;
+  }
+  spacesBeforeLine(document: TextDocument, lineNumber: number): string {
+    const textLine = document.lineAt(lineNumber);
+    const lineFirstNonWhitespaceCharacterIndex =
+      textLine.firstNonWhitespaceCharacterIndex;
+    return textLine.text
+      .split('')
+      .splice(0, lineFirstNonWhitespaceCharacterIndex)
+      .reduce(
+        (previousValue, currentValue) => previousValue + currentValue,
+        '',
+      );
   }
 }

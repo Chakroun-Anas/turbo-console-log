@@ -5,4 +5,11 @@ export interface LineCodeFunctionProcessing {
   isFunctionDeclaration(loc: string): boolean;
   isObjectFunctionCall(loc: string): boolean;
   getFunctionName(loc: string): string;
+  isAnonymousFunction(loc: string): boolean;
+  isArgumentOfAnonymousFunction(loc: string, argument: string): boolean;
+  /* 
+    Wether the body of the anonymous function is already on a block or not
+    Return true if the body is already in a block, false otherwise
+  */
+  shouldTransformAnonymousFunction(loc: string): boolean;
 }
