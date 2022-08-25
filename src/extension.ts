@@ -199,7 +199,7 @@ function getExtensionProperties(
   const insertEmptyLineBeforeLogMessage = workspaceConfig.insertEmptyLineBeforeLogMessage;
   const insertEmptyLineAfterLogMessage = workspaceConfig.insertEmptyLineAfterLogMessage;
   const quote = workspaceConfig.quote || '"';
-  const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "~";
+  const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || "";
   const includeFileNameAndLineNum =
     workspaceConfig.includeFileNameAndLineNum || false;
   const logType = workspaceConfig.logType || "log";
