@@ -30,7 +30,7 @@ Properties:
 
 - turboConsoleLog.logFunction (string): Custom log function to use in the inserted log message, when specified logType property will be ignored
 
-- turboConsoleLog.logType (enum): "log","warn", "error","debug","table"
+- turboConsoleLog.logType (enum): "log","warn","error","debug","table","info"
 
 - turboConsoleLog.wrapLogMessage (boolean): Whether to wrap the log message or not.
 
