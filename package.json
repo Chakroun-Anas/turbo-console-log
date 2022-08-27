@@ -85,7 +85,8 @@
             "warn",
             "error",
             "debug",
-            "table"
+            "table",
+            "info"
           ],
           "default": "log",
           "description": "Select the log type"

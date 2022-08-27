@@ -19,5 +19,6 @@ enum enumLogType {
   error = "error",
   debug = "debug",
   table = "table",
+  info = "info"
 }
 
