@@ -40,6 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
           const {
             wrapLogMessage,
             logMessagePrefix,
+            logMessagePostfix,
             quote,
             addSemicolonInTheEnd,
             insertEnclosingClass,
@@ -59,6 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
               lineOfSelectedVar,
               wrapLogMessage,
               logMessagePrefix,
+              logMessagePostfix,
               quote,
               addSemicolonInTheEnd,
               insertEnclosingClass,
@@ -193,6 +195,10 @@ function getExtensionProperties(
   const logMessagePrefix = workspaceConfig.logMessagePrefix
     ? workspaceConfig.logMessagePrefix
     : "";
+
+  const logMessagePostfix = workspaceConfig.logMessagePostfix
+    ? workspaceConfig.logMessagePostfix
+    : "";
   const addSemicolonInTheEnd = workspaceConfig.addSemicolonInTheEnd || false;
   const insertEnclosingClass = workspaceConfig.insertEnclosingClass;
   const insertEnclosingFunction = workspaceConfig.insertEnclosingFunction;
@@ -207,6 +213,7 @@ function getExtensionProperties(
   const extensionProperties: ExtensionProperties = {
     wrapLogMessage,
     logMessagePrefix,
+    logMessagePostfix,
     addSemicolonInTheEnd,
     insertEnclosingClass,
     insertEnclosingFunction,

@@ -15,6 +15,7 @@ export class JSDebugMessage extends DebugMessage {
     lineOfSelectedVar: number,
     wrapLogMessage: boolean,
     logMessagePrefix: string,
+    logMessagePostfix: string,
     quote: string,
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,
@@ -85,12 +86,12 @@ export class JSDebugMessage extends DebugMessage {
           ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
           : ''
         : ''
-    }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
+    }${selectedVar}${logMessagePostfix}${quote}, ${selectedVar})${semicolon}`;
     if (wrapLogMessage) {
       // 16 represents the length of console.log("");
       const wrappingMsg = `console.${logType}(${quote}${logMessagePrefix} ${'-'.repeat(
         debuggingMsg.length - 16,
-      )}${logMessagePrefix}${quote})${semicolon}`;
+      )}${logMessagePostfix}${quote})${semicolon}`;
       textEditor.insert(
         new vscode.Position(
           lineOfLogMsg >= document.lineCount

@@ -36,6 +36,8 @@ Properties:
 
 - turboConsoleLog.logMessagePrefix (string): The prefix of the log message (default one is 🚀 ).
 
+- turboConsoleLog.logMessagePostfix (string): The postfix of the log message (default one is '' ).
+
 - turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
 
 - turboConsoleLog.insertEnclosingClass (boolean): Whether to insert or not the enclosing class of the selected variable in the log message.
