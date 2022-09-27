@@ -14,6 +14,7 @@ export abstract class DebugMessage {
     lineOfSelectedVar: number,
     wrapLogMessage: boolean,
     logMessagePrefix: string,
+    logMessagePostfix: string,
     quote: string,
     addSemicolonInTheEnd: boolean,
     insertEnclosingClass: boolean,

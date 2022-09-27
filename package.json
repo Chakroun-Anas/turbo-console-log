@@ -33,6 +33,11 @@
           "default": "🚀",
           "description": "The prefix of the log message."
         },
+        "turboConsoleLog.logMessagePostfix": {
+          "type": "string",
+          "default": "",
+          "description": "The postfix of the log message."
+        },
         "turboConsoleLog.includeFileNameAndLineNum": {
           "type": "boolean",
           "default": true,
