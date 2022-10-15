@@ -1,5 +1,10 @@
 import { TextDocument, TextEditorEdit } from 'vscode';
-import { BlockType, LocElement, Message } from '../entities';
+import {
+  BlockType,
+  ExtensionProperties,
+  LocElement,
+  Message,
+} from '../entities';
 import { LineCodeProcessing } from '../line-code-processing';
 
 export abstract class DebugMessage {
@@ -12,19 +17,8 @@ export abstract class DebugMessage {
     document: TextDocument,
     selectedVar: string,
     lineOfSelectedVar: number,
-    wrapLogMessage: boolean,
-    logMessagePrefix: string,
-    quote: string,
-    addSemicolonInTheEnd: boolean,
-    insertEnclosingClass: boolean,
-    insertEnclosingFunction: boolean,
-    insertEmptyLineBeforeLogMessage: boolean,
-    insertEmptyLineAfterLogMessage: boolean,
-    delemiterInsideMessage: string,
-    includeFileNameAndLineNum: boolean,
     tabSize: number,
-    logType: string,
-    logFunction: string,
+    extensionProperties: ExtensionProperties,
   ): void;
   abstract line(
     document: TextDocument,

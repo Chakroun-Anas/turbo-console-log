@@ -149,6 +149,7 @@
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
+    "@types/lodash": "^4.14.186",
     "@types/mocha": "^8.0.0",
     "@types/node": "^12.11.7",
     "@types/vscode": "^1.50.0",
@@ -178,5 +179,8 @@
     "publisherDisplayName": "ChakrounAnas",
     "publisherId": "4fecec8e-335d-44fc-ab16-5356745fb1ac",
     "isPreReleaseVersion": false
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
   }
 }

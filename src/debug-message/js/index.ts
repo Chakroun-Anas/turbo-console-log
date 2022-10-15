@@ -1,8 +1,14 @@
 import * as vscode from 'vscode';
-import { TextDocument, TextEditorEdit, TextLine } from 'vscode';
+import { Position, TextDocument, TextEditorEdit, TextLine } from 'vscode';
 import { DebugMessage } from '..';
-import { BlockType, LocElement, Message } from '../../entities';
+import {
+  BlockType,
+  ExtensionProperties,
+  LocElement,
+  Message,
+} from '../../entities';
 import { LineCodeProcessing } from '../../line-code-processing';
+import { omit } from 'lodash';
 
 export class JSDebugMessage extends DebugMessage {
   constructor(lineCodeProcessing: LineCodeProcessing) {
@@ -13,112 +19,90 @@ export class JSDebugMessage extends DebugMessage {
     document: TextDocument,
     selectedVar: string,
     lineOfSelectedVar: number,
-    wrapLogMessage: boolean,
-    logMessagePrefix: string,
-    quote: string,
-    addSemicolonInTheEnd: boolean,
-    insertEnclosingClass: boolean,
-    insertEnclosingFunction: boolean,
-    insertEmptyLineBeforeLogMessage: boolean,
-    insertEmptyLineAfterLogMessage: boolean,
-    delemiterInsideMessage: string,
-    includeFileNameAndLineNum: boolean,
     tabSize: number,
-    logType: string,
-    logFunction: string,
+    extensionProperties: ExtensionProperties,
   ): void {
-    const classThatEncloseTheVar: string = this.enclosingBlockName(
-      document,
-      lineOfSelectedVar,
-      'class',
-    );
-    const funcThatEncloseTheVar: string = this.enclosingBlockName(
-      document,
-      lineOfSelectedVar,
-      'function',
-    );
     const lineOfLogMsg: number = this.line(
       document,
       lineOfSelectedVar,
       selectedVar,
     );
-    const linesToAdd: number = insertEmptyLineBeforeLogMessage ? 2 : 1;
     const spacesBeforeMsg: string = this.spacesBeforeLogMsg(
       document,
       lineOfSelectedVar,
       lineOfLogMsg,
     );
-    const semicolon: string = addSemicolonInTheEnd ? ';' : '';
-    const fileName = document.fileName.includes('/')
-      ? document.fileName.split('/')[document.fileName.split('/').length - 1]
-      : document.fileName.split('\\')[document.fileName.split('\\').length - 1];
-    if (
-      !includeFileNameAndLineNum &&
-      !insertEnclosingFunction &&
-      !insertEnclosingClass &&
-      logMessagePrefix.length === 0
-    ) {
-      logMessagePrefix = `${delemiterInsideMessage} `;
-    }
-    const debuggingMsg = `${
-      logFunction !== 'log' ? logFunction : `console.${logType}`
-    }(${quote}${logMessagePrefix}${
-      logMessagePrefix.length !== 0 &&
-      logMessagePrefix !== `${delemiterInsideMessage} `
-        ? ` ${delemiterInsideMessage} `
-        : ''
-    }${
-      includeFileNameAndLineNum
-        ? `file: ${fileName} ${delemiterInsideMessage} line ${
-            lineOfLogMsg + linesToAdd
-          } ${delemiterInsideMessage} `
-        : ''
-    }${
-      insertEnclosingClass
-        ? classThatEncloseTheVar.length > 0
-          ? `${classThatEncloseTheVar} ${delemiterInsideMessage} `
-          : ``
-        : ''
-    }${
-      insertEnclosingFunction
-        ? funcThatEncloseTheVar.length > 0
-          ? `${funcThatEncloseTheVar} ${delemiterInsideMessage} `
-          : ''
-        : ''
-    }${selectedVar}${quote}, ${selectedVar})${semicolon}`;
-    if (wrapLogMessage) {
-      // 16 represents the length of console.log("");
-      const wrappingMsg = `console.${logType}(${quote}${logMessagePrefix} ${'-'.repeat(
-        debuggingMsg.length - 16,
-      )}${logMessagePrefix}${quote})${semicolon}`;
-      textEditor.insert(
-        new vscode.Position(
-          lineOfLogMsg >= document.lineCount
-            ? document.lineCount
-            : lineOfLogMsg,
-          0,
-        ),
-        `${
-          lineOfLogMsg === document.lineCount ? '\n' : ''
-        }${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}${wrappingMsg}\n`,
-      );
-      return;
-    }
-    const previousMsgLogLine = document.lineAt(lineOfLogMsg - 1);
-    if (/\){.*}/.test(previousMsgLogLine.text.replace(/\s/g, ''))) {
-      this.emptyBlockMsg(
+    const debuggingMsgContent: string = this.constructDebuggingMsgContent(
+      document,
+      selectedVar,
+      lineOfSelectedVar,
+      lineOfLogMsg,
+      omit(extensionProperties, [
+        'wrapLogMessage',
+        'insertEmptyLineAfterLogMessage',
+      ]),
+    );
+    const debuggingMsg: string = this.constructDebuggingMsg(
+      extensionProperties,
+      debuggingMsgContent,
+      spacesBeforeMsg,
+    );
+    const selectedVarLine = document.lineAt(lineOfSelectedVar);
+    const selectedVarLineLoc = selectedVarLine.text;
+    if (this.isEmptyBlockContext(selectedVarLineLoc)) {
+      this.emptyBlockDebuggingMsg(
         document,
         textEditor,
-        previousMsgLogLine,
+        selectedVarLine,
         lineOfLogMsg,
-        debuggingMsg,
+        debuggingMsgContent,
         spacesBeforeMsg,
       );
       return;
     }
-    const selectedVarLine = document.lineAt(lineOfSelectedVar);
-    const selectedVarLineLoc = selectedVarLine.text;
-    if (
+    if (this.isAnounymousFunctionContext(selectedVar, selectedVarLineLoc)) {
+      this.anonymousPropDebuggingMsg(
+        document,
+        textEditor,
+        tabSize,
+        extensionProperties.addSemicolonInTheEnd,
+        selectedVarLine,
+        debuggingMsgContent,
+      );
+      return;
+    }
+    this.baseDebuggingMsg(
+      document,
+      textEditor,
+      lineOfLogMsg,
+      debuggingMsg,
+      extensionProperties.insertEmptyLineBeforeLogMessage,
+      extensionProperties.insertEmptyLineAfterLogMessage,
+    );
+  }
+  private baseDebuggingMsg(
+    document: TextDocument,
+    textEditor: TextEditorEdit,
+    lineOfLogMsg: number,
+    debuggingMsg: string,
+    insertEmptyLineBeforeLogMessage: ExtensionProperties['insertEmptyLineBeforeLogMessage'],
+    insertEmptyLineAfterLogMessage: ExtensionProperties['insertEmptyLineAfterLogMessage'],
+  ): void {
+    textEditor.insert(
+      new Position(
+        lineOfLogMsg >= document.lineCount ? document.lineCount : lineOfLogMsg,
+        0,
+      ),
+      `${insertEmptyLineBeforeLogMessage ? '\n' : ''}${
+        lineOfLogMsg === document.lineCount ? '\n' : ''
+      }${debuggingMsg}\n${insertEmptyLineAfterLogMessage ? '\n' : ''}`,
+    );
+  }
+  private isAnounymousFunctionContext(
+    selectedVar: string,
+    selectedVarLineLoc: string,
+  ) {
+    return (
       this.lineCodeProcessing.isAnonymousFunction(selectedVarLineLoc) &&
       this.lineCodeProcessing.isArgumentOfAnonymousFunction(
         selectedVarLineLoc,
@@ -127,30 +111,88 @@ export class JSDebugMessage extends DebugMessage {
       this.lineCodeProcessing.shouldTransformAnonymousFunction(
         selectedVarLineLoc,
       )
-    ) {
-      this.anonymousPropMsg(
-        document,
-        textEditor,
-        tabSize,
-        addSemicolonInTheEnd,
-        selectedVarLine,
-        debuggingMsg,
-      );
-      return;
-    }
-    textEditor.insert(
-      new vscode.Position(
-        lineOfLogMsg >= document.lineCount ? document.lineCount : lineOfLogMsg,
-        0,
-      ),
-      `${insertEmptyLineBeforeLogMessage ? '\n' : ''}${
-        lineOfLogMsg === document.lineCount ? '\n' : ''
-      }${spacesBeforeMsg}${debuggingMsg}\n${
-        insertEmptyLineAfterLogMessage ? '\n' : ''
-      }`,
     );
   }
-  private anonymousPropMsg(
+  private isEmptyBlockContext(selectedVarLinerLoc: string) {
+    return /\){.*}/.test(selectedVarLinerLoc.replace(/\s/g, ''));
+  }
+  private constructDebuggingMsg(
+    extensionProperties: ExtensionProperties,
+    debuggingMsgContent: string,
+    spacesBeforeMsg: string,
+  ): string {
+    const wrappingMsg = `console.${extensionProperties.logType}(${
+      extensionProperties.quote
+    }${extensionProperties.logMessagePrefix} ${'-'.repeat(
+      debuggingMsgContent.length - 16,
+    )}${extensionProperties.logMessagePrefix}${extensionProperties.quote})${
+      extensionProperties.addSemicolonInTheEnd ? ';' : ''
+    }`;
+    const debuggingMsg: string = extensionProperties.wrapLogMessage
+      ? `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsgContent}\n${spacesBeforeMsg}${wrappingMsg}`
+      : `${spacesBeforeMsg}${debuggingMsgContent}`;
+    return debuggingMsg;
+  }
+  private constructDebuggingMsgContent(
+    document: TextDocument,
+    selectedVar: string,
+    lineOfSelectedVar: number,
+    lineOfLogMsg: number,
+    extensionProperties: Omit<
+      ExtensionProperties,
+      'wrapLogMessage' | 'insertEmptyLineAfterLogMessage'
+    >,
+  ): string {
+    const fileName = document.fileName.includes('/')
+      ? document.fileName.split('/')[document.fileName.split('/').length - 1]
+      : document.fileName.split('\\')[document.fileName.split('\\').length - 1];
+    const funcThatEncloseTheVar: string = this.enclosingBlockName(
+      document,
+      lineOfSelectedVar,
+      'function',
+    );
+    const classThatEncloseTheVar: string = this.enclosingBlockName(
+      document,
+      lineOfSelectedVar,
+      'class',
+    );
+    const semicolon: string = extensionProperties.addSemicolonInTheEnd
+      ? ';'
+      : '';
+    return `${
+      extensionProperties.logFunction !== 'log'
+        ? extensionProperties.logFunction
+        : `console.${extensionProperties.logType}`
+    }(${extensionProperties.quote}${extensionProperties.logMessagePrefix}${
+      extensionProperties.logMessagePrefix.length !== 0 &&
+      extensionProperties.logMessagePrefix !==
+        `${extensionProperties.delimiterInsideMessage} `
+        ? ` ${extensionProperties.delimiterInsideMessage} `
+        : ''
+    }${
+      extensionProperties.includeFileNameAndLineNum
+        ? `file: ${fileName} ${
+            extensionProperties.delimiterInsideMessage
+          } line ${
+            lineOfLogMsg +
+            (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
+          } ${extensionProperties.delimiterInsideMessage} `
+        : ''
+    }${
+      extensionProperties.insertEnclosingClass
+        ? classThatEncloseTheVar.length > 0
+          ? `${classThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
+          : ``
+        : ''
+    }${
+      extensionProperties.insertEnclosingFunction
+        ? funcThatEncloseTheVar.length > 0
+          ? `${funcThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
+          : ''
+        : ''
+    }${selectedVar}${extensionProperties.quote}, ${selectedVar})${semicolon}`;
+  }
+  private anonymousPropDebuggingMsg(
     document: TextDocument,
     textEditor: TextEditorEdit,
     tabSize: number,
@@ -263,7 +305,7 @@ export class JSDebugMessage extends DebugMessage {
       );
     }
   }
-  private emptyBlockMsg(
+  private emptyBlockDebuggingMsg(
     document: TextDocument,
     textEditor: TextEditorEdit,
     emptyBlockLine: TextLine,
@@ -276,7 +318,7 @@ export class JSDebugMessage extends DebugMessage {
         emptyBlockLine.text.split(')')[0];
       textEditor.delete(emptyBlockLine.rangeIncludingLineBreak);
       textEditor.insert(
-        new vscode.Position(
+        new Position(
           logMsgLine >= document.lineCount ? document.lineCount : logMsgLine,
           0,
         ),

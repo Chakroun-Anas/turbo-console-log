@@ -14,10 +14,9 @@ export type ExtensionProperties = {
 };
 
 enum enumLogType {
-  log = "log",
-  warn = "warn",
-  error = "error",
-  debug = "debug",
-  table = "table",
+  log = 'log',
+  warn = 'warn',
+  error = 'error',
+  debug = 'debug',
+  table = 'table',
 }
-
