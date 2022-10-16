@@ -95,8 +95,23 @@ export class JSDebugMessage extends DebugMessage {
       ),
       `${insertEmptyLineBeforeLogMessage ? '\n' : ''}${
         lineOfLogMsg === document.lineCount ? '\n' : ''
-      }${debuggingMsg}\n${insertEmptyLineAfterLogMessage ? '\n' : ''}`,
+      }${debuggingMsg}${this.brakeLineAfterDebuggingMsg(
+        document,
+        lineOfLogMsg,
+      )}${insertEmptyLineAfterLogMessage ? '\n' : ''}`,
     );
+  }
+  private brakeLineAfterDebuggingMsg(
+    document: TextDocument,
+    lineOfLogMsg: number,
+  ): string {
+    if (lineOfLogMsg >= document.lineCount - 1) {
+      return '';
+    }
+    if (document.lineAt(lineOfLogMsg + 1).text !== '') {
+      return '\n';
+    }
+    return '';
   }
   private isAnounymousFunctionContext(
     selectedVar: string,
@@ -335,7 +350,7 @@ export class JSDebugMessage extends DebugMessage {
     selectedVar: string,
   ): number {
     if (selectionLine === document.lineCount - 1) {
-      return selectionLine;
+      return selectionLine + 1;
     }
     const multilineParenthesisVariableLine = this.getMultiLineVariableLine(
       document,
