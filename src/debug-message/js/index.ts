@@ -95,23 +95,8 @@ export class JSDebugMessage extends DebugMessage {
       ),
       `${insertEmptyLineBeforeLogMessage ? '\n' : ''}${
         lineOfLogMsg === document.lineCount ? '\n' : ''
-      }${debuggingMsg}${this.brakeLineAfterDebuggingMsg(
-        document,
-        lineOfLogMsg,
-      )}${insertEmptyLineAfterLogMessage ? '\n' : ''}`,
+      }${debuggingMsg}\n${insertEmptyLineAfterLogMessage ? '\n' : ''}`,
     );
-  }
-  private brakeLineAfterDebuggingMsg(
-    document: TextDocument,
-    lineOfLogMsg: number,
-  ): string {
-    if (lineOfLogMsg >= document.lineCount - 1) {
-      return '';
-    }
-    if (document.lineAt(lineOfLogMsg + 1).text !== '') {
-      return '\n';
-    }
-    return '';
   }
   private isAnounymousFunctionContext(
     selectedVar: string,
