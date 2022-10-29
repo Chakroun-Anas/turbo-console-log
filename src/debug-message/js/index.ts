@@ -60,7 +60,7 @@ export class JSDebugMessage extends DebugMessage {
       );
       return;
     }
-    if (this.isAnounymousFunctionContext(selectedVar, selectedVarLineLoc)) {
+    if (this.isAnonymousFunctionContext(selectedVar, selectedVarLineLoc)) {
       this.anonymousPropDebuggingMsg(
         document,
         textEditor,
@@ -98,7 +98,7 @@ export class JSDebugMessage extends DebugMessage {
       }${debuggingMsg}\n${insertEmptyLineAfterLogMessage ? '\n' : ''}`,
     );
   }
-  private isAnounymousFunctionContext(
+  private isAnonymousFunctionContext(
     selectedVar: string,
     selectedVarLineLoc: string,
   ) {

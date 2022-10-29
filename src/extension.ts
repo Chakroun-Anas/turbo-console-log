@@ -5,10 +5,20 @@ import { ExtensionProperties, Message } from './entities';
 import { LineCodeProcessing } from './line-code-processing';
 import { JSLineCodeProcessing } from './line-code-processing/js';
 
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(): void {
   const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
   const jsDebugMessage: DebugMessage = new JSDebugMessage(jsLineCodeProcessing);
   // Insert debug message
+  displayLogMessageCommand(jsDebugMessage);
+  // Comment all debug messages
+  commentAllLogMessagesCommand(jsDebugMessage);
+  // Uncomment all debug messages
+  uncommentAllLogMessagesCommand(jsDebugMessage);
+  // Delete all debug messages
+  deleteAllLogMessagesCommand(jsDebugMessage);
+}
+
+function displayLogMessageCommand(jsDebugMessage: DebugMessage) {
   vscode.commands.registerCommand(
     'turboConsoleLog.displayLogMessage',
     async () => {
@@ -24,7 +34,6 @@ export function activate(context: vscode.ExtensionContext): void {
       const properties: ExtensionProperties = getExtensionProperties(config);
       for (let index = 0; index < editor.selections.length; index++) {
         const selection: vscode.Selection = editor.selections[index];
-
         let wordUnderCursor = '';
         const rangeUnderCursor: vscode.Range | undefined =
           document.getWordRangeAtPosition(selection.active);
@@ -35,22 +44,7 @@ export function activate(context: vscode.ExtensionContext): void {
         const selectedVar: string =
           document.getText(selection) || wordUnderCursor;
         const lineOfSelectedVar: number = selection.active.line;
-        // Check if the selection line is not the last one in the document and the selected variable is not empty
         if (selectedVar.trim().length !== 0) {
-          const {
-            wrapLogMessage,
-            logMessagePrefix,
-            quote,
-            addSemicolonInTheEnd,
-            insertEnclosingClass,
-            insertEnclosingFunction,
-            insertEmptyLineBeforeLogMessage,
-            insertEmptyLineAfterLogMessage,
-            delimiterInsideMessage,
-            includeFileNameAndLineNum,
-            logType,
-            logFunction,
-          } = properties;
           await editor.edit((editBuilder) => {
             jsDebugMessage.msg(
               editBuilder,
@@ -58,27 +52,16 @@ export function activate(context: vscode.ExtensionContext): void {
               selectedVar,
               lineOfSelectedVar,
               tabSize,
-              {
-                wrapLogMessage,
-                logMessagePrefix,
-                quote,
-                addSemicolonInTheEnd,
-                insertEnclosingClass,
-                insertEnclosingFunction,
-                insertEmptyLineBeforeLogMessage,
-                insertEmptyLineAfterLogMessage,
-                delimiterInsideMessage,
-                includeFileNameAndLineNum,
-                logType,
-                logFunction,
-              },
+              properties,
             );
           });
         }
       }
     },
   );
-  // Comment all debug messages
+}
+
+function commentAllLogMessagesCommand(jsDebugMessage: DebugMessage) {
   vscode.commands.registerCommand(
     'turboConsoleLog.commentAllLogMessages',
     () => {
@@ -87,7 +70,6 @@ export function activate(context: vscode.ExtensionContext): void {
       if (!editor) {
         return;
       }
-      const tabSize: number = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
       const config: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration('turboConsoleLog');
@@ -110,7 +92,9 @@ export function activate(context: vscode.ExtensionContext): void {
       });
     },
   );
-  // Uncomment all debug messages
+}
+
+function uncommentAllLogMessagesCommand(jsDebugMessage: DebugMessage) {
   vscode.commands.registerCommand(
     'turboConsoleLog.uncommentAllLogMessages',
     () => {
@@ -119,7 +103,6 @@ export function activate(context: vscode.ExtensionContext): void {
       if (!editor) {
         return;
       }
-      const tabSize: number = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
       const config: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration('turboConsoleLog');
@@ -142,7 +125,9 @@ export function activate(context: vscode.ExtensionContext): void {
       });
     },
   );
-  // Delete all debug messages
+}
+
+function deleteAllLogMessagesCommand(jsDebugMessage: DebugMessage) {
   vscode.commands.registerCommand(
     'turboConsoleLog.deleteAllLogMessages',
     () => {
@@ -151,7 +136,6 @@ export function activate(context: vscode.ExtensionContext): void {
       if (!editor) {
         return;
       }
-      const tabSize: number = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
       const config: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration('turboConsoleLog');
@@ -191,46 +175,28 @@ export function activate(context: vscode.ExtensionContext): void {
 function getExtensionProperties(
   workspaceConfig: vscode.WorkspaceConfiguration,
 ) {
-  const wrapLogMessage = workspaceConfig.wrapLogMessage || false;
-  const logMessagePrefix = workspaceConfig.logMessagePrefix
-    ? workspaceConfig.logMessagePrefix
-    : '';
-  const addSemicolonInTheEnd = workspaceConfig.addSemicolonInTheEnd || false;
-  const insertEnclosingClass = workspaceConfig.insertEnclosingClass;
-  const insertEnclosingFunction = workspaceConfig.insertEnclosingFunction;
-  const insertEmptyLineBeforeLogMessage =
-    workspaceConfig.insertEmptyLineBeforeLogMessage;
-  const insertEmptyLineAfterLogMessage =
-    workspaceConfig.insertEmptyLineAfterLogMessage;
-  const quote = workspaceConfig.quote || '"';
-  const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || '~';
-  const includeFileNameAndLineNum =
-    workspaceConfig.includeFileNameAndLineNum || false;
-  const logType = workspaceConfig.logType || 'log';
-  const logFunction = workspaceConfig.logFunction || 'log';
-  const extensionProperties: ExtensionProperties = {
-    wrapLogMessage,
-    logMessagePrefix,
-    addSemicolonInTheEnd,
-    insertEnclosingClass,
-    insertEnclosingFunction,
-    insertEmptyLineBeforeLogMessage,
-    insertEmptyLineAfterLogMessage,
-    quote,
-    delimiterInsideMessage,
-    includeFileNameAndLineNum,
-    logType,
-    logFunction,
+  return {
+    wrapLogMessage: workspaceConfig.wrapLogMessage ?? false,
+    logMessagePrefix: workspaceConfig.logMessagePrefix ?? '',
+    addSemicolonInTheEnd: workspaceConfig.addSemicolonInTheEnd ?? false,
+    insertEnclosingClass: workspaceConfig.insertEnclosingClass ?? true,
+    insertEnclosingFunction: workspaceConfig.insertEnclosingFunction ?? true,
+    insertEmptyLineBeforeLogMessage:
+      workspaceConfig.insertEmptyLineBeforeLogMessage ?? false,
+    insertEmptyLineAfterLogMessage:
+      workspaceConfig.insertEmptyLineAfterLogMessage ?? false,
+    quote: workspaceConfig.quote ?? '"',
+    delimiterInsideMessage: workspaceConfig.delimiterInsideMessage ?? '~',
+    includeFileNameAndLineNum:
+      workspaceConfig.includeFileNameAndLineNum ?? false,
+    logType: workspaceConfig.logType ?? 'log',
+    logFunction: workspaceConfig.logFunction ?? 'log',
   };
-  return extensionProperties;
 }
 
 function getTabSize(tabSize: string | number | undefined): number {
-  if (tabSize && typeof tabSize === 'number') {
-    return tabSize;
-  } else if (tabSize && typeof tabSize === 'string') {
-    return parseInt(tabSize);
-  } else {
+  if (!tabSize) {
     return 4;
   }
+  return typeof tabSize === 'string' ? parseInt(tabSize) : tabSize;
 }
