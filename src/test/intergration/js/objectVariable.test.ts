@@ -1,17 +1,16 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 import Mocha from 'mocha';
-import { openDocument, zeroBasedLine, ZeroBasedPosition } from '../helpers';
+import { openDocument } from '../../helpers';
 
-test('Insert log message related to a class function param', async () => {
-  await openDocument('../files/js/classFunction.js');
+test('Insert log message related to an object variable', async () => {
+  await openDocument('../files/js/objectVariable.js');
   const { activeTextEditor } = vscode.window;
-  const zeroBasedLineHelper = zeroBasedLine;
   if (activeTextEditor) {
     activeTextEditor.selections = [
       new vscode.Selection(
-        new ZeroBasedPosition(2, 12),
-        new ZeroBasedPosition(2, 20),
+        new vscode.Position(0, 6),
+        new vscode.Position(0, 12),
       ),
     ];
     await vscode.commands.executeCommand(
@@ -19,12 +18,8 @@ test('Insert log message related to a class function param', async () => {
       [],
     );
     const textDocument = activeTextEditor.document;
-    const logMessage = textDocument.lineAt(zeroBasedLineHelper(3)).text;
+    const logMessage = textDocument.lineAt(4).text;
     assert.strictEqual(/console\.log\(.*/.test(logMessage), true);
-    // Class name
-    assert.strictEqual(logMessage.includes('Person'), true);
-    // Function name
-    assert.strictEqual(logMessage.includes('sayHello'), true);
   }
   Mocha.afterEach(async () => {
     await vscode.commands.executeCommand(

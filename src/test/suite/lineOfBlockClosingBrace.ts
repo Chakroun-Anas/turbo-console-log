@@ -1,15 +1,17 @@
-
-import * as path from "path";
-import Mocha from "mocha";
+import * as path from 'path';
+import Mocha from 'mocha';
 
 export function run(): Promise<void> {
   // Create the mocha test
   const mocha = new Mocha({
-    ui: "tdd",
+    ui: 'tdd',
     color: true,
   });
 
-  const testFile = path.resolve(__dirname, "../js/lineOfBlockClosingBrace.test.js");
+  const testFile = path.resolve(
+    __dirname,
+    '../integration/js/lineOfBlockClosingBrace.test.js',
+  );
   mocha.addFile(testFile);
   return new Promise((resolve, reject) => {
     try {

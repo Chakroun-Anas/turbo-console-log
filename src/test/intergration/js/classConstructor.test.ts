@@ -1,17 +1,16 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
+import { openDocument } from '../../helpers';
 import Mocha from 'mocha';
-import { openDocument, ZeroBasedPosition, zeroBasedLine } from '../helpers';
 
-test('Insert log message related to a function parameter within a class function', async () => {
-  await openDocument('../files/js/classNestedFunctions.js');
+test('Insert log message related to a class constructor param', async () => {
+  await openDocument('../files/js/classConstructor.js');
   const { activeTextEditor } = vscode.window;
-  const zeroBasedLineHelper = zeroBasedLine;
   if (activeTextEditor) {
     activeTextEditor.selections = [
       new vscode.Selection(
-        new ZeroBasedPosition(3, 30),
-        new ZeroBasedPosition(3, 42),
+        new vscode.Position(1, 14),
+        new vscode.Position(1, 22),
       ),
     ];
     await vscode.commands.executeCommand(
@@ -19,14 +18,12 @@ test('Insert log message related to a function parameter within a class function
       [],
     );
     const textDocument = activeTextEditor.document;
-    const logMessage = textDocument.lineAt(zeroBasedLineHelper(4)).text;
+    const logMessage = textDocument.lineAt(2).text;
     assert.strictEqual(/console\.log\(.*/.test(logMessage), true);
     // Class name
     assert.strictEqual(logMessage.includes('Person'), true);
     // Function name
-    assert.strictEqual(logMessage.includes('anotherFunction'), true);
-    // Variable name
-    assert.strictEqual(logMessage.includes('anotherParam'), true);
+    assert.strictEqual(logMessage.includes('constructor'), true);
   }
   Mocha.afterEach(async () => {
     await vscode.commands.executeCommand(

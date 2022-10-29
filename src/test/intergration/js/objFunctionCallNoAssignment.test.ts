@@ -1,16 +1,16 @@
 import Mocha from 'mocha';
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { openDocument, ZeroBasedPosition } from '../helpers';
+import { openDocument } from '../../helpers';
 
-test('Insert log message in the last line of the file', async () => {
-  await openDocument('../files/js/logLastLine.js');
+test('Obj function call no variable assignment', async () => {
+  await openDocument('../files/js/objFunctionCallNoAssignment.ts');
   const { activeTextEditor } = vscode.window;
   if (activeTextEditor) {
     activeTextEditor.selections = [
       new vscode.Selection(
-        new ZeroBasedPosition(1, 7),
-        new ZeroBasedPosition(1, 9),
+        new vscode.Position(3, 2),
+        new vscode.Position(3, 20),
       ),
     ];
     await vscode.commands.executeCommand(
@@ -18,7 +18,7 @@ test('Insert log message in the last line of the file', async () => {
       [],
     );
     const textDocument = activeTextEditor.document;
-    const logMessage = textDocument.lineAt(1).text;
+    const logMessage = textDocument.lineAt(16).text;
     assert.strictEqual(/console\.log\(.*/.test(logMessage), true);
   }
   Mocha.afterEach(async () => {

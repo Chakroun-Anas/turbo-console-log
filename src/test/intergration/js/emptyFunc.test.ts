@@ -1,7 +1,7 @@
 import Mocha from 'mocha';
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { openDocument, ZeroBasedPosition, zeroBasedLine } from '../helpers';
+import { openDocument, ZeroBasedPosition, zeroBasedLine } from '../../helpers';
 
 suite('Empty functions', async () => {
   const { activeTextEditor } = vscode.window;

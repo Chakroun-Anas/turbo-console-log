@@ -1,17 +1,16 @@
 import Mocha from 'mocha';
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { openDocument, ZeroBasedPosition, zeroBasedLine } from '../helpers';
+import { openDocument } from '../../helpers';
 
-test('Insert log message in the context of a function with a bunch of decorators', async () => {
-  await openDocument('../files/js/functionWithDecorators.ts');
+test('Insert log message related to a function parameter', async () => {
+  await openDocument('../files/js/functionParam.ts');
   const { activeTextEditor } = vscode.window;
-  const zeroBasedLineHelper = zeroBasedLine;
   if (activeTextEditor) {
     activeTextEditor.selections = [
       new vscode.Selection(
-        new ZeroBasedPosition(9, 20),
-        new ZeroBasedPosition(9, 24),
+        new vscode.Position(2, 49),
+        new vscode.Position(2, 66),
       ),
     ];
     await vscode.commands.executeCommand(
@@ -19,7 +18,7 @@ test('Insert log message in the context of a function with a bunch of decorators
       [],
     );
     const textDocument = activeTextEditor.document;
-    const logMessage = textDocument.lineAt(zeroBasedLineHelper(14)).text;
+    const logMessage = textDocument.lineAt(3).text;
     assert.strictEqual(/console\.log\(.*/.test(logMessage), true);
   }
   Mocha.afterEach(async () => {

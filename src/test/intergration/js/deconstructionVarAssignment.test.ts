@@ -1,7 +1,7 @@
 import Mocha from 'mocha';
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { openDocument } from '../helpers';
+import { openDocument } from '../../helpers';
 
 test('Insert log message related to a deconstructred property assigned to a variable', async () => {
   await openDocument('../files/js/deconstructionVarAssignment.tsx');

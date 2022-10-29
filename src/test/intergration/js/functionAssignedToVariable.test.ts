@@ -1,7 +1,7 @@
 import Mocha from 'mocha';
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import { openDocument, zeroBasedLine, ZeroBasedPosition } from '../helpers';
+import { openDocument, zeroBasedLine, ZeroBasedPosition } from '../../helpers';
 
 suite(
   'Insert log message related to a variable with a function as the value',

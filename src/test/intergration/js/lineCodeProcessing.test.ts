@@ -1,11 +1,11 @@
-import * as assert from "assert";
-import { JSLineCodeProcessing } from "../../line-code-processing/js";
+import * as assert from 'assert';
+import { JSLineCodeProcessing } from '../../../line-code-processing/js';
 
 const jsLineCodeProcessing: JSLineCodeProcessing = new JSLineCodeProcessing();
 
-suite("JS Line Code Processing", () => {
-  suite("Classes", () => {
-    test("Check class declaration", () => {
+suite('JS Line Code Processing', () => {
+  suite('Classes', () => {
+    test('Check class declaration', () => {
       const classLOCs = [
         `export class JSLineCodeProcessing implements LineCodeProcessing {`,
         `class  HelloWorld extends React.Component {`,
@@ -30,17 +30,17 @@ suite("JS Line Code Processing", () => {
       classLOCs.forEach((classLOC) => {
         assert.strictEqual(
           jsLineCodeProcessing.doesContainClassDeclaration(classLOC),
-          true
+          true,
         );
       });
       nonClassLOCs.forEach((nonClassLOC) => {
         assert.strictEqual(
           jsLineCodeProcessing.doesContainClassDeclaration(nonClassLOC),
-          false
+          false,
         );
       });
     });
-    test("Get class name", () => {
+    test('Get class name', () => {
       const classLOCs = [
         `export class JSLineCodeProcessing implements LineCodeProcessing {`,
         `export default class JSLineCodeProcessing implements LineCodeProcessing {`,
@@ -49,83 +49,83 @@ suite("JS Line Code Processing", () => {
         `class Day { `,
       ];
       const classesNames = [
-        "JSLineCodeProcessing",
-        "JSLineCodeProcessing",
-        "MyComponent",
-        "HelloWorld",
-        "Day",
+        'JSLineCodeProcessing',
+        'JSLineCodeProcessing',
+        'MyComponent',
+        'HelloWorld',
+        'Day',
       ];
       classLOCs.forEach((classLOC, index) => {
         assert.strictEqual(
           jsLineCodeProcessing.getClassName(classLOC),
-          classesNames[index]
+          classesNames[index],
         );
       });
     });
   });
-  suite("Functions", () => {
+  suite('Functions', () => {
     const namedFunctionsLOCs = [
-      "function functionName(){",
-      "function functionName(){",
-      "function sayHello (arg1, arg2) {",
-      "module.exports = function functionName (arg1, arg2) {",
-      "export default function functionName (arg1, arg2) {",
-      "functionName (arg1, arg2, arg3) {",
-      "const functionName = function (arg1, arg2) {",
-      "let functionName = (arg1, arg2) => {",
-      "array.forEach(function functionName() {",
-      "export const functionName = (arg1, arg2) => {",
-      "const functionName = (arg1: Type1, arg2: Type2) => {",
-      "const functionName = (arg1: Type1, arg2: Type2): Type3 => {",
-      "functionName(arg1: any): any {",
-      "async functionName(arg1: any): any {",
-      "public functionName(arg1: any): any {",
-      "public async functionName(arg1: any): any {",
-      "public static functionName(arg1: any): any {",
-      "private functionName(arg1: any): any {",
-      "protected functionName(arg1: any): any {",
-      "static functionName(arg1: any): any {",
-      "export functionName(arg1: any): any {",
-      "export default async function functionName(arg1) {",
-      "  constructor(fullName) {",
-      " async sayHello(somePram: any): Promise<void> {",
-      "  unitsValidation( scriptId ): any[] {",
+      'function functionName(){',
+      'function functionName(){',
+      'function sayHello (arg1, arg2) {',
+      'module.exports = function functionName (arg1, arg2) {',
+      'export default function functionName (arg1, arg2) {',
+      'functionName (arg1, arg2, arg3) {',
+      'const functionName = function (arg1, arg2) {',
+      'let functionName = (arg1, arg2) => {',
+      'array.forEach(function functionName() {',
+      'export const functionName = (arg1, arg2) => {',
+      'const functionName = (arg1: Type1, arg2: Type2) => {',
+      'const functionName = (arg1: Type1, arg2: Type2): Type3 => {',
+      'functionName(arg1: any): any {',
+      'async functionName(arg1: any): any {',
+      'public functionName(arg1: any): any {',
+      'public async functionName(arg1: any): any {',
+      'public static functionName(arg1: any): any {',
+      'private functionName(arg1: any): any {',
+      'protected functionName(arg1: any): any {',
+      'static functionName(arg1: any): any {',
+      'export functionName(arg1: any): any {',
+      'export default async function functionName(arg1) {',
+      '  constructor(fullName) {',
+      ' async sayHello(somePram: any): Promise<void> {',
+      '  unitsValidation( scriptId ): any[] {',
     ];
     const namedFunctionsNames = [
-      "functionName",
-      "functionName",
-      "sayHello",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "functionName",
-      "constructor",
-      "sayHello",
-      "unitsValidation",
+      'functionName',
+      'functionName',
+      'sayHello',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'functionName',
+      'constructor',
+      'sayHello',
+      'unitsValidation',
     ];
     const nonNamedFunctionsLOCs = [
-      "function() {",
-      "function(arg1, arg2) {",
-      "() => {",
-      "(arg1, arg2) => {",
-      "module.exports = function (arg1, arg2) {",
-      "function( {",
-      "function) {",
+      'function() {',
+      'function(arg1, arg2) {',
+      '() => {',
+      '(arg1, arg2) => {',
+      'module.exports = function (arg1, arg2) {',
+      'function( {',
+      'function) {',
     ];
     const functionsAssignmentsLOCs = [
       `const x = someFunc();`,
@@ -147,12 +147,12 @@ suite("JS Line Code Processing", () => {
     const anonymousFunctionsLOCs = [
       'const sayHello = fullName => `Hello ${fullName}`',
       'const happyBirthday = (fullName, age) => `Happy ${age} birthday ${fullName}`',
-      'fullName => `Hello ${fullName}`'
+      'fullName => `Hello ${fullName}`',
     ];
     const transformedAnonymousFunctions = [
-      'const sayHello = fullName => { `Hello ${fullName}`'
-    ]
-    test("Check built in function invocation", () => {
+      'const sayHello = fullName => { `Hello ${fullName}`',
+    ];
+    test('Check built in function invocation', () => {
       const builtInFunctionInvocationLOCs = [
         `if (a > 0)  {`,
         `if (a > 0) return 0;`,
@@ -171,57 +171,57 @@ suite("JS Line Code Processing", () => {
       builtInFunctionInvocationLOCs.forEach((builtInFunctionInvocationLOC) => {
         assert.strictEqual(
           jsLineCodeProcessing.doesContainsBuiltInFunction(
-            builtInFunctionInvocationLOC
+            builtInFunctionInvocationLOC,
           ),
-          true
+          true,
         );
       });
       nonBuiltInFunctionLOCs.forEach((nonBuiltInFunctionLOC) => {
         assert.strictEqual(
           jsLineCodeProcessing.doesContainsBuiltInFunction(
-            nonBuiltInFunctionLOC
+            nonBuiltInFunctionLOC,
           ),
-          false
+          false,
         );
       });
     });
-    test("Check named function Declaration", () => {
+    test('Check named function Declaration', () => {
       namedFunctionsLOCs.forEach((namedFunctionLOC) => {
         assert.strictEqual(
           jsLineCodeProcessing.doesContainsNamedFunctionDeclaration(
-            namedFunctionLOC
+            namedFunctionLOC,
           ),
-          true
+          true,
         );
       });
       nonNamedFunctionsLOCs.forEach((nonNamedFunctionLOC) => {
         assert.strictEqual(
           jsLineCodeProcessing.doesContainsNamedFunctionDeclaration(
-            nonNamedFunctionLOC
+            nonNamedFunctionLOC,
           ),
-          false
+          false,
         );
       });
     });
-    test("Get function name", () => {
+    test('Get function name', () => {
       namedFunctionsLOCs.forEach((namedFunctionLOC, index) => {
         assert.strictEqual(
           jsLineCodeProcessing.getFunctionName(namedFunctionLOC),
-          namedFunctionsNames[index]
+          namedFunctionsNames[index],
         );
       });
     });
-    test("Assignment of function to a variable", () => {
+    test('Assignment of function to a variable', () => {
       functionsAssignmentsLOCs.forEach((functionsAssignmentsLOC) => {
         assert.strictEqual(
           jsLineCodeProcessing.isFunctionAssignedToVariable(
-            functionsAssignmentsLOC
+            functionsAssignmentsLOC,
           ),
-          true
+          true,
         );
       });
     });
-    test("Check object function call", () => {
+    test('Check object function call', () => {
       const objectFunctionCallLOCs = [
         `const x = obj.someFunc();`,
         `const x = obj.someFunc()`,
@@ -247,37 +247,62 @@ suite("JS Line Code Processing", () => {
       objectFunctionCallLOCs.forEach((objectFunctionCallLOC) => {
         assert.strictEqual(
           jsLineCodeProcessing.isObjectFunctionCall(objectFunctionCallLOC),
-          true
+          true,
         );
       });
       functionsAssignmentsLOCs.forEach((functionsAssignmentsLOC) => {
         assert.strictEqual(
           jsLineCodeProcessing.isObjectFunctionCall(functionsAssignmentsLOC),
-          false
+          false,
         );
       });
     });
-    test("Anonymous functions", () => {
-      anonymousFunctionsLOCs.forEach(anonymousFunctionLOC => {
-        assert.strictEqual(jsLineCodeProcessing.isAnonymousFunction(anonymousFunctionLOC), true);
-      })
-    });
-    test("Arugment of anonymous function", () => {
-      anonymousFunctionsLOCs.forEach(anonymousFunctionLOC => {
-        assert.strictEqual(jsLineCodeProcessing.isArgumentOfAnonymousFunction(anonymousFunctionLOC, 'fullName'), true);
+    test('Anonymous functions', () => {
+      anonymousFunctionsLOCs.forEach((anonymousFunctionLOC) => {
+        assert.strictEqual(
+          jsLineCodeProcessing.isAnonymousFunction(anonymousFunctionLOC),
+          true,
+        );
       });
-      assert.strictEqual(jsLineCodeProcessing.isArgumentOfAnonymousFunction(namedFunctionsLOCs[0], 'functionName'), false);
     });
-    test("Should transform anonymous function", () => {
-      anonymousFunctionsLOCs.forEach(anonymousFunctionLOC => {
-        assert.strictEqual(jsLineCodeProcessing.shouldTransformAnonymousFunction(anonymousFunctionLOC), true);
+    test('Arugment of anonymous function', () => {
+      anonymousFunctionsLOCs.forEach((anonymousFunctionLOC) => {
+        assert.strictEqual(
+          jsLineCodeProcessing.isArgumentOfAnonymousFunction(
+            anonymousFunctionLOC,
+            'fullName',
+          ),
+          true,
+        );
       });
-      transformedAnonymousFunctions.forEach(transformedAnonymousFunction => {
-        assert.strictEqual(jsLineCodeProcessing.shouldTransformAnonymousFunction(transformedAnonymousFunction), false);
+      assert.strictEqual(
+        jsLineCodeProcessing.isArgumentOfAnonymousFunction(
+          namedFunctionsLOCs[0],
+          'functionName',
+        ),
+        false,
+      );
+    });
+    test('Should transform anonymous function', () => {
+      anonymousFunctionsLOCs.forEach((anonymousFunctionLOC) => {
+        assert.strictEqual(
+          jsLineCodeProcessing.shouldTransformAnonymousFunction(
+            anonymousFunctionLOC,
+          ),
+          true,
+        );
+      });
+      transformedAnonymousFunctions.forEach((transformedAnonymousFunction) => {
+        assert.strictEqual(
+          jsLineCodeProcessing.shouldTransformAnonymousFunction(
+            transformedAnonymousFunction,
+          ),
+          false,
+        );
       });
     });
   });
-  test("Assignment of object literal to a variable", () => {
+  test('Assignment of object literal to a variable', () => {
     const objLiteralAssignmentLOCs = [
       `var myObject = {
                 sProp: 'some string value',
@@ -327,21 +352,21 @@ suite("JS Line Code Processing", () => {
     objLiteralAssignmentLOCs.forEach((objLiteralAssignmentLOC) => {
       assert.strictEqual(
         jsLineCodeProcessing.isObjectLiteralAssignedToVariable(
-          objLiteralAssignmentLOC
+          objLiteralAssignmentLOC,
         ),
-        true
+        true,
       );
     });
     nonObjLiteralAssignmentLOCs.forEach((nonObjLiteralAssignmentLOC) => {
       assert.strictEqual(
         jsLineCodeProcessing.isObjectLiteralAssignedToVariable(
-          nonObjLiteralAssignmentLOC
+          nonObjLiteralAssignmentLOC,
         ),
-        false
+        false,
       );
     });
   });
-  test("Assignment of an array to a variable", () => {
+  test('Assignment of an array to a variable', () => {
     const arrayAssignmentLOCs = [
       `let    myArray =   [
                 1,
@@ -373,13 +398,13 @@ suite("JS Line Code Processing", () => {
     arrayAssignmentLOCs.forEach((arrayAssignmentLOC) => {
       assert.strictEqual(
         jsLineCodeProcessing.isArrayAssignedToVariable(arrayAssignmentLOC),
-        true
+        true,
       );
     });
     nonArrayAssignmentLOCs.forEach((nonArrayAssignmentLOC) => {
       assert.strictEqual(
         jsLineCodeProcessing.isArrayAssignedToVariable(nonArrayAssignmentLOC),
-        false
+        false,
       );
     });
   });
