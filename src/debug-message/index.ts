@@ -28,6 +28,7 @@ export abstract class DebugMessage {
   abstract detectAll(
     document: TextDocument,
     delemiterInsideMessage: string,
+    delimiterOutsideMessage: string,
     quote: string,
   ): Message[];
   abstract enclosingBlockName(

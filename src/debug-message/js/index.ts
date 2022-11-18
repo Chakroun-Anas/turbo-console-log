@@ -190,7 +190,7 @@ export class JSDebugMessage extends DebugMessage {
           ? `${funcThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
           : ''
         : ''
-    }${selectedVar}${extensionProperties.quote}, ${selectedVar})${semicolon}`;
+    }${selectedVar} ${extensionProperties.quote} ${extensionProperties.delimiterOutsideMessage} ${selectedVar})${semicolon}`;
   }
   private anonymousPropDebuggingMsg(
     document: TextDocument,

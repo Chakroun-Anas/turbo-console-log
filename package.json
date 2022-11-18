@@ -66,7 +66,12 @@
         "turboConsoleLog.delimiterInsideMessage": {
           "type": "string",
           "default": "~",
-          "description": "The delimiter that will separate the different log message elements (file name, line number, class, function and variable)"
+          "description": "The delimiter that will separate the different log message elements (file name, line number, class, function and variable)."
+        },
+        "turboConsoleLog.delimiterOutsideMessage": {
+          "type": "string",
+          "default": "~",
+          "description": "The delimiter that will separate the log message from the variable outside the message."
         },
         "turboConsoleLog.quote": {
           "type": "string",

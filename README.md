@@ -48,6 +48,8 @@ Properties:
 
 - turboConsoleLog.delemiterInsideMessage (string): The delimiter that will separate the different log message elements (file name, line number, class, function and variable)
 
+- turboConsoleLog.delemiterOutsideMessage (string): The delimiter that will separate the log message from the variable outside the message.
+
 - turboConsoleLog.includeFileNameAndLineNum (boolean): Whether to include the file name and the line number of the log message.
 
 - turboConsoleLog.quote (enum): Double quotes (""), single quotes ('') or backtick(``).

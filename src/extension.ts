@@ -47,6 +47,7 @@ export function activate(context: vscode.ExtensionContext): void {
             insertEmptyLineBeforeLogMessage,
             insertEmptyLineAfterLogMessage,
             delimiterInsideMessage,
+            delimiterOutsideMessage,
             includeFileNameAndLineNum,
             logType,
             logFunction,
@@ -68,6 +69,7 @@ export function activate(context: vscode.ExtensionContext): void {
                 insertEmptyLineBeforeLogMessage,
                 insertEmptyLineAfterLogMessage,
                 delimiterInsideMessage,
+                delimiterOutsideMessage,
                 includeFileNameAndLineNum,
                 logType,
                 logFunction,
@@ -95,6 +97,7 @@ export function activate(context: vscode.ExtensionContext): void {
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         properties.delimiterInsideMessage,
+        properties.delimiterOutsideMessage,
         properties.quote,
       );
       editor.edit((editBuilder) => {
@@ -127,6 +130,7 @@ export function activate(context: vscode.ExtensionContext): void {
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         properties.delimiterInsideMessage,
+        properties.delimiterOutsideMessage,
         properties.quote,
       );
       editor.edit((editBuilder) => {
@@ -159,6 +163,7 @@ export function activate(context: vscode.ExtensionContext): void {
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         properties.delimiterInsideMessage,
+        properties.delimiterOutsideMessage,
         properties.quote,
       );
       editor.edit((editBuilder) => {
@@ -204,6 +209,7 @@ function getExtensionProperties(
     workspaceConfig.insertEmptyLineAfterLogMessage;
   const quote = workspaceConfig.quote || '"';
   const delimiterInsideMessage = workspaceConfig.delimiterInsideMessage || '~';
+  const delimiterOutsideMessage= workspaceConfig.delimiterOutsideMessage || ',';
   const includeFileNameAndLineNum =
     workspaceConfig.includeFileNameAndLineNum || false;
   const logType = workspaceConfig.logType || 'log';
@@ -218,6 +224,7 @@ function getExtensionProperties(
     insertEmptyLineAfterLogMessage,
     quote,
     delimiterInsideMessage,
+    delimiterOutsideMessage,
     includeFileNameAndLineNum,
     logType,
     logFunction,
