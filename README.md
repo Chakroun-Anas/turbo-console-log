@@ -46,7 +46,7 @@ Properties:
 
 - turboConsoleLog.insertEmptyLineAfterLogMessage (boolean): Whether to insert an empty line after the log message or not.
 
-- turboConsoleLog.delemiterInsideMessage (string): The delimiter that will separate the different log message elements (file name, line number, class, function and variable)
+- turboConsoleLog.delimiterInsideMessage (string): The delimiter that will separate the different log message elements (file name, line number, class, function and variable)
 
 - turboConsoleLog.includeFileNameAndLineNum (boolean): Whether to include the file name and the line number of the log message.
 
