@@ -120,9 +120,7 @@ export class JSDebugMessage extends DebugMessage {
         : ''
     }${
       extensionProperties.includeFileNameAndLineNum
-        ? `file: ${fileName} ${
-            extensionProperties.delimiterInsideMessage
-          } line ${
+        ? `file: ${fileName}:${
             lineOfLogMsg +
             (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
           } ${extensionProperties.delimiterInsideMessage} `
