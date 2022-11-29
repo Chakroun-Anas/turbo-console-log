@@ -23,7 +23,7 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
     }
     return false;
   }
-  isValueAssignedToVariable(loc: string): boolean {
+  isAssignedToVariable(loc: string): boolean {
     return /.*=.*/.test(loc) && !/=>/.test(loc);
   }
   isObjectLiteralAssignedToVariable(loc: string): boolean {
@@ -79,7 +79,7 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   }
   isObjectFunctionCall(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
-    return /([a-zA-Z0-9]+\.){1,}/.test(locWithoutWhiteSpaces);
+    return /([a-zA-Z0-9]+\.[a-zA-Z0-9]+)\({1,}/.test(locWithoutWhiteSpaces);
   }
   getFunctionName(loc: string): string {
     if (this.doesContainsNamedFunctionDeclaration(loc)) {

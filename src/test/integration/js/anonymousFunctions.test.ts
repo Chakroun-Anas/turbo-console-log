@@ -3,7 +3,7 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { openDocument, zeroBasedLine, ZeroBasedPosition } from '../../helpers';
 
-suite('Insert log message related to an anonymous function context', () => {
+suite('d', () => {
   const { activeTextEditor } = vscode.window;
   const zeroBasedLineHelper = zeroBasedLine;
   Mocha.afterEach(async () => {

@@ -3,7 +3,7 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import { openDocument } from '../../helpers';
 
-test('Insert log message related to a multilines function parameter ', async () => {
+test('Insert log message related to a multiline function parameter ', async () => {
   await openDocument('../files/js/functionMultiLineParameters.ts');
   const { activeTextEditor } = vscode.window;
   if (activeTextEditor) {

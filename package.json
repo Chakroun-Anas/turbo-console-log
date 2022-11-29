@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "2.5.6",
+  "version": "2.6.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -140,7 +140,7 @@
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
-    "compile": "tsc -p ./ && mkdir -p out/test/files/js && cp -r src/test/files/js out/test/files",
+    "compile": "rm -rf out && tsc -p ./ && mkdir -p out/test/files/js && cp -r src/test/files/js out/test/files",
     "lint": "eslint src --ext ts",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile",
