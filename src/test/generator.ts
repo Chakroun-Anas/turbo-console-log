@@ -137,7 +137,6 @@ function generateTest() {
 
 function areParametersValid(): boolean {
   const commandPrams = [...process.argv];
-  console.log('🚀 ~ areParametersValid ~ commandPrams', commandPrams);
   let validParams = true;
   if (
     commandPrams.every((param) => !/--fileName=([a-zA-Z0-9(\s)])+/.test(param))

@@ -163,6 +163,17 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
+      "name": "Test: Object With Type",
+      "type": "extensionHost",
+      "request": "launch",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/objectWithType"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "${defaultBuildTask}"
+    },
+    {
       "name": "Test: Object function call",
       "type": "extensionHost",
       "request": "launch",
@@ -218,12 +229,12 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
-      "name": "Test: Object With Type",
+      "name": "Test: Promise Anonymous",
       "type": "extensionHost",
       "request": "launch",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/objectWithType"
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/promiseAnonymousFunction"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "${defaultBuildTask}"

@@ -281,7 +281,10 @@ export class JSDebugMessage extends DebugMessage {
         return /`/.test(currentLineText);
       },
       [LogMessageType.MultilineBraces]: () => {
-        return multilineBracesVariableLine !== null;
+        return (
+          multilineBracesVariableLine !== null &&
+          !this.lineCodeProcessing.isAssignedToVariable(currentLineText)
+        );
       },
       [LogMessageType.MultilineParenthesis]: () => {
         return (
