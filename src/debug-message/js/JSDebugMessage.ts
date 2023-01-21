@@ -121,8 +121,7 @@ export class JSDebugMessage extends DebugMessage {
     }${
       extensionProperties.includeFileNameAndLineNum
         ? `file: ${fileName}:${
-            lineOfLogMsg +
-            (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
+          lineOfSelectedVar + 1
           } ${extensionProperties.delimiterInsideMessage} `
         : ''
     }${
@@ -137,7 +136,7 @@ export class JSDebugMessage extends DebugMessage {
           ? `${funcThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
           : ''
         : ''
-    }${selectedVar}${extensionProperties.quote}, ${selectedVar})${semicolon}`;
+    }${selectedVar}${extensionProperties.logMessageSuffix}${extensionProperties.quote}, ${selectedVar})${semicolon}`;
   }
 
   private emptyBlockDebuggingMsg(

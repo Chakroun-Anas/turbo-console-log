@@ -33,6 +33,11 @@
           "default": "🚀",
           "description": "The prefix of the log message."
         },
+        "turboConsoleLog.logMessageSuffix": {
+          "type": "string",
+          "default": ":",
+          "description": "The suffix of the log message."
+        },
         "turboConsoleLog.includeFileNameAndLineNum": {
           "type": "boolean",
           "default": true,
