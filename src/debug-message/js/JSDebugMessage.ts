@@ -119,10 +119,12 @@ export class JSDebugMessage extends DebugMessage {
         ? ` ${extensionProperties.delimiterInsideMessage} `
         : ''
     }${
-      extensionProperties.includeFileNameAndLineNum
-        ? `file: ${fileName}:${
-          lineOfSelectedVar + 1
-          } ${extensionProperties.delimiterInsideMessage} `
+      extensionProperties.includeFileName
+        ? `file: ${fileName} ${extensionProperties.delimiterInsideMessage} `
+        : ''
+    }${
+      extensionProperties.includeLineNum
+        ? `Line:${lineOfSelectedVar + 1} ${extensionProperties.delimiterInsideMessage} `
         : ''
     }${
       extensionProperties.insertEnclosingClass

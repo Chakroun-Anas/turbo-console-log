@@ -8,7 +8,8 @@ export type ExtensionProperties = {
   insertEmptyLineBeforeLogMessage: boolean;
   insertEmptyLineAfterLogMessage: boolean;
   delimiterInsideMessage: string;
-  includeFileNameAndLineNum: boolean;
+  includeFileName: boolean;
+  includeLineNum: boolean;
   quote: string;
   logType: enumLogType;
   logFunction: string;
