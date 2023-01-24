@@ -135,6 +135,10 @@ Initial release of Turbo Console Log
 
 ### 2.6.0
 
+- ?
+
+### 2.7.0
+
 - Support adding log message suffix
 - Fixed line number of the variable to be logged
 - `File Name` and `Line Number` are separated
