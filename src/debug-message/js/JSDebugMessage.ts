@@ -119,11 +119,12 @@ export class JSDebugMessage extends DebugMessage {
         ? ` ${extensionProperties.delimiterInsideMessage} `
         : ''
     }${
-      extensionProperties.includeFileNameAndLineNum
-        ? `file: ${fileName}:${
-            lineOfLogMsg +
-            (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
-          } ${extensionProperties.delimiterInsideMessage} `
+      extensionProperties.includeFileName
+        ? `file: ${fileName} ${extensionProperties.delimiterInsideMessage} `
+        : ''
+    }${
+      extensionProperties.includeLineNum
+        ? `Line:${lineOfSelectedVar + 1} ${extensionProperties.delimiterInsideMessage} `
         : ''
     }${
       extensionProperties.insertEnclosingClass
@@ -137,7 +138,7 @@ export class JSDebugMessage extends DebugMessage {
           ? `${funcThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
           : ''
         : ''
-    }${selectedVar}${extensionProperties.quote}, ${selectedVar})${semicolon}`;
+    }${selectedVar}${extensionProperties.logMessageSuffix}${extensionProperties.quote}, ${selectedVar})${semicolon}`;
   }
 
   private emptyBlockDebuggingMsg(

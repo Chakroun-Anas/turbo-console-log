@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "2.6.2",
+  "version": "2.7.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -33,10 +33,20 @@
           "default": "🚀",
           "description": "The prefix of the log message."
         },
-        "turboConsoleLog.includeFileNameAndLineNum": {
+        "turboConsoleLog.logMessageSuffix": {
+          "type": "string",
+          "default": ":",
+          "description": "The suffix of the log message."
+        },
+        "turboConsoleLog.includeFileName": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to include the file name and the line number of the log message."
+          "description": "Whether to include the file name in the log message."
+        },
+        "turboConsoleLog.includeLineNum": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to include the line number of in log message."
         },
         "turboConsoleLog.addSemicolonInTheEnd": {
           "type": "boolean",
