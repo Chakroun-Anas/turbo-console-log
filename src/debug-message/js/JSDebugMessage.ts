@@ -113,7 +113,7 @@ export class JSDebugMessage extends DebugMessage {
         ? extensionProperties.logFunction
         : `console.${extensionProperties.logType}`
     }(${extensionProperties.quote}${extensionProperties.logMessagePrefix} ${
-      extensionProperties.includeLogMessageLineNumber ? `logMsgLine:${lineOfLogMsg + (extensionProperties.insertEmptyLineBeforeLogMessage && extensionProperties.wrapLogMessage ? 3 : extensionProperties.insertEmptyLineBeforeLogMessage | extensionProperties.wrapLogMessage ? 2 : 1)}`
+      extensionProperties.includeLogMessageLineNumber ? `logMsgLine:${lineOfLogMsg + (extensionProperties.insertEmptyLineBeforeLogMessage && extensionProperties.wrapLogMessage ? 3 : extensionProperties.insertEmptyLineBeforeLogMessage || extensionProperties.wrapLogMessage ? 2 : 1)}`
         : ''
     }${
       extensionProperties.logMessagePrefix.length !== 0 &&
