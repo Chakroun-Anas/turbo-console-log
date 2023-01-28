@@ -89,7 +89,7 @@ export class JSDebugMessage extends DebugMessage {
     lineOfLogMsg: number,
     extensionProperties: Omit<
       ExtensionProperties,
-      'wrapLogMessage' | 'insertEmptyLineAfterLogMessage'
+      'insertEmptyLineAfterLogMessage'
     >,
   ): string {
     const fileName = document.fileName.includes('/')
@@ -112,7 +112,10 @@ export class JSDebugMessage extends DebugMessage {
       extensionProperties.logFunction !== 'log'
         ? extensionProperties.logFunction
         : `console.${extensionProperties.logType}`
-    }(${extensionProperties.quote}${extensionProperties.logMessagePrefix}${
+    }(${extensionProperties.quote}${extensionProperties.logMessagePrefix} ${
+      extensionProperties.includeLogMessageLineNumber ? `logMsgLine:${lineOfLogMsg + (extensionProperties.insertEmptyLineBeforeLogMessage && extensionProperties.wrapLogMessage ? 3 : extensionProperties.insertEmptyLineBeforeLogMessage | extensionProperties.wrapLogMessage ? 2 : 1)}`
+        : ''
+    }${
       extensionProperties.logMessagePrefix.length !== 0 &&
       extensionProperties.logMessagePrefix !==
         `${extensionProperties.delimiterInsideMessage} `
@@ -123,7 +126,7 @@ export class JSDebugMessage extends DebugMessage {
         ? `file: ${fileName} ${extensionProperties.delimiterInsideMessage} `
         : ''
     }${
-      extensionProperties.includeLineNum
+      extensionProperties.includeLineNumber
         ? `Line:${lineOfSelectedVar + 1} ${extensionProperties.delimiterInsideMessage} `
         : ''
     }${
@@ -195,8 +198,7 @@ export class JSDebugMessage extends DebugMessage {
       lineOfSelectedVar,
       lineOfLogMsg,
       omit(extensionProperties, [
-        'wrapLogMessage',
-        'insertEmptyLineAfterLogMessage',
+        'insertEmptyLineAfterLogMessage'
       ]),
     );
     const debuggingMsg: string = this.constructDebuggingMsg(

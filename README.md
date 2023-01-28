@@ -50,9 +50,11 @@ Properties:
 
 - turboConsoleLog.delimiterInsideMessage (string): The delimiter that will separate the different log message elements (file name, line number, class, function and variable)
 
+- turboConsoleLog.includeLogMessageLineNumber (boolean): Whether to include the `console.log` line number.
+
 - turboConsoleLog.includeFileNam (boolean): Whether to include the file name in the log message.
 
-- turboConsoleLog.includeLineNum (boolean): Whether to include the line number in the log message.
+- turboConsoleLog.includeLineNumber (boolean): Whether to include the line number in the log message.
 
 - turboConsoleLog.quote (enum): Double quotes (""), single quotes ('') or backtick(``).
 
@@ -142,6 +144,7 @@ Initial release of Turbo Console Log
 - Support adding log message suffix
 - Fixed line number of the variable to be logged
 - `File Name` and `Line Number` are separated
+- Support showing `console.log` command line number
 
 ## Participate
 

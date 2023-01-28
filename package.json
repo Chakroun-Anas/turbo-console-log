@@ -38,12 +38,17 @@
           "default": ":",
           "description": "The suffix of the log message."
         },
+        "turboConsoleLog.includeLogMessageLineNumber": {
+          "type": "boolean",
+          "default": false,
+          "description": "`console.log` command line number"
+        },
         "turboConsoleLog.includeFileName": {
           "type": "boolean",
           "default": true,
           "description": "Whether to include the file name in the log message."
         },
-        "turboConsoleLog.includeLineNum": {
+        "turboConsoleLog.includeLineNumber": {
           "type": "boolean",
           "default": true,
           "description": "Whether to include the line number of in log message."

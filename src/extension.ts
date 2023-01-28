@@ -190,8 +190,10 @@ function getExtensionProperties(
     delimiterInsideMessage: workspaceConfig.delimiterInsideMessage ?? '~',
     includeFileName:
       workspaceConfig.includeFileName ?? false,
-    includeLineNum:
-      workspaceConfig.includeLineNum ?? false,
+    includeLineNumber:
+      workspaceConfig.includeLineNumber ?? false,
+    includeLogMessageLineNumber:
+      workspaceConfig.includeLogMessageLineNumber ?? false,
     logType: workspaceConfig.logType ?? 'log',
     logFunction: workspaceConfig.logFunction ?? 'log',
   };
