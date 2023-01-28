@@ -36,6 +36,8 @@ Properties:
 
 - turboConsoleLog.logMessagePrefix (string): The prefix of the log message (default one is 🚀 ).
 
+- turboConsoleLog.logMessageSuffix (string): The suffix of the log message (default one is `:` ).
+
 - turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
 
 - turboConsoleLog.insertEnclosingClass (boolean): Whether to insert or not the enclosing class of the selected variable in the log message.
@@ -48,7 +50,11 @@ Properties:
 
 - turboConsoleLog.delimiterInsideMessage (string): The delimiter that will separate the different log message elements (file name, line number, class, function and variable)
 
-- turboConsoleLog.includeFileNameAndLineNum (boolean): Whether to include the file name and the line number of the log message.
+- turboConsoleLog.includeLogMessageLineNumber (boolean): Whether to include the `console.log` line number.
+
+- turboConsoleLog.includeFileNam (boolean): Whether to include the file name in the log message.
+
+- turboConsoleLog.includeLineNumber (boolean): Whether to include the line number in the log message.
 
 - turboConsoleLog.quote (enum): Double quotes (""), single quotes ('') or backtick(``).
 
@@ -128,6 +134,17 @@ Initial release of Turbo Console Log
 ### 2.5.0
 
 - Support arrow function transformation
+
+### 2.6.0
+
+- ?
+
+### 2.7.0
+
+- Support adding log message suffix
+- Fixed line number of the variable to be logged
+- `File Name` and `Line Number` are separated
+- Support showing `console.log` command line number
 
 ## Participate
 
