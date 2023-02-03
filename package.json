@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "2.6.2",
+  "version": "2.7.1",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -28,15 +28,35 @@
           "default": false,
           "description": "Determine if the log message should be wrapped or not."
         },
+        "turboConsoleLog.LineBreak": {
+          "type": "boolean",
+          "default": false,
+          "description": "Determine if the target variable should to be printed in the next line or not."
+        },
         "turboConsoleLog.logMessagePrefix": {
           "type": "string",
           "default": "🚀",
           "description": "The prefix of the log message."
         },
-        "turboConsoleLog.includeFileNameAndLineNum": {
+        "turboConsoleLog.logMessageSuffix": {
+          "type": "string",
+          "default": ":",
+          "description": "The suffix of the log message."
+        },
+        "turboConsoleLog.includeLogMessageLineNumber": {
+          "type": "boolean",
+          "default": false,
+          "description": "`console.log` command line number"
+        },
+        "turboConsoleLog.includeFileName": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to include the file name and the line number of the log message."
+          "description": "Whether to include the file name in the log message."
+        },
+        "turboConsoleLog.includeLineNumber": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to include the line number of in log message."
         },
         "turboConsoleLog.addSemicolonInTheEnd": {
           "type": "boolean",
