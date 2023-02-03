@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -27,6 +27,11 @@
           "type": "boolean",
           "default": false,
           "description": "Determine if the log message should be wrapped or not."
+        },
+        "turboConsoleLog.LineBreak": {
+          "type": "boolean",
+          "default": false,
+          "description": "Determine if the target variable should to be printed in the next line or not."
         },
         "turboConsoleLog.logMessagePrefix": {
           "type": "string",

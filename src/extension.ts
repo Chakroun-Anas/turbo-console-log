@@ -179,6 +179,7 @@ function getExtensionProperties(
     wrapLogMessage: workspaceConfig.wrapLogMessage ?? false,
     logMessagePrefix: workspaceConfig.logMessagePrefix ?? '',
     logMessageSuffix: workspaceConfig.logMessageSuffix ?? '',
+    LineBreak: workspaceConfig.LineBreak ?? false,
     addSemicolonInTheEnd: workspaceConfig.addSemicolonInTheEnd ?? false,
     insertEnclosingClass: workspaceConfig.insertEnclosingClass ?? true,
     insertEnclosingFunction: workspaceConfig.insertEnclosingFunction ?? true,

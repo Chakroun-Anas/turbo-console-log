@@ -108,6 +108,9 @@ export class JSDebugMessage extends DebugMessage {
     const semicolon: string = extensionProperties.addSemicolonInTheEnd
       ? ';'
       : '';
+
+    const lineBreak: string = extensionProperties.LineBreak ? '\\n' : '';
+
     return `${
       extensionProperties.logFunction !== 'log'
         ? extensionProperties.logFunction
@@ -141,7 +144,7 @@ export class JSDebugMessage extends DebugMessage {
           ? `${funcThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
           : ''
         : ''
-    }${selectedVar}${extensionProperties.logMessageSuffix}${extensionProperties.quote}, ${selectedVar})${semicolon}`;
+    }${selectedVar}${extensionProperties.logMessageSuffix}${lineBreak}${extensionProperties.quote}, ${selectedVar})${semicolon}`;
   }
 
   private emptyBlockDebuggingMsg(
