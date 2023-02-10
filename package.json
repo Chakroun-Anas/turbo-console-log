@@ -11,12 +11,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:turboConsoleLog.displayLogMessage",
-    "onCommand:turboConsoleLog.commentAllLogMessages",
-    "onCommand:turboConsoleLog.uncommentAllLogMessages",
-    "onCommand:turboConsoleLog.deleteAllLogMessages"
-  ],
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
