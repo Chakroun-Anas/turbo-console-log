@@ -18,7 +18,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Anonymous functions",
@@ -29,7 +29,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/anonymousFunctions"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Block closing brace",
@@ -40,7 +40,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/lineOfBlockClosingBrace"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Class constructor",
@@ -51,7 +51,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/classConstructor"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Class function",
@@ -62,7 +62,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/classFunction"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Class nested functions",
@@ -73,7 +73,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/classNestedFunctions"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Deconstruction var assignment",
@@ -84,7 +84,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/deconstructionVarAssignment"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Function Multiline params",
@@ -95,7 +95,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/functionMultiLineParameters"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Function parameter",
@@ -106,7 +106,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/functionParam"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Function with decorators",
@@ -117,7 +117,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/functionWithDecorators"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: JS loc processing",
@@ -138,7 +138,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/logLastLine"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Obj function call no assignment",
@@ -149,7 +149,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/objFunctionCallNoAssignment"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Obj with type",
@@ -160,7 +160,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/objWithType"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Object With Type",
@@ -171,7 +171,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/objectWithType"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Object function call",
@@ -182,7 +182,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/objFunctionCall"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Object variable",
@@ -193,7 +193,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/objectVariable"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: One line function param",
@@ -204,7 +204,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/oneLineFunctionParam"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Parameter of empty function",
@@ -215,7 +215,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/emptyFunc"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Primitive variable",
@@ -226,7 +226,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/primitiveVariable"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Promise Anonymous",
@@ -237,7 +237,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/promiseAnonymousFunction"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     },
     {
       "name": "Test: Variable function assignment",
@@ -248,7 +248,7 @@
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/functionAssignedToVariable"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "${defaultBuildTask}"
+      "preLaunchTask": "npm: test-compile"
     }
   ]
 }

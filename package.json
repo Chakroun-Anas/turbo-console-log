@@ -133,11 +133,14 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "yarn run compile",
-    "compile": "rm -rf out && tsc -p ./ && mkdir -p out/test/files/js && cp -r src/test/files/js out/test/files",
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+    "watch": "npm run esbuild --watch",
     "lint": "eslint src --ext ts",
-    "watch": "tsc -watch -p ./",
-    "pretest": "yarn run compile",
+    "pretest": "yarn run esbuild-base",
+    "test-compile": "tsc -p ./ && cp -r src/test/files/js out/test/files",
     "test": "node ./out/test/runTest.js",
     "generateTest": "ts-node ./src/test/generator.ts"
   },
@@ -150,6 +153,7 @@
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "chalk": "^4.1.0",
+    "esbuild": "^0.17.7",
     "eslint": "^7.9.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^3.1.4",
