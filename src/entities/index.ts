@@ -1,9 +1,10 @@
-import { BlockType } from './blockType';
-import { Message } from './message';
-import { ExtensionProperties } from './extensionProperties';
-import { BracketType } from './bracketType';
-import { LogMessageType } from './logMessageType';
-import { LogBracket } from './logBracket';
+import { BlockType } from './extension/blockType';
+import { Message } from './extension/message';
+import { ExtensionProperties } from './extension/extensionProperties';
+import { BracketType } from './extension/bracketType';
+import { LogMessageType } from './extension/logMessageType';
+import { LogBracket } from './extension/logBracket';
+import { Command } from './extension/Command';
 export {
   BlockType,
   Message,
@@ -11,4 +12,5 @@ export {
   BracketType,
   LogMessageType,
   LogBracket,
+  Command,
 };
