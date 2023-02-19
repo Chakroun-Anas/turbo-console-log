@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "2.6.3",
+  "version": "2.7.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -10,6 +10,12 @@
   "icon": "images/icon.png",
   "categories": [
     "Other"
+  ],
+  "activationEvents": [
+    "onCommand:turboConsoleLog.displayLogMessage",
+    "onCommand:turboConsoleLog.commentAllLogMessages",
+    "onCommand:turboConsoleLog.uncommentAllLogMessages",
+    "onCommand:turboConsoleLog.deleteAllLogMessages"
   ],
   "main": "./out/extension.js",
   "contributes": {
