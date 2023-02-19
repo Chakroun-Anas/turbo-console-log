@@ -36,6 +36,8 @@ Properties:
 
 - turboConsoleLog.logMessagePrefix (string): The prefix of the log message (default one is 🚀 ).
 
+- turboConsoleLog.logMessageSuffix (string): The suffix of the log message (default one is `:` ).
+
 - turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.
 
 - turboConsoleLog.insertEnclosingClass (boolean): Whether to insert or not the enclosing class of the selected variable in the log message.
@@ -128,6 +130,10 @@ Initial release of Turbo Console Log
 ### 2.5.0
 
 - Support arrow function transformation
+
+### 2.7.0
+
+- Build the extension with esbuild
 
 ## Participate
 
