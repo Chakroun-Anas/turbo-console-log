@@ -131,9 +131,9 @@ Initial release of Turbo Console Log
 
 - Support arrow function transformation
 
-### 2.6.0
+### 2.7.0
 
-- Support adding log message suffix
+- Build the extension with esbuild
 
 ## Participate
 
