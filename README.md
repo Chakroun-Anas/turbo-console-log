@@ -36,6 +36,8 @@ Properties:
 
 - turboConsoleLog.logMessagePrefix (string): The prefix of the log message (default one is 🚀 ).
 
+- turboConsoleLog.logMessagePrefixRandomEmoji (boolean): Whether to prepend the log message with a random emoji.
+
 - turboConsoleLog.logMessageSuffix (string): The suffix of the log message (default one is `:` ).
 
 - turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.

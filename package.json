@@ -33,6 +33,11 @@
           "default": "🚀",
           "description": "The prefix of the log message."
         },
+        "turboConsoleLog.logMessagePrefixRandomEmoji": {
+          "type": "boolean",
+          "default": false,
+          "description": "Determines if the prefix of a log message is prepended with a random emoji"
+        },
         "turboConsoleLog.logMessageSuffix": {
           "type": "string",
           "default": ":",
