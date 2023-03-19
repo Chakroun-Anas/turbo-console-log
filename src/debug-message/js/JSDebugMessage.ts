@@ -137,7 +137,9 @@ export class JSDebugMessage extends DebugMessage {
           ? `${funcThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
           : ''
         : ''
-    }${selectedVar}${extensionProperties.logMessageSuffix}${extensionProperties.quote}, ${selectedVar})${semicolon}`;
+    }${selectedVar}${extensionProperties.logMessageSuffix}${
+      extensionProperties.quote
+    }, ${selectedVar})${semicolon}`;
   }
 
   private emptyBlockDebuggingMsg(
@@ -403,8 +405,8 @@ export class JSDebugMessage extends DebugMessage {
   }
   detectAll(
     document: TextDocument,
-    delemiterInsideMessage: string,
-    quote: string,
+    logMessagePrefix: string,
+    delimiterInsideMessage: string,
   ): Message[] {
     const documentNbrOfLines: number = document.lineCount;
     const logMessages: Message[] = [];
@@ -427,9 +429,8 @@ export class JSDebugMessage extends DebugMessage {
           logMessage.lines.push(document.lineAt(j).rangeIncludingLineBreak);
         }
         if (
-          new RegExp(
-            `${delemiterInsideMessage}[a-zA-Z0-9]+${quote},(//)?[a-zA-Z0-9]+`,
-          ).test(msg.replace(/\s/g, ''))
+          new RegExp(logMessagePrefix).test(msg) ||
+          new RegExp(delimiterInsideMessage).test(msg)
         ) {
           logMessages.push(logMessage);
         }

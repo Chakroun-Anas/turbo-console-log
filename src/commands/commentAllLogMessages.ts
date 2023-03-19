@@ -6,7 +6,7 @@ export function commentAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.commentAllLogMessages',
     handler: async (
-      { delimiterInsideMessage, quote }: ExtensionProperties,
+      { delimiterInsideMessage, logMessagePrefix }: ExtensionProperties,
       jsDebugMessage: DebugMessage,
     ) => {
       const editor: vscode.TextEditor | undefined =
@@ -17,8 +17,8 @@ export function commentAllLogMessagesCommand(): Command {
       const document: vscode.TextDocument = editor.document;
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
+        logMessagePrefix,
         delimiterInsideMessage,
-        quote,
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
