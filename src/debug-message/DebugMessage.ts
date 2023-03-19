@@ -33,8 +33,8 @@ export abstract class DebugMessage {
   ): void;
   abstract detectAll(
     document: TextDocument,
-    delemiterInsideMessage: string,
-    quote: string,
+    logMessagePrefix: string,
+    delimiterInsideMessage: string,
   ): Message[];
   abstract enclosingBlockName(
     document: TextDocument,
