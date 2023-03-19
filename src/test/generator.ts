@@ -7,7 +7,7 @@ const testFile = `
 import Mocha from "mocha";
 import * as assert from "assert";
 import * as vscode from "vscode";
-import { openDocument } from "../helpers";
+import { openDocument } from "../../helpers";
 
 test("testLongName", async () => {
   await openDocument("../files/js/testFileName.js");
@@ -47,7 +47,7 @@ export function run(): Promise<void> {
     color: true,
   });
 
-  const testFile = path.resolve(__dirname, "../js/testFileName.test.js");
+  const testFile = path.resolve(__dirname, "../integration/js/testFileName.test.js");
   mocha.addFile(testFile);
   return new Promise((resolve, reject) => {
     try {
@@ -85,7 +85,7 @@ function generateTest() {
     const testLongName: string = getTestLongName(process.argv);
     const testShortName: string = getTestShortName(process.argv);
     fs.writeFile(
-      `${path.join(__dirname, `./js/${testFileName}.test.ts`)}`,
+      `${path.join(__dirname, `./integration/js/${testFileName}.test.ts`)}`,
       testFile
         .replace(/testLongName/, testLongName)
         .replace(/testFileName/, testFileName),
