@@ -34,6 +34,8 @@ Properties:
 
 - turboConsoleLog.wrapLogMessage (boolean): Whether to wrap the log message or not.
 
+- turboConsoleLog.lineBreak (boolean): Printing the variable in the next line after the log message (default is `yes` ).
+
 - turboConsoleLog.logMessagePrefix (string): The prefix of the log message (default one is 🚀 ).
 
 - turboConsoleLog.logMessageSuffix (string): The suffix of the log message (default one is `:` ).

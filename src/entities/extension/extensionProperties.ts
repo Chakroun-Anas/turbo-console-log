@@ -1,5 +1,6 @@
 export type ExtensionProperties = {
   wrapLogMessage: boolean;
+  LineBreak: boolean;
   logMessagePrefix: string;
   logMessageSuffix: string;
   addSemicolonInTheEnd: boolean;
