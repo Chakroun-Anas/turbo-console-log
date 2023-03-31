@@ -13,7 +13,8 @@ import { DebugMessageLine } from '../DebugMessageLine';
 import { JSDebugMessageLine } from './JSDebugMessageLine';
 import {
   getMultiLineContextVariableLine,
-  closingBracketLine,
+  closingBracketLine, 
+  randomEmoji
 } from '../../utilities';
 import { JSDebugMessageAnonymous } from './JSDebugMessageAnonymous';
 
@@ -112,7 +113,8 @@ export class JSDebugMessage extends DebugMessage {
       extensionProperties.logFunction !== 'log'
         ? extensionProperties.logFunction
         : `console.${extensionProperties.logType}`
-    }(${extensionProperties.quote}${extensionProperties.logMessagePrefix}${
+    }(${extensionProperties.quote}${extensionProperties.logMessagePrefixRandomEmoji ? 
+      randomEmoji() : ''}${extensionProperties.logMessagePrefix}${
       extensionProperties.logMessagePrefix.length !== 0 &&
       extensionProperties.logMessagePrefix !==
         `${extensionProperties.delimiterInsideMessage} `
