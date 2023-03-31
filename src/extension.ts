@@ -25,6 +25,7 @@ function getExtensionProperties(
 ) {
   return {
     wrapLogMessage: workspaceConfig.wrapLogMessage ?? false,
+    LineBreak: workspaceConfig.LineBreak ?? true,
     logMessagePrefix: workspaceConfig.logMessagePrefix ?? '',
     logMessageSuffix: workspaceConfig.logMessageSuffix ?? '',
     addSemicolonInTheEnd: workspaceConfig.addSemicolonInTheEnd ?? false,

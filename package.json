@@ -28,6 +28,11 @@
           "default": false,
           "description": "Determine if the log message should be wrapped or not."
         },
+        "turboConsoleLog.LineBreak": {
+          "type": "boolean",
+          "default": false,
+          "description": "Determine if the target variable should to be printed in the next line or not."
+        },
         "turboConsoleLog.logMessagePrefix": {
           "type": "string",
           "default": "🚀",
