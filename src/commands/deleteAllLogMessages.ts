@@ -6,7 +6,11 @@ export function deleteAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.deleteAllLogMessages',
     handler: async (
-      { delimiterInsideMessage, logMessagePrefix }: ExtensionProperties,
+      {
+        delimiterInsideMessage,
+        logMessagePrefix,
+        logFunction,
+      }: ExtensionProperties,
       jsDebugMessage: DebugMessage,
     ) => {
       const editor: vscode.TextEditor | undefined =
@@ -17,6 +21,7 @@ export function deleteAllLogMessagesCommand(): Command {
       const document: vscode.TextDocument = editor.document;
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
+        logFunction,
         logMessagePrefix,
         delimiterInsideMessage,
       );

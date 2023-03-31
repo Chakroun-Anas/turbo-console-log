@@ -6,7 +6,11 @@ export function uncommentAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.uncommentAllLogMessages',
     handler: async (
-      { delimiterInsideMessage, logMessagePrefix }: ExtensionProperties,
+      {
+        delimiterInsideMessage,
+        logMessagePrefix,
+        logFunction,
+      }: ExtensionProperties,
       jsDebugMessage: DebugMessage,
     ) => {
       const editor: vscode.TextEditor | undefined =
@@ -18,6 +22,7 @@ export function uncommentAllLogMessagesCommand(): Command {
 
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
+        logFunction,
         logMessagePrefix,
         delimiterInsideMessage,
       );

@@ -33,6 +33,7 @@ export abstract class DebugMessage {
   ): void;
   abstract detectAll(
     document: TextDocument,
+    logFunction: string,
     logMessagePrefix: string,
     delimiterInsideMessage: string,
   ): Message[];

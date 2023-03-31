@@ -405,13 +405,16 @@ export class JSDebugMessage extends DebugMessage {
   }
   detectAll(
     document: TextDocument,
+    logFunction: string,
     logMessagePrefix: string,
     delimiterInsideMessage: string,
   ): Message[] {
     const documentNbrOfLines: number = document.lineCount;
     const logMessages: Message[] = [];
     for (let i = 0; i < documentNbrOfLines; i++) {
-      const turboConsoleLogMessage = /console\.log\(/;
+      const turboConsoleLogMessage = new RegExp(
+        logFunction.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      );
       if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
         const logMessage: Message = {
           spaces: '',
