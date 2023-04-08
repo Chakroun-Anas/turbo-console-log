@@ -308,8 +308,8 @@ export class JSDebugMessage extends DebugMessage {
       },
       [LogMessageType.Decorator]: () => {
         return {
-          isChecked: /@[a-zA-Z0-9]{1,}(.*)[a-zA-Z0-9]{1,}/.test(
-            currentLineText,
+          isChecked: /^@[a-zA-Z0-9]{1,}(.*)[a-zA-Z0-9]{1,}/.test(
+            currentLineText.trim(),
           ),
         };
       },
