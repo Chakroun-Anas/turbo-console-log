@@ -2,15 +2,23 @@ import { BlockType } from './extension/blockType';
 import { Message } from './extension/message';
 import { ExtensionProperties } from './extension/extensionProperties';
 import { BracketType } from './extension/bracketType';
-import { LogMessageType } from './extension/logMessageType';
+import {
+  LogMessageType,
+  LogMessage,
+  LogBracketMetadata,
+} from './extension/logMessage';
 import { LogBracket } from './extension/logBracket';
 import { Command } from './extension/Command';
+import { MultilineContextVariable } from './extension/MultilineContextVariable';
 export {
   BlockType,
-  Message,
-  ExtensionProperties,
   BracketType,
-  LogMessageType,
-  LogBracket,
   Command,
+  ExtensionProperties,
+  LogBracket,
+  LogBracketMetadata,
+  LogMessage,
+  LogMessageType,
+  Message,
+  MultilineContextVariable,
 };
