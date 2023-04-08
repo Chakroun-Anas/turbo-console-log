@@ -2,8 +2,11 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [2.9.0]
 
-## [Unreleased]
+- Promise will keep an eye on the CHANGELOG from now on 😊
 
-- Initial release
+## [2.8.0]
+
+- Default value for prefix property is set back to '🚀'
+- Default value for suffix property is ':'
