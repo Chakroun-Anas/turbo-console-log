@@ -1,38 +1,38 @@
 import { TextDocument } from 'vscode';
-import { BracketType, LogMessageType } from '../../entities';
+import { BracketType, LogMessage, LogMessageType } from '../../entities';
 import { DebugMessageLine } from '../DebugMessageLine';
-import { getMultiLineContextVariableLine } from '../../utilities';
+import { getMultiLineContextVariable } from '../../utilities';
 
 export class JSDebugMessageLine implements DebugMessageLine {
   line(
     document: TextDocument,
     selectionLine: number,
     selectedVar: string,
-    logMsgType: LogMessageType,
+    logMsg: LogMessage,
   ): number {
-    const multilineParenthesisVariableLine = getMultiLineContextVariableLine(
+    const multilineParenthesisVariable = getMultiLineContextVariable(
       document,
       selectionLine,
       BracketType.PARENTHESIS,
     );
-    const multilineBracesVariableLine = getMultiLineContextVariableLine(
+    const multilineBracesVariable = getMultiLineContextVariable(
       document,
       selectionLine,
       BracketType.CURLY_BRACES,
     );
-    switch (logMsgType) {
+    switch (logMsg.logMessageType) {
       case LogMessageType.ObjectLiteral:
         return this.objectLiteralLine(document, selectionLine);
       case LogMessageType.NamedFunctionAssignment:
         return this.functionAssignmentLine(document, selectionLine);
       case LogMessageType.Decorator:
         return (
-          getMultiLineContextVariableLine(
+          getMultiLineContextVariable(
             document,
             selectionLine,
             BracketType.PARENTHESIS,
             false,
-          ) || selectionLine + 1
+          )?.closingBracketLine || selectionLine + 1
         );
       case LogMessageType.MultiLineAnonymousFunction:
         return (
@@ -51,11 +51,13 @@ export class JSDebugMessageLine implements DebugMessageLine {
       case LogMessageType.ArrayAssignment:
         return this.arrayLine(document, selectionLine);
       case LogMessageType.MultilineParenthesis:
-        return multilineParenthesisVariableLine || selectionLine + 1;
+        return (
+          multilineParenthesisVariable?.closingBracketLine || selectionLine + 1
+        );
       case LogMessageType.Ternary:
         return this.templateStringLine(document, selectionLine);
       case LogMessageType.MultilineBraces:
-        return multilineBracesVariableLine || selectionLine + 1;
+        return multilineBracesVariable?.closingBracketLine || selectionLine + 1;
       default:
         return selectionLine + 1;
     }

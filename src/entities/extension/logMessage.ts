@@ -11,3 +11,13 @@ export enum LogMessageType {
   PrimitiveAssignment = 'PrimitiveAssignment',
   Ternary = 'Ternary',
 }
+
+export type LogBracketMetadata = {
+  openingBracketLine: number;
+  closingBracketLine: number;
+};
+
+export type LogMessage = {
+  logMessageType: LogMessageType;
+  metadata?: LogBracketMetadata | unknown;
+};

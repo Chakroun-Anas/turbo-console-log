@@ -1,11 +1,11 @@
 import { TextDocument } from 'vscode';
-import { LogMessageType } from '../entities';
+import { LogMessage } from '../entities';
 
 export interface DebugMessageLine {
   line(
     document: TextDocument,
     selectionLine: number,
     selectedVar: string,
-    logMsgType: LogMessageType,
+    logMsg: LogMessage,
   ): number;
 }

@@ -2,7 +2,7 @@ import { TextDocument, TextEditorEdit } from 'vscode';
 import {
   BlockType,
   ExtensionProperties,
-  LogMessageType,
+  LogMessage,
   Message,
 } from '../entities';
 import { LineCodeProcessing } from '../line-code-processing';
@@ -18,11 +18,11 @@ export abstract class DebugMessage {
     this.lineCodeProcessing = lineCodeProcessing;
     this.debugMessageLine = debugMessageLine;
   }
-  abstract logMessageType(
+  abstract logMessage(
     document: TextDocument,
     selectionLine: number,
     selectedVar: string,
-  ): LogMessageType;
+  ): LogMessage;
   abstract msg(
     textEditor: TextEditorEdit,
     document: TextDocument,
@@ -46,13 +46,13 @@ export abstract class DebugMessage {
     document: TextDocument,
     selectionLine: number,
     selectedVar: string,
-    logMsgType: LogMessageType,
+    logMsg: LogMessage,
   ): number {
     return this.debugMessageLine.line(
       document,
       selectionLine,
       selectedVar,
-      logMsgType,
+      logMsg,
     );
   }
   spacesBeforeLogMsg(

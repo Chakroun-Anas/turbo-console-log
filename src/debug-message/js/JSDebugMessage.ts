@@ -5,6 +5,8 @@ import {
   BracketType,
   LogMessageType,
   Message,
+  LogMessage,
+  LogBracketMetadata,
 } from '../../entities';
 import { LineCodeProcessing } from '../../line-code-processing';
 import _, { omit } from 'lodash';
@@ -12,7 +14,7 @@ import { DebugMessage } from '../DebugMessage';
 import { DebugMessageLine } from '../DebugMessageLine';
 import { JSDebugMessageLine } from './JSDebugMessageLine';
 import {
-  getMultiLineContextVariableLine,
+  getMultiLineContextVariable,
   closingBracketLine,
 } from '../../utilities';
 import { JSDebugMessageAnonymous } from './JSDebugMessageAnonymous';
@@ -27,6 +29,7 @@ const logMessageTypeVerificationPriority = _.sortBy(
     { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 7 },
     { logMessageType: LogMessageType.MultilineParenthesis, priority: 8 },
     { logMessageType: LogMessageType.MultilineBraces, priority: 9 },
+    { logMessageType: LogMessageType.PrimitiveAssignment, priority: 10 },
     { logMessageType: LogMessageType.Decorator, priority: 0 },
     { logMessageType: LogMessageType.Ternary, priority: 1 },
   ],
@@ -174,25 +177,48 @@ export class JSDebugMessage extends DebugMessage {
     tabSize: number,
     extensionProperties: ExtensionProperties,
   ): void {
-    const logMsgType: LogMessageType = this.logMessageType(
+    const logMsg: LogMessage = this.logMessage(
       document,
       lineOfSelectedVar,
       selectedVar,
     );
+    let isObjectLiteralAssignedToVariable = false;
+    if (LogMessageType.MultilineBraces === logMsg.logMessageType) {
+      isObjectLiteralAssignedToVariable =
+        this.lineCodeProcessing.isObjectLiteralAssignedToVariable(
+          `${
+            document.lineAt(
+              (logMsg.metadata as LogBracketMetadata).openingBracketLine,
+            ).text
+          }${
+            document.lineAt(
+              (logMsg.metadata as LogBracketMetadata).openingBracketLine + 1,
+            ).text
+          }`,
+        );
+    }
     const lineOfLogMsg: number = this.line(
       document,
       lineOfSelectedVar,
       selectedVar,
-      logMsgType,
+      logMsg,
     );
     const spacesBeforeMsg: string = this.spacesBeforeLogMsg(
       document,
-      lineOfSelectedVar,
+      isObjectLiteralAssignedToVariable
+        ? (logMsg.metadata as LogBracketMetadata).openingBracketLine
+        : lineOfSelectedVar,
       lineOfLogMsg,
     );
     const debuggingMsgContent: string = this.constructDebuggingMsgContent(
       document,
-      selectedVar,
+      isObjectLiteralAssignedToVariable
+        ? `${document
+            .lineAt((logMsg.metadata as LogBracketMetadata).openingBracketLine)
+            .text.split('=')[0]
+            .replace(/(const|let|var)/, '')
+            .trim()}.${selectedVar}`
+        : selectedVar,
       lineOfSelectedVar,
       lineOfLogMsg,
       omit(extensionProperties, [
@@ -243,104 +269,148 @@ export class JSDebugMessage extends DebugMessage {
       extensionProperties.insertEmptyLineAfterLogMessage,
     );
   }
-  logMessageType(
+  logMessage(
     document: TextDocument,
     selectionLine: number,
     selectedVar: string,
-  ): LogMessageType {
+  ): LogMessage {
     const currentLineText: string = document.lineAt(selectionLine).text;
-    const multilineParenthesisVariableLine = getMultiLineContextVariableLine(
+    const multilineParenthesisVariable = getMultiLineContextVariable(
       document,
       selectionLine,
       BracketType.PARENTHESIS,
     );
-    const multilineBracesVariableLine = getMultiLineContextVariableLine(
+    const multilineBracesVariable = getMultiLineContextVariable(
       document,
       selectionLine,
       BracketType.CURLY_BRACES,
     );
-    const logMsgTypesChecks = {
+    const logMsgTypesChecks: {
+      [key in LogMessageType]: () => {
+        isChecked: boolean;
+        metadata?: Pick<LogMessage, 'metadata'>;
+      };
+    } = {
       [LogMessageType.ObjectLiteral]: () => {
         if (document.lineCount === selectionLine + 1) {
-          return false;
+          return {
+            isChecked: false,
+          };
         }
         const nextLineText: string = document
           .lineAt(selectionLine + 1)
           .text.replace(/\s/g, '');
-        return this.lineCodeProcessing.isObjectLiteralAssignedToVariable(
-          `${currentLineText}\n${nextLineText}`,
-        );
+        return {
+          isChecked: this.lineCodeProcessing.isObjectLiteralAssignedToVariable(
+            `${currentLineText}\n${nextLineText}`,
+          ),
+        };
       },
       [LogMessageType.Decorator]: () => {
-        return /@[a-zA-Z0-9]{1,}(.*)[a-zA-Z0-9]{1,}/.test(currentLineText);
+        return {
+          isChecked: /@[a-zA-Z0-9]{1,}(.*)[a-zA-Z0-9]{1,}/.test(
+            currentLineText,
+          ),
+        };
       },
       [LogMessageType.ArrayAssignment]: () => {
-        return this.lineCodeProcessing.isArrayAssignedToVariable(
-          `${currentLineText}\n${currentLineText}`,
-        );
+        return {
+          isChecked: this.lineCodeProcessing.isArrayAssignedToVariable(
+            `${currentLineText}\n${currentLineText}`,
+          ),
+        };
       },
       [LogMessageType.Ternary]: () => {
-        return /`/.test(currentLineText);
+        return {
+          isChecked: /`/.test(currentLineText),
+        };
       },
       [LogMessageType.MultilineBraces]: () => {
-        return (
-          multilineBracesVariableLine !== null &&
-          !this.lineCodeProcessing.isAssignedToVariable(currentLineText)
-        );
+        return {
+          isChecked:
+            multilineBracesVariable !== null &&
+            !this.lineCodeProcessing.isAssignedToVariable(currentLineText),
+          metadata: {
+            openingBracketLine:
+              multilineBracesVariable?.openingBracketLine as number,
+            closingBracketLine:
+              multilineBracesVariable?.closingBracketLine as number,
+          } as Pick<LogMessage, 'metadata'>,
+        };
       },
       [LogMessageType.MultilineParenthesis]: () => {
-        return (
-          multilineParenthesisVariableLine !== null &&
-          document
-            .lineAt(multilineParenthesisVariableLine - 1)
-            .text.includes('{')
-        );
+        return {
+          isChecked:
+            multilineParenthesisVariable !== null &&
+            document
+              .lineAt(multilineParenthesisVariable.closingBracketLine - 1)
+              .text.includes('{'),
+        };
       },
       [LogMessageType.ObjectFunctionCall]: () => {
         if (document.lineCount === selectionLine + 1) {
-          return false;
+          return {
+            isChecked: false,
+          };
         }
         const nextLineText: string = document
           .lineAt(selectionLine + 1)
           .text.replace(/\s/g, '');
-        return this.lineCodeProcessing.isObjectFunctionCall(
-          `${currentLineText}\n${nextLineText}`,
-        );
+        return {
+          isChecked: this.lineCodeProcessing.isObjectFunctionCall(
+            `${currentLineText}\n${nextLineText}`,
+          ),
+        };
       },
       [LogMessageType.NamedFunction]: () => {
-        return this.lineCodeProcessing.doesContainsNamedFunctionDeclaration(
-          currentLineText,
-        );
+        return {
+          isChecked:
+            this.lineCodeProcessing.doesContainsNamedFunctionDeclaration(
+              currentLineText,
+            ),
+        };
       },
       [LogMessageType.NamedFunctionAssignment]: () => {
-        return (
-          this.lineCodeProcessing.isFunctionAssignedToVariable(
-            `${currentLineText}`,
-          ) && currentLineText.split('=')[0].includes(selectedVar)
-        );
+        return {
+          isChecked:
+            this.lineCodeProcessing.isFunctionAssignedToVariable(
+              `${currentLineText}`,
+            ) && currentLineText.split('=')[0].includes(selectedVar),
+        };
       },
       [LogMessageType.MultiLineAnonymousFunction]: () => {
-        return (
-          this.lineCodeProcessing.isFunctionAssignedToVariable(
-            `${currentLineText}`,
-          ) &&
-          this.lineCodeProcessing.isAnonymousFunction(currentLineText) &&
-          this.lineCodeProcessing.shouldTransformAnonymousFunction(
-            currentLineText,
-          )
-        );
+        return {
+          isChecked:
+            this.lineCodeProcessing.isFunctionAssignedToVariable(
+              `${currentLineText}`,
+            ) &&
+            this.lineCodeProcessing.isAnonymousFunction(currentLineText) &&
+            this.lineCodeProcessing.shouldTransformAnonymousFunction(
+              currentLineText,
+            ),
+        };
+      },
+      [LogMessageType.PrimitiveAssignment]: () => {
+        return {
+          isChecked:
+            this.lineCodeProcessing.isAssignedToVariable(currentLineText),
+        };
       },
     };
 
     for (const { logMessageType } of logMessageTypeVerificationPriority) {
-      if (
-        logMessageType !== LogMessageType.PrimitiveAssignment &&
-        logMsgTypesChecks[logMessageType as keyof typeof logMsgTypesChecks]()
-      ) {
-        return logMessageType as LogMessageType;
+      const { isChecked, metadata } =
+        logMsgTypesChecks[logMessageType as keyof typeof logMsgTypesChecks]();
+      if (logMessageType !== LogMessageType.PrimitiveAssignment && isChecked) {
+        return {
+          logMessageType,
+          metadata,
+        };
       }
     }
-    return LogMessageType.PrimitiveAssignment;
+    return {
+      logMessageType: LogMessageType.PrimitiveAssignment,
+    };
   }
   enclosingBlockName(
     document: TextDocument,
