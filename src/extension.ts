@@ -14,9 +14,9 @@ export function activate(): void {
   const properties: ExtensionProperties = getExtensionProperties(config);
   const commands: Array<Command> = getAllCommands();
   for (const { name, handler } of commands) {
-    vscode.commands.registerCommand(name, () =>
-      handler(properties, jsDebugMessage),
-    );
+    vscode.commands.registerCommand(name, (args: unknown[]) => {
+      handler(properties, jsDebugMessage, args);
+    });
   }
 }
 

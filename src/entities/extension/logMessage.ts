@@ -17,7 +17,20 @@ export type LogBracketMetadata = {
   closingBracketLine: number;
 };
 
+export type LogParenthesisMetadata = {
+  openingParenthesisLine: number;
+  closingParenthesisLine: number;
+};
+
+export type NamedFunctionMetadata = {
+  line: number;
+};
+
 export type LogMessage = {
   logMessageType: LogMessageType;
-  metadata?: LogBracketMetadata | unknown;
+  metadata?:
+    | LogBracketMetadata
+    | LogParenthesisMetadata
+    | NamedFunctionMetadata
+    | unknown;
 };

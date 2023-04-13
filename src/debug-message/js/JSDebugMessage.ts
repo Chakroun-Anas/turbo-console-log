@@ -18,14 +18,18 @@ import {
   closingBracketLine,
 } from '../../utilities';
 import { JSDebugMessageAnonymous } from './JSDebugMessageAnonymous';
+import {
+  LogParenthesisMetadata,
+  NamedFunctionMetadata,
+} from '../../entities/extension/logMessage';
 
 const logMessageTypeVerificationPriority = _.sortBy(
   [
     { logMessageType: LogMessageType.ArrayAssignment, priority: 2 },
     { logMessageType: LogMessageType.ObjectLiteral, priority: 3 },
     { logMessageType: LogMessageType.ObjectFunctionCall, priority: 4 },
-    { logMessageType: LogMessageType.NamedFunction, priority: 5 },
-    { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 6 },
+    { logMessageType: LogMessageType.NamedFunction, priority: 6 },
+    { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 5 },
     { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 7 },
     { logMessageType: LogMessageType.MultilineParenthesis, priority: 8 },
     { logMessageType: LogMessageType.MultilineBraces, priority: 9 },
@@ -65,8 +69,25 @@ export class JSDebugMessage extends DebugMessage {
       }${debuggingMsg}\n${insertEmptyLineAfterLogMessage ? '\n' : ''}`,
     );
   }
-  private isEmptyBlockContext(selectedVarLinerLoc: string) {
-    return /\){.*}/.test(selectedVarLinerLoc.replace(/\s/g, ''));
+  private isEmptyBlockContext(document: TextDocument, logMessage: LogMessage) {
+    if (logMessage.logMessageType === LogMessageType.MultilineParenthesis) {
+      return /\){.*}/.test(
+        document
+          .lineAt(
+            (logMessage.metadata as LogParenthesisMetadata)
+              .closingParenthesisLine,
+          )
+          .text.replace(/\s/g, ''),
+      );
+    }
+    if (logMessage.logMessageType === LogMessageType.NamedFunction) {
+      return /\){.*}/.test(
+        document
+          .lineAt((logMessage.metadata as NamedFunctionMetadata).line)
+          .text.replace(/\s/g, ''),
+      );
+    }
+    return false;
   }
   private constructDebuggingMsg(
     extensionProperties: ExtensionProperties,
@@ -233,11 +254,18 @@ export class JSDebugMessage extends DebugMessage {
     );
     const selectedVarLine = document.lineAt(lineOfSelectedVar);
     const selectedVarLineLoc = selectedVarLine.text;
-    if (this.isEmptyBlockContext(selectedVarLineLoc)) {
+    if (this.isEmptyBlockContext(document, logMsg)) {
+      const emptyBlockLine =
+        logMsg.logMessageType === LogMessageType.MultilineParenthesis
+          ? document.lineAt(
+              (logMsg.metadata as LogParenthesisMetadata)
+                .closingParenthesisLine,
+            )
+          : document.lineAt((logMsg.metadata as NamedFunctionMetadata).line);
       this.emptyBlockDebuggingMsg(
         document,
         textEditor,
-        selectedVarLine,
+        emptyBlockLine,
         lineOfLogMsg,
         debuggingMsgContent,
         spacesBeforeMsg,
@@ -343,8 +371,14 @@ export class JSDebugMessage extends DebugMessage {
           isChecked:
             multilineParenthesisVariable !== null &&
             document
-              .lineAt(multilineParenthesisVariable.closingBracketLine - 1)
+              .lineAt(multilineParenthesisVariable.closingBracketLine)
               .text.includes('{'),
+          metadata: {
+            openingParenthesisLine:
+              multilineParenthesisVariable?.openingBracketLine as number,
+            closingParenthesisLine:
+              multilineParenthesisVariable?.closingBracketLine as number,
+          } as Pick<LogMessage, 'metadata'>,
         };
       },
       [LogMessageType.ObjectFunctionCall]: () => {
@@ -368,6 +402,9 @@ export class JSDebugMessage extends DebugMessage {
             this.lineCodeProcessing.doesContainsNamedFunctionDeclaration(
               currentLineText,
             ),
+          metadata: {
+            line: selectionLine,
+          } as Pick<LogMessage, 'metadata'>,
         };
       },
       [LogMessageType.NamedFunctionAssignment]: () => {

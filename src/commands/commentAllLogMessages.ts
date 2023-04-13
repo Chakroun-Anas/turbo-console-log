@@ -12,7 +12,27 @@ export function commentAllLogMessagesCommand(): Command {
         logFunction,
       }: ExtensionProperties,
       jsDebugMessage: DebugMessage,
+      args?: unknown[],
     ) => {
+      function logFunctionToUse(): string {
+        if (
+          args &&
+          args.length > 0 &&
+          typeof args[0] === 'object' &&
+          args[0] !== null
+        ) {
+          const firstArg = args[0] as Record<string, unknown>;
+          if (
+            'logFunction' in firstArg &&
+            typeof firstArg.logFunction === 'string'
+          ) {
+            return firstArg.logFunction;
+          }
+          return logFunction;
+        }
+        return logFunction;
+      }
+
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
@@ -21,7 +41,7 @@ export function commentAllLogMessagesCommand(): Command {
       const document: vscode.TextDocument = editor.document;
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
-        logFunction,
+        logFunctionToUse(),
         logMessagePrefix,
         delimiterInsideMessage,
       );

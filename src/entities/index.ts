@@ -10,6 +10,7 @@ import {
 import { LogBracket } from './extension/logBracket';
 import { Command } from './extension/Command';
 import { MultilineContextVariable } from './extension/MultilineContextVariable';
+import { ProgrammingLanguage } from './extension/ProgrammingLanguage';
 export {
   BlockType,
   BracketType,
@@ -21,4 +22,5 @@ export {
   LogMessageType,
   Message,
   MultilineContextVariable,
+  ProgrammingLanguage,
 };
