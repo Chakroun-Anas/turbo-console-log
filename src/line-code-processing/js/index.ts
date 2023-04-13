@@ -6,11 +6,8 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   }
   isArgumentOfAnonymousFunction(loc: string, argument: string): boolean {
     if (this.isAnonymousFunction(loc)) {
-      const arrowLeftPart = loc.split('=>')[0];
-      const anonymousFunctionArgs = arrowLeftPart.includes('=')
-        ? arrowLeftPart.split('=')[1]
-        : arrowLeftPart;
-      return anonymousFunctionArgs.includes(argument);
+      const match = loc.match(/(\(.*\)|\w+)\s*=>/);
+      return match !== null && match[1].includes(argument);
     }
     return false;
   }

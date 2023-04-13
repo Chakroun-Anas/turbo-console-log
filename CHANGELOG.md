@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.9.2]
+
+- Fix issue with logging a variable with an anonymous function as the value (#210)
+
 ## [2.9.1]
 
 - Fix issue with logging a function assigned to a variable

@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "2.9.1",
+  "version": "2.9.2",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -152,7 +152,8 @@
     "lint": "eslint src --ext ts",
     "pretest": "yarn run esbuild-base",
     "test-compile": "rm -rf out && tsc -p ./ && mkdir out/test/files && cp -r src/test/files/ out/test/files/",
-    "test": "npm run test-compile && node ./out/test/runTests.js"
+    "test": "npm run test-compile && node ./out/test/runTests.js",
+    "test:unit": "npm run test-compile && mocha --require ts-node/register 'src/test/unit/**/*.test.ts'"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
