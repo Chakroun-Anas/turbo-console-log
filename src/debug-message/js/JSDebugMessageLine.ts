@@ -27,12 +27,12 @@ export class JSDebugMessageLine implements DebugMessageLine {
         return this.functionAssignmentLine(document, selectionLine);
       case LogMessageType.Decorator:
         return (
-          getMultiLineContextVariable(
+          (getMultiLineContextVariable(
             document,
             selectionLine,
             BracketType.PARENTHESIS,
             false,
-          )?.closingBracketLine || selectionLine + 1
+          )?.closingBracketLine || selectionLine) + 1
         );
       case LogMessageType.MultiLineAnonymousFunction:
         return (
@@ -52,12 +52,15 @@ export class JSDebugMessageLine implements DebugMessageLine {
         return this.arrayLine(document, selectionLine);
       case LogMessageType.MultilineParenthesis:
         return (
-          multilineParenthesisVariable?.closingBracketLine || selectionLine + 1
+          (multilineParenthesisVariable?.closingBracketLine || selectionLine) +
+          1
         );
       case LogMessageType.Ternary:
         return this.templateStringLine(document, selectionLine);
       case LogMessageType.MultilineBraces:
-        return multilineBracesVariable?.closingBracketLine || selectionLine + 1;
+        return (
+          (multilineBracesVariable?.closingBracketLine || selectionLine) + 1
+        );
       default:
         return selectionLine + 1;
     }

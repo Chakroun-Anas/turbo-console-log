@@ -31,8 +31,11 @@ export function getMultiLineContextVariable(
     if (nbrOfOpenedBlockType === nbrOfClosedBlockType) {
       return {
         openingBracketLine: currentLineNum,
-        closingBracketLine:
-          closingBracketLine(document, currentLineNum, bracketType) + 1,
+        closingBracketLine: closingBracketLine(
+          document,
+          currentLineNum,
+          bracketType,
+        ),
       };
     }
     currentLineNum--;
