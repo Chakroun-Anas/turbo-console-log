@@ -7,6 +7,7 @@ import {
   Message,
   LogMessage,
   LogBracketMetadata,
+  MultilineContextVariable,
 } from '../../entities';
 import { LineCodeProcessing } from '../../line-code-processing';
 import _, { omit } from 'lodash';
@@ -190,6 +191,40 @@ export class JSDebugMessage extends DebugMessage {
       return;
     }
   }
+  private deepObjectProperty(
+    document: TextDocument,
+    line: number,
+    path = '',
+  ): { path: string; line: number } | null {
+    const lineText = document.lineAt(line).text;
+    const propertyNameRegex = /(\w+):\s*\{/;
+    const propertyNameRegexMatch = propertyNameRegex.exec(lineText);
+    if (propertyNameRegexMatch) {
+      const multilineBracesVariable: MultilineContextVariable | null =
+        getMultiLineContextVariable(document, line, BracketType.CURLY_BRACES);
+      if (multilineBracesVariable) {
+        return this.deepObjectProperty(
+          document,
+          multilineBracesVariable.openingBracketLine,
+          `${propertyNameRegexMatch[1]}.${path}`,
+        );
+      }
+    } else if (
+      this.lineCodeProcessing.isObjectLiteralAssignedToVariable(
+        `${document.lineAt(line).text}${document.lineAt(line + 1).text})}`,
+      )
+    ) {
+      return {
+        path: `${document
+          .lineAt(line)
+          .text.split('=')[0]
+          .replace(/(const|let|var)/, '')
+          .trim()}.${path}`,
+        line: closingBracketLine(document, line, BracketType.CURLY_BRACES),
+      };
+    }
+    return null;
+  }
   msg(
     textEditor: TextEditorEdit,
     document: TextDocument,
@@ -203,43 +238,28 @@ export class JSDebugMessage extends DebugMessage {
       lineOfSelectedVar,
       selectedVar,
     );
-    let isObjectLiteralAssignedToVariable = false;
-    if (LogMessageType.MultilineBraces === logMsg.logMessageType) {
-      isObjectLiteralAssignedToVariable =
-        this.lineCodeProcessing.isObjectLiteralAssignedToVariable(
-          `${
-            document.lineAt(
-              (logMsg.metadata as LogBracketMetadata).openingBracketLine,
-            ).text
-          }${
-            document.lineAt(
-              (logMsg.metadata as LogBracketMetadata).openingBracketLine + 1,
-            ).text
-          }`,
-        );
-    }
+    const deepObjectProperty =
+      LogMessageType.MultilineBraces === logMsg.logMessageType
+        ? this.deepObjectProperty(
+            document,
+            (logMsg.metadata as LogBracketMetadata).openingBracketLine,
+            selectedVar,
+          )
+        : null;
     const lineOfLogMsg: number = this.line(
       document,
-      lineOfSelectedVar,
+      deepObjectProperty ? deepObjectProperty.line : lineOfSelectedVar,
       selectedVar,
       logMsg,
     );
     const spacesBeforeMsg: string = this.spacesBeforeLogMsg(
       document,
-      isObjectLiteralAssignedToVariable
-        ? (logMsg.metadata as LogBracketMetadata).openingBracketLine
-        : lineOfSelectedVar,
+      deepObjectProperty ? deepObjectProperty.line : lineOfSelectedVar,
       lineOfLogMsg,
     );
     const debuggingMsgContent: string = this.constructDebuggingMsgContent(
       document,
-      isObjectLiteralAssignedToVariable
-        ? `${document
-            .lineAt((logMsg.metadata as LogBracketMetadata).openingBracketLine)
-            .text.split('=')[0]
-            .replace(/(const|let|var)/, '')
-            .trim()}.${selectedVar}`
-        : selectedVar,
+      deepObjectProperty ? deepObjectProperty.path : selectedVar,
       lineOfSelectedVar,
       lineOfLogMsg,
       omit(extensionProperties, [
