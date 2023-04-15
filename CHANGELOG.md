@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.9.3]
+
+- Fix issue with logging a deep object property 🥳 (#211)
+
 ## [2.9.2]
 
 - Fix issue with logging a variable with an anonymous function as the value (#210)
