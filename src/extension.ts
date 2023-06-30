@@ -5,10 +5,18 @@ import { Command, ExtensionProperties } from './entities';
 import { LineCodeProcessing } from './line-code-processing';
 import { JSLineCodeProcessing } from './line-code-processing/js';
 import { getAllCommands } from './commands/';
+import { DebugMessageLine } from './debug-message/DebugMessageLine';
+import { JSDebugMessageLine } from './debug-message/js/JSDebugMessageLine';
 
 export function activate(): void {
   const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
-  const jsDebugMessage: DebugMessage = new JSDebugMessage(jsLineCodeProcessing);
+  const debugMessageLine: DebugMessageLine = new JSDebugMessageLine(
+    jsLineCodeProcessing,
+  );
+  const jsDebugMessage: DebugMessage = new JSDebugMessage(
+    jsLineCodeProcessing,
+    debugMessageLine,
+  );
   const config: vscode.WorkspaceConfiguration =
     vscode.workspace.getConfiguration('turboConsoleLog');
   const properties: ExtensionProperties = getExtensionProperties(config);

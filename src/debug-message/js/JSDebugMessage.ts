@@ -45,7 +45,7 @@ export class JSDebugMessage extends DebugMessage {
   jsDebugMessageAnonymous: JSDebugMessageAnonymous;
   constructor(
     lineCodeProcessing: LineCodeProcessing,
-    debugMessageLine: DebugMessageLine = new JSDebugMessageLine(),
+    debugMessageLine: DebugMessageLine,
   ) {
     super(lineCodeProcessing, debugMessageLine);
     this.jsDebugMessageAnonymous = new JSDebugMessageAnonymous(

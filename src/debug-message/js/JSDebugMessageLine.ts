@@ -2,8 +2,13 @@ import { TextDocument } from 'vscode';
 import { BracketType, LogMessage, LogMessageType } from '../../entities';
 import { DebugMessageLine } from '../DebugMessageLine';
 import { getMultiLineContextVariable } from '../../utilities';
+import { LineCodeProcessing } from '../../line-code-processing';
 
 export class JSDebugMessageLine implements DebugMessageLine {
+  lineCodeProcessing: LineCodeProcessing;
+  constructor(lineCodeProcessing: LineCodeProcessing) {
+    this.lineCodeProcessing = lineCodeProcessing;
+  }
   line(
     document: TextDocument,
     selectionLine: number,
@@ -58,9 +63,16 @@ export class JSDebugMessageLine implements DebugMessageLine {
       case LogMessageType.Ternary:
         return this.templateStringLine(document, selectionLine);
       case LogMessageType.MultilineBraces:
-        return (
-          (multilineBracesVariable?.closingBracketLine || selectionLine) + 1
-        );
+        // Deconstructing assignment
+        if (
+          multilineBracesVariable?.closingBracketLine &&
+          this.lineCodeProcessing.isAssignedToVariable(
+            document.lineAt(multilineBracesVariable.closingBracketLine).text,
+          )
+        ) {
+          return multilineBracesVariable.closingBracketLine + 1;
+        }
+        return selectionLine + 1;
       default:
         return selectionLine + 1;
     }
