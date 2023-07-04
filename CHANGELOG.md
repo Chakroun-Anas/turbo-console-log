@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.9.6]
+
+- Refined ES6 object literal assignment detection for improved accuracy.
+
 ## [2.9.5]
 
 - Fix incorrect log line in the context of single-line and multi-line comments in object literal assignment check

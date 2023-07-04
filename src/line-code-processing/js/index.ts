@@ -25,8 +25,11 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   }
   isObjectLiteralAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
-    return /(const|let|var)[a-zA-Z0-9]*.*={.+:.+/.test(locWithoutWhiteSpaces);
+    return /(const|let|var)\w+(:?.*)={(\w+(\(\)|:?.*))/g.test(
+      locWithoutWhiteSpaces,
+    );
   }
+
   isArrayAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
     return /(const|let|var).*=\[.*/.test(locWithoutWhiteSpaces);

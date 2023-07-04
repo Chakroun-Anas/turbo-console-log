@@ -13,7 +13,6 @@ export default (): void => {
                     };`,
         `var myObject = { sProp: 'some string value', numProp: 2, bProp: false};`,
         `var Swapper = {
-                        // an array literal
                         images: ["smile.gif", "grim.gif", "frown.gif", "bomb.gif"],
                         pos: { // nested object literal
                             x: 40,
@@ -40,6 +39,8 @@ export default (): void => {
                   x: SomeOperator.y(p),
                 }),
               };`,
+        'export const platform={clear(){',
+        'let obj = {x, y, z};',
       ];
       objLiteralAssignmentLOCs.forEach((objLiteralAssignmentLOC) => {
         expect(
