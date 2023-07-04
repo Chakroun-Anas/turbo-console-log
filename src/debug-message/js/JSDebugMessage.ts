@@ -13,7 +13,6 @@ import { LineCodeProcessing } from '../../line-code-processing';
 import _, { omit } from 'lodash';
 import { DebugMessage } from '../DebugMessage';
 import { DebugMessageLine } from '../DebugMessageLine';
-import { JSDebugMessageLine } from './JSDebugMessageLine';
 import {
   getMultiLineContextVariable,
   closingBracketLine,
@@ -345,15 +344,52 @@ export class JSDebugMessage extends DebugMessage {
             isChecked: false,
           };
         }
-        const nextLineText: string = document
-          .lineAt(selectionLine + 1)
+
+        let nextLineIndex = selectionLine + 1;
+        let nextLineText = document
+          .lineAt(nextLineIndex)
           .text.replace(/\s/g, '');
+
+        // Skip comment-only lines
+        while (
+          nextLineText.trim().startsWith('//') ||
+          nextLineText.trim().startsWith('/*')
+        ) {
+          if (nextLineText.trim().startsWith('/*')) {
+            // Skip lines until the end of the multi-line comment
+            while (!nextLineText.trim().endsWith('*/')) {
+              nextLineIndex++;
+              if (nextLineIndex >= document.lineCount) {
+                return {
+                  isChecked: false,
+                };
+              }
+              nextLineText = document
+                .lineAt(nextLineIndex)
+                .text.replace(/\s/g, '');
+            }
+            nextLineIndex++;
+          } else {
+            nextLineIndex++;
+          }
+
+          if (nextLineIndex >= document.lineCount) {
+            return {
+              isChecked: false,
+            };
+          }
+          nextLineText = document.lineAt(nextLineIndex).text.replace(/\s/g, '');
+        }
+
+        const combinedText = `${currentLineText}${nextLineText}`;
         return {
-          isChecked: this.lineCodeProcessing.isObjectLiteralAssignedToVariable(
-            `${currentLineText}\n${nextLineText}`,
-          ),
+          isChecked:
+            this.lineCodeProcessing.isObjectLiteralAssignedToVariable(
+              combinedText,
+            ),
         };
       },
+
       [LogMessageType.Decorator]: () => {
         return {
           isChecked: /^@[a-zA-Z0-9]{1,}(.*)[a-zA-Z0-9]{1,}/.test(
