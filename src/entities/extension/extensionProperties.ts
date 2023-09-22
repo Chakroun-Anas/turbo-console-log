@@ -2,6 +2,7 @@ export type ExtensionProperties = {
   wrapLogMessage: boolean;
   logMessagePrefix: string;
   logMessageSuffix: string;
+  includeDirectoriesFromEnd: number;
   addSemicolonInTheEnd: boolean;
   insertEnclosingClass: boolean;
   insertEnclosingFunction: boolean;

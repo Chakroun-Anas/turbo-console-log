@@ -34,6 +34,7 @@ function getExtensionProperties(
   return {
     wrapLogMessage: workspaceConfig.wrapLogMessage ?? false,
     logMessagePrefix: workspaceConfig.logMessagePrefix ?? '🚀',
+    includeDirectoriesFromEnd: workspaceConfig.includeDirectoriesFromEnd ?? 0,
     logMessageSuffix: workspaceConfig.logMessageSuffix ?? ':',
     addSemicolonInTheEnd: workspaceConfig.addSemicolonInTheEnd ?? false,
     insertEnclosingClass: workspaceConfig.insertEnclosingClass ?? true,

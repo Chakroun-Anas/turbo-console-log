@@ -36,6 +36,8 @@ Properties:
 
 - turboConsoleLog.logMessagePrefix (string): The prefix of the log message (default one is 🚀 ).
 
+- turboConsoleLog.includeDirectoriesFromEnd (number): Whether to include directories from end of path (default is -1, meaning only the filename, -2 means the parent directory and the filename and so on..).
+
 - turboConsoleLog.logMessageSuffix (string): The suffix of the log message (default one is `:` ).
 
 - turboConsoleLog.addSemicolonInTheEnd (boolean): Whether to put a semicolon in the end of the log message or not.

@@ -64,8 +64,7 @@ export class JSDebugMessage extends DebugMessage {
         lineOfLogMsg >= document.lineCount ? document.lineCount : lineOfLogMsg,
         0,
       ),
-      `${insertEmptyLineBeforeLogMessage ? '\n' : ''}${
-        lineOfLogMsg === document.lineCount ? '\n' : ''
+      `${insertEmptyLineBeforeLogMessage ? '\n' : ''}${lineOfLogMsg === document.lineCount ? '\n' : ''
       }${debuggingMsg}\n${insertEmptyLineAfterLogMessage ? '\n' : ''}`,
     );
   }
@@ -94,13 +93,11 @@ export class JSDebugMessage extends DebugMessage {
     debuggingMsgContent: string,
     spacesBeforeMsg: string,
   ): string {
-    const wrappingMsg = `console.${extensionProperties.logType}(${
-      extensionProperties.quote
-    }${extensionProperties.logMessagePrefix} ${'-'.repeat(
-      debuggingMsgContent.length - 16,
-    )}${extensionProperties.logMessagePrefix}${extensionProperties.quote})${
-      extensionProperties.addSemicolonInTheEnd ? ';' : ''
-    }`;
+    const wrappingMsg = `console.${extensionProperties.logType}(${extensionProperties.quote
+      }${extensionProperties.logMessagePrefix} ${'-'.repeat(
+        debuggingMsgContent.length - 16,
+      )}${extensionProperties.logMessagePrefix}${extensionProperties.quote})${extensionProperties.addSemicolonInTheEnd ? ';' : ''
+      }`;
     const debuggingMsg: string = extensionProperties.wrapLogMessage
       ? `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsgContent}\n${spacesBeforeMsg}${wrappingMsg}`
       : `${spacesBeforeMsg}${debuggingMsgContent}`;
@@ -116,9 +113,8 @@ export class JSDebugMessage extends DebugMessage {
       'wrapLogMessage' | 'insertEmptyLineAfterLogMessage'
     >,
   ): string {
-    const fileName = document.fileName.includes('/')
-      ? document.fileName.split('/')[document.fileName.split('/').length - 1]
-      : document.fileName.split('\\')[document.fileName.split('\\').length - 1];
+
+    const fileName: string = this.getFileName(document, extensionProperties.includeDirectoriesFromEnd)
     const funcThatEncloseTheVar: string = this.enclosingBlockName(
       document,
       lineOfSelectedVar,
@@ -132,38 +128,39 @@ export class JSDebugMessage extends DebugMessage {
     const semicolon: string = extensionProperties.addSemicolonInTheEnd
       ? ';'
       : '';
-    return `${
-      extensionProperties.logFunction !== 'log'
-        ? extensionProperties.logFunction
-        : `console.${extensionProperties.logType}`
-    }(${extensionProperties.quote}${extensionProperties.logMessagePrefix}${
-      extensionProperties.logMessagePrefix.length !== 0 &&
-      extensionProperties.logMessagePrefix !==
+    return `${extensionProperties.logFunction !== 'log'
+      ? extensionProperties.logFunction
+      : `console.${extensionProperties.logType}`
+      }(${extensionProperties.quote}${extensionProperties.logMessagePrefix}${extensionProperties.logMessagePrefix.length !== 0 &&
+        extensionProperties.logMessagePrefix !==
         `${extensionProperties.delimiterInsideMessage} `
         ? ` ${extensionProperties.delimiterInsideMessage} `
         : ''
-    }${
-      extensionProperties.includeFileNameAndLineNum
-        ? `file: ${fileName}:${
-            lineOfLogMsg +
-            (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
-          } ${extensionProperties.delimiterInsideMessage} `
+      }${extensionProperties.includeFileNameAndLineNum
+        ? `file: ${fileName}:${lineOfLogMsg +
+        (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
+        } ${extensionProperties.delimiterInsideMessage} `
         : ''
-    }${
-      extensionProperties.insertEnclosingClass
+      }${extensionProperties.insertEnclosingClass
         ? classThatEncloseTheVar.length > 0
           ? `${classThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
           : ``
         : ''
-    }${
-      extensionProperties.insertEnclosingFunction
+      }${extensionProperties.insertEnclosingFunction
         ? funcThatEncloseTheVar.length > 0
           ? `${funcThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
           : ''
         : ''
-    }${selectedVar}${extensionProperties.logMessageSuffix}${
-      extensionProperties.quote
-    }, ${selectedVar})${semicolon}`;
+      }${selectedVar}${extensionProperties.logMessageSuffix}${extensionProperties.quote
+      }, ${selectedVar})${semicolon}`;
+  }
+  private getFileName(document: TextDocument, includeDirectoryLevel: number) {
+    const sections = document.fileName.includes('/')
+      ? document.fileName.split('/')
+      : document.fileName.split('\\');
+
+    const filename = sections.slice(sections.length > (includeDirectoryLevel * -1) ? includeDirectoryLevel : -1).join('/');
+    return filename;
   }
 
   private emptyBlockDebuggingMsg(
@@ -183,8 +180,7 @@ export class JSDebugMessage extends DebugMessage {
           logMsgLine >= document.lineCount ? document.lineCount : logMsgLine,
           0,
         ),
-        `${textBeforeClosedFunctionParenthesis}) {\n${
-          logMsgLine === document.lineCount ? '\n' : ''
+        `${textBeforeClosedFunctionParenthesis}) {\n${logMsgLine === document.lineCount ? '\n' : ''
         }${spacesBeforeMsg}${debuggingMsg}\n${spacesBeforeMsg}}\n`,
       );
       return;
@@ -240,10 +236,10 @@ export class JSDebugMessage extends DebugMessage {
     const deepObjectProperty =
       LogMessageType.MultilineBraces === logMsg.logMessageType
         ? this.deepObjectProperty(
-            document,
-            (logMsg.metadata as LogBracketMetadata).openingBracketLine,
-            selectedVar,
-          )
+          document,
+          (logMsg.metadata as LogBracketMetadata).openingBracketLine,
+          selectedVar,
+        )
         : null;
     const lineOfLogMsg: number = this.line(
       document,
@@ -277,9 +273,9 @@ export class JSDebugMessage extends DebugMessage {
       const emptyBlockLine =
         logMsg.logMessageType === LogMessageType.MultilineParenthesis
           ? document.lineAt(
-              (logMsg.metadata as LogParenthesisMetadata)
-                .closingParenthesisLine,
-            )
+            (logMsg.metadata as LogParenthesisMetadata)
+              .closingParenthesisLine,
+          )
           : document.lineAt((logMsg.metadata as NamedFunctionMetadata).line);
       this.emptyBlockDebuggingMsg(
         document,
@@ -521,11 +517,11 @@ export class JSDebugMessage extends DebugMessage {
             if (
               lineOfSelectedVar > currentLineNum &&
               lineOfSelectedVar <
-                closingBracketLine(
-                  document,
-                  currentLineNum,
-                  BracketType.CURLY_BRACES,
-                )
+              closingBracketLine(
+                document,
+                currentLineNum,
+                BracketType.CURLY_BRACES,
+              )
             ) {
               return `${this.lineCodeProcessing.getClassName(currentLineText)}`;
             }
@@ -543,11 +539,11 @@ export class JSDebugMessage extends DebugMessage {
             if (
               lineOfSelectedVar >= currentLineNum &&
               lineOfSelectedVar <
-                closingBracketLine(
-                  document,
-                  currentLineNum,
-                  BracketType.CURLY_BRACES,
-                )
+              closingBracketLine(
+                document,
+                currentLineNum,
+                BracketType.CURLY_BRACES,
+              )
             ) {
               if (
                 this.lineCodeProcessing.getFunctionName(currentLineText)
