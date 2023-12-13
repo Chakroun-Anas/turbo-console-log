@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.9.8]
+
+- Bundle size optimized following the release of recent version `2.9.7`
+
 ## [2.9.7]
 
 - This update enhances the handling of destructuring assignments, ensuring that log messages are inserted in the correct line when logging variables within these structures.
