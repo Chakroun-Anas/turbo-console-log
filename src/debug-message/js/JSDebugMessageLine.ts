@@ -64,12 +64,7 @@ export class JSDebugMessageLine implements DebugMessageLine {
         return this.templateStringLine(document, selectionLine);
       case LogMessageType.MultilineBraces:
         // Deconstructing assignment
-        if (
-          multilineBracesVariable?.closingBracketLine &&
-          this.lineCodeProcessing.isAssignedToVariable(
-            document.lineAt(multilineBracesVariable.closingBracketLine).text,
-          )
-        ) {
+        if (multilineBracesVariable?.closingBracketLine) {
           return multilineBracesVariable.closingBracketLine + 1;
         }
         return selectionLine + 1;

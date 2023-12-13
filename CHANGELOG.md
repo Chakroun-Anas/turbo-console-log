@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.9.7]
+
+- This update enhances the handling of destructuring assignments, ensuring that log messages are inserted in the correct line when logging variables within these structures.
+
 ## [2.9.6]
 
 - Refined ES6 object literal assignment detection for improved accuracy.
