@@ -66,7 +66,7 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
     );
   }
   isFunctionAssignedToVariable(loc: string): boolean {
-    return /(const|let|var).*\s*=.*\(.*/.test(loc);
+    return /(const|let|var)?.*\s*=.*\(.*/.test(loc);
   }
   isFunctionDeclaration(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');

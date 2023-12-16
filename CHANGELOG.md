@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.9.9]
+
+- Better detection of function assignment to a variable
+
 ## [2.9.8]
 
 - Bundle size optimized following the release of recent version `2.9.7`

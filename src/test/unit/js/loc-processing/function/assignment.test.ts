@@ -21,6 +21,7 @@ export default (): void => {
         `const myVar =  (fullName) => {
               return 'hello';
             }`,
+        'onDragStart={(start: DragStart, provided: ResponderProvided) => {',
       ];
       functionsAssignmentsLOCs.forEach((functionsAssignmentsLOC) => {
         expect(

@@ -232,11 +232,7 @@ export class JSDebugMessage extends DebugMessage {
     tabSize: number,
     extensionProperties: ExtensionProperties,
   ): void {
-    const logMsg: LogMessage = this.logMessage(
-      document,
-      lineOfSelectedVar,
-      selectedVar,
-    );
+    const logMsg: LogMessage = this.logMessage(document, lineOfSelectedVar);
     const deepObjectProperty =
       LogMessageType.MultilineBraces === logMsg.logMessageType
         ? this.deepObjectProperty(
@@ -316,11 +312,7 @@ export class JSDebugMessage extends DebugMessage {
       extensionProperties.insertEmptyLineAfterLogMessage,
     );
   }
-  logMessage(
-    document: TextDocument,
-    selectionLine: number,
-    selectedVar: string,
-  ): LogMessage {
+  logMessage(document: TextDocument, selectionLine: number): LogMessage {
     const currentLineText: string = document.lineAt(selectionLine).text;
     const multilineParenthesisVariable = getMultiLineContextVariable(
       document,
@@ -468,7 +460,7 @@ export class JSDebugMessage extends DebugMessage {
           isChecked:
             this.lineCodeProcessing.isFunctionAssignedToVariable(
               `${currentLineText}`,
-            ) && currentLineText.split('=')[0].includes(selectedVar),
+            ) && multilineParenthesisVariable === null,
         };
       },
       [LogMessageType.MultiLineAnonymousFunction]: () => {
