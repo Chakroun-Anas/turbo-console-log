@@ -29,7 +29,11 @@ export class JSDebugMessageLine implements DebugMessageLine {
       case LogMessageType.ObjectLiteral:
         return this.objectLiteralLine(document, selectionLine);
       case LogMessageType.NamedFunctionAssignment:
-        return this.functionAssignmentLine(document, selectionLine);
+        return this.functionAssignmentLine(
+          document,
+          selectionLine,
+          selectedVar,
+        );
       case LogMessageType.Decorator:
         return (
           (getMultiLineContextVariable(
@@ -98,9 +102,15 @@ export class JSDebugMessageLine implements DebugMessageLine {
   private functionAssignmentLine(
     document: TextDocument,
     selectionLine: number,
+    selectedVar: string,
   ): number {
     const currentLineText = document.lineAt(selectionLine).text;
     if (/{/.test(currentLineText)) {
+      if (
+        document.lineAt(selectionLine).text.split('=')[1].includes(selectedVar)
+      ) {
+        return selectionLine + 1;
+      }
       return (
         this.closingElementLine(
           document,

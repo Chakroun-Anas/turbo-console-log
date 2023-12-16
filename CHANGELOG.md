@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.9.10]
+
+- Fix issue with logging a parameter of a function assigned to a variable
+
 ## [2.9.9]
 
 - Better detection of function assignment to a variable

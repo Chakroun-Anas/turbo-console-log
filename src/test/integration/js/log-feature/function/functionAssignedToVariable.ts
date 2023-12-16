@@ -102,7 +102,36 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            expectedLogMessageLine - 1,
+            expectedLogMessageLine,
+          ]),
+        );
+        expect(
+          /console\.log\(.*/.test(
+            textDocument.lineAt(expectedLogMessageLine).text,
+          ),
+        ).to.equal(true);
+      }
+    });
+    it('Should log a parameter of a function assigned to a variable', async () => {
+      const { activeTextEditor } = vscode.window;
+      expectActiveTextEditorWithFile(
+        activeTextEditor,
+        'functionAssignedToVariable.ts',
+      );
+      const expectedLogMessageLine = zeroBasedLine({ visualLine: 19 });
+      if (activeTextEditor) {
+        const textDocument = activeTextEditor.document;
+        activeTextEditor.selection = new vscode.Selection(
+          new ZeroBasedPosition(18, 22),
+          new ZeroBasedPosition(18, 27),
+        );
+        await vscode.commands.executeCommand(
+          'turboConsoleLog.displayLogMessage',
+          [],
+        );
+        await Promise.all(
+          documentLinesChanged(activeTextEditor.document, [
+            expectedLogMessageLine,
           ]),
         );
         expect(
