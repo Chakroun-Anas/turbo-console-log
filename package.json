@@ -33,6 +33,11 @@
           "default": "🚀",
           "description": "The prefix of the log message."
         },
+        "turboConsoleLog.includeDirectoriesFromEnd": {
+          "type": "number",
+          "default": "-1",
+          "description": "Whether to include directories from end of path"
+        },
         "turboConsoleLog.logMessageSuffix": {
           "type": "string",
           "default": ":",
