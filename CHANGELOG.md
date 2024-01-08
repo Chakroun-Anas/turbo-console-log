@@ -2,6 +2,11 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.10.0]
+
+- Launch of Turbo Console Log new website (https://www.turboconsolelog.io) 🎉
+- Include file name and line number setting is now disabled by default
+
 ## [2.9.10]
 
 - Fix issue with logging a parameter of a function assigned to a variable
