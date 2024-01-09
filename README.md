@@ -12,7 +12,7 @@ Since the extension is free and open source, we need your support to continue de
 
 ## Core Features
 
-Full documentation of the core features can be found in the official website: https://www.turboconsolelog.io/documentation?activeSection=features
+Full documentation of the core features can be found in the official website: https://www.turboconsolelog.io/documentation/features
 
 ### I) Insert a meaningful log message
 
@@ -30,29 +30,29 @@ The log function and the content of the log message can be customized in the ext
 
 Multiple cursor selection is also supported.
 
-[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation?activeSection=features&activeSubSection=insert-log-message)
+[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation/features/insert-log-message)
 
 ### II) Comment all log messages, inserted by the extension, from the current document
 
 All it takes to comment all log messages, inserted by the extension, from the current document is to press alt + shift + c (Windows) or option + shift + c (Mac)
 
-[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation?activeSection=features&activeSubSection=comment-inserted-log-messages)
+[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation/features/comment-inserted-log-messages)
 
 ### III) Uncomment all log messages, inserted by the extension, from the current document
 
 All it takes to uncomment all log messages, inserted by the extension, from the current document is to press alt + shift + u (Windows) or option + shift + u (Mac)
 
-[<u>See It In Action</u>](https://turboconsolelog.io/documentation?activeSection=features&activeSubSection=uncomment-log-messages)
+[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation/features/uncomment-log-messages)
 
 ### IV) Delete all log messages, inserted by the extension, from the current document
 
 All it takes to delete all log messages, inserted by the extension, from the current document is to press alt + shift + d (Windows) or option + shift + d (Mac)
 
-[<u>See It In Action</u>](https://turboconsolelog.io/documentation?activeSection=features&activeSubSection=delete-log-messages)
+[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation/features/delete-log-messages)
 
 ## Settings
 
-Full documentation of the settings can be found in the official website: https://www.turboconsolelog.io/documentation?activeSection=settings
+Full documentation of the settings can be found in the official website: https://www.turboconsolelog.io/documentation/settings
 
 Properties:
 
@@ -78,8 +78,8 @@ https://www.turboconsolelog.io/roadmap
 
 ## Articles
 
-- [<u>Introducing Our New Website</u>](https://turboconsolelog.io/articles?articleId=introducing-new-website)
-- [<u>Motivation behind Turbo Console Log</u>](https://turboconsolelog.io/articles?articleId=motivation-behind-tcl)
+- [<u>Introducing Our New Website</u>](https://www.turboconsolelog.io/articles/introducing-new-website)
+- [<u>Motivation behind Turbo Console Log</u>](https://www.turboconsolelog.io/articles/motivation-behind-tcl)
 
 ## Contact
 

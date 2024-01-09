@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.10.3]
+
+- Update README website links
+
 ## [2.10.2]
 
 - Fix README
