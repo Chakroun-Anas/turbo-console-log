@@ -1,4 +1,19 @@
-# Official website
+<style>
+table th:first-of-type {
+    width: 20%;
+}
+table th:nth-of-type(2) {
+    width: 60%;
+}
+table th:nth-of-type(3) {
+    width: 10%;
+}
+table th:nth-of-type(4) {
+    width: 10%;
+}
+</style>
+
+# Official Website
 
 https://www.turboconsolelog.io
 
@@ -56,21 +71,21 @@ Full documentation of the settings can be found in the official website: https:/
 
 Properties:
 
-| Feature                              | Description                                                                                                                | Setting                                         | Default     |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ----------- |
-| Custom Prefix                        | The prefix of the log message                                                                                              | turboConsoleLog.logMessagePrefix                | 🚀          |
-| Custom suffix                        | The suffix of the log message                                                                                              | turboConsoleLog.logMessageSuffix                | :           |
-| Log Type                             | The type of the log message                                                                                                | turboConsoleLog.logType                         | log         |
-| Custom Log Function                  | Custom log function to use in the inserted log message, when specified logType property will be ignored                    | turboConsoleLog.logFunction                     | console.log |
-| Delimiter Inside Message             | The delimiter that will separate the different log message elements (file name, line number, class, function and variable) | turboConsoleLog.delimiterInsideMessage          | ~           |
-| Quote                                | Double quotes ("") or single quotes ('')                                                                                   | turboConsoleLog.quote                           | "           |
-| Add Semicolon In The End             | Whether to put a semicolon in the end of the log message or not                                                            | turboConsoleLog.addSemicolonInTheEnd            | true        |
-| Insert Enclosing Class               | Whether to insert or not the enclosing class of the selected variable in the log message                                   | turboConsoleLog.insertEnclosingClass            | true        |
-| Insert Enclosing Function            | Whether to insert or not the enclosing function of the selected variable in the log message                                | turboConsoleLog.insertEnclosingFunction         | true        |
-| Include File Name And Line Number    | Whether to include the file name and the line number of the log message                                                    | turboConsoleLog.includeFileNameAndLineNum       | true        |
-| Wrap Log Message                     | Whether to wrap the log message or not                                                                                     | turboConsoleLog.wrapLogMessage                  | true        |
-| Insert Empty Line Before Log Message | Whether to insert an empty line before the log message or not                                                              | turboConsoleLog.insertEmptyLineBeforeLogMessage | true        |
-| Insert Empty Line After Log Message  | Whether to insert an empty line after the log message or not                                                               | turboConsoleLog.insertEmptyLineAfterLogMessage  | true        |
+| Feature                              | Description                                                                                                                 | Setting                         | Default     |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ----------- |
+| Custom Prefix                        | The prefix of the log message                                                                                               | logMessagePrefix                | 🚀          |
+| Custom Suffix                        | The suffix of the log message                                                                                               | logMessageSuffix                | :           |
+| Log Type                             | The type of the log message                                                                                                 | logType                         | log         |
+| Custom Log Function                  | Custom log function to use in the inserted log message, when specified logType property will be ignored                     | logFunction                     | console.log |
+| Delimiter Inside Message             | The delimiter that will separate the different log message elements (file name, line number, class, function, and variable) | delimiterInsideMessage          | ~           |
+| Quote                                | Double quotes ("") or single quotes ('')                                                                                    | quote                           | "           |
+| Add Semicolon In The End             | Whether to put a semicolon at the end of the log message or not                                                             | addSemicolonInTheEnd            | true        |
+| Insert Enclosing Class               | Whether to insert or not the enclosing class of the selected variable in the log message                                    | insertEnclosingClass            | true        |
+| Insert Enclosing Function            | Whether to insert or not the enclosing function of the selected variable in the log message                                 | insertEnclosingFunction         | true        |
+| Include File Name And Line Number    | Whether to include the file name and the line number of the log message                                                     | includeFileNameAndLineNum       | true        |
+| Wrap Log Message                     | Whether to wrap the log message or not                                                                                      | wrapLogMessage                  | true        |
+| Insert Empty Line Before Log Message | Whether to insert an empty line before the log message or not                                                               | insertEmptyLineBeforeLogMessage | true        |
+| Insert Empty Line After Log Message  | Whether to insert an empty line after the log message or not                                                                | insertEmptyLineAfterLogMessage  | true        |
 
 ## Roadmap
 
@@ -79,17 +94,17 @@ https://www.turboconsolelog.io/roadmap
 ## Articles
 
 - [<u>Introducing Our New Website</u>](https://turboconsolelog.io/articles?articleId=introducing-new-website)
-- [<u>Introducing Our New Website</u>](https://turboconsolelog.io/articles?articleId=motivation-behind-tcl)
+- [<u>Motivation behind Turbo Console Log</u>](https://turboconsolelog.io/articles?articleId=motivation-behind-tcl)
 
 ## Contact
 
-- Support: support@turboconsolelog.io
-- Feedback: feedback@turboconsolelog.io
-- Sponsorship: sponsorship@turboconsolelog.io
+- Support: [support@turboconsolelog.io](mailto:support@turboconsolelog.io)
+- Feedback: [feedback@turboconsolelog.io](mailto:feedback@turboconsolelog.io)
+- Sponsorship: [sponsorship@turboconsolelog.io](mailto:sponsorship@turboconsolelog.io)
 
 ## Release Notes
 
-See the ChangeLog file for details.
+See the [<u>Changelog file</u>](https://marketplace.visualstudio.com/items/ChakrounAnas.turbo-console-log/changelog) for details.
 
 ## Participate
 
