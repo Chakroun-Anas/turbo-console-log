@@ -3,7 +3,7 @@ import Mocha, { it, describe } from 'mocha';
 import { expect } from 'chai';
 import {
   openDocument,
-  ZeroBasedPosition,
+  NaturalEditorPosition,
   zeroBasedLine,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
@@ -34,8 +34,8 @@ export default (): void => {
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new ZeroBasedPosition(6, 9),
-            new ZeroBasedPosition(6, 21),
+            new NaturalEditorPosition(6, 9),
+            new NaturalEditorPosition(6, 21),
           ),
         ];
         await vscode.commands.executeCommand(
@@ -55,8 +55,8 @@ export default (): void => {
         ).to.equal(true);
         activeTextEditor.selections = [
           new vscode.Selection(
-            new ZeroBasedPosition(8, 9),
-            new ZeroBasedPosition(8, 29),
+            new NaturalEditorPosition(8, 9),
+            new NaturalEditorPosition(8, 29),
           ),
         ];
         await vscode.commands.executeCommand(

@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import {
   openDocument,
   zeroBasedLine,
-  ZeroBasedPosition,
+  NaturalEditorPosition,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
 } from '../../../helpers';
@@ -36,8 +36,8 @@ export default (): void => {
           if (activeTextEditor) {
             activeTextEditor.selections = [
               new vscode.Selection(
-                new ZeroBasedPosition(3, 29),
-                new ZeroBasedPosition(3, 37),
+                new NaturalEditorPosition(3, 29),
+                new NaturalEditorPosition(3, 37),
               ),
             ];
             await vscode.commands.executeCommand(
@@ -74,8 +74,8 @@ export default (): void => {
           if (activeTextEditor) {
             activeTextEditor.selections = [
               new vscode.Selection(
-                new ZeroBasedPosition(5, 14),
-                new ZeroBasedPosition(5, 20),
+                new NaturalEditorPosition(5, 14),
+                new NaturalEditorPosition(5, 20),
               ),
             ];
             await vscode.commands.executeCommand(
@@ -117,8 +117,8 @@ export default (): void => {
           if (activeTextEditor) {
             activeTextEditor.selections = [
               new vscode.Selection(
-                new ZeroBasedPosition(8, 14),
-                new ZeroBasedPosition(8, 18),
+                new NaturalEditorPosition(8, 14),
+                new NaturalEditorPosition(8, 18),
               ),
             ];
             await vscode.commands.executeCommand(
@@ -163,8 +163,8 @@ export default (): void => {
         if (activeTextEditor) {
           activeTextEditor.selections = [
             new vscode.Selection(
-              new ZeroBasedPosition(12, 16),
-              new ZeroBasedPosition(12, 22),
+              new NaturalEditorPosition(12, 16),
+              new NaturalEditorPosition(12, 22),
             ),
           ];
           await vscode.commands.executeCommand(
@@ -206,8 +206,8 @@ export default (): void => {
         if (activeTextEditor) {
           activeTextEditor.selections = [
             new vscode.Selection(
-              new ZeroBasedPosition(19, 16),
-              new ZeroBasedPosition(19, 22),
+              new NaturalEditorPosition(19, 16),
+              new NaturalEditorPosition(19, 22),
             ),
           ];
           await vscode.commands.executeCommand(
@@ -249,8 +249,8 @@ export default (): void => {
         if (activeTextEditor) {
           activeTextEditor.selections = [
             new vscode.Selection(
-              new ZeroBasedPosition(27, 18),
-              new ZeroBasedPosition(27, 24),
+              new NaturalEditorPosition(27, 18),
+              new NaturalEditorPosition(27, 24),
             ),
           ];
           await vscode.commands.executeCommand(
@@ -292,8 +292,8 @@ export default (): void => {
         if (activeTextEditor) {
           activeTextEditor.selections = [
             new vscode.Selection(
-              new ZeroBasedPosition(35, 18),
-              new ZeroBasedPosition(35, 24),
+              new NaturalEditorPosition(35, 18),
+              new NaturalEditorPosition(35, 24),
             ),
           ];
           await vscode.commands.executeCommand(

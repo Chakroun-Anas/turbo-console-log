@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import {
   openDocument,
   zeroBasedLine,
-  ZeroBasedPosition,
+  NaturalEditorPosition,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
 } from '../../../helpers';
@@ -35,8 +35,8 @@ export default (): void => {
       if (activeTextEditor) {
         const textDocument = activeTextEditor.document;
         activeTextEditor.selection = new vscode.Selection(
-          new ZeroBasedPosition(3, 7),
-          new ZeroBasedPosition(3, 20),
+          new NaturalEditorPosition(3, 7),
+          new NaturalEditorPosition(3, 20),
         );
         await vscode.commands.executeCommand(
           'turboConsoleLog.displayLogMessage',
@@ -64,8 +64,8 @@ export default (): void => {
       if (activeTextEditor) {
         const textDocument = activeTextEditor.document;
         activeTextEditor.selection = new vscode.Selection(
-          new ZeroBasedPosition(7, 7),
-          new ZeroBasedPosition(7, 24),
+          new NaturalEditorPosition(7, 7),
+          new NaturalEditorPosition(7, 24),
         );
         await vscode.commands.executeCommand(
           'turboConsoleLog.displayLogMessage',
@@ -93,8 +93,8 @@ export default (): void => {
       if (activeTextEditor) {
         const textDocument = activeTextEditor.document;
         activeTextEditor.selection = new vscode.Selection(
-          new ZeroBasedPosition(11, 7),
-          new ZeroBasedPosition(11, 34),
+          new NaturalEditorPosition(11, 7),
+          new NaturalEditorPosition(11, 34),
         );
         await vscode.commands.executeCommand(
           'turboConsoleLog.displayLogMessage',
@@ -122,8 +122,8 @@ export default (): void => {
       if (activeTextEditor) {
         const textDocument = activeTextEditor.document;
         activeTextEditor.selection = new vscode.Selection(
-          new ZeroBasedPosition(18, 22),
-          new ZeroBasedPosition(18, 27),
+          new NaturalEditorPosition(18, 22),
+          new NaturalEditorPosition(18, 27),
         );
         await vscode.commands.executeCommand(
           'turboConsoleLog.displayLogMessage',

@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as vscode from 'vscode';
 import {
   openDocument,
-  ZeroBasedPosition,
+  NaturalEditorPosition,
   zeroBasedLine,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
@@ -31,8 +31,8 @@ export default (): void => {
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new ZeroBasedPosition(3, 5),
-            new ZeroBasedPosition(3, 8),
+            new NaturalEditorPosition(3, 5),
+            new NaturalEditorPosition(3, 8),
           ),
         ];
         await vscode.commands.executeCommand(
@@ -59,8 +59,8 @@ export default (): void => {
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new ZeroBasedPosition(5, 9),
-            new ZeroBasedPosition(5, 15),
+            new NaturalEditorPosition(5, 9),
+            new NaturalEditorPosition(5, 15),
           ),
         ];
         await vscode.commands.executeCommand(
@@ -87,8 +87,8 @@ export default (): void => {
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new ZeroBasedPosition(6, 13),
-            new ZeroBasedPosition(6, 22),
+            new NaturalEditorPosition(6, 13),
+            new NaturalEditorPosition(6, 22),
           ),
         ];
         await vscode.commands.executeCommand(

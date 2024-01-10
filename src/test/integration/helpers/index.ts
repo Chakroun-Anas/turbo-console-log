@@ -1,11 +1,11 @@
 import { openDocument } from './openDocument';
-import { ZeroBasedPosition } from './ZeroBasedPosition';
+import { NaturalEditorPosition } from './NaturalEditorPosition';
 import { zeroBasedLine } from './zeroBasedLine';
 import { expectActiveTextEditorWithFile } from './expectActiveTextEditorWithFile';
 import { documentLinesChanged } from './documentLinesChanged';
 export {
   openDocument,
-  ZeroBasedPosition,
+  NaturalEditorPosition,
   zeroBasedLine,
   expectActiveTextEditorWithFile,
   documentLinesChanged,

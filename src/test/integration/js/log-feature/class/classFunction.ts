@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import {
   openDocument,
   zeroBasedLine,
-  ZeroBasedPosition,
+  NaturalEditorPosition,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
 } from '../../../helpers';
@@ -32,8 +32,8 @@ export default (): void => {
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new ZeroBasedPosition(2, 12),
-            new ZeroBasedPosition(2, 20),
+            new NaturalEditorPosition(2, 12),
+            new NaturalEditorPosition(2, 20),
           ),
         ];
         await vscode.commands.executeCommand(
