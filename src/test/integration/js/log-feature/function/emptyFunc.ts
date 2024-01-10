@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import {
   openDocument,
   NaturalEditorPosition,
-  zeroBasedLine,
+  naturalEditorLine,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
 } from '../../../helpers';
@@ -41,17 +41,17 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            zeroBasedLine({ visualLine: 7 }),
+            naturalEditorLine({ visualLine: 7 }),
           ]),
         );
         const textDocument = activeTextEditor.document;
         expect(
           /\{\s*$/.test(
-            textDocument.lineAt(zeroBasedLine({ visualLine: 7 })).text,
+            textDocument.lineAt(naturalEditorLine({ visualLine: 7 })).text,
           ),
         ).to.equal(true);
         const logMessage = textDocument.lineAt(
-          zeroBasedLine({ visualLine: 8 }),
+          naturalEditorLine({ visualLine: 8 }),
         ).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
       }
@@ -72,17 +72,17 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            zeroBasedLine({ visualLine: 15 }),
+            naturalEditorLine({ visualLine: 15 }),
           ]),
         );
         const textDocument = activeTextEditor.document;
         expect(
           /\{\s*$/.test(
-            textDocument.lineAt(zeroBasedLine({ visualLine: 14 })).text,
+            textDocument.lineAt(naturalEditorLine({ visualLine: 14 })).text,
           ),
         ).to.equal(true);
         const logMessage = textDocument.lineAt(
-          zeroBasedLine({ visualLine: 15 }),
+          naturalEditorLine({ visualLine: 15 }),
         ).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
       }

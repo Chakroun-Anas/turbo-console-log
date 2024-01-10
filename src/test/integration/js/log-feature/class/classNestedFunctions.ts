@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import {
   openDocument,
   NaturalEditorPosition,
-  zeroBasedLine,
+  naturalEditorLine,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
 } from '../../../helpers';
@@ -31,7 +31,7 @@ export default (): void => {
         activeTextEditor,
         'classNestedFunctions.js',
       );
-      const expectedLogMessageLine = zeroBasedLine({ visualLine: 4 });
+      const expectedLogMessageLine = naturalEditorLine({ visualLine: 4 });
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(

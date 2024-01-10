@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import {
   openDocument,
   NaturalEditorPosition,
-  zeroBasedLine,
+  naturalEditorLine,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
 } from '../../../helpers';
@@ -44,13 +44,14 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            zeroBasedLine({ visualLine: 7 }),
+            naturalEditorLine({ visualLine: 7 }),
           ]),
         );
         expect(
           /console\.log\(.*/.test(
-            activeTextEditor.document.lineAt(zeroBasedLine({ visualLine: 7 }))
-              .text,
+            activeTextEditor.document.lineAt(
+              naturalEditorLine({ visualLine: 7 }),
+            ).text,
           ),
         ).to.equal(true);
         activeTextEditor.selections = [
@@ -65,13 +66,14 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            zeroBasedLine({ visualLine: 9 }),
+            naturalEditorLine({ visualLine: 9 }),
           ]),
         );
         expect(
           /console\.log\(.*/.test(
-            activeTextEditor.document.lineAt(zeroBasedLine({ visualLine: 9 }))
-              .text,
+            activeTextEditor.document.lineAt(
+              naturalEditorLine({ visualLine: 9 }),
+            ).text,
           ),
         ).to.equal(true);
       }

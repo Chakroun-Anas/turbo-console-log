@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import {
   openDocument,
   NaturalEditorPosition,
-  zeroBasedLine,
+  naturalEditorLine,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
 } from '../../../helpers';
@@ -42,12 +42,12 @@ export default (): void => {
         // Console log message is appended to the end of the document starting with /n character
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            zeroBasedLine({ visualLine: 9 }),
+            naturalEditorLine({ visualLine: 9 }),
           ]),
         );
         const textDocument = activeTextEditor.document;
         const logMessage = textDocument.lineAt(
-          zeroBasedLine({ visualLine: 10 }),
+          naturalEditorLine({ visualLine: 10 }),
         ).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
         expect(logMessage).to.includes('person.age');
@@ -70,12 +70,12 @@ export default (): void => {
         // Console log message is appended to the end of the document starting with /n character
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            zeroBasedLine({ visualLine: 9 }),
+            naturalEditorLine({ visualLine: 9 }),
           ]),
         );
         const textDocument = activeTextEditor.document;
         const logMessage = textDocument.lineAt(
-          zeroBasedLine({ visualLine: 10 }),
+          naturalEditorLine({ visualLine: 10 }),
         ).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
         expect(logMessage).to.includes('person.family.mother');
@@ -98,12 +98,12 @@ export default (): void => {
         // Console log message is appended to the end of the document starting with /n character
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            zeroBasedLine({ visualLine: 9 }),
+            naturalEditorLine({ visualLine: 9 }),
           ]),
         );
         const textDocument = activeTextEditor.document;
         const logMessage = textDocument.lineAt(
-          zeroBasedLine({ visualLine: 10 }),
+          naturalEditorLine({ visualLine: 10 }),
         ).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
         expect(logMessage).to.includes('person.family.mother.firstName');

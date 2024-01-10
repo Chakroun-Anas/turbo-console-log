@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import {
   openDocument,
   NaturalEditorPosition,
-  zeroBasedLine,
+  naturalEditorLine,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
 } from '../../../helpers';
@@ -31,7 +31,7 @@ export default (): void => {
         activeTextEditor,
         'functionWithDecorators.ts',
       );
-      const expectedLogMessageLine = zeroBasedLine({ visualLine: 14 });
+      const expectedLogMessageLine = naturalEditorLine({ visualLine: 14 });
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(

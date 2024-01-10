@@ -3,7 +3,7 @@ import Mocha, { describe, it } from 'mocha';
 import { expect } from 'chai';
 import {
   openDocument,
-  zeroBasedLine,
+  naturalEditorLine,
   NaturalEditorPosition,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
@@ -50,17 +50,17 @@ export default (): void => {
             const textDocument = activeTextEditor.document;
             expect(
               /\{\s*$/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 3 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 3 })).text,
               ),
             ).to.equal(true);
             expect(
               /console\.log\(.*/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 4 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 4 })).text,
               ),
             ).to.equal(true);
             expect(
               /return /.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 5 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 5 })).text,
               ),
             ).to.equal(true);
           }
@@ -88,22 +88,22 @@ export default (): void => {
             const textDocument = activeTextEditor.document;
             expect(
               /\{\s*$/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 5 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 5 })).text,
               ),
             ).to.equal(true);
             expect(
               /console\.log\(.*/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 6 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 6 })).text,
               ),
             ).to.equal(true);
             expect(
               /return member.include\('S'\)/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 7 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 7 })).text,
               ),
             ).to.equal(true);
             expect(
               /}\)/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 8 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 8 })).text,
               ),
             ).to.equal(true);
           }
@@ -131,22 +131,22 @@ export default (): void => {
             const textDocument = activeTextEditor.document;
             expect(
               /\{\s*$/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 8 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 8 })).text,
               ),
             ).to.equal(true);
             expect(
               /console\.log\(.*/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 9 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 9 })).text,
               ),
             ).to.equal(true);
             expect(
               /return item.index !== original.index/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 10 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 10 })).text,
               ),
             ).to.equal(true);
             expect(
               /}\)/.test(
-                textDocument.lineAt(zeroBasedLine({ visualLine: 11 })).text,
+                textDocument.lineAt(naturalEditorLine({ visualLine: 11 })).text,
               ),
             ).to.equal(true);
           }
@@ -177,22 +177,22 @@ export default (): void => {
           const textDocument = activeTextEditor.document;
           expect(
             /\{\s*$/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 12 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 12 })).text,
             ),
           ).to.equal(true);
           expect(
             /console\.log\(.*/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 13 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 13 })).text,
             ),
           ).to.equal(true);
           expect(
             /return checkAccountingPeriodDivide\(budget._id, accountingPeriodId\)/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 14 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 14 })).text,
             ),
           ).to.equal(true);
           expect(
             /}\)/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 15 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 15 })).text,
             ),
           ).to.equal(true);
         }
@@ -220,22 +220,22 @@ export default (): void => {
           const textDocument = activeTextEditor.document;
           expect(
             /\{\s*$/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 19 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 19 })).text,
             ),
           ).to.equal(true);
           expect(
             /console\.log\(.*/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 20 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 20 })).text,
             ),
           ).to.equal(true);
           expect(
             /return checkAccountingPeriodDivide\(budget._id\)/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 21 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 21 })).text,
             ),
           ).to.equal(true);
           expect(
             /}\)/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 23 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 23 })).text,
             ),
           ).to.equal(true);
         }
@@ -263,22 +263,22 @@ export default (): void => {
           const textDocument = activeTextEditor.document;
           expect(
             /\{\s*$/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 27 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 27 })).text,
             ),
           ).to.equal(true);
           expect(
             /console\.log\(.*/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 28 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 28 })).text,
             ),
           ).to.equal(true);
           expect(
             /return checkAccountingPeriodDivide\(budget._id, accountingPeriodId\)/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 29 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 29 })).text,
             ),
           ).to.equal(true);
           expect(
             /}\)/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 30 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 30 })).text,
             ),
           ).to.equal(true);
         }
@@ -306,22 +306,22 @@ export default (): void => {
           const textDocument = activeTextEditor.document;
           expect(
             /\{\s*$/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 35 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 35 })).text,
             ),
           ).to.equal(true);
           expect(
             /console\.log\(.*/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 36 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 36 })).text,
             ),
           ).to.equal(true);
           expect(
             /return checkAccountingPeriodDivide\(budget._id\)/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 37 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 37 })).text,
             ),
           ).to.equal(true);
           expect(
             /}\)/.test(
-              textDocument.lineAt(zeroBasedLine({ visualLine: 39 })).text,
+              textDocument.lineAt(naturalEditorLine({ visualLine: 39 })).text,
             ),
           ).to.equal(true);
         }

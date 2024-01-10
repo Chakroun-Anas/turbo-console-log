@@ -3,7 +3,7 @@ import Mocha, { describe, it } from 'mocha';
 import { expect } from 'chai';
 import {
   openDocument,
-  zeroBasedLine,
+  naturalEditorLine,
   NaturalEditorPosition,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
@@ -31,7 +31,7 @@ export default (): void => {
         activeTextEditor,
         'functionAssignedToVariable.ts',
       );
-      const expectedLogMessageLine = zeroBasedLine({ visualLine: 6 });
+      const expectedLogMessageLine = naturalEditorLine({ visualLine: 6 });
       if (activeTextEditor) {
         const textDocument = activeTextEditor.document;
         activeTextEditor.selection = new vscode.Selection(
@@ -60,7 +60,7 @@ export default (): void => {
         activeTextEditor,
         'functionAssignedToVariable.ts',
       );
-      const expectedLogMessageLine = zeroBasedLine({ visualLine: 10 });
+      const expectedLogMessageLine = naturalEditorLine({ visualLine: 10 });
       if (activeTextEditor) {
         const textDocument = activeTextEditor.document;
         activeTextEditor.selection = new vscode.Selection(
@@ -89,7 +89,7 @@ export default (): void => {
         activeTextEditor,
         'functionAssignedToVariable.ts',
       );
-      const expectedLogMessageLine = zeroBasedLine({ visualLine: 17 });
+      const expectedLogMessageLine = naturalEditorLine({ visualLine: 17 });
       if (activeTextEditor) {
         const textDocument = activeTextEditor.document;
         activeTextEditor.selection = new vscode.Selection(
@@ -118,7 +118,7 @@ export default (): void => {
         activeTextEditor,
         'functionAssignedToVariable.ts',
       );
-      const expectedLogMessageLine = zeroBasedLine({ visualLine: 19 });
+      const expectedLogMessageLine = naturalEditorLine({ visualLine: 19 });
       if (activeTextEditor) {
         const textDocument = activeTextEditor.document;
         activeTextEditor.selection = new vscode.Selection(

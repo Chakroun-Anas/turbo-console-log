@@ -3,7 +3,7 @@ import Mocha, { it, describe } from 'mocha';
 import { expect } from 'chai';
 import {
   openDocument,
-  zeroBasedLine,
+  naturalEditorLine,
   NaturalEditorPosition,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
@@ -28,7 +28,7 @@ export default (): void => {
     it('Should insert a log message related to parameter of a function inside a class', async () => {
       const { activeTextEditor } = vscode.window;
       expectActiveTextEditorWithFile(activeTextEditor, 'classFunction.js');
-      const expectedLogMessageLine = zeroBasedLine({ visualLine: 3 });
+      const expectedLogMessageLine = naturalEditorLine({ visualLine: 3 });
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
