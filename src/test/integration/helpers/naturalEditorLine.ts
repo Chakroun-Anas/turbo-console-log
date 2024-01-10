@@ -1,7 +1,3 @@
-export const naturalEditorLine = ({
-  visualLine,
-}: {
-  visualLine: number;
-}): number => {
-  return visualLine - 1;
+export const naturalEditorLine = (visualEditorLine: number): number => {
+  return visualEditorLine - 1;
 };

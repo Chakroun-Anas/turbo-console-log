@@ -44,14 +44,12 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine({ visualLine: 7 }),
+            naturalEditorLine(7),
           ]),
         );
         expect(
           /console\.log\(.*/.test(
-            activeTextEditor.document.lineAt(
-              naturalEditorLine({ visualLine: 7 }),
-            ).text,
+            activeTextEditor.document.lineAt(naturalEditorLine(7)).text,
           ),
         ).to.equal(true);
         activeTextEditor.selections = [
@@ -66,14 +64,12 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine({ visualLine: 9 }),
+            naturalEditorLine(9),
           ]),
         );
         expect(
           /console\.log\(.*/.test(
-            activeTextEditor.document.lineAt(
-              naturalEditorLine({ visualLine: 9 }),
-            ).text,
+            activeTextEditor.document.lineAt(naturalEditorLine(9)).text,
           ),
         ).to.equal(true);
       }

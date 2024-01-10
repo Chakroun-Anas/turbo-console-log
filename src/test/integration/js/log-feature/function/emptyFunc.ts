@@ -41,18 +41,14 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine({ visualLine: 7 }),
+            naturalEditorLine(7),
           ]),
         );
         const textDocument = activeTextEditor.document;
         expect(
-          /\{\s*$/.test(
-            textDocument.lineAt(naturalEditorLine({ visualLine: 7 })).text,
-          ),
+          /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(7)).text),
         ).to.equal(true);
-        const logMessage = textDocument.lineAt(
-          naturalEditorLine({ visualLine: 8 }),
-        ).text;
+        const logMessage = textDocument.lineAt(naturalEditorLine(8)).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
       }
     });
@@ -72,18 +68,14 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine({ visualLine: 15 }),
+            naturalEditorLine(15),
           ]),
         );
         const textDocument = activeTextEditor.document;
         expect(
-          /\{\s*$/.test(
-            textDocument.lineAt(naturalEditorLine({ visualLine: 14 })).text,
-          ),
+          /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(14)).text),
         ).to.equal(true);
-        const logMessage = textDocument.lineAt(
-          naturalEditorLine({ visualLine: 15 }),
-        ).text;
+        const logMessage = textDocument.lineAt(naturalEditorLine(15)).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
       }
     });

@@ -28,7 +28,7 @@ export default (): void => {
     it('Should insert a log message related to parameter of a function inside a class', async () => {
       const { activeTextEditor } = vscode.window;
       expectActiveTextEditorWithFile(activeTextEditor, 'classFunction.js');
-      const expectedLogMessageLine = naturalEditorLine({ visualLine: 3 });
+      const expectedLogMessageLine = naturalEditorLine(3);
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(

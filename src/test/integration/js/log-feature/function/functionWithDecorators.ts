@@ -31,7 +31,7 @@ export default (): void => {
         activeTextEditor,
         'functionWithDecorators.ts',
       );
-      const expectedLogMessageLine = naturalEditorLine({ visualLine: 14 });
+      const expectedLogMessageLine = naturalEditorLine(14);
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(

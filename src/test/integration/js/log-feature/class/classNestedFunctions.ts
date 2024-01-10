@@ -31,7 +31,7 @@ export default (): void => {
         activeTextEditor,
         'classNestedFunctions.js',
       );
-      const expectedLogMessageLine = naturalEditorLine({ visualLine: 4 });
+      const expectedLogMessageLine = naturalEditorLine(4);
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(

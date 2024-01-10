@@ -42,13 +42,11 @@ export default (): void => {
         // Console log message is appended to the end of the document starting with /n character
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine({ visualLine: 9 }),
+            naturalEditorLine(9),
           ]),
         );
         const textDocument = activeTextEditor.document;
-        const logMessage = textDocument.lineAt(
-          naturalEditorLine({ visualLine: 10 }),
-        ).text;
+        const logMessage = textDocument.lineAt(naturalEditorLine(10)).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
         expect(logMessage).to.includes('person.age');
       }
@@ -70,13 +68,11 @@ export default (): void => {
         // Console log message is appended to the end of the document starting with /n character
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine({ visualLine: 9 }),
+            naturalEditorLine(9),
           ]),
         );
         const textDocument = activeTextEditor.document;
-        const logMessage = textDocument.lineAt(
-          naturalEditorLine({ visualLine: 10 }),
-        ).text;
+        const logMessage = textDocument.lineAt(naturalEditorLine(10)).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
         expect(logMessage).to.includes('person.family.mother');
       }
@@ -98,13 +94,11 @@ export default (): void => {
         // Console log message is appended to the end of the document starting with /n character
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine({ visualLine: 9 }),
+            naturalEditorLine(9),
           ]),
         );
         const textDocument = activeTextEditor.document;
-        const logMessage = textDocument.lineAt(
-          naturalEditorLine({ visualLine: 10 }),
-        ).text;
+        const logMessage = textDocument.lineAt(naturalEditorLine(10)).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
         expect(logMessage).to.includes('person.family.mother.firstName');
       }

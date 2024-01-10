@@ -49,19 +49,15 @@ export default (): void => {
             );
             const textDocument = activeTextEditor.document;
             expect(
-              /\{\s*$/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 3 })).text,
-              ),
+              /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(3)).text),
             ).to.equal(true);
             expect(
               /console\.log\(.*/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 4 })).text,
+                textDocument.lineAt(naturalEditorLine(4)).text,
               ),
             ).to.equal(true);
             expect(
-              /return /.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 5 })).text,
-              ),
+              /return /.test(textDocument.lineAt(naturalEditorLine(5)).text),
             ).to.equal(true);
           }
         });
@@ -87,24 +83,20 @@ export default (): void => {
             );
             const textDocument = activeTextEditor.document;
             expect(
-              /\{\s*$/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 5 })).text,
-              ),
+              /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(5)).text),
             ).to.equal(true);
             expect(
               /console\.log\(.*/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 6 })).text,
+                textDocument.lineAt(naturalEditorLine(6)).text,
               ),
             ).to.equal(true);
             expect(
               /return member.include\('S'\)/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 7 })).text,
+                textDocument.lineAt(naturalEditorLine(7)).text,
               ),
             ).to.equal(true);
             expect(
-              /}\)/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 8 })).text,
-              ),
+              /}\)/.test(textDocument.lineAt(naturalEditorLine(8)).text),
             ).to.equal(true);
           }
         });
@@ -130,24 +122,20 @@ export default (): void => {
             );
             const textDocument = activeTextEditor.document;
             expect(
-              /\{\s*$/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 8 })).text,
-              ),
+              /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(8)).text),
             ).to.equal(true);
             expect(
               /console\.log\(.*/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 9 })).text,
+                textDocument.lineAt(naturalEditorLine(9)).text,
               ),
             ).to.equal(true);
             expect(
               /return item.index !== original.index/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 10 })).text,
+                textDocument.lineAt(naturalEditorLine(10)).text,
               ),
             ).to.equal(true);
             expect(
-              /}\)/.test(
-                textDocument.lineAt(naturalEditorLine({ visualLine: 11 })).text,
-              ),
+              /}\)/.test(textDocument.lineAt(naturalEditorLine(11)).text),
             ).to.equal(true);
           }
         });
@@ -176,24 +164,20 @@ export default (): void => {
           );
           const textDocument = activeTextEditor.document;
           expect(
-            /\{\s*$/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 12 })).text,
-            ),
+            /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(12)).text),
           ).to.equal(true);
           expect(
             /console\.log\(.*/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 13 })).text,
+              textDocument.lineAt(naturalEditorLine(13)).text,
             ),
           ).to.equal(true);
           expect(
             /return checkAccountingPeriodDivide\(budget._id, accountingPeriodId\)/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 14 })).text,
+              textDocument.lineAt(naturalEditorLine(14)).text,
             ),
           ).to.equal(true);
           expect(
-            /}\)/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 15 })).text,
-            ),
+            /}\)/.test(textDocument.lineAt(naturalEditorLine(15)).text),
           ).to.equal(true);
         }
       });
@@ -219,24 +203,20 @@ export default (): void => {
           );
           const textDocument = activeTextEditor.document;
           expect(
-            /\{\s*$/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 19 })).text,
-            ),
+            /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(19)).text),
           ).to.equal(true);
           expect(
             /console\.log\(.*/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 20 })).text,
+              textDocument.lineAt(naturalEditorLine(20)).text,
             ),
           ).to.equal(true);
           expect(
             /return checkAccountingPeriodDivide\(budget._id\)/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 21 })).text,
+              textDocument.lineAt(naturalEditorLine(21)).text,
             ),
           ).to.equal(true);
           expect(
-            /}\)/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 23 })).text,
-            ),
+            /}\)/.test(textDocument.lineAt(naturalEditorLine(23)).text),
           ).to.equal(true);
         }
       });
@@ -262,24 +242,20 @@ export default (): void => {
           );
           const textDocument = activeTextEditor.document;
           expect(
-            /\{\s*$/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 27 })).text,
-            ),
+            /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(27)).text),
           ).to.equal(true);
           expect(
             /console\.log\(.*/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 28 })).text,
+              textDocument.lineAt(naturalEditorLine(28)).text,
             ),
           ).to.equal(true);
           expect(
             /return checkAccountingPeriodDivide\(budget._id, accountingPeriodId\)/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 29 })).text,
+              textDocument.lineAt(naturalEditorLine(29)).text,
             ),
           ).to.equal(true);
           expect(
-            /}\)/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 30 })).text,
-            ),
+            /}\)/.test(textDocument.lineAt(naturalEditorLine(30)).text),
           ).to.equal(true);
         }
       });
@@ -305,24 +281,20 @@ export default (): void => {
           );
           const textDocument = activeTextEditor.document;
           expect(
-            /\{\s*$/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 35 })).text,
-            ),
+            /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(35)).text),
           ).to.equal(true);
           expect(
             /console\.log\(.*/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 36 })).text,
+              textDocument.lineAt(naturalEditorLine(36)).text,
             ),
           ).to.equal(true);
           expect(
             /return checkAccountingPeriodDivide\(budget._id\)/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 37 })).text,
+              textDocument.lineAt(naturalEditorLine(37)).text,
             ),
           ).to.equal(true);
           expect(
-            /}\)/.test(
-              textDocument.lineAt(naturalEditorLine({ visualLine: 39 })).text,
-            ),
+            /}\)/.test(textDocument.lineAt(naturalEditorLine(39)).text),
           ).to.equal(true);
         }
       });
