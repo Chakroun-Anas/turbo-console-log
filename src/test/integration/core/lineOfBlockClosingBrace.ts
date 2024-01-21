@@ -3,7 +3,7 @@ import Mocha, { it, describe } from 'mocha';
 import { expect } from 'chai';
 import { openDocument, expectActiveTextEditorWithFile } from '../helpers';
 import { BracketType } from '../../../entities';
-import { closingBracketLine } from '../../../utilities/closingBracketLine';
+import { closingContextLine } from '../../../utilities/closingContextLine';
 
 export default (): void => {
   describe('Determine the closing brace line num', () => {
@@ -24,14 +24,14 @@ export default (): void => {
       );
       if (activeTextEditor) {
         expect(
-          closingBracketLine(
+          closingContextLine(
             activeTextEditor.document,
             0,
             BracketType.CURLY_BRACES,
           ),
         ).to.equal(4);
         expect(
-          closingBracketLine(
+          closingContextLine(
             activeTextEditor.document,
             1,
             BracketType.CURLY_BRACES,

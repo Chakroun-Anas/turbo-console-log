@@ -1,5 +1,10 @@
 import { TextDocument } from 'vscode';
-import { BracketType, LogMessage, LogMessageType } from '../../entities';
+import {
+  BracketType,
+  LogContextMetadata,
+  LogMessage,
+  LogMessageType,
+} from '../../entities';
 import { DebugMessageLine } from '../DebugMessageLine';
 import { getMultiLineContextVariable } from '../../utilities';
 import { LineCodeProcessing } from '../../line-code-processing';
@@ -15,16 +20,6 @@ export class JSDebugMessageLine implements DebugMessageLine {
     selectedVar: string,
     logMsg: LogMessage,
   ): number {
-    const multilineParenthesisVariable = getMultiLineContextVariable(
-      document,
-      selectionLine,
-      BracketType.PARENTHESIS,
-    );
-    const multilineBracesVariable = getMultiLineContextVariable(
-      document,
-      selectionLine,
-      BracketType.CURLY_BRACES,
-    );
     switch (logMsg.logMessageType) {
       case LogMessageType.ObjectLiteral:
         return this.objectLiteralLine(document, selectionLine);
@@ -41,7 +36,7 @@ export class JSDebugMessageLine implements DebugMessageLine {
             selectionLine,
             BracketType.PARENTHESIS,
             false,
-          )?.closingBracketLine || selectionLine) + 1
+          )?.closingContextLine || selectionLine) + 1
         );
       case LogMessageType.MultiLineAnonymousFunction:
         return (
@@ -51,7 +46,7 @@ export class JSDebugMessageLine implements DebugMessageLine {
             BracketType.CURLY_BRACES,
           ) + 1
         );
-      case LogMessageType.ObjectFunctionCall:
+      case LogMessageType.ObjectFunctionCallAssignment:
         return this.objectFunctionCallLine(
           document,
           selectionLine,
@@ -61,15 +56,17 @@ export class JSDebugMessageLine implements DebugMessageLine {
         return this.arrayLine(document, selectionLine);
       case LogMessageType.MultilineParenthesis:
         return (
-          (multilineParenthesisVariable?.closingBracketLine || selectionLine) +
-          1
+          ((logMsg?.metadata as LogContextMetadata)?.closingContextLine ||
+            selectionLine) + 1
         );
       case LogMessageType.Ternary:
         return this.templateStringLine(document, selectionLine);
       case LogMessageType.MultilineBraces:
         // Deconstructing assignment
-        if (multilineBracesVariable?.closingBracketLine) {
-          return multilineBracesVariable.closingBracketLine + 1;
+        if ((logMsg?.metadata as LogContextMetadata)?.closingContextLine) {
+          return (
+            (logMsg?.metadata as LogContextMetadata)?.closingContextLine + 1
+          );
         }
         return selectionLine + 1;
       default:

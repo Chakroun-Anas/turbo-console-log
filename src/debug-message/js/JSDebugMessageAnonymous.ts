@@ -1,7 +1,7 @@
 import { Position, TextDocument, TextEditorEdit, TextLine } from 'vscode';
 import { BracketType } from '../../entities';
 import { LineCodeProcessing } from '../../line-code-processing';
-import { spacesBeforeLine, closingBracketLine } from '../../utilities';
+import { spacesBeforeLine, closingContextLine } from '../../utilities';
 
 export class JSDebugMessageAnonymous {
   lineCodeProcessing: LineCodeProcessing;
@@ -51,7 +51,7 @@ export class JSDebugMessageAnonymous {
       .lineAt(selectedPropLine.lineNumber + 1)
       .text.trim()
       .startsWith('.');
-    const anonymousFunctionClosedParenthesisLine = closingBracketLine(
+    const anonymousFunctionClosedParenthesisLine = closingContextLine(
       document,
       selectedPropLine.lineNumber,
       BracketType.PARENTHESIS,

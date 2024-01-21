@@ -5,7 +5,7 @@ import { BracketType } from './extension/bracketType';
 import {
   LogMessageType,
   LogMessage,
-  LogBracketMetadata,
+  LogContextMetadata,
 } from './extension/logMessage';
 import { LogBracket } from './extension/logBracket';
 import { Command } from './extension/Command';
@@ -17,7 +17,7 @@ export {
   Command,
   ExtensionProperties,
   LogBracket,
-  LogBracketMetadata,
+  LogContextMetadata,
   LogMessage,
   LogMessageType,
   Message,

@@ -1,4 +1,4 @@
 export type MultilineContextVariable = {
-  openingBracketLine: number;
-  closingBracketLine: number;
+  openingContextLine: number;
+  closingContextLine: number;
 };

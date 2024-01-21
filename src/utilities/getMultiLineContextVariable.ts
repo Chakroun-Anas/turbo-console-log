@@ -1,7 +1,7 @@
 import { TextDocument } from 'vscode';
 import { BracketType, MultilineContextVariable } from '../entities';
 import { locBrackets } from './locBrackets';
-import { closingBracketLine } from './closingBracketLine';
+import { closingContextLine } from './closingContextLine';
 
 export function getMultiLineContextVariable(
   document: TextDocument,
@@ -30,8 +30,8 @@ export function getMultiLineContextVariable(
     nbrOfClosedBlockType += currentLineParenthesis.closingBrackets;
     if (nbrOfOpenedBlockType === nbrOfClosedBlockType) {
       return {
-        openingBracketLine: currentLineNum,
-        closingBracketLine: closingBracketLine(
+        openingContextLine: currentLineNum,
+        closingContextLine: closingContextLine(
           document,
           currentLineNum,
           bracketType,
@@ -39,6 +39,12 @@ export function getMultiLineContextVariable(
       };
     }
     currentLineNum--;
+  }
+  if (bracketType === BracketType.PARENTHESIS && openingBrackets > 0) {
+    return {
+      openingContextLine: lineNum,
+      closingContextLine: closingContextLine(document, lineNum, bracketType),
+    };
   }
   return null;
 }

@@ -2,7 +2,7 @@ import { TextDocument } from 'vscode';
 import { BracketType } from '../entities';
 import { locBrackets } from './locBrackets';
 
-export function closingBracketLine(
+export function closingContextLine(
   document: TextDocument,
   declarationLine: number,
   bracketType: BracketType,

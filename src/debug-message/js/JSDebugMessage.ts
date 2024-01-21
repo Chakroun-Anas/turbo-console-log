@@ -6,7 +6,6 @@ import {
   LogMessageType,
   Message,
   LogMessage,
-  LogBracketMetadata,
   MultilineContextVariable,
 } from '../../entities';
 import { LineCodeProcessing } from '../../line-code-processing';
@@ -15,11 +14,11 @@ import { DebugMessage } from '../DebugMessage';
 import { DebugMessageLine } from '../DebugMessageLine';
 import {
   getMultiLineContextVariable,
-  closingBracketLine,
+  closingContextLine,
 } from '../../utilities';
 import { JSDebugMessageAnonymous } from './JSDebugMessageAnonymous';
 import {
-  LogParenthesisMetadata,
+  LogContextMetadata,
   NamedFunctionMetadata,
 } from '../../entities/extension/logMessage';
 
@@ -27,7 +26,10 @@ const logMessageTypeVerificationPriority = _.sortBy(
   [
     { logMessageType: LogMessageType.ArrayAssignment, priority: 2 },
     { logMessageType: LogMessageType.ObjectLiteral, priority: 3 },
-    { logMessageType: LogMessageType.ObjectFunctionCall, priority: 4 },
+    {
+      logMessageType: LogMessageType.ObjectFunctionCallAssignment,
+      priority: 4,
+    },
     { logMessageType: LogMessageType.NamedFunction, priority: 6 },
     { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 5 },
     { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 7 },
@@ -74,8 +76,7 @@ export class JSDebugMessage extends DebugMessage {
       return /\){.*}/.test(
         document
           .lineAt(
-            (logMessage.metadata as LogParenthesisMetadata)
-              .closingParenthesisLine,
+            (logMessage.metadata as LogContextMetadata).closingContextLine,
           )
           .text.replace(/\s/g, ''),
       );
@@ -204,7 +205,7 @@ export class JSDebugMessage extends DebugMessage {
       if (multilineBracesVariable) {
         return this.deepObjectProperty(
           document,
-          multilineBracesVariable.openingBracketLine,
+          multilineBracesVariable.openingContextLine,
           `${propertyNameRegexMatch[1]}.${path}`,
         );
       }
@@ -219,7 +220,7 @@ export class JSDebugMessage extends DebugMessage {
           .text.split('=')[0]
           .replace(/(const|let|var)/, '')
           .trim()}.${path}`,
-        line: closingBracketLine(document, line, BracketType.CURLY_BRACES),
+        line: closingContextLine(document, line, BracketType.CURLY_BRACES),
       };
     }
     return null;
@@ -232,29 +233,29 @@ export class JSDebugMessage extends DebugMessage {
     tabSize: number,
     extensionProperties: ExtensionProperties,
   ): void {
-    const logMsg: LogMessage = this.logMessage(document, lineOfSelectedVar);
-    const deepObjectProperty =
-      LogMessageType.MultilineBraces === logMsg.logMessageType
-        ? this.deepObjectProperty(
-            document,
-            (logMsg.metadata as LogBracketMetadata).openingBracketLine,
-            selectedVar,
-          )
-        : null;
+    const logMsg: LogMessage = this.logMessage(
+      document,
+      lineOfSelectedVar,
+      selectedVar,
+    );
     const lineOfLogMsg: number = this.line(
       document,
-      deepObjectProperty ? deepObjectProperty.line : lineOfSelectedVar,
+      lineOfSelectedVar,
       selectedVar,
       logMsg,
     );
     const spacesBeforeMsg: string = this.spacesBeforeLogMsg(
       document,
-      deepObjectProperty ? deepObjectProperty.line : lineOfSelectedVar,
+      (logMsg.metadata as LogContextMetadata)?.deepObjectLine
+        ? (logMsg.metadata as LogContextMetadata)?.deepObjectLine
+        : lineOfSelectedVar,
       lineOfLogMsg,
     );
     const debuggingMsgContent: string = this.constructDebuggingMsgContent(
       document,
-      deepObjectProperty ? deepObjectProperty.path : selectedVar,
+      (logMsg.metadata as LogContextMetadata)?.deepObjectPath
+        ? (logMsg.metadata as LogContextMetadata)?.deepObjectPath
+        : selectedVar,
       lineOfSelectedVar,
       lineOfLogMsg,
       omit(extensionProperties, [
@@ -273,8 +274,7 @@ export class JSDebugMessage extends DebugMessage {
       const emptyBlockLine =
         logMsg.logMessageType === LogMessageType.MultilineParenthesis
           ? document.lineAt(
-              (logMsg.metadata as LogParenthesisMetadata)
-                .closingParenthesisLine,
+              (logMsg.metadata as LogContextMetadata).closingContextLine,
             )
           : document.lineAt((logMsg.metadata as NamedFunctionMetadata).line);
       this.emptyBlockDebuggingMsg(
@@ -312,7 +312,11 @@ export class JSDebugMessage extends DebugMessage {
       extensionProperties.insertEmptyLineAfterLogMessage,
     );
   }
-  logMessage(document: TextDocument, selectionLine: number): LogMessage {
+  logMessage(
+    document: TextDocument,
+    selectionLine: number,
+    selectedVar: string,
+  ): LogMessage {
     const currentLineText: string = document.lineAt(selectionLine).text;
     const multilineParenthesisVariable = getMultiLineContextVariable(
       document,
@@ -402,34 +406,90 @@ export class JSDebugMessage extends DebugMessage {
         };
       },
       [LogMessageType.MultilineBraces]: () => {
+        const isChecked =
+          multilineBracesVariable !== null &&
+          !this.lineCodeProcessing.isAssignedToVariable(currentLineText) &&
+          !this.lineCodeProcessing.isAffectationToVariable(currentLineText);
+        // FIXME: No need for multilineBracesVariable !== null since it contribute already in the value of isChecked boolean
+        if (isChecked && multilineBracesVariable !== null) {
+          const deepObjectProperty = this.deepObjectProperty(
+            document,
+            multilineBracesVariable?.openingContextLine,
+            selectedVar,
+          );
+          if (deepObjectProperty) {
+            const multilineBracesObjectScope = getMultiLineContextVariable(
+              document,
+              deepObjectProperty.line,
+              BracketType.CURLY_BRACES,
+            );
+            return {
+              isChecked: true,
+              metadata: {
+                openingContextLine:
+                  multilineBracesObjectScope?.openingContextLine as number,
+                closingContextLine:
+                  multilineBracesObjectScope?.closingContextLine as number,
+                deepObjectLine: deepObjectProperty.line,
+                deepObjectPath: deepObjectProperty.path,
+              } as Pick<LogMessage, 'metadata'>,
+            };
+          }
+          return {
+            isChecked: true,
+            metadata: {
+              openingContextLine:
+                multilineBracesVariable?.openingContextLine as number,
+              closingContextLine:
+                multilineBracesVariable?.closingContextLine as number,
+            } as Pick<LogMessage, 'metadata'>,
+          };
+        }
         return {
-          isChecked:
-            multilineBracesVariable !== null &&
-            !this.lineCodeProcessing.isAssignedToVariable(currentLineText),
-          metadata: {
-            openingBracketLine:
-              multilineBracesVariable?.openingBracketLine as number,
-            closingBracketLine:
-              multilineBracesVariable?.closingBracketLine as number,
-          } as Pick<LogMessage, 'metadata'>,
+          isChecked: false,
         };
       },
       [LogMessageType.MultilineParenthesis]: () => {
+        const isChecked = multilineParenthesisVariable !== null;
+        if (isChecked) {
+          const isOpeningCurlyBraceContext = document
+            .lineAt(multilineParenthesisVariable?.closingContextLine as number)
+            .text.includes('{');
+          const isOpeningParenthesisContext = document
+            .lineAt(selectionLine)
+            .text.includes('(');
+          if (isOpeningCurlyBraceContext || isOpeningParenthesisContext) {
+            if (this.lineCodeProcessing.isAssignedToVariable(currentLineText)) {
+              return {
+                isChecked: true,
+                metadata: {
+                  openingContextLine: selectionLine,
+                  closingContextLine: closingContextLine(
+                    document,
+                    multilineParenthesisVariable?.closingContextLine as number,
+                    isOpeningCurlyBraceContext
+                      ? BracketType.CURLY_BRACES
+                      : BracketType.PARENTHESIS,
+                  ),
+                } as Pick<LogMessage, 'metadata'>,
+              };
+            }
+            return {
+              isChecked: true,
+              metadata: {
+                openingContextLine:
+                  multilineParenthesisVariable?.openingContextLine as number,
+                closingContextLine:
+                  multilineParenthesisVariable?.closingContextLine as number,
+              } as Pick<LogMessage, 'metadata'>,
+            };
+          }
+        }
         return {
-          isChecked:
-            multilineParenthesisVariable !== null &&
-            document
-              .lineAt(multilineParenthesisVariable.closingBracketLine)
-              .text.includes('{'),
-          metadata: {
-            openingParenthesisLine:
-              multilineParenthesisVariable?.openingBracketLine as number,
-            closingParenthesisLine:
-              multilineParenthesisVariable?.closingBracketLine as number,
-          } as Pick<LogMessage, 'metadata'>,
+          isChecked: false,
         };
       },
-      [LogMessageType.ObjectFunctionCall]: () => {
+      [LogMessageType.ObjectFunctionCallAssignment]: () => {
         if (document.lineCount === selectionLine + 1) {
           return {
             isChecked: false,
@@ -439,9 +499,10 @@ export class JSDebugMessage extends DebugMessage {
           .lineAt(selectionLine + 1)
           .text.replace(/\s/g, '');
         return {
-          isChecked: this.lineCodeProcessing.isObjectFunctionCall(
-            `${currentLineText}\n${nextLineText}`,
-          ),
+          isChecked:
+            this.lineCodeProcessing.isObjectFunctionCall(
+              `${currentLineText}\n${nextLineText}`,
+            ) && this.lineCodeProcessing.isAssignedToVariable(currentLineText),
         };
       },
       [LogMessageType.NamedFunction]: () => {
@@ -513,7 +574,7 @@ export class JSDebugMessage extends DebugMessage {
             if (
               lineOfSelectedVar > currentLineNum &&
               lineOfSelectedVar <
-                closingBracketLine(
+                closingContextLine(
                   document,
                   currentLineNum,
                   BracketType.CURLY_BRACES,
@@ -535,7 +596,7 @@ export class JSDebugMessage extends DebugMessage {
             if (
               lineOfSelectedVar >= currentLineNum &&
               lineOfSelectedVar <
-                closingBracketLine(
+                closingContextLine(
                   document,
                   currentLineNum,
                   BracketType.CURLY_BRACES,
@@ -576,7 +637,7 @@ export class JSDebugMessage extends DebugMessage {
           lines: [],
         };
         logMessage.spaces = this.spacesBeforeLogMsg(document, i, i);
-        const closedParenthesisLine = closingBracketLine(
+        const closedParenthesisLine = closingContextLine(
           document,
           i,
           BracketType.PARENTHESIS,

@@ -6,31 +6,23 @@ export enum LogMessageType {
   MultilineParenthesis = 'MultilineParenthesis',
   NamedFunction = 'NamedFunction',
   NamedFunctionAssignment = 'NamedFunctionAssignment',
-  ObjectFunctionCall = 'ObjectFunctionCall',
+  ObjectFunctionCallAssignment = 'ObjectFunctionCallAssignment',
   ObjectLiteral = 'ObjectLiteral',
   PrimitiveAssignment = 'PrimitiveAssignment',
   Ternary = 'Ternary',
 }
 
-export type LogBracketMetadata = {
-  openingBracketLine: number;
-  closingBracketLine: number;
+export type LogContextMetadata = {
+  openingContextLine: number;
+  closingContextLine: number;
+  deepObjectLine: number;
+  deepObjectPath: string;
 };
-
-export type LogParenthesisMetadata = {
-  openingParenthesisLine: number;
-  closingParenthesisLine: number;
-};
-
 export type NamedFunctionMetadata = {
   line: number;
 };
 
 export type LogMessage = {
   logMessageType: LogMessageType;
-  metadata?:
-    | LogBracketMetadata
-    | LogParenthesisMetadata
-    | NamedFunctionMetadata
-    | unknown;
+  metadata?: LogContextMetadata | NamedFunctionMetadata | unknown;
 };
