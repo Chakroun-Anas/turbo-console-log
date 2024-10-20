@@ -5,16 +5,18 @@ import {
   openDocument,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
+  NaturalEditorPosition,
+  naturalEditorLine,
 } from '../../../helpers';
 import { ProgrammingLanguage } from '../../../../../entities';
 
 export default (): void => {
-  describe('Deconstruction variables creation', () => {
+  describe('Variable getting its value from a function call', () => {
     Mocha.before(async () => {
       await openDocument(
         ProgrammingLanguage.JAVASCRIPT,
         'log-feature/variable',
-        'deconstructionVarAssignment.tsx',
+        'valueFromFunctionCall.ts',
       );
     });
     Mocha.after(async () => {
@@ -23,17 +25,17 @@ export default (): void => {
         [],
       );
     });
-    it('Should insert a log message related to a deconstructed property of an object', async () => {
+    it('Case 1', async () => {
       const { activeTextEditor } = vscode.window;
       expectActiveTextEditorWithFile(
         activeTextEditor,
-        'deconstructionVarAssignment.tsx',
+        'valueFromFunctionCall.ts',
       );
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new vscode.Position(13, 5),
-            new vscode.Position(13, 13),
+            new NaturalEditorPosition(4, 9),
+            new NaturalEditorPosition(4, 19),
           ),
         ];
         await vscode.commands.executeCommand(
@@ -41,26 +43,14 @@ export default (): void => {
           [],
         );
         await Promise.all(
-          documentLinesChanged(activeTextEditor.document, [20]),
+          documentLinesChanged(activeTextEditor.document, [
+            naturalEditorLine(9),
+          ]),
         );
         expect(
-          /console\.log\(.*/.test(activeTextEditor.document.lineAt(20).text),
-        ).to.equal(true);
-        activeTextEditor.selections = [
-          new vscode.Selection(
-            new vscode.Position(25, 10),
-            new vscode.Position(25, 14),
+          /console\.log\(.*/.test(
+            activeTextEditor.document.lineAt(naturalEditorLine(9)).text,
           ),
-        ];
-        await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
-          [],
-        );
-        await Promise.all(
-          documentLinesChanged(activeTextEditor.document, [26]),
-        );
-        expect(
-          /console\.log\(.*/.test(activeTextEditor.document.lineAt(26).text),
         ).to.equal(true);
       }
     });
