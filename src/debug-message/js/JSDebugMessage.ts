@@ -455,11 +455,8 @@ export class JSDebugMessage extends DebugMessage {
           const isOpeningCurlyBraceContext = document
             .lineAt(multilineParenthesisVariable?.closingContextLine as number)
             .text.includes('{');
-          const isOpeningParenthesisContext = document
-            .lineAt(selectionLine)
-            .text.includes('(');
-          if (isOpeningCurlyBraceContext || isOpeningParenthesisContext) {
-            if (this.lineCodeProcessing.isAssignedToVariable(currentLineText)) {
+          if (this.lineCodeProcessing.isAssignedToVariable(currentLineText)) {
+            if (isOpeningCurlyBraceContext) {
               return {
                 isChecked: true,
                 metadata: {
@@ -467,23 +464,24 @@ export class JSDebugMessage extends DebugMessage {
                   closingContextLine: closingContextLine(
                     document,
                     multilineParenthesisVariable?.closingContextLine as number,
-                    isOpeningCurlyBraceContext
-                      ? BracketType.CURLY_BRACES
-                      : BracketType.PARENTHESIS,
+                    BracketType.CURLY_BRACES,
                   ),
                 } as Pick<LogMessage, 'metadata'>,
               };
             }
             return {
-              isChecked: true,
-              metadata: {
-                openingContextLine:
-                  multilineParenthesisVariable?.openingContextLine as number,
-                closingContextLine:
-                  multilineParenthesisVariable?.closingContextLine as number,
-              } as Pick<LogMessage, 'metadata'>,
+              isChecked: false,
             };
           }
+          return {
+            isChecked: true,
+            metadata: {
+              openingContextLine:
+                multilineParenthesisVariable?.openingContextLine as number,
+              closingContextLine:
+                multilineParenthesisVariable?.closingContextLine as number,
+            } as Pick<LogMessage, 'metadata'>,
+          };
         }
         return {
           isChecked: false,

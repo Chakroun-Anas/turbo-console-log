@@ -21,7 +21,9 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
     return false;
   }
   isAssignedToVariable(loc: string): boolean {
-    return /(const|let|var).*{?\s*}?=.*/.test(loc);
+    return /^(?:const|let|var)?\s*(\w+|\$?\w+(\.\w+)*)(\s*{[^}]*}\s*)?\s*=/.test(
+      loc,
+    );
   }
   isAffectationToVariable(loc: string): boolean {
     return /.*=.*/.test(loc);
