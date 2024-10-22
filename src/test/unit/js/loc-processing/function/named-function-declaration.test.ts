@@ -33,6 +33,10 @@ export default (): void => {
     ];
     it('Should return true when LOC contains named function declaration', () => {
       namedFunctionsLOCs.forEach((namedFunctionLOC) => {
+        // console.log(
+        //   '🚀 ~ namedFunctionsLOCs.forEach ~ namedFunctionLOC:',
+        //   namedFunctionLOC,
+        // );
         expect(
           helpers.jsLineCodeProcessing.doesContainsNamedFunctionDeclaration(
             namedFunctionLOC,

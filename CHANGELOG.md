@@ -2,6 +2,12 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.10.6]
+
+### Fixed
+
+- Improved detection of anonymous functions assigned to variable declarations, especially in cases where type annotations or complex expressions were used.
+
 ## [2.10.5]
 
 ### Fixed

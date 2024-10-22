@@ -62,7 +62,7 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
       /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=(\s*)\(.*\)(\s*){/,
     );
     const arrowFunctionAssignedToVariableRegex = new RegExp(
-      /(const|let|var)(\s*)[a-zA-Z0-9]*\s*=.*=>.*/,
+      /(const|let|var)\s+[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*\([^)]*\s*(?::\s*[a-zA-Z_$][a-zA-Z0-9_$<>,\s]*)?\)\s*(?::\s*[a-zA-Z_$][a-zA-Z0-9_$<>,\s]*)?\s*=>\s*{/,
     );
     return (
       regularNamedFunctionRegex.test(locWithoutFunctionKeyword) ||
