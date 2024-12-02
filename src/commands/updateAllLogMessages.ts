@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
 import { DebugMessage } from '../debug-message';
 import { Command, ExtensionProperties, Message } from '../entities';
+import type { JSDebugMessage } from '../debug-message/js';
 
-export function commentAllLogMessagesCommand(): Command {
+export function updateAllLogMessagesCommand(): Command {
   return {
-    name: 'turboConsoleLog.commentAllLogMessages',
+    name: 'turboConsoleLog.updateAllLogMessages',
     handler: async (
       {
         delimiterInsideMessage,
@@ -33,23 +34,31 @@ export function commentAllLogMessagesCommand(): Command {
         return logFunction;
       }
 
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) return;
+      const editor: vscode.TextEditor | undefined =
+        vscode.window.activeTextEditor;
+      if (!editor) {
+        return;
+      }
+      const document: vscode.TextDocument = editor.document;
 
-      const document = editor.document;
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         logFunctionToUse(),
         logMessagePrefix,
         delimiterInsideMessage,
       );
+
       editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {
           lines.forEach((line: vscode.Range) => {
+            const prevLine = document.getText(line).trim();
+            const newLine = (
+              jsDebugMessage as JSDebugMessage
+            ).updateFileNameAndLineNum(prevLine, document, line.start.line + 1);
             editBuilder.delete(line);
             editBuilder.insert(
               new vscode.Position(line.start.line, 0),
-              `${spaces}// ${document.getText(line).trim()}\n`,
+              `${spaces}${newLine}\n`,
             );
           });
         });
