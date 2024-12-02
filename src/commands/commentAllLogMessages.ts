@@ -33,12 +33,10 @@ export function commentAllLogMessagesCommand(): Command {
         return logFunction;
       }
 
-      const editor: vscode.TextEditor | undefined =
-        vscode.window.activeTextEditor;
-      if (!editor) {
-        return;
-      }
-      const document: vscode.TextDocument = editor.document;
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) return;
+
+      const document = editor.document;
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         logFunctionToUse(),

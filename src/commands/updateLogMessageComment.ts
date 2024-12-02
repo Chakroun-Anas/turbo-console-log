@@ -3,9 +3,9 @@ import { DebugMessage } from '../debug-message';
 import { Command, ExtensionProperties, Message } from '../entities';
 import type { JSDebugMessage } from '../debug-message/js';
 
-export function updateAllLogMessagesCommand(): Command {
+export function updateLogMessagesCommand(): Command {
   return {
-    name: 'turboConsoleLog.updateAllLogMessages',
+    name: 'turboConsoleLog.updateLogMessage',
     handler: async (
       {
         delimiterInsideMessage,
@@ -41,6 +41,7 @@ export function updateAllLogMessagesCommand(): Command {
       }
       const document: vscode.TextDocument = editor.document;
 
+      const selections = editor.selections;
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         logFunctionToUse(),
@@ -48,16 +49,26 @@ export function updateAllLogMessagesCommand(): Command {
         delimiterInsideMessage,
       );
 
+      const selectedLogMessages = logMessages.filter((msg) =>
+        msg.lines.some((lineRange) => {
+          return selections.some((sel) => lineRange.intersection(sel));
+        }),
+      );
+
       editor.edit((editBuilder) => {
-        logMessages.forEach(({ spaces, lines }) => {
-          lines.forEach((line: vscode.Range) => {
-            const prevLine = document.getText(line).trim();
+        selectedLogMessages.forEach(({ spaces, lines }) => {
+          lines.forEach((lineRange: vscode.Range) => {
+            const prevLine = document.getText(lineRange).trim();
             const newLine = (
               jsDebugMessage as JSDebugMessage
-            ).updateFileNameAndLineNum(prevLine, document, line.start.line + 1);
-            editBuilder.delete(line);
+            ).updateFileNameAndLineNum(
+              prevLine,
+              document,
+              lineRange.start.line + 1,
+            );
+            editBuilder.delete(lineRange);
             editBuilder.insert(
-              new vscode.Position(line.start.line, 0),
+              new vscode.Position(lineRange.start.line, 0),
               `${spaces}${newLine}\n`,
             );
           });

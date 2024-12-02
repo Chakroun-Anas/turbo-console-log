@@ -166,8 +166,6 @@ export class JSDebugMessage extends DebugMessage {
       props.logFunction !== 'log' ? props.logFunction : `console.${logType}`;
 
     let messageExpression = `${logFunc}(${quote}${message}${quote}, ${selectedVar})`;
-    //console.log( '🚀 ~ file: JSDebugMessage.ts:163 ~ messageExpression:', JSON.stringify(messageExpression), { logFunc, message, contents: JSON.stringify(contents), delimiter, quote, selectedVar, },);
-
     if (addSemicolonInTheEnd) {
       messageExpression += ';';
     }
@@ -324,8 +322,7 @@ export class JSDebugMessage extends DebugMessage {
     newLineNum: number,
   ): string {
     const newFileName = this.normalizeFilename(document.fileName);
-    return prevLine.replace(/file: ([^:]*?):([0-9]+)/, (..._matchData) => {
-      //const [prevFileName, prevLineNum] = matchData.slice(1);
+    return prevLine.replace(/file: ([^:]*?):([0-9]+)/, () => {
       return `file: ${newFileName}:${newLineNum}`;
     });
   }
@@ -348,15 +345,6 @@ export class JSDebugMessage extends DebugMessage {
       lineOfSelectedVar,
       selectedVar,
       logMsg,
-    );
-    console.log(
-      '🚀 ~ file: JSDebugMessage.ts:326 ~ .trim ~ lineOfLogMsg:',
-      lineOfLogMsg,
-      {
-        logMsg,
-        selectedVar,
-        lineOfSelectedVar,
-      },
     );
     const spacesBeforeMsg: string = this.spacesBeforeLogMsg(
       document,
@@ -663,7 +651,6 @@ export class JSDebugMessage extends DebugMessage {
       const { isChecked, metadata } =
         logMsgTypesChecks[logMessageType as keyof typeof logMsgTypesChecks]();
       if (logMessageType !== LogMessageType.PrimitiveAssignment && isChecked) {
-        //console.log( '🚀 ~ file: JSDebugMessage.ts:637 ~ logMessageType:', logMessageType, { isChecked, metadata },);
         return {
           logMessageType,
           metadata,
@@ -750,17 +737,7 @@ export class JSDebugMessage extends DebugMessage {
       logFunction.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
     );
 
-    const documentNbrOfLines: number = document.lineCount;
-    console.log(
-      '🚀 ~ file: JSDebugMessage.ts:726 ~ logFunction:',
-      documentNbrOfLines,
-      JSON.stringify(logFunction),
-      {
-        logMessagePrefix,
-        delimiterInsideMessage,
-      },
-    );
-
+    const documentNbrOfLines = document.lineCount;
     for (let i = 0; i < documentNbrOfLines; i++) {
       // skip if line does not contain any log function text
       if (!turboConsoleLogMessage.test(document.lineAt(i).text)) continue;
@@ -787,12 +764,6 @@ export class JSDebugMessage extends DebugMessage {
         new RegExp(delimiterInsideMessage).test(msg)
       ) {
         logMessages.push(logMessage);
-        console.log(
-          '🚀 ~ file: JSDebugMessage.ts:754 ~ logMessage:',
-          logMessages.length,
-          logMessage.lines.map(formatRange),
-          { logMessage },
-        );
       }
     }
 

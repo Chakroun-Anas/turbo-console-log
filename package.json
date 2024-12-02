@@ -116,6 +116,10 @@
         "title": "Turbo Console Log: Uncomment All Log Messages"
       },
       {
+        "command": "turboConsoleLog.updateLogMessage",
+        "title": "Turbo Console Log: Update Log Messages at Selected Lines"
+      },
+      {
         "command": "turboConsoleLog.updateAllLogMessages",
         "title": "Turbo Console Log: Update All Log Messages"
       },
