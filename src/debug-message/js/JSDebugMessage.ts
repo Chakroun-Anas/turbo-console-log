@@ -44,6 +44,7 @@ const logMessageTypeVerificationPriority = _.sortBy(
 
 export class JSDebugMessage extends DebugMessage {
   jsDebugMessageAnonymous: JSDebugMessageAnonymous;
+
   constructor(
     lineCodeProcessing: LineCodeProcessing,
     debugMessageLine: DebugMessageLine,
@@ -53,6 +54,7 @@ export class JSDebugMessage extends DebugMessage {
       lineCodeProcessing,
     );
   }
+
   private baseDebuggingMsg(
     document: TextDocument,
     textEditor: TextEditorEdit,
@@ -90,81 +92,171 @@ export class JSDebugMessage extends DebugMessage {
     }
     return false;
   }
+
   private constructDebuggingMsg(
     extensionProperties: ExtensionProperties,
     debuggingMsgContent: string,
     spacesBeforeMsg: string,
   ): string {
-    const wrappingMsg = `console.${extensionProperties.logType}(${
-      extensionProperties.quote
-    }${extensionProperties.logMessagePrefix} ${'-'.repeat(
-      debuggingMsgContent.length - 16,
-    )}${extensionProperties.logMessagePrefix}${extensionProperties.quote})${
-      extensionProperties.addSemicolonInTheEnd ? ';' : ''
-    }`;
-    const debuggingMsg: string = extensionProperties.wrapLogMessage
+    const {
+      logType,
+      quote,
+      logMessagePrefix,
+      addSemicolonInTheEnd,
+      wrapLogMessage,
+    } = extensionProperties;
+
+    let msgContent = '-'.repeat(debuggingMsgContent.length - 16);
+    msgContent = `${logMessagePrefix} ${msgContent}${logMessagePrefix}`;
+
+    let wrappingMsg = `console.${logType}(${quote}${msgContent}${quote})`;
+    if (addSemicolonInTheEnd) {
+      wrappingMsg += ';';
+    }
+
+    const debuggingMsg: string = wrapLogMessage
       ? `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsgContent}\n${spacesBeforeMsg}${wrappingMsg}`
       : `${spacesBeforeMsg}${debuggingMsgContent}`;
+
     return debuggingMsg;
   }
+
+  /** Construct the message content to display. */
   private constructDebuggingMsgContent(
     document: TextDocument,
     selectedVar: string,
     lineOfSelectedVar: number,
     lineOfLogMsg: number,
-    extensionProperties: Omit<
+    props: Omit<
       ExtensionProperties,
       'wrapLogMessage' | 'insertEmptyLineAfterLogMessage'
     >,
   ): string {
-    const fileName = document.fileName.includes('/')
-      ? document.fileName.split('/')[document.fileName.split('/').length - 1]
-      : document.fileName.split('\\')[document.fileName.split('\\').length - 1];
-    const funcThatEncloseTheVar: string = this.enclosingBlockName(
+    const {
+      addSemicolonInTheEnd,
+      logType,
+      quote,
+      logMessageSuffix,
+      delimiterInsideMessage: delimiter,
+    } = props;
+
+    const contents = [
+      ...this.gen_fileNameAndLineNum(document, lineOfLogMsg, props),
+      ...this.gen_enclosingClass(
+        document,
+        lineOfSelectedVar,
+        this.enclosingBlockName.bind(this),
+        props,
+      ),
+      ...this.gen_enclosingFunction(
+        document,
+        lineOfSelectedVar,
+        this.enclosingBlockName.bind(this),
+        props,
+      ),
+      selectedVar,
+    ];
+    const message = [
+      prefix(),
+      contents.join(` ${delimiter} `),
+      logMessageSuffix,
+    ].join('');
+
+    const logFunc =
+      props.logFunction !== 'log' ? props.logFunction : `console.${logType}`;
+
+    let messageExpression = `${logFunc}(${quote}${message}${quote}, ${selectedVar})`;
+    //console.log( '🚀 ~ file: JSDebugMessage.ts:163 ~ messageExpression:', JSON.stringify(messageExpression), { logFunc, message, contents: JSON.stringify(contents), delimiter, quote, selectedVar, },);
+
+    if (addSemicolonInTheEnd) {
+      messageExpression += ';';
+    }
+
+    return messageExpression;
+
+    ///
+
+    function prefix() {
+      const { logMessagePrefix, delimiterInsideMessage: delimiter } = props;
+
+      const space =
+        logMessagePrefix && logMessagePrefix !== `${delimiter} `
+          ? ` ${delimiter} `
+          : '';
+
+      return `${logMessagePrefix}${space}`;
+    }
+  }
+
+  private gen_enclosingFunction(
+    document: TextDocument,
+    lineOfSelectedVar: number,
+    enclosingBlockName: (
+      document: TextDocument,
+      lineOfSelectedVar: number,
+      blockType: BlockType,
+    ) => string,
+    {
+      insertEnclosingFunction,
+    }: Pick<ExtensionProperties, 'insertEnclosingFunction'>,
+  ) {
+    if (!insertEnclosingFunction) return [];
+
+    const funcThatEncloseTheVar: string = enclosingBlockName(
       document,
       lineOfSelectedVar,
       'function',
     );
-    const classThatEncloseTheVar: string = this.enclosingBlockName(
+    if (!funcThatEncloseTheVar) return [];
+
+    return [funcThatEncloseTheVar];
+  }
+
+  private gen_enclosingClass(
+    document: TextDocument,
+    lineOfSelectedVar: number,
+    enclosingBlockName: (
+      document: TextDocument,
+      lineOfSelectedVar: number,
+      blockType: BlockType,
+    ) => string,
+    { insertEnclosingClass }: Pick<ExtensionProperties, 'insertEnclosingClass'>,
+  ) {
+    if (!insertEnclosingClass) return [];
+
+    const classThatEncloseTheVar: string = enclosingBlockName(
       document,
       lineOfSelectedVar,
       'class',
     );
-    const semicolon: string = extensionProperties.addSemicolonInTheEnd
-      ? ';'
-      : '';
-    return `${
-      extensionProperties.logFunction !== 'log'
-        ? extensionProperties.logFunction
-        : `console.${extensionProperties.logType}`
-    }(${extensionProperties.quote}${extensionProperties.logMessagePrefix}${
-      extensionProperties.logMessagePrefix.length !== 0 &&
-      extensionProperties.logMessagePrefix !==
-        `${extensionProperties.delimiterInsideMessage} `
-        ? ` ${extensionProperties.delimiterInsideMessage} `
-        : ''
-    }${
-      extensionProperties.includeFileNameAndLineNum
-        ? `file: ${fileName}:${
-            lineOfLogMsg +
-            (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
-          } ${extensionProperties.delimiterInsideMessage} `
-        : ''
-    }${
-      extensionProperties.insertEnclosingClass
-        ? classThatEncloseTheVar.length > 0
-          ? `${classThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
-          : ``
-        : ''
-    }${
-      extensionProperties.insertEnclosingFunction
-        ? funcThatEncloseTheVar.length > 0
-          ? `${funcThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
-          : ''
-        : ''
-    }${selectedVar}${extensionProperties.logMessageSuffix}${
-      extensionProperties.quote
-    }, ${selectedVar})${semicolon}`;
+    if (!classThatEncloseTheVar) return [];
+
+    return [classThatEncloseTheVar];
+  }
+
+  private gen_fileNameAndLineNum(
+    { fileName: docFileName }: TextDocument,
+    lineOfLogMsg: number,
+    {
+      insertEmptyLineBeforeLogMessage,
+      includeFileNameAndLineNum,
+    }: Pick<
+      ExtensionProperties,
+      'includeFileNameAndLineNum' | 'insertEmptyLineBeforeLogMessage'
+    >,
+  ) {
+    if (!includeFileNameAndLineNum) return [];
+
+    const fileName = this.normalizeFilename(docFileName);
+
+    const lineNum = lineOfLogMsg + (insertEmptyLineBeforeLogMessage ? 2 : 1);
+    return [`file: ${fileName}:${lineNum}`];
+  }
+
+  private normalizeFilename(docFileName: string): string {
+    return docFileName.includes('/')
+      ? docFileName.split('/')[docFileName.split('/').length - 1]
+      : docFileName.split('\\')[docFileName.split('\\').length - 1];
   }
 
   private emptyBlockDebuggingMsg(
@@ -225,6 +317,19 @@ export class JSDebugMessage extends DebugMessage {
     }
     return null;
   }
+
+  updateFileNameAndLineNum(
+    prevLine: string,
+    document: TextDocument,
+    newLineNum: number,
+  ): string {
+    const newFileName = this.normalizeFilename(document.fileName);
+    return prevLine.replace(/file: ([^:]*?):([0-9]+)/, (..._matchData) => {
+      //const [prevFileName, prevLineNum] = matchData.slice(1);
+      return `file: ${newFileName}:${newLineNum}`;
+    });
+  }
+
   msg(
     textEditor: TextEditorEdit,
     document: TextDocument,
@@ -244,6 +349,15 @@ export class JSDebugMessage extends DebugMessage {
       selectedVar,
       logMsg,
     );
+    console.log(
+      '🚀 ~ file: JSDebugMessage.ts:326 ~ .trim ~ lineOfLogMsg:',
+      lineOfLogMsg,
+      {
+        logMsg,
+        selectedVar,
+        lineOfSelectedVar,
+      },
+    );
     const spacesBeforeMsg: string = this.spacesBeforeLogMsg(
       document,
       (logMsg.metadata as LogContextMetadata)?.deepObjectLine
@@ -251,6 +365,7 @@ export class JSDebugMessage extends DebugMessage {
         : lineOfSelectedVar,
       lineOfLogMsg,
     );
+
     const debuggingMsgContent: string = this.constructDebuggingMsgContent(
       document,
       (logMsg.metadata as LogContextMetadata)?.deepObjectPath
@@ -263,11 +378,13 @@ export class JSDebugMessage extends DebugMessage {
         'insertEmptyLineAfterLogMessage',
       ]),
     );
+
     const debuggingMsg: string = this.constructDebuggingMsg(
       extensionProperties,
       debuggingMsgContent,
       spacesBeforeMsg,
     );
+
     const selectedVarLine = document.lineAt(lineOfSelectedVar);
     const selectedVarLineLoc = selectedVarLine.text;
     if (this.isEmptyBlockContext(document, logMsg)) {
@@ -546,6 +663,7 @@ export class JSDebugMessage extends DebugMessage {
       const { isChecked, metadata } =
         logMsgTypesChecks[logMessageType as keyof typeof logMsgTypesChecks]();
       if (logMessageType !== LogMessageType.PrimitiveAssignment && isChecked) {
+        //console.log( '🚀 ~ file: JSDebugMessage.ts:637 ~ logMessageType:', logMessageType, { isChecked, metadata },);
         return {
           logMessageType,
           metadata,
@@ -617,42 +735,81 @@ export class JSDebugMessage extends DebugMessage {
     }
     return '';
   }
+
+  /** Detect all messages */
   detectAll(
     document: TextDocument,
     logFunction: string,
     logMessagePrefix: string,
     delimiterInsideMessage: string,
   ): Message[] {
-    const documentNbrOfLines: number = document.lineCount;
     const logMessages: Message[] = [];
+
+    const turboConsoleLogMessage = new RegExp(
+      // escape special characters with backslash(\)
+      logFunction.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+    );
+
+    const documentNbrOfLines: number = document.lineCount;
+    console.log(
+      '🚀 ~ file: JSDebugMessage.ts:726 ~ logFunction:',
+      documentNbrOfLines,
+      JSON.stringify(logFunction),
+      {
+        logMessagePrefix,
+        delimiterInsideMessage,
+      },
+    );
+
     for (let i = 0; i < documentNbrOfLines; i++) {
-      const turboConsoleLogMessage = new RegExp(
-        logFunction.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+      // skip if line does not contain any log function text
+      if (!turboConsoleLogMessage.test(document.lineAt(i).text)) continue;
+
+      const logMessage: Message = {
+        spaces: '',
+        lines: [],
+      };
+      logMessage.spaces = this.spacesBeforeLogMsg(document, i, i);
+
+      const closedParenthesisLine = closingContextLine(
+        document,
+        i,
+        BracketType.PARENTHESIS,
       );
-      if (turboConsoleLogMessage.test(document.lineAt(i).text)) {
-        const logMessage: Message = {
-          spaces: '',
-          lines: [],
-        };
-        logMessage.spaces = this.spacesBeforeLogMsg(document, i, i);
-        const closedParenthesisLine = closingContextLine(
-          document,
-          i,
-          BracketType.PARENTHESIS,
+      let msg = '';
+      for (let j = i; j <= closedParenthesisLine; j++) {
+        msg += document.lineAt(j).text;
+        logMessage.lines.push(document.lineAt(j).rangeIncludingLineBreak);
+      }
+      // line should have messagePrefix and delimiter to be recognized.
+      if (
+        new RegExp(logMessagePrefix).test(msg) ||
+        new RegExp(delimiterInsideMessage).test(msg)
+      ) {
+        logMessages.push(logMessage);
+        console.log(
+          '🚀 ~ file: JSDebugMessage.ts:754 ~ logMessage:',
+          logMessages.length,
+          logMessage.lines.map(formatRange),
+          { logMessage },
         );
-        let msg = '';
-        for (let j = i; j <= closedParenthesisLine; j++) {
-          msg += document.lineAt(j).text;
-          logMessage.lines.push(document.lineAt(j).rangeIncludingLineBreak);
-        }
-        if (
-          new RegExp(logMessagePrefix).test(msg) ||
-          new RegExp(delimiterInsideMessage).test(msg)
-        ) {
-          logMessages.push(logMessage);
-        }
       }
     }
+
     return logMessages;
+  }
+}
+
+// ---
+import * as vscode from 'vscode';
+
+function formatRange(range: vscode.Range) {
+  return `${formatPos(range.start)}-${_formatPos(range.end)}`;
+  function _formatPos(pos: vscode.Position) {
+    return `${pos.line}:${pos.character}`;
+  }
+
+  function formatPos(pos: vscode.Position) {
+    return `Pos(${_formatPos(pos)})`;
   }
 }

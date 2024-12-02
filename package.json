@@ -116,6 +116,10 @@
         "title": "Turbo Console Log: Uncomment All Log Messages"
       },
       {
+        "command": "turboConsoleLog.updateAllLogMessages",
+        "title": "Turbo Console Log: Update All Log Messages"
+      },
+      {
         "command": "turboConsoleLog.deleteAllLogMessages",
         "title": "Turbo Console Log: Delete All Log Messages"
       }
@@ -150,7 +154,7 @@
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "watch": "npm run esbuild --watch",
     "lint": "eslint src --ext ts",
-    "pretest": "yarn run esbuild-base",
+    "pretest": "npm run esbuild-base",
     "test-compile": "rm -rf out && tsc -p ./ && mkdir out/test/files && cp -r src/test/files/ out/test/files/",
     "test": "npm run test-compile && node ./out/test/runTests.js",
     "test:unit": "npm run test-compile && mocha --require ts-node/register 'src/test/unit/**/*.test.ts'"
