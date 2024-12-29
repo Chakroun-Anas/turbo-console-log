@@ -17,12 +17,13 @@ export function activate(): void {
     jsLineCodeProcessing,
     debugMessageLine,
   );
-  const config: vscode.WorkspaceConfiguration =
-    vscode.workspace.getConfiguration('turboConsoleLog');
-  const properties: ExtensionProperties = getExtensionProperties(config);
+
   const commands: Array<Command> = getAllCommands();
   for (const { name, handler } of commands) {
     vscode.commands.registerCommand(name, (args: unknown[]) => {
+      const config: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration('turboConsoleLog');
+      const properties: ExtensionProperties = getExtensionProperties(config);
       handler(properties, jsDebugMessage, args);
     });
   }
