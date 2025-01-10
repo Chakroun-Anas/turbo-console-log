@@ -1,2 +1,2 @@
-import { JSDebugMessage } from './JSDebugMessage';
-export { JSDebugMessage };
+import { jsDebugMessage } from './JSDebugMessage/JSDebugMessage';
+export { jsDebugMessage };

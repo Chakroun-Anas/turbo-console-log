@@ -1,100 +1,107 @@
-# Official Website
+# Turbo Console Log 🚀
 
-https://www.turboconsolelog.io
+[Official Website](https://www.turboconsolelog.io)  
+[Become a Sponsor](https://www.turboconsolelog.io/home?showSponsor=true)
 
-# Main Functionality
+---
 
-Turbo Console Log extension makes debugging much easier by automating the operation of writing meaningful log message.
+## 🌟 Why Turbo Console Log?
 
-## Sponsorship
+Turbo Console Log isn’t just an extension—it’s a **game-changer** trusted by over **1.7 million developers** worldwide. It simplifies debugging and saves countless hours by automating the process of inserting meaningful log messages into your code.
 
-Since the extension is free and open source, we need your support to continue developing and maintaining it. If you are interested in sponsoring the project, u can do it through the following [Link](https://donate.stripe.com/3cs28j2es9mxaGI7st) or contact us at sponsorship@turboconsolelog.io. For more information please visit: https://www.turboconsolelog.io/sponsorship
+Whether you're a beginner or a seasoned pro, Turbo Console Log **supercharges your productivity**, helping you focus on building, not debugging.
 
-## Core Features
+---
 
-Full documentation of the core features can be found in the official website: https://www.turboconsolelog.io/documentation/features
+## ❤️ We Need Your Support!
 
-### I) Insert a meaningful log message
+Turbo Console Log is **free** and **open source**, built on passion, late nights, and a commitment to the community. But maintaining and improving it requires resources.
 
-Two steps:
+Your sponsorship is **critical** to:
 
-- Selecting or hovering the variable which is the subject of the debugging (Manual selection will always take over the hover selection)
+- ⚡ Deliver faster bug fixes and updates.
+- 🌟 Create exciting new features for the developer community.
+- 💻 Ensure Turbo Console Log remains free for everyone.
 
-- Pressing ctrl + alt + L (Windows) or ctrl + option + L (Mac)
+Every contribution makes a difference. Imagine being part of a movement that helps over **1.7 million developers worldwide** build better software.
 
-The log message will be inserted in the next line relative to the selected variable like the following:
+🎯 **Click here to sponsor now**: [https://www.turboconsolelog.io/home?showSponsor=true](https://www.turboconsolelog.io/home?showSponsor=true)
 
-`console.log('🚀 ~ classWrappingVariable ~ functionWrappingVariable ~ variable', variable);`
+---
 
-The log function and the content of the log message can be customized in the extension settings (see Settings section for more details).
+## 🏆 What’s in It for You?
 
-Multiple cursor selection is also supported.
+By sponsoring Turbo Console Log, you:
 
-[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation/features/insert-log-message)
+1. **Join the Turbo Console Log Family**: Be recognized as a vital supporter of one of the most-used debugging tools in the JavaScript ecosystem.
+2. **Fuel Innovation**: Your contribution directly funds impactful new features and improvements.
+3. **Get Bragging Rights**: Show your support for a project that powers the tools of millions of developers.
 
-### II) Comment all log messages, inserted by the extension, from the current document
+We’ve created an **easy-to-use donation process** to make supporting the project as seamless as possible. It only takes a moment to contribute to something meaningful.
 
-All it takes to comment all log messages, inserted by the extension, from the current document is to press alt + shift + c (Windows) or option + shift + c (Mac)
+[👉 Become a Sponsor Today](https://www.turboconsolelog.io/home?showSponsor=true)
 
-[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation/features/comment-inserted-log-messages)
+---
 
-### III) Uncomment all log messages, inserted by the extension, from the current document
+## 💡 Core Features
 
-All it takes to uncomment all log messages, inserted by the extension, from the current document is to press alt + shift + u (Windows) or option + shift + u (Mac)
+Turbo Console Log’s main features are designed to make debugging **simple, intuitive, and efficient**. Here’s a quick overview of what you can do:
 
-[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation/features/uncomment-log-messages)
+1. **Insert Meaningful Log Messages**  
+   Quickly add console log statements with context, including class, function, variable, and file name.
 
-### IV) Delete all log messages, inserted by the extension, from the current document
+2. **Comment, Uncomment, or Delete Log Messages**  
+   Manage log messages inserted by the extension with just a shortcut.
 
-All it takes to delete all log messages, inserted by the extension, from the current document is to press alt + shift + d (Windows) or option + shift + d (Mac)
+3. **Multi-Cursor Support**  
+   Add logs to multiple variables at once for comprehensive debugging.
 
-[<u>See It In Action</u>](https://www.turboconsolelog.io/documentation/features/delete-log-messages)
+For full documentation of these features, visit the [Official Documentation](https://www.turboconsolelog.io/documentation/features).
 
-## Settings
+---
 
-Full documentation of the settings can be found in the official website: https://www.turboconsolelog.io/documentation/settings
+## ⚙️ Customization
 
-Properties:
+Turbo Console Log offers extensive customization options to match your preferences. Customize everything from prefixes and suffixes to the log function and message format.
 
-| Feature                              | Description                                                                                                                 | Setting                         | Default     |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ----------- |
-| Custom Prefix                        | The prefix of the log message                                                                                               | logMessagePrefix                | 🚀          |
-| Custom Suffix                        | The suffix of the log message                                                                                               | logMessageSuffix                | :           |
-| Log Type                             | The type of the log message                                                                                                 | logType                         | log         |
-| Custom Log Function                  | Custom log function to use in the inserted log message, when specified logType property will be ignored                     | logFunction                     | console.log |
-| Delimiter Inside Message             | The delimiter that will separate the different log message elements (file name, line number, class, function, and variable) | delimiterInsideMessage          | ~           |
-| Quote                                | Double quotes ("") or single quotes ('')                                                                                    | quote                           | "           |
-| Add Semicolon In The End             | Whether to put a semicolon at the end of the log message or not                                                             | addSemicolonInTheEnd            | true        |
-| Insert Enclosing Class               | Whether to insert or not the enclosing class of the selected variable in the log message                                    | insertEnclosingClass            | true        |
-| Insert Enclosing Function            | Whether to insert or not the enclosing function of the selected variable in the log message                                 | insertEnclosingFunction         | true        |
-| Include File Name And Line Number    | Whether to include the file name and the line number of the log message                                                     | includeFileNameAndLineNum       | true        |
-| Wrap Log Message                     | Whether to wrap the log message or not                                                                                      | wrapLogMessage                  | true        |
-| Insert Empty Line Before Log Message | Whether to insert an empty line before the log message or not                                                               | insertEmptyLineBeforeLogMessage | true        |
-| Insert Empty Line After Log Message  | Whether to insert an empty line after the log message or not                                                                | insertEmptyLineAfterLogMessage  | true        |
+Explore all settings here: [Settings Documentation](https://www.turboconsolelog.io/documentation/settings)
 
-## Roadmap
+---
 
-https://www.turboconsolelog.io/roadmap
+## 🌟 Testimonials and Reviews
 
-## Articles
+> “Turbo Console Log is a lifesaver. It’s made debugging so much faster and more enjoyable.”  
+> – A Turbo Console Log User
 
-- [<u>Introducing Our New Website</u>](https://www.turboconsolelog.io/articles/introducing-new-website)
-- [<u>Motivation behind Turbo Console Log</u>](https://www.turboconsolelog.io/articles/motivation-behind-tcl)
+With over **1.7 million installs**, we’re proud to be one of the most-loved extensions in the VS Code Marketplace.
 
-## Contact
+---
+
+## 🎯 Take Action Now
+
+Imagine a world where Turbo Console Log no longer exists. Debugging becomes slower, productivity drops, and development feels like a chore. **Don’t let that happen.**
+
+💡 **Click below to support the extension and keep it alive**:  
+[https://www.turboconsolelog.io/home?showSponsor=true](https://www.turboconsolelog.io/home?showSponsor=true)
+
+Every euro you contribute directly impacts **millions of developers** worldwide. Let’s keep building something amazing, together.
+
+---
+
+## 📧 Contact
 
 - Support: [support@turboconsolelog.io](mailto:support@turboconsolelog.io)
 - Feedback: [feedback@turboconsolelog.io](mailto:feedback@turboconsolelog.io)
 - Sponsorship: [sponsorship@turboconsolelog.io](mailto:sponsorship@turboconsolelog.io)
 
-## Release Notes
+---
 
-See the [<u>Changelog file</u>](https://marketplace.visualstudio.com/items/ChakrounAnas.turbo-console-log/changelog) for details.
+## 💻 Participate
 
-## Participate
+Turbo Console Log is open for contributions. Join us on GitHub to report issues, suggest features, or submit pull requests: [GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)
 
-You're more than welcome to participate in the development of the extension by creating pull requests and submitting issues, link of the project in github: https://github.com/Chakroun-Anas/turbo-console-log
+---
 
-## License
+## 📜 License
 
 MIT Copyright &copy; Turbo Console Log

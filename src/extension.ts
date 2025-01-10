@@ -1,31 +1,25 @@
 import * as vscode from 'vscode';
-import { DebugMessage } from './debug-message';
-import { JSDebugMessage } from './debug-message/js';
+import { jsDebugMessage } from './debug-message/js';
 import { Command, ExtensionProperties } from './entities';
-import { LineCodeProcessing } from './line-code-processing';
-import { JSLineCodeProcessing } from './line-code-processing/js';
 import { getAllCommands } from './commands/';
-import { DebugMessageLine } from './debug-message/DebugMessageLine';
-import { JSDebugMessageLine } from './debug-message/js/JSDebugMessageLine';
 
-export function activate(): void {
-  const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
-  const debugMessageLine: DebugMessageLine = new JSDebugMessageLine(
-    jsLineCodeProcessing,
-  );
-  const jsDebugMessage: DebugMessage = new JSDebugMessage(
-    jsLineCodeProcessing,
-    debugMessageLine,
-  );
+const CURRENT_VERSION = '2.10.6';
+const DONATION_LINK = 'https://turboconsolelog.io/home?showSponsor=true';
+const LAST_VERSION_KEY = 'lastNotifiedVersion';
+
+export function activate(context: vscode.ExtensionContext): void {
   const config: vscode.WorkspaceConfiguration =
     vscode.workspace.getConfiguration('turboConsoleLog');
   const properties: ExtensionProperties = getExtensionProperties(config);
   const commands: Array<Command> = getAllCommands();
+
   for (const { name, handler } of commands) {
     vscode.commands.registerCommand(name, (args: unknown[]) => {
       handler(properties, jsDebugMessage, args);
     });
   }
+
+  checkVersionAndShowNotification(context);
 }
 
 function getExtensionProperties(
@@ -49,4 +43,51 @@ function getExtensionProperties(
     logType: workspaceConfig.logType ?? 'log',
     logFunction: workspaceConfig.logFunction ?? 'log',
   };
+}
+
+// Function to check version and show notification
+function checkVersionAndShowNotification(
+  context: vscode.ExtensionContext,
+): void {
+  const installedVersion = vscode.extensions.getExtension(
+    'ChakrounAnas.turbo-console-log',
+  )?.packageJSON.version;
+
+  if (
+    installedVersion &&
+    isVersionGreaterThan(installedVersion, CURRENT_VERSION)
+  ) {
+    const lastNotifiedVersion =
+      context.globalState.get<string>(LAST_VERSION_KEY);
+
+    // Show notification only if it's a new version
+    if (lastNotifiedVersion !== installedVersion) {
+      vscode.window
+        .showInformationMessage(
+          `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
+          'Donate',
+          'Dismiss',
+        )
+        .then((selection) => {
+          if (selection === 'Donate') {
+            vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
+          }
+        });
+
+      // Update the last notified version
+      context.globalState.update(LAST_VERSION_KEY, installedVersion);
+    }
+  }
+}
+
+// Function to compare semantic versions
+function isVersionGreaterThan(version: string, baseVersion: string): boolean {
+  const parseVersion = (v: string) =>
+    v.split('.').map((num) => parseInt(num, 10));
+  const [majorA, minorA, patchA] = parseVersion(version);
+  const [majorB, minorB, patchB] = parseVersion(baseVersion);
+
+  if (majorA !== majorB) return majorA > majorB;
+  if (minorA !== minorB) return minorA > minorB;
+  return patchA > patchB;
 }
