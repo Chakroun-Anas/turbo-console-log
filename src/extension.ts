@@ -50,7 +50,7 @@ function checkVersionAndShowNotification(
   context: vscode.ExtensionContext,
 ): void {
   const installedVersion = vscode.extensions.getExtension(
-    'ChakrounAnas.turbo-console-log',
+    'chakrounanas.turbo-console-log',
   )?.packageJSON.version;
 
   if (

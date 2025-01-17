@@ -2,6 +2,13 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.10.8]
+
+### Fixed
+
+- Corrected the extension ID used in the donation notification logic to ensure the notification displays properly in the published version.  
+  Users will now see the sponsorship invitation notification when updating to a new version.
+
 ## [2.10.7]
 
 ### Changed
