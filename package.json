@@ -38,10 +38,15 @@
           "default": ":",
           "description": "The suffix of the log message."
         },
-        "turboConsoleLog.includeFileNameAndLineNum": {
+        "turboConsoleLog.includeFilename": {
           "type": "boolean",
           "default": false,
-          "description": "Whether to include the file name and the line number of the log message."
+          "description": "Whether to include the file name of the log message."
+        },
+        "turboConsoleLog.includeLineNum": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to include the line number of the log message."
         },
         "turboConsoleLog.addSemicolonInTheEnd": {
           "type": "boolean",

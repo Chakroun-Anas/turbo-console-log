@@ -38,8 +38,8 @@ function getExtensionProperties(
       workspaceConfig.insertEmptyLineAfterLogMessage ?? false,
     quote: workspaceConfig.quote ?? '"',
     delimiterInsideMessage: workspaceConfig.delimiterInsideMessage ?? '~',
-    includeFileNameAndLineNum:
-      workspaceConfig.includeFileNameAndLineNum ?? false,
+    includeLineNum: workspaceConfig.includeLineNum ?? false,
+    includeFilename: workspaceConfig.includeFilename ?? false,
     logType: workspaceConfig.logType ?? 'log',
     logFunction: workspaceConfig.logFunction ?? 'log',
   };

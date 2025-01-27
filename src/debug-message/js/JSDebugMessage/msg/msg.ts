@@ -82,6 +82,8 @@ function constructDebuggingMsgContent(
     lineCodeProcessing,
   );
   const semicolon: string = extensionProperties.addSemicolonInTheEnd ? ';' : '';
+  const includeFilename = extensionProperties.includeFilename;
+  const includeLineNum = extensionProperties.includeLineNum;
   return `${
     extensionProperties.logFunction !== 'log'
       ? extensionProperties.logFunction
@@ -93,10 +95,12 @@ function constructDebuggingMsgContent(
       ? ` ${extensionProperties.delimiterInsideMessage} `
       : ''
   }${
-    extensionProperties.includeFileNameAndLineNum
-      ? `file: ${fileName}:${
-          lineOfLogMsg +
-          (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
+    includeFilename || includeLineNum
+      ? `${includeFilename ? fileName : ''}${includeLineNum ? ':' : ''}${
+          includeLineNum
+            ? lineOfLogMsg +
+              (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
+            : ''
         } ${extensionProperties.delimiterInsideMessage} `
       : ''
   }${
