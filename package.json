@@ -110,19 +110,23 @@
     "commands": [
       {
         "command": "turboConsoleLog.displayLogMessage",
-        "title": "Turbo Console Log: Display Log Message"
+        "title": "Turbo Console Log: Display Turbo Log Message"
       },
       {
         "command": "turboConsoleLog.commentAllLogMessages",
-        "title": "Turbo Console Log: Comment All Log Messages"
+        "title": "Turbo Console Log: Comment Turbo Log Messages"
       },
       {
         "command": "turboConsoleLog.uncommentAllLogMessages",
-        "title": "Turbo Console Log: Uncomment All Log Messages"
+        "title": "Turbo Console Log: Uncomment Turbo Log Messages"
       },
       {
         "command": "turboConsoleLog.deleteAllLogMessages",
-        "title": "Turbo Console Log: Delete All Log Messages"
+        "title": "Turbo Console Log: Delete Turbo Log Messages"
+      },
+      {
+        "command": "turboConsoleLog.correctAllLogMessages",
+        "title": "Turbo Console Log: Correct Turbo Log Messages"
       }
     ],
     "keybindings": [
@@ -145,6 +149,11 @@
         "command": "turboConsoleLog.deleteAllLogMessages",
         "key": "alt+shift+d",
         "mac": "alt+shift+d"
+      },
+      {
+        "command": "turboConsoleLog.correctAllLogMessages",
+        "key": "alt+shift+x",
+        "mac": "alt+shift+x"
       }
     ]
   },
