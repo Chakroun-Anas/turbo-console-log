@@ -41,6 +41,7 @@ export default (): void => {
               };`,
         'export const platform={clear(){',
         'let obj = {x, y, z};',
+        "const FLAG_CONFIG = {'OSSNextMajor':getNextMajorFlagValue,",
       ];
       objLiteralAssignmentLOCs.forEach((objLiteralAssignmentLOC) => {
         expect(
