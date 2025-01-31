@@ -52,6 +52,12 @@ export class JSDebugMessageLine implements DebugMessageLine {
           selectionLine,
           selectedVar,
         );
+      case LogMessageType.FunctionCallAssignment:
+        return this.objectFunctionCallLine(
+          document,
+          selectionLine,
+          selectedVar,
+        );
       case LogMessageType.ArrayAssignment:
         return this.arrayLine(document, selectionLine);
       case LogMessageType.MultilineParenthesis:

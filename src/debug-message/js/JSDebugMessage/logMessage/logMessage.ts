@@ -16,12 +16,16 @@ const logMessageTypeVerificationPriority = _.sortBy(
       logMessageType: LogMessageType.ObjectFunctionCallAssignment,
       priority: 4,
     },
-    { logMessageType: LogMessageType.NamedFunction, priority: 6 },
-    { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 5 },
-    { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 7 },
-    { logMessageType: LogMessageType.MultilineParenthesis, priority: 9 },
-    { logMessageType: LogMessageType.MultilineBraces, priority: 10 },
-    { logMessageType: LogMessageType.PrimitiveAssignment, priority: 8 },
+    {
+      logMessageType: LogMessageType.FunctionCallAssignment,
+      priority: 5,
+    },
+    { logMessageType: LogMessageType.NamedFunction, priority: 7 },
+    { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 6 },
+    { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 8 },
+    { logMessageType: LogMessageType.MultilineParenthesis, priority: 10 },
+    { logMessageType: LogMessageType.MultilineBraces, priority: 11 },
+    { logMessageType: LogMessageType.PrimitiveAssignment, priority: 9 },
     { logMessageType: LogMessageType.Decorator, priority: 0 },
     { logMessageType: LogMessageType.Ternary, priority: 1 },
   ],
@@ -213,6 +217,18 @@ export function logMessage(
           lineCodeProcessing.isObjectFunctionCall(
             `${currentLineText}\n${nextLineText}`,
           ) && lineCodeProcessing.isAssignedToVariable(currentLineText),
+      };
+    },
+    [LogMessageType.FunctionCallAssignment]: () => {
+      if (document.lineCount === selectionLine + 1) {
+        return {
+          isChecked: false,
+        };
+      }
+      return {
+        isChecked:
+          lineCodeProcessing.isFunctionCall(currentLineText) &&
+          lineCodeProcessing.isAssignedToVariable(currentLineText),
       };
     },
     [LogMessageType.NamedFunction]: () => {
