@@ -3,6 +3,7 @@ import functionTests from './function';
 import classTests from './class';
 import arrayTests from './array';
 import objectTests from './object';
+import assignmentTests from './variable';
 
 export default (): void => {
   describe('JS LOC processing', () => {
@@ -10,5 +11,6 @@ export default (): void => {
     arrayTests();
     classTests();
     functionTests();
+    assignmentTests();
   });
 };

@@ -22,7 +22,7 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   }
   isAssignedToVariable(loc: string): boolean {
     return /^(?:const|let|var)?\s*(\w+|\$?\w+(\.\w+)*)(\s*{[^}]*}\s*)?\s*=/.test(
-      loc,
+      loc.trim(),
     );
   }
   isAffectationToVariable(loc: string): boolean {
