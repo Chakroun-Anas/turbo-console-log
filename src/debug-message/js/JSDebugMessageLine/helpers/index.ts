@@ -6,6 +6,7 @@ import { functionCallLine } from './functionCallLine';
 import { arrayLine } from './arrayLine';
 import { templateStringLine } from './templateStringLine';
 import { nullishCoalescingLine } from './nullishCoalescingLine';
+import { primitiveAssignmentLine } from './primitiveAssignmentLine';
 export {
   ternaryExpressionLine,
   objectLiteralLine,
@@ -15,4 +16,5 @@ export {
   arrayLine,
   templateStringLine,
   nullishCoalescingLine,
+  primitiveAssignmentLine,
 };

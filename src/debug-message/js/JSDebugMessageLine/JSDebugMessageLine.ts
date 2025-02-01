@@ -16,6 +16,7 @@ import {
   arrayLine,
   templateStringLine,
   nullishCoalescingLine,
+  primitiveAssignmentLine,
 } from './helpers';
 
 export const jsDebugMessageLine: DebugMessageLine = {
@@ -26,6 +27,8 @@ export const jsDebugMessageLine: DebugMessageLine = {
     logMsg: LogMessage,
   ): number {
     switch (logMsg.logMessageType) {
+      case LogMessageType.PrimitiveAssignment:
+        return primitiveAssignmentLine(document, selectionLine);
       case LogMessageType.ObjectLiteral:
         return objectLiteralLine(document, selectionLine);
       case LogMessageType.NamedFunctionAssignment:
