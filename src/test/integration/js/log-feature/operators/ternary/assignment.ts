@@ -25,7 +25,7 @@ export default (): void => {
         [],
       );
     });
-    it('Should log ternary assignment variable rightly', async () => {
+    it('Should log ternary assignment in a relatively simple case', async () => {
       const { activeTextEditor } = vscode.window;
       expectActiveTextEditorWithFile(activeTextEditor, 'assignment.ts');
       if (activeTextEditor) {
@@ -48,6 +48,33 @@ export default (): void => {
         expect(
           /console\.log\(.*/.test(
             textDocument.lineAt(naturalEditorLine(6)).text,
+          ),
+        ).to.equal(true);
+      }
+    });
+    it('Should log ternary assignment in a complex case', async () => {
+      const { activeTextEditor } = vscode.window;
+      expectActiveTextEditorWithFile(activeTextEditor, 'assignment.ts');
+      if (activeTextEditor) {
+        activeTextEditor.selections = [
+          new vscode.Selection(
+            new NaturalEditorPosition(7, 14),
+            new NaturalEditorPosition(7, 15),
+          ),
+        ];
+        await vscode.commands.executeCommand(
+          'turboConsoleLog.displayLogMessage',
+          [],
+        );
+        await Promise.all(
+          documentLinesChanged(activeTextEditor.document, [
+            naturalEditorLine(24),
+          ]),
+        );
+        const textDocument = activeTextEditor.document;
+        expect(
+          /console\.log\(.*/.test(
+            textDocument.lineAt(naturalEditorLine(25)).text,
           ),
         ).to.equal(true);
       }

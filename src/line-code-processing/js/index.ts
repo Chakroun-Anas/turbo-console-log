@@ -95,7 +95,9 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
     );
   }
   isTernaryExpressionAssignment(loc: string): boolean {
-    return /[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*[^?:]+\?.+:.+/.test(loc);
+    return /^\s*(export\s+)?(const|let|var)\s+[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*(\/\/.*\s*)*[^?:]+\s*\?.+:.+;$/.test(
+      loc,
+    );
   }
   isNullishCoalescingAssignment(loc: string): boolean {
     return /[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*.+\?\?+.+/.test(loc);

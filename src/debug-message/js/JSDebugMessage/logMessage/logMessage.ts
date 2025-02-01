@@ -125,7 +125,7 @@ export function logMessage(
       };
     },
     [LogMessageType.Ternary]: () => {
-      const MAX_TERNARY_LOOKAHEAD = 5;
+      const MAX_TERNARY_LOOKAHEAD = 20;
       let concatenatedLines = currentLineText.trim(); // Start with the current line
 
       // Grab the next `MAX_TERNARY_LOOKAHEAD` lines and concatenate

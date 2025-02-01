@@ -25,7 +25,15 @@ export type NamedFunctionMetadata = {
   line: number;
 };
 
+export type TernaryExpressionMetadata = {
+  lines: number;
+};
+
 export type LogMessage = {
   logMessageType: LogMessageType;
-  metadata?: LogContextMetadata | NamedFunctionMetadata | unknown;
+  metadata?:
+    | LogContextMetadata
+    | NamedFunctionMetadata
+    | TernaryExpressionMetadata
+    | unknown;
 };
