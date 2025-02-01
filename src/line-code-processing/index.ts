@@ -9,4 +9,5 @@ export interface LineCodeProcessing
   isObjectLiteralAssignedToVariable(loc: string): boolean;
   isArrayAssignedToVariable(loc: string): boolean;
   isTernaryExpressionAssignment(loc: string): boolean;
+  isNullishCoalescingAssignment(loc: string): boolean;
 }
