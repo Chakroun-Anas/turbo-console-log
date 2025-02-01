@@ -281,9 +281,13 @@ export function logMessage(
     [LogMessageType.NamedFunctionAssignment]: () => {
       return {
         isChecked:
-          lineCodeProcessing.isFunctionAssignedToVariable(
+          (lineCodeProcessing.isFunctionAssignedToVariable(
             `${currentLineText}`,
-          ) && multilineParenthesisVariable === null,
+          ) ||
+            lineCodeProcessing.isFunctionAssignedToObjectProperty(
+              `${currentLineText}`,
+            )) &&
+          multilineParenthesisVariable === null,
       };
     },
     [LogMessageType.MultiLineAnonymousFunction]: () => {

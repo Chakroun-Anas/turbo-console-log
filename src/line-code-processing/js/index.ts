@@ -86,6 +86,9 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
     return /([a-zA-Z0-9]+\.[a-zA-Z0-9]+)\({1,}/.test(locWithoutWhiteSpaces);
   }
+  isFunctionAssignedToObjectProperty(loc: string): boolean {
+    return /^\s*[a-zA-Z_$][\w$]*\s*:\s*function\s*\(/.test(loc);
+  }
   isFunctionCall(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
 

@@ -7,10 +7,19 @@ export function functionAssignmentLine(
   selectionLine: number,
   selectedVar: string,
 ): number {
-  const currentLineText = document.lineAt(selectionLine).text;
+  const currentLineText = document.lineAt(selectionLine).text.trim();
+
+  // Check if it's an object property function (e.g., `actions: function() {`)
+  const isObjectPropertyFunction =
+    /^\s*[a-zA-Z_$][\w$]*\s*:\s*function\s*\(/.test(currentLineText);
+
+  if (isObjectPropertyFunction) {
+    return selectionLine + 1; // 🔥 Simplified! Just place the log on the next line.
+  }
+
   if (/{/.test(currentLineText)) {
     if (
-      document.lineAt(selectionLine).text.split('=')[1].includes(selectedVar)
+      document.lineAt(selectionLine).text.split('=')[1]?.includes(selectedVar)
     ) {
       return selectionLine + 1;
     }
