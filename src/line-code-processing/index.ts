@@ -8,4 +8,5 @@ export interface LineCodeProcessing
   isAffectationToVariable(loc: string): boolean;
   isObjectLiteralAssignedToVariable(loc: string): boolean;
   isArrayAssignedToVariable(loc: string): boolean;
+  isTernaryExpressionAssignment(loc: string): boolean;
 }

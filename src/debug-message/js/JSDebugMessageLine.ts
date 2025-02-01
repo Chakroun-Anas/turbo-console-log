@@ -65,8 +65,10 @@ export class JSDebugMessageLine implements DebugMessageLine {
           ((logMsg?.metadata as LogContextMetadata)?.closingContextLine ||
             selectionLine) + 1
         );
-      case LogMessageType.Ternary:
+      case LogMessageType.TemplateString:
         return this.templateStringLine(document, selectionLine);
+      case LogMessageType.Ternary:
+        return this.ternaryExpressionLine(document, selectionLine);
       case LogMessageType.MultilineBraces:
         // Deconstructing assignment
         if ((logMsg?.metadata as LogContextMetadata)?.closingContextLine) {
@@ -79,6 +81,26 @@ export class JSDebugMessageLine implements DebugMessageLine {
         return selectionLine + 1;
     }
   }
+  private ternaryExpressionLine(
+    document: TextDocument,
+    selectionLine: number,
+  ): number {
+    let concatenatedLines = document.lineAt(selectionLine).text.trim();
+    let lineIndex = selectionLine;
+    const MAX_TERNARY_LOOKAHEAD = 5;
+    for (let i = 1; i < MAX_TERNARY_LOOKAHEAD; i++) {
+      if (lineIndex + 1 < document.lineCount) {
+        lineIndex++;
+        concatenatedLines += ' ' + document.lineAt(lineIndex).text.trim();
+      }
+      if (/[^\\?:]+\?.+:.+/.test(concatenatedLines)) {
+        break;
+      }
+    }
+
+    return lineIndex + 1;
+  }
+
   private objectLiteralLine(
     document: TextDocument,
     selectionLine: number,

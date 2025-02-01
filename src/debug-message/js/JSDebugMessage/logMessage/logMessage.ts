@@ -10,6 +10,8 @@ import { deepObjectProperty } from '../helpers/deepObjectProperty';
 
 const logMessageTypeVerificationPriority = _.sortBy(
   [
+    { logMessageType: LogMessageType.Decorator, priority: 0 },
+    { logMessageType: LogMessageType.TemplateString, priority: 1 },
     { logMessageType: LogMessageType.ArrayAssignment, priority: 2 },
     { logMessageType: LogMessageType.ObjectLiteral, priority: 3 },
     {
@@ -20,14 +22,13 @@ const logMessageTypeVerificationPriority = _.sortBy(
       logMessageType: LogMessageType.FunctionCallAssignment,
       priority: 5,
     },
-    { logMessageType: LogMessageType.NamedFunction, priority: 7 },
-    { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 6 },
-    { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 8 },
-    { logMessageType: LogMessageType.MultilineParenthesis, priority: 10 },
-    { logMessageType: LogMessageType.MultilineBraces, priority: 11 },
-    { logMessageType: LogMessageType.PrimitiveAssignment, priority: 9 },
-    { logMessageType: LogMessageType.Decorator, priority: 0 },
-    { logMessageType: LogMessageType.Ternary, priority: 1 },
+    { logMessageType: LogMessageType.Ternary, priority: 6 },
+    { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 7 },
+    { logMessageType: LogMessageType.NamedFunction, priority: 8 },
+    { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 9 },
+    { logMessageType: LogMessageType.PrimitiveAssignment, priority: 10 },
+    { logMessageType: LogMessageType.MultilineParenthesis, priority: 11 },
+    { logMessageType: LogMessageType.MultilineBraces, priority: 12 },
   ],
   'priority',
 );
@@ -117,9 +118,26 @@ export function logMessage(
         ),
       };
     },
-    [LogMessageType.Ternary]: () => {
+    [LogMessageType.TemplateString]: () => {
       return {
         isChecked: /`/.test(currentLineText),
+      };
+    },
+    [LogMessageType.Ternary]: () => {
+      const MAX_TERNARY_LOOKAHEAD = 5;
+      let concatenatedLines = currentLineText.trim(); // Start with the current line
+
+      // Grab the next `MAX_TERNARY_LOOKAHEAD` lines and concatenate
+      for (let i = 1; i < MAX_TERNARY_LOOKAHEAD; i++) {
+        if (selectionLine + i < document.lineCount) {
+          concatenatedLines += document.lineAt(selectionLine + i).text.trim();
+        } else {
+          break;
+        }
+      }
+      return {
+        isChecked:
+          lineCodeProcessing.isTernaryExpressionAssignment(concatenatedLines),
       };
     },
     [LogMessageType.MultilineBraces]: () => {

@@ -94,6 +94,9 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
       locWithoutWhiteSpaces,
     );
   }
+  isTernaryExpressionAssignment(loc: string): boolean {
+    return /[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*[^?:]+\?.+:.+/.test(loc);
+  }
   getFunctionName(loc: string): string {
     if (this.doesContainsNamedFunctionDeclaration(loc)) {
       if (/(const|let|var)(\s*)[a-zA-Z0-9]*\s*=/.test(loc)) {

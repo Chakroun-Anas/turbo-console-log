@@ -11,6 +11,7 @@ export enum LogMessageType {
   ObjectLiteral = 'ObjectLiteral',
   PrimitiveAssignment = 'PrimitiveAssignment',
   Ternary = 'Ternary',
+  TemplateString = 'TemplateString',
 }
 
 export type LogContextMetadata = {
