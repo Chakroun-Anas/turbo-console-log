@@ -113,9 +113,19 @@ export function logMessage(
       };
     },
     [LogMessageType.ArrayAssignment]: () => {
+      if (document.lineCount === selectionLine + 1) {
+        return {
+          isChecked: lineCodeProcessing.isArrayAssignedToVariable(
+            `${currentLineText}}`,
+          ),
+        };
+      }
+      const nextLineText = document
+        .lineAt(selectionLine + 1)
+        .text.replace(/\s/g, '');
       return {
         isChecked: lineCodeProcessing.isArrayAssignedToVariable(
-          `${currentLineText}\n${currentLineText}`,
+          `${currentLineText}\n${nextLineText}`,
         ),
       };
     },

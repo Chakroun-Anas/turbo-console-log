@@ -34,11 +34,15 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
       locWithoutExtraSpaces,
     );
   }
-
   isArrayAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
-    return /(const|let|var).*=\[.*/.test(locWithoutWhiteSpaces);
+
+    // Detects both standard & multi-line array assignments
+    return /^(const|let|var|\w+(\.\w+)*)\s*=\s*\[.*|\.\.\.\w+\(.*\),?$/.test(
+      locWithoutWhiteSpaces,
+    );
   }
+
   doesContainClassDeclaration(loc: string): boolean {
     return /class(\s+).*{/.test(loc);
   }
