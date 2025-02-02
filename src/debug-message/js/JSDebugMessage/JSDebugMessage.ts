@@ -12,14 +12,10 @@ import { detectAll } from './detectAll';
 import { msg } from './msg';
 import { JSLineCodeProcessing } from '../../../line-code-processing/js';
 import { LineCodeProcessing } from '../../../line-code-processing';
-import { DebugMessageLine } from '../../DebugMessageLine';
 import { JSDebugMessageAnonymous } from '../JSDebugMessageAnonymous';
-import { JSDebugMessageLine } from '../JSDebugMessageLine';
+import { jsDebugMessageLine } from '../JSDebugMessageLine/';
 
 const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
-const debugMessageLine: DebugMessageLine = new JSDebugMessageLine(
-  jsLineCodeProcessing,
-);
 const jsDebugMessageAnonymous = new JSDebugMessageAnonymous(
   jsLineCodeProcessing,
 );
@@ -41,7 +37,7 @@ export const jsDebugMessage: DebugMessage = {
       tabSize,
       extensionProperties,
       jsLineCodeProcessing,
-      debugMessageLine,
+      jsDebugMessageLine,
       jsDebugMessageAnonymous,
     );
   },
@@ -88,6 +84,11 @@ export const jsDebugMessage: DebugMessage = {
     selectedVar: string,
     logMsg: LogMessage,
   ): number {
-    return debugMessageLine.line(document, selectionLine, selectedVar, logMsg);
+    return jsDebugMessageLine.line(
+      document,
+      selectionLine,
+      selectedVar,
+      logMsg,
+    );
   },
 };

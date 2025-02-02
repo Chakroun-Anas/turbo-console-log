@@ -2,6 +2,7 @@ import { displayLogMessageCommand } from './displayLogMessage';
 import { commentAllLogMessagesCommand } from './commentAllLogMessages';
 import { uncommentAllLogMessagesCommand } from './uncommentAllLogMessages';
 import { deleteAllLogMessagesCommand } from './deleteAllLogMessages';
+import { correctAllLogMessagesCommand } from './correctAllLogMessages';
 import { Command } from '../entities';
 export function getAllCommands(): Array<Command> {
   return [
@@ -9,5 +10,6 @@ export function getAllCommands(): Array<Command> {
     commentAllLogMessagesCommand(),
     uncommentAllLogMessagesCommand(),
     deleteAllLogMessagesCommand(),
+    correctAllLogMessagesCommand(),
   ];
 }

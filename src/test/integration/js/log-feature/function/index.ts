@@ -8,6 +8,8 @@ import functionParamTest from './functionParam';
 import functionWithDecoratorsTest from './functionWithDecorators';
 import oneLineFunctionParamTest from './oneLineFunctionParam';
 import promiseAnonymousFunctionTest from './promiseAnonymousFunction';
+import functionCallAssignedToVariableTest from './functionCall';
+import functionObjectPropertyTests from './objectProperty';
 export default (): void => {
   describe('Function Context', () => {
     anonymousFunctionsTest();
@@ -18,5 +20,7 @@ export default (): void => {
     functionWithDecoratorsTest();
     oneLineFunctionParamTest();
     promiseAnonymousFunctionTest();
+    functionCallAssignedToVariableTest();
+    functionObjectPropertyTests();
   });
 };

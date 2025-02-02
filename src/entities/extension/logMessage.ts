@@ -6,10 +6,13 @@ export enum LogMessageType {
   MultilineParenthesis = 'MultilineParenthesis',
   NamedFunction = 'NamedFunction',
   NamedFunctionAssignment = 'NamedFunctionAssignment',
+  FunctionCallAssignment = 'FunctionCallAssignment',
   ObjectFunctionCallAssignment = 'ObjectFunctionCallAssignment',
   ObjectLiteral = 'ObjectLiteral',
   PrimitiveAssignment = 'PrimitiveAssignment',
   Ternary = 'Ternary',
+  TemplateString = 'TemplateString',
+  NullishCoalescing = 'NullishCoalescing',
 }
 
 export type LogContextMetadata = {
@@ -22,7 +25,15 @@ export type NamedFunctionMetadata = {
   line: number;
 };
 
+export type TernaryExpressionMetadata = {
+  lines: number;
+};
+
 export type LogMessage = {
   logMessageType: LogMessageType;
-  metadata?: LogContextMetadata | NamedFunctionMetadata | unknown;
+  metadata?:
+    | LogContextMetadata
+    | NamedFunctionMetadata
+    | TernaryExpressionMetadata
+    | unknown;
 };

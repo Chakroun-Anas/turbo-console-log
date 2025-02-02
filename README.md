@@ -1,107 +1,94 @@
 # Turbo Console Log 🚀
 
-[Official Website](https://www.turboconsolelog.io)  
-[Become a Sponsor](https://www.turboconsolelog.io/home?showSponsor=true)
-
----
+[Official Website](https://www.turboconsolelog.io) 🎨 \
+[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)📝
 
 ## 🌟 Why Turbo Console Log?
 
-Turbo Console Log isn’t just an extension—it’s a **game-changer** trusted by over **1.7 million developers** worldwide. It simplifies debugging and saves countless hours by automating the process of inserting meaningful log messages into your code.
+Turbo Console Log is a **developer’s best friend** when it comes to debugging.
 
-Whether you're a beginner or a seasoned pro, Turbo Console Log **supercharges your productivity**, helping you focus on building, not debugging.
+Used by **1.7 million developers**, it simplifies inserting meaningful log messages and makes debugging **faster and more efficient**.
 
----
+**🚀 Key Benefits:**
 
-## ❤️ We Need Your Support!
+✔️ Save time by **automating console.log statements**.  
+✔️ **Instantly add context** like function names, variables, and file locations.  
+✔️ **Customize logs** to match your workflow.
 
-Turbo Console Log is **free** and **open source**, built on passion, late nights, and a commitment to the community. But maintaining and improving it requires resources.
+## 💡 What’s New in v2.11.0?
 
-Your sponsorship is **critical** to:
+### ✅ **Automatic Log Correction**
 
-- ⚡ Deliver faster bug fixes and updates.
-- 🌟 Create exciting new features for the developer community.
-- 💻 Ensure Turbo Console Log remains free for everyone.
+- No more **manual updates** after refactoring!
+- Use `turboConsoleLog.correctAllLogMessages` to **fix log messages instantly**.
+- **Shortcut:** (Alt + Shift + X)
 
-Every contribution makes a difference. Imagine being part of a movement that helps over **1.7 million developers worldwide** build better software.
+### ⚙️ **More Control Over Log Messages**
 
-🎯 **Click here to sponsor now**: [https://www.turboconsolelog.io/home?showSponsor=true](https://www.turboconsolelog.io/home?showSponsor=true)
+- **New Settings:**
+  - ✅ `includeFilename` → Show the filename in logs.
+  - ✅ `includeLineNum` → Show the line number in logs.
 
----
+📌 Full release details: [v2.11.0 Changelog](https://github.com/Chakroun-Anas/turbo-console-log/blob/master/CHANGELOG.md)
 
-## 🏆 What’s in It for You?
+## 🚀 Features at a Glance
 
-By sponsoring Turbo Console Log, you:
+✔️ **Insert Meaningful Log Messages** – Quickly generate console logs with helpful context.  
+✔️ **Comment, Uncomment, or Delete Logs** – Manage logs with a simple shortcut.  
+✔️ **Multi-Cursor Support** – Debug multiple variables simultaneously.  
+✔️ **Customizable Log Format** – Personalize how logs appear in your code.
 
-1. **Join the Turbo Console Log Family**: Be recognized as a vital supporter of one of the most-used debugging tools in the JavaScript ecosystem.
-2. **Fuel Innovation**: Your contribution directly funds impactful new features and improvements.
-3. **Get Bragging Rights**: Show your support for a project that powers the tools of millions of developers.
+📖 **Full Documentation**: [Turbo Console Log Docs](https://www.turboconsolelog.io/documentation/features)
 
-We’ve created an **easy-to-use donation process** to make supporting the project as seamless as possible. It only takes a moment to contribute to something meaningful.
+## 🔧 Configuration & Customization
 
-[👉 Become a Sponsor Today](https://www.turboconsolelog.io/home?showSponsor=true)
+Want to customize your logs? Turbo Console Log allows you to adjust:
 
----
+✅ Prefixes & Suffixes  
+✅ Log Function (`console.log`, `console.warn`, `console.error`, etc.)  
+✅ Quote Type (`'` or `"`)  
+✅ Filename & Line Number Inclusion
 
-## 💡 Core Features
+📖 **Explore Settings**: [Settings Documentation](https://www.turboconsolelog.io/documentation/settings)
 
-Turbo Console Log’s main features are designed to make debugging **simple, intuitive, and efficient**. Here’s a quick overview of what you can do:
+## ✉️ Stay in the Loop – Join the Newsletter
 
-1. **Insert Meaningful Log Messages**  
-   Quickly add console log statements with context, including class, function, variable, and file name.
+🚀 **Get early access to new features, exclusive updates, and behind-the-scenes insights!**  
+Be the first to know about **Turbo Console Log improvements, new releases, and special announcements**.
 
-2. **Comment, Uncomment, or Delete Log Messages**  
-   Manage log messages inserted by the extension with just a shortcut.
-
-3. **Multi-Cursor Support**  
-   Add logs to multiple variables at once for comprehensive debugging.
-
-For full documentation of these features, visit the [Official Documentation](https://www.turboconsolelog.io/documentation/features).
-
----
-
-## ⚙️ Customization
-
-Turbo Console Log offers extensive customization options to match your preferences. Customize everything from prefixes and suffixes to the log function and message format.
-
-Explore all settings here: [Settings Documentation](https://www.turboconsolelog.io/documentation/settings)
+📩 **Join the newsletter here** → [https://www.turboconsolelog.io/join](https://www.turboconsolelog.io/join)
 
 ---
 
-## 🌟 Testimonials and Reviews
+## 💙 Support the Project
 
-> “Turbo Console Log is a lifesaver. It’s made debugging so much faster and more enjoyable.”  
-> – A Turbo Console Log User
+Turbo Console Log is **free & open-source**, maintained with **passion and community support**.
 
-With over **1.7 million installs**, we’re proud to be one of the most-loved extensions in the VS Code Marketplace.
+If you find it useful and want to contribute, consider:
 
----
+⭐ **Starring the repo on GitHub** → [GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)  
+💖 **Supporting via sponsorship** → [Become a Sponsor](https://www.turboconsolelog.io/sponsorship?showSponsor=true)
 
-## 🎯 Take Action Now
+Your support **helps us improve and maintain the project**—but whether or not you contribute, we're happy you're here! 🚀
 
-Imagine a world where Turbo Console Log no longer exists. Debugging becomes slower, productivity drops, and development feels like a chore. **Don’t let that happen.**
+## 📢 Stay Updated
 
-💡 **Click below to support the extension and keep it alive**:  
-[https://www.turboconsolelog.io/home?showSponsor=true](https://www.turboconsolelog.io/home?showSponsor=true)
-
-Every euro you contribute directly impacts **millions of developers** worldwide. Let’s keep building something amazing, together.
-
----
+🔗 **[Follow Turbo Console Log Updates](https://www.turboconsolelog.io/articles)**  
+💬 **Join the Discussion** → [GitHub Discussions](https://github.com/Chakroun-Anas/turbo-console-log/discussions)
 
 ## 📧 Contact
 
-- Support: [support@turboconsolelog.io](mailto:support@turboconsolelog.io)
-- Feedback: [feedback@turboconsolelog.io](mailto:feedback@turboconsolelog.io)
-- Sponsorship: [sponsorship@turboconsolelog.io](mailto:sponsorship@turboconsolelog.io)
+📩 **Support:** [support@turboconsolelog.io](mailto:support@turboconsolelog.io) \
+📩 **Feedback:** [feedback@turboconsolelog.io](mailto:feedback@turboconsolelog.io) \
+📩 **Sponsorship:** [sponsorship@turboconsolelog.io](mailto:sponsorship@turboconsolelog.io)
 
----
+## 🎯 Contribute
 
-## 💻 Participate
+Turbo Console Log is **open for contributions!**  
+Want to improve it? Report issues, suggest features, or submit pull requests:
 
-Turbo Console Log is open for contributions. Join us on GitHub to report issues, suggest features, or submit pull requests: [GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)
-
----
+👉 **[Contribute on GitHub](https://github.com/Chakroun-Anas/turbo-console-log)**
 
 ## 📜 License
 
-MIT Copyright &copy; Turbo Console Log
+MIT License &copy; Turbo Console Log

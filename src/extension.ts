@@ -2,10 +2,21 @@ import * as vscode from 'vscode';
 import { jsDebugMessage } from './debug-message/js';
 import { Command, ExtensionProperties } from './entities';
 import { getAllCommands } from './commands/';
+import { getHtmlWevView as release2110HtmlWebView } from './releases/2110';
+import { readFromGlobalState, writeToGlobalState } from './helpers';
 
-const CURRENT_VERSION = '2.10.6';
-const DONATION_LINK = 'https://turboconsolelog.io/home?showSponsor=true';
-const LAST_VERSION_KEY = 'lastNotifiedVersion';
+const DONATION_LINK = 'https://turboconsolelog.io/sponsorship?showSponsor=true';
+
+const RELEASE_NOTES: Record<
+  string,
+  { webViewHtml: string; notification: string }
+> = {
+  '2.11.0': {
+    webViewHtml: release2110HtmlWebView(),
+    notification:
+      "We've introduced an **automatic log correction** feature!\n\nYour logs now **update themselves** after refactoring – no manual edits needed!\n\n🚀 Try It Now\n\nRun the new command: `turboConsoleLog.correctAllLogMessages`",
+  },
+};
 
 export function activate(context: vscode.ExtensionContext): void {
   const config: vscode.WorkspaceConfiguration =
@@ -19,7 +30,7 @@ export function activate(context: vscode.ExtensionContext): void {
     });
   }
 
-  checkVersionAndShowNotification(context);
+  showReleaseHtmlWebViewAndNotification(context);
 }
 
 function getExtensionProperties(
@@ -38,56 +49,57 @@ function getExtensionProperties(
       workspaceConfig.insertEmptyLineAfterLogMessage ?? false,
     quote: workspaceConfig.quote ?? '"',
     delimiterInsideMessage: workspaceConfig.delimiterInsideMessage ?? '~',
-    includeFileNameAndLineNum:
-      workspaceConfig.includeFileNameAndLineNum ?? false,
+    includeLineNum: workspaceConfig.includeLineNum ?? false,
+    includeFilename: workspaceConfig.includeFilename ?? false,
     logType: workspaceConfig.logType ?? 'log',
     logFunction: workspaceConfig.logFunction ?? 'log',
   };
 }
 
 // Function to check version and show notification
-function checkVersionAndShowNotification(
+function showReleaseHtmlWebViewAndNotification(
   context: vscode.ExtensionContext,
 ): void {
   const installedVersion = vscode.extensions.getExtension(
     'chakrounanas.turbo-console-log',
   )?.packageJSON.version;
-
-  if (
-    installedVersion &&
-    isVersionGreaterThan(installedVersion, CURRENT_VERSION)
-  ) {
-    const lastNotifiedVersion =
-      context.globalState.get<string>(LAST_VERSION_KEY);
-
-    // Show notification only if it's a new version
-    if (lastNotifiedVersion !== installedVersion) {
-      vscode.window
-        .showInformationMessage(
-          `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
-          'Donate',
-          'Dismiss',
-        )
-        .then((selection) => {
-          if (selection === 'Donate') {
-            vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
-          }
-        });
-
-      // Update the last notified version
-      context.globalState.update(LAST_VERSION_KEY, installedVersion);
+  const releaseNote = RELEASE_NOTES[installedVersion];
+  if (installedVersion && releaseNote && releaseNote.notification) {
+    const wasNotificationShown = readFromGlobalState(
+      context,
+      `IS_NOTIFICATION_SHOWN_${installedVersion}`,
+    );
+    if (!wasNotificationShown) {
+      openWhatsNewWebView(releaseNote.webViewHtml);
+      setTimeout(() => {
+        vscode.window
+          .showInformationMessage(
+            `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
+            'Sponsor',
+            'Dismiss',
+          )
+          .then((selection) => {
+            if (selection === 'Sponsor') {
+              vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
+            }
+          });
+      }, 1000 * 30); // 30 seconds
+      writeToGlobalState(
+        context,
+        `IS_NOTIFICATION_SHOWN_${installedVersion}`,
+        true,
+      );
     }
   }
 }
 
-// Function to compare semantic versions
-function isVersionGreaterThan(version: string, baseVersion: string): boolean {
-  const parseVersion = (v: string) =>
-    v.split('.').map((num) => parseInt(num, 10));
-  const [majorA, minorA, patchA] = parseVersion(version);
-  const [majorB, minorB, patchB] = parseVersion(baseVersion);
+function openWhatsNewWebView(htmlContent: string) {
+  const panel = vscode.window.createWebviewPanel(
+    'turboConsoleLogUpdates',
+    '🚀 Turbo Console Log – What’s New',
+    vscode.ViewColumn.One,
+    { enableScripts: true },
+  );
 
-  if (majorA !== majorB) return majorA > majorB;
-  if (minorA !== minorB) return minorA > minorB;
-  return patchA > patchB;
+  panel.webview.html = htmlContent;
 }
