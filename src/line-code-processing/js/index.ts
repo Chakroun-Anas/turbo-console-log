@@ -22,23 +22,27 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   }
   isAssignedToVariable(loc: string): boolean {
     return /^(?:const|let|var)?\s*(\w+|\$?\w+(\.\w+)*)(\s*{[^}]*}\s*)?\s*=/.test(
-      loc,
+      loc.trim(),
     );
   }
   isAffectationToVariable(loc: string): boolean {
     return /.*=.*/.test(loc);
   }
   isObjectLiteralAssignedToVariable(loc: string): boolean {
+    const locWithoutExtraSpaces = loc.replace(/\s+/g, ' ').trim(); // Preserve structure but clean spaces
+    return /^(export\s+)?(const|let|var)\s+[\w$]+(\s*:\s*[\w<>{},[\]\s]+)?\s*=\s*\{/.test(
+      locWithoutExtraSpaces,
+    );
+  }
+  isArrayAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
-    return /(const|let|var)\w+(:?.*)={(\w+(\(\)|:?.*))/g.test(
+
+    // Detects both standard & multi-line array assignments
+    return /^(const|let|var|\w+(\.\w+)*)\s*=\s*\[.*|\.\.\.\w+\(.*\),?$/.test(
       locWithoutWhiteSpaces,
     );
   }
 
-  isArrayAssignedToVariable(loc: string): boolean {
-    const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
-    return /(const|let|var).*=\[.*/.test(locWithoutWhiteSpaces);
-  }
   doesContainClassDeclaration(loc: string): boolean {
     return /class(\s+).*{/.test(loc);
   }
@@ -85,6 +89,25 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
   isObjectFunctionCall(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
     return /([a-zA-Z0-9]+\.[a-zA-Z0-9]+)\({1,}/.test(locWithoutWhiteSpaces);
+  }
+  isFunctionAssignedToObjectProperty(loc: string): boolean {
+    return /^\s*[a-zA-Z_$][\w$]*\s*:\s*function\s*\(/.test(loc);
+  }
+  isFunctionCall(loc: string): boolean {
+    const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
+
+    // Ensure the assignment is followed by an actual function call
+    return /(?:const|let|var)?\s*[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*(?!function\b)[a-zA-Z_$][a-zA-Z0-9_$]*\s*\(/.test(
+      locWithoutWhiteSpaces,
+    );
+  }
+  isTernaryExpressionAssignment(loc: string): boolean {
+    return /^\s*(export\s+)?(const|let|var)\s+[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*(\/\/.*\s*)*[^?:]+\s*\?.+:.+;$/.test(
+      loc,
+    );
+  }
+  isNullishCoalescingAssignment(loc: string): boolean {
+    return /[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*.+\?\?+.+/.test(loc);
   }
   getFunctionName(loc: string): string {
     if (this.doesContainsNamedFunctionDeclaration(loc)) {

@@ -11,12 +11,12 @@ import {
 import { ProgrammingLanguage } from '../../../../../entities';
 
 export default (): void => {
-  describe('Insert log message related to an object function call', () => {
+  describe('Function call', () => {
     Mocha.beforeEach(async () => {
       await openDocument(
         ProgrammingLanguage.JAVASCRIPT,
-        'log-feature/object',
-        'objFunctionCall.ts',
+        'log-feature/function',
+        'functionCall.ts',
       );
     });
     Mocha.afterEach(async () => {
@@ -25,14 +25,14 @@ export default (): void => {
         [],
       );
     });
-    it('Should handles logging a message related to an object function call', async () => {
+    it('Should insert the log message related to function call assigned to a variable', async () => {
       const { activeTextEditor } = vscode.window;
-      expectActiveTextEditorWithFile(activeTextEditor, 'objFunctionCall.ts');
+      expectActiveTextEditorWithFile(activeTextEditor, 'functionCall.ts');
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new NaturalEditorPosition(4, 3),
-            new NaturalEditorPosition(4, 20),
+            new NaturalEditorPosition(2, 7),
+            new NaturalEditorPosition(2, 16),
           ),
         ];
         await vscode.commands.executeCommand(
@@ -41,22 +41,22 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine(9),
+            naturalEditorLine(5),
           ]),
         );
         const textDocument = activeTextEditor.document;
-        const logMessage = textDocument.lineAt(naturalEditorLine(9)).text;
+        const logMessage = textDocument.lineAt(naturalEditorLine(5)).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
       }
     });
-    it('Should handles object function call assigned to a variable', async () => {
+    it('Should insert the log message related to styled call function assigned to a variable', async () => {
       const { activeTextEditor } = vscode.window;
-      expectActiveTextEditorWithFile(activeTextEditor, 'objFunctionCall.ts');
+      expectActiveTextEditorWithFile(activeTextEditor, 'functionCall.ts');
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new NaturalEditorPosition(12, 9),
-            new NaturalEditorPosition(12, 15),
+            new NaturalEditorPosition(6, 7),
+            new NaturalEditorPosition(6, 17),
           ),
         ];
         await vscode.commands.executeCommand(

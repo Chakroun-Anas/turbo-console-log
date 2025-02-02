@@ -1,22 +1,22 @@
 import * as vscode from 'vscode';
-import Mocha, { it, describe } from 'mocha';
+import Mocha, { describe, it } from 'mocha';
 import { expect } from 'chai';
 import {
   openDocument,
+  naturalEditorLine,
+  NaturalEditorPosition,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
-  NaturalEditorPosition,
-  naturalEditorLine,
-} from '../../../helpers';
-import { ProgrammingLanguage } from '../../../../../entities';
+} from '../../../../helpers';
+import { ProgrammingLanguage } from '../../../../../../entities';
 
 export default (): void => {
-  describe('Insert log message related to an object function call', () => {
+  describe('Ternary Assignment', () => {
     Mocha.beforeEach(async () => {
       await openDocument(
         ProgrammingLanguage.JAVASCRIPT,
-        'log-feature/object',
-        'objFunctionCall.ts',
+        'log-feature/operator/ternary',
+        'assignment.ts',
       );
     });
     Mocha.afterEach(async () => {
@@ -25,14 +25,14 @@ export default (): void => {
         [],
       );
     });
-    it('Should handles logging a message related to an object function call', async () => {
+    it('Should log ternary assignment in a relatively simple case', async () => {
       const { activeTextEditor } = vscode.window;
-      expectActiveTextEditorWithFile(activeTextEditor, 'objFunctionCall.ts');
+      expectActiveTextEditorWithFile(activeTextEditor, 'assignment.ts');
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new NaturalEditorPosition(4, 3),
-            new NaturalEditorPosition(4, 20),
+            new NaturalEditorPosition(3, 7),
+            new NaturalEditorPosition(3, 10),
           ),
         ];
         await vscode.commands.executeCommand(
@@ -41,22 +41,25 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine(9),
+            naturalEditorLine(6),
           ]),
         );
         const textDocument = activeTextEditor.document;
-        const logMessage = textDocument.lineAt(naturalEditorLine(9)).text;
-        expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
+        expect(
+          /console\.log\(.*/.test(
+            textDocument.lineAt(naturalEditorLine(6)).text,
+          ),
+        ).to.equal(true);
       }
     });
-    it('Should handles object function call assigned to a variable', async () => {
+    it('Should log ternary assignment in a complex case', async () => {
       const { activeTextEditor } = vscode.window;
-      expectActiveTextEditorWithFile(activeTextEditor, 'objFunctionCall.ts');
+      expectActiveTextEditorWithFile(activeTextEditor, 'assignment.ts');
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new NaturalEditorPosition(12, 9),
-            new NaturalEditorPosition(12, 15),
+            new NaturalEditorPosition(7, 14),
+            new NaturalEditorPosition(7, 15),
           ),
         ];
         await vscode.commands.executeCommand(
@@ -65,12 +68,15 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine(16),
+            naturalEditorLine(24),
           ]),
         );
         const textDocument = activeTextEditor.document;
-        const logMessage = textDocument.lineAt(naturalEditorLine(16)).text;
-        expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
+        expect(
+          /console\.log\(.*/.test(
+            textDocument.lineAt(naturalEditorLine(25)).text,
+          ),
+        ).to.equal(true);
       }
     });
   });

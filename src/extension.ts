@@ -29,7 +29,7 @@ export function activate(context: vscode.ExtensionContext): void {
     });
   }
 
-  showReleaseHtmlWebViewAndNotification(context);
+  // showReleaseHtmlWebViewAndNotification(context);
 }
 
 function getExtensionProperties(

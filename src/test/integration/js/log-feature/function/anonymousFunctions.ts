@@ -16,7 +16,7 @@ export default (): void => {
       await openDocument(
         ProgrammingLanguage.JAVASCRIPT,
         'log-feature/function',
-        'anonymousFunctions.ts',
+        'anonymousFunctions.tsx',
       );
     });
     Mocha.afterEach(async () => {
@@ -31,7 +31,7 @@ export default (): void => {
           const { activeTextEditor } = vscode.window;
           expectActiveTextEditorWithFile(
             activeTextEditor,
-            'anonymousFunctions.ts',
+            'anonymousFunctions.tsx',
           );
           if (activeTextEditor) {
             activeTextEditor.selections = [
@@ -65,7 +65,7 @@ export default (): void => {
           const { activeTextEditor } = vscode.window;
           expectActiveTextEditorWithFile(
             activeTextEditor,
-            'anonymousFunctions.ts',
+            'anonymousFunctions.tsx',
           );
           if (activeTextEditor) {
             activeTextEditor.selections = [
@@ -104,7 +104,7 @@ export default (): void => {
           const { activeTextEditor } = vscode.window;
           expectActiveTextEditorWithFile(
             activeTextEditor,
-            'anonymousFunctions.ts',
+            'anonymousFunctions.tsx',
           );
           if (activeTextEditor) {
             activeTextEditor.selections = [
@@ -146,7 +146,7 @@ export default (): void => {
         const { activeTextEditor } = vscode.window;
         expectActiveTextEditorWithFile(
           activeTextEditor,
-          'anonymousFunctions.ts',
+          'anonymousFunctions.tsx',
         );
         if (activeTextEditor) {
           activeTextEditor.selections = [
@@ -185,7 +185,7 @@ export default (): void => {
         const { activeTextEditor } = vscode.window;
         expectActiveTextEditorWithFile(
           activeTextEditor,
-          'anonymousFunctions.ts',
+          'anonymousFunctions.tsx',
         );
         if (activeTextEditor) {
           activeTextEditor.selections = [
@@ -224,7 +224,7 @@ export default (): void => {
         const { activeTextEditor } = vscode.window;
         expectActiveTextEditorWithFile(
           activeTextEditor,
-          'anonymousFunctions.ts',
+          'anonymousFunctions.tsx',
         );
         if (activeTextEditor) {
           activeTextEditor.selections = [
@@ -263,7 +263,7 @@ export default (): void => {
         const { activeTextEditor } = vscode.window;
         expectActiveTextEditorWithFile(
           activeTextEditor,
-          'anonymousFunctions.ts',
+          'anonymousFunctions.tsx',
         );
         if (activeTextEditor) {
           activeTextEditor.selections = [
@@ -295,6 +295,36 @@ export default (): void => {
           ).to.equal(true);
           expect(
             /}\)/.test(textDocument.lineAt(naturalEditorLine(39)).text),
+          ).to.equal(true);
+        }
+      });
+      it('Example 05', async () => {
+        const { activeTextEditor } = vscode.window;
+        expectActiveTextEditorWithFile(
+          activeTextEditor,
+          'anonymousFunctions.tsx',
+        );
+        if (activeTextEditor) {
+          activeTextEditor.selections = [
+            new vscode.Selection(
+              new NaturalEditorPosition(57, 20),
+              new NaturalEditorPosition(57, 21),
+            ),
+          ];
+          await vscode.commands.executeCommand(
+            'turboConsoleLog.displayLogMessage',
+            [],
+          );
+          await Promise.all(
+            documentLinesChanged(activeTextEditor.document, [
+              naturalEditorLine(58),
+            ]),
+          );
+          const textDocument = activeTextEditor.document;
+          expect(
+            /console\.log\(.*/.test(
+              textDocument.lineAt(naturalEditorLine(58)).text,
+            ),
           ).to.equal(true);
         }
       });

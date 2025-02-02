@@ -18,6 +18,35 @@ import {
 } from '../helpers';
 import { JSDebugMessageAnonymous } from '../../JSDebugMessageAnonymous';
 
+function hasFunctionBody(
+  document: TextDocument,
+  functionStartLine: number,
+): boolean {
+  let currentLineNum = functionStartLine;
+  let totalOpenedBraces = 0;
+
+  while (currentLineNum < document.lineCount) {
+    const currentLineText = document.lineAt(currentLineNum).text.trim();
+
+    // ✅ Count `{` and `}`
+    totalOpenedBraces += (currentLineText.match(/{/g) || []).length;
+
+    // ✅ If `{` exists → The function has a body
+    if (totalOpenedBraces > 0) {
+      return true;
+    }
+
+    currentLineNum++;
+
+    // ✅ Stop early if we reach a new statement without finding `{`
+    if (/^\S/.test(currentLineText) && totalOpenedBraces === 0) {
+      return false;
+    }
+  }
+
+  return false;
+}
+
 function constructDebuggingMsg(
   extensionProperties: ExtensionProperties,
   debuggingMsgContent: string,
@@ -191,7 +220,8 @@ export function msg(
     jsDebugMessageAnonymous.isAnonymousFunctionContext(
       selectedVar,
       selectedVarLineLoc,
-    )
+    ) &&
+    !hasFunctionBody(document, lineOfSelectedVar)
   ) {
     jsDebugMessageAnonymous.anonymousPropDebuggingMsg(
       document,

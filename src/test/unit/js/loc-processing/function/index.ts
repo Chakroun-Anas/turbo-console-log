@@ -5,6 +5,8 @@ import builtInFunctionInvocation from './built-in-function-invocation.test';
 import functionNameTest from './function-name.test';
 import namedFunctionDeclaration from './named-function-declaration.test';
 import objectFunctionCallTest from './object-function-call.test';
+import functionCallTest from './function-call.test';
+import functionObjPropAssignmentTests from './object-property-assignment.test';
 
 export default (): void => {
   describe('Function LOC processing', () => {
@@ -14,5 +16,7 @@ export default (): void => {
     functionNameTest();
     namedFunctionDeclaration();
     objectFunctionCallTest();
+    functionCallTest();
+    functionObjPropAssignmentTests();
   });
 };
