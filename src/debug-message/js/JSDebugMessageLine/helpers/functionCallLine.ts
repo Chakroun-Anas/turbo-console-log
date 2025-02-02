@@ -5,54 +5,68 @@ import { locOpenedClosedElementOccurrences } from './locOpenedClosedElementOccur
 export function functionCallLine(
   document: TextDocument,
   selectionLine: number,
-  selectedVar: string,
 ): number {
   let currentLineText: string = document.lineAt(selectionLine).text;
-  let nextLineText: string = document
-    .lineAt(selectionLine + 1)
-    .text.replace(/\s/g, '');
-  if (
-    /\((\s*)$/.test(currentLineText.split(selectedVar)[0]) ||
-    /,(\s*)$/.test(currentLineText.split(selectedVar)[0])
-  ) {
-    return selectionLine + 1;
-  }
-  let totalOpenedParenthesis = 0;
-  let totalClosedParenthesis = 0;
-  const { openedElementOccurrences, closedElementOccurrences } =
-    locOpenedClosedElementOccurrences(currentLineText, BracketType.PARENTHESIS);
-  totalOpenedParenthesis += openedElementOccurrences;
-  totalClosedParenthesis += closedElementOccurrences;
+
+  // Track if we're inside a Styled Component template literal
+  const insideTemplateLiteral =
+    currentLineText.includes('`') && !currentLineText.includes('`;');
+
+  let totalOpenedBrackets = 0;
+  let totalClosedBrackets = 0;
+  let totalOpenedParentheses = 0;
+  let totalClosedParentheses = 0;
+  let totalOpenedBackticks = insideTemplateLiteral ? 1 : 0;
+
+  const curlyBracesOcurrences = locOpenedClosedElementOccurrences(
+    currentLineText,
+    BracketType.CURLY_BRACES,
+  );
+
+  totalOpenedBrackets += curlyBracesOcurrences.openedElementOccurrences;
+  totalClosedBrackets += curlyBracesOcurrences.closedElementOccurrences;
+
+  const parenthesisOcurrences = locOpenedClosedElementOccurrences(
+    currentLineText,
+    BracketType.PARENTHESIS,
+  );
+
+  totalOpenedParentheses += parenthesisOcurrences.openedElementOccurrences;
+  totalClosedParentheses += parenthesisOcurrences.closedElementOccurrences;
+
   let currentLineNum = selectionLine + 1;
-  if (
-    totalOpenedParenthesis !== totalClosedParenthesis ||
-    currentLineText.endsWith('.') ||
-    nextLineText.trim().startsWith('.')
-  ) {
-    while (currentLineNum < document.lineCount) {
-      currentLineText = document.lineAt(currentLineNum).text;
-      const { openedElementOccurrences, closedElementOccurrences } =
-        locOpenedClosedElementOccurrences(
-          currentLineText,
-          BracketType.PARENTHESIS,
-        );
-      totalOpenedParenthesis += openedElementOccurrences;
-      totalClosedParenthesis += closedElementOccurrences;
-      if (currentLineNum === document.lineCount - 1) {
-        break;
-      }
-      nextLineText = document.lineAt(currentLineNum + 1).text;
-      currentLineNum++;
-      if (
-        totalOpenedParenthesis === totalClosedParenthesis &&
-        !currentLineText.endsWith('.') &&
-        !nextLineText.trim().startsWith('.')
-      ) {
-        break;
-      }
+
+  while (currentLineNum < document.lineCount) {
+    currentLineText = document.lineAt(currentLineNum).text;
+
+    // 🚀 Improved: Count ALL occurrences of '{', '}', '(', and ')'
+    totalOpenedBrackets += (currentLineText.match(/{/g) || []).length;
+    totalClosedBrackets += (currentLineText.match(/}/g) || []).length;
+    totalOpenedParentheses += (currentLineText.match(/\(/g) || []).length;
+    totalClosedParentheses += (currentLineText.match(/\)/g) || []).length;
+
+    // Track template literals (Styled Component template strings)
+    if (currentLineText.includes('`')) totalOpenedBackticks++;
+
+    if (currentLineNum === document.lineCount - 1) {
+      break;
+    }
+
+    currentLineNum++;
+
+    // 🚀 Stop scanning when we close all brackets, parentheses, and backticks
+    if (
+      totalOpenedBrackets === totalClosedBrackets &&
+      totalOpenedParentheses === totalClosedParentheses &&
+      totalOpenedBackticks % 2 === 0
+    ) {
+      break;
     }
   }
-  return totalOpenedParenthesis === totalClosedParenthesis
+
+  return totalOpenedBrackets === totalClosedBrackets &&
+    totalOpenedParentheses === totalClosedParentheses &&
+    totalOpenedBackticks % 2 === 0
     ? currentLineNum
     : selectionLine + 1;
 }

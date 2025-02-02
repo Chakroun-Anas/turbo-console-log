@@ -31,17 +31,21 @@ export default (): void => {
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new vscode.Position(3, 3),
-            new vscode.Position(3, 20),
+            new NaturalEditorPosition(4, 3),
+            new NaturalEditorPosition(4, 20),
           ),
         ];
         await vscode.commands.executeCommand(
           'turboConsoleLog.displayLogMessage',
           [],
         );
-        await Promise.all(documentLinesChanged(activeTextEditor.document, [8]));
+        await Promise.all(
+          documentLinesChanged(activeTextEditor.document, [
+            naturalEditorLine(9),
+          ]),
+        );
         const textDocument = activeTextEditor.document;
-        const logMessage = textDocument.lineAt(8).text;
+        const logMessage = textDocument.lineAt(naturalEditorLine(9)).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
       }
     });

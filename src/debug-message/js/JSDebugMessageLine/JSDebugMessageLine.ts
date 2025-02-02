@@ -51,9 +51,9 @@ export const jsDebugMessageLine: DebugMessageLine = {
           ) + 1
         );
       case LogMessageType.ObjectFunctionCallAssignment:
-        return functionCallLine(document, selectionLine, selectedVar);
+        return functionCallLine(document, selectionLine);
       case LogMessageType.FunctionCallAssignment:
-        return functionCallLine(document, selectionLine, selectedVar);
+        return functionCallLine(document, selectionLine);
       case LogMessageType.ArrayAssignment:
         return arrayLine(document, selectionLine);
       case LogMessageType.MultilineParenthesis:
