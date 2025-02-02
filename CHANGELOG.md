@@ -2,6 +2,29 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.11.0] - 2025-02-02
+
+### ✨ New Features
+
+- **Correct Log Messages Command**: Logs now **automatically update their filenames and line numbers** after refactoring.
+
+  - 🏷️ **Command:** `turboConsoleLog.correctAllLogMessages`
+  - ⌨️ **Shortcut:** (Alt + Shift + X)
+  - 📌 Related issue: [#248 – 🚀 Release v2.11.0: Major Bug Fixes & Improvements](https://github.com/Chakroun-Anas/turbo-console-log/issues/248)
+
+- **Enhanced File Name & Line Number Handling**: The old `includeFileNameAndLineNum` setting has been split into:
+  - ✅ `includeFilename` → Includes the file name in log messages.
+  - ✅ `includeLineNum` → Includes the line number in log messages.
+  - 📌 Related issue: [#247 – Enhance File Name and Line Number Handling in Log Messages](https://github.com/Chakroun-Anas/turbo-console-log/issues/247)
+
+### 🛠️ Improvements & Bug Fixes
+
+- 🔧 Improved **log placement accuracy** in complex expressions.
+- 📝 Better handling of **nested objects, ternary expressions, and template literals**.
+- 🛠️ Refined detection logic for **function assignments and array elements**.
+
+📢 **First Bi-Weekly Release of 2025** → Expect **regular updates** and continuous improvements! 🚀
+
 ## [2.10.8]
 
 ### Fixed

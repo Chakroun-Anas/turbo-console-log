@@ -3,6 +3,7 @@ import { jsDebugMessage } from './debug-message/js';
 import { Command, ExtensionProperties } from './entities';
 import { getAllCommands } from './commands/';
 import { getHtmlWevView as release2110HtmlWebView } from './releases/2110';
+import { readFromGlobalState, writeToGlobalState } from './helpers';
 
 const DONATION_LINK = 'https://turboconsolelog.io/sponsorship?showSponsor=true';
 
@@ -29,7 +30,7 @@ export function activate(context: vscode.ExtensionContext): void {
     });
   }
 
-  // showReleaseHtmlWebViewAndNotification(context);
+  showReleaseHtmlWebViewAndNotification(context);
 }
 
 function getExtensionProperties(
@@ -59,52 +60,40 @@ function getExtensionProperties(
 function showReleaseHtmlWebViewAndNotification(
   context: vscode.ExtensionContext,
 ): void {
-  // const installedVersion = vscode.extensions.getExtension(
-  //   'chakrounanas.turbo-console-log',
-  // )?.packageJSON.version;
-  // if (
-  //   installedVersion &&
-  //   isVersionGreaterThan(installedVersion, CURRENT_VERSION)
-  // ) {
-  //   const lastNotifiedVersion =
-  //     context.globalState.get<string>(LAST_VERSION_KEY);
-  //   // Show notification only if it's a new version
-  //   if (lastNotifiedVersion !== installedVersion) {
-  //     vscode.window
-  //       .showInformationMessage(
-  //         `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
-  //         'Donate',
-  //         'Dismiss',
-  //       )
-  //       .then((selection) => {
-  //         if (selection === 'Donate') {
-  //           vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
-  //         }
-  //       });
-  //     // Update the last notified version
-  //     context.globalState.update(LAST_VERSION_KEY, installedVersion);
-  //   }
-  // }
-  openWhatsNewWebView(context, RELEASE_NOTES['2.11.0'].webViewHtml);
-  setTimeout(() => {
-    vscode.window
-      .showInformationMessage(
-        `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
-        'Donate',
-        'Dismiss',
-      )
-      .then((selection) => {
-        if (selection === 'Donate') {
-          vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
-        }
-      });
-  }, 0);
+  const installedVersion = vscode.extensions.getExtension(
+    'chakrounanas.turbo-console-log',
+  )?.packageJSON.version;
+  const releaseNote = RELEASE_NOTES[installedVersion];
+  if (installedVersion && releaseNote && releaseNote.notification) {
+    const wasNotificationShown = readFromGlobalState(
+      context,
+      `IS_NOTIFICATION_SHOWN_${installedVersion}`,
+    );
+    if (!wasNotificationShown) {
+      openWhatsNewWebView(releaseNote.webViewHtml);
+      setTimeout(() => {
+        vscode.window
+          .showInformationMessage(
+            `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
+            'Sponsor',
+            'Dismiss',
+          )
+          .then((selection) => {
+            if (selection === 'Sponsor') {
+              vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
+            }
+          });
+      }, 1000 * 30); // 30 seconds
+      writeToGlobalState(
+        context,
+        `IS_NOTIFICATION_SHOWN_${installedVersion}`,
+        true,
+      );
+    }
+  }
 }
 
-function openWhatsNewWebView(
-  context: vscode.ExtensionContext,
-  htmlContent: string,
-) {
+function openWhatsNewWebView(htmlContent: string) {
   const panel = vscode.window.createWebviewPanel(
     'turboConsoleLogUpdates',
     '🚀 Turbo Console Log – What’s New',

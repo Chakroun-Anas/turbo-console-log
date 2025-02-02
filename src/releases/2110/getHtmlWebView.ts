@@ -3,92 +3,108 @@ export function getHtmlWevView(): string {
       <html>
         <head>
           <style>
-            body { font-family: Arial, sans-serif; padding: 16px; }
-            .primary-color { color: #FF6B6B; }
-            .secondary-color { color: #FFC947; }
-            .info-color { color: #48BFE3 }
-            .container { max-width: 800px; margin: 0 auto; }
-            .section-container {  }
-            .text {
-                max-width: 450px;
-                line-height: 1.6;
-            }
+            body { font-family: Arial, sans-serif; padding: 16px; background: #1E1E1E; color: #FFFFFF; }
+            h1, h2, h3 { font-weight: bold; }
+            a { color: #48BFE3; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+            .primary-color { color: #FF6B6B; font-size: 22px; }
+            .secondary-color { color: #FFC947; font-size: 20px; }
+            .info-color { color: #48BFE3; font-weight: bold; }
+            .container { max-width: 800px; margin: 0 auto; line-height: 1.6; text-align: center; }
+            .section-container { margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.08); border-radius: 8px; text-align: left; }
+            .text { max-width: 600px; margin: 0 auto 10px; }
+            .button-container { text-align: center; margin-top: 30px; margin-bottom: 25px; }
             .button {
-              background: #FF6B6B; color: black; padding: 10px 15px;
-              text-decoration: none; border-radius: 5px; display: inline-block;
+              background: #FF6B6B; color: black; padding: 14px 24px; font-weight: bold;
+              text-decoration: none; border-radius: 6px; display: inline-block;
+              text-align: center; cursor: pointer;
             }
+            .list { margin-left: 20px; text-align: left; padding-left: 10px; }
+            .list li { margin-bottom: 8px; display: flex; align-items: center; }
+            .list li::before { content: "✅"; margin-right: 10px; }
+            .strong { font-weight: bold; }
+            .image-container { margin: 20px auto; text-align: center; }
+            img { max-width: 100%; border-radius: 8px; }
           </style>
         </head>
         <body>
           <div class="container">
             <h1 class="primary-color">🚀 Turbo Console Log Release 2.11.0 💫</h1>
-            <p class="text">
-                In the context of the major changes Turbo Console Log project is going through, this is the first official bi-weekly release, one the many to
-                come, couting on your feedback and support so that we fuel the rocket and keep it flying high.
-                <br /> <br />
-                U can read more about the new releases cycle and how it reflects on the project's roadmap in the project's GitHub repository <a href="http://localhost:3000/articles/release-plan-2025">here</a>.
-            </p>
-            <div class="section-container">            
-                <h2 class="secondary-color">What does the release brings to the table ? 🍒</h2>
-                <ol>
-                    <li style="display: flex; flex-direction: column;">
-                        <span class="text">
-                            The setting "includeFileNameAndLineNum" is splitted to two settings "includeFilename" and "includeLineNum" to 
-                            allow more flexibility and control over the inserted log messages.
-                        </span>
-                        <span style="inline-block; margin-top: 8px; display: flex; flex-direction: column;">
-                            <span style="display: inline-block;" class="info-color">Associated issues:</span> 
-                            <span style="display: inline-block; margin-top: 8px;">
-                                <ul>
-                                    <li><a href="https://github.com/Chakroun-Anas/turbo-console-log/issues/225">Suggestions for handling the filename and line number #225</a></li>
-                                    <li style="margin-top: 4px;"><a href="https://github.com/Chakroun-Anas/turbo-console-log/issues/111">Can we separate the Include File name and Line Num? #111</a></li>
-                                    <li style="margin-top: 4px;"><a href="https://github.com/Chakroun-Anas/turbo-console-log/issues/109">hi I was upadated latest version How to remove "File" and "Line" please!!!!!!! #109</a></li>
-                                </ul>
-                            </span>
-                        </span>
-                    </li>
-                    <br />
-                    <li style="display: flex; flex-direction: column;">
-                        <span class="text">
-                            You can now correct the line number and the file name inside the log messages inserted by turbo console log, 
-                            by executing the newly introduced command "turboConsoleLog.correctAllLogMessages" or using the associated shortcut (alt+shift+x).
-                        </span>
-                        <span style="inline-block; margin-top: 8px; display: flex; flex-direction: column;">
-                            <span style="display: inline-block;" class="info-color">Associated issues:</span> 
-                            <span style="display: inline-block; margin-top: 8px;">
-                                <ul>
-                                    <li style="margin-top: 4px;"><a href="https://github.com/Chakroun-Anas/turbo-console-log/issues/238">Auto change line number in console.log when line no changed #238</a></li>
-                                    <li><a href="https://github.com/Chakroun-Anas/turbo-console-log/issues/188">Line Number Correcting #188</a></li>
-                                    <li style="margin-top: 4px;"><a href="https://github.com/Chakroun-Anas/turbo-console-log/issues/147">[feature request] Update log messages #147</a></li>
-                                </ul>
-                            </span>
-                        </span>
-                    </li>
-                </ol>
+            
+            <div class="image-container">
+              <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-campaign.9fe6b2af.webp&w=640&q=75" 
+                   alt="Turbo Console Log Sponsorship Campaign" />
             </div>
-            <div style="margin-top: 16px;">            
-                <h2 class="secondary-color">Support Turbo Console Log Family 🚀</h2>
+
+            <p class="text">
+                <span class="strong">Turbo Console Log v2.11.0 brings two highly requested features!</span>
+                We're excited to introduce **enhanced log control and an all-new command for correcting log messages**.  
+                <br/><br/>
+                <span class="strong">This is the first of many bi-weekly releases</span>, ensuring continuous refinement and expansion of the extension.  
+                <br/><br/>
+                Read more about the new release cycle and roadmap <a href="https://www.turboconsolelog.io/articles/release-plan-2025">here</a>.
+            </p>
+
+            <div class="section-container">
+                <h2 class="secondary-color">🚀 Key Features in v2.11.0 🎯</h2>
+
+                <h3 class="info-color">🛠️ More Control Over Log Messages</h3>
                 <p class="text">
-                    First we thank u so much for using Turbo Console Log, and we would like to remind you that your support is critical to keep the project alive,
-                    last month campaign was a success and we are looking forward to keep the momentum going.
-                    <br /> <br />
-                    Consider sponsoring the project by donating a small amount, it will help us to keep the project alive and to deliver more features and improvements.
+                    The setting <span class="strong">"includeFileNameAndLineNum"</span> is now split into two independent settings:  
+                    <span class="strong">"includeFilename"</span> and <span class="strong">"includeLineNum"</span>.  
+                    <br/><br/>
+                    This gives you **precise control** over what appears in your log messages.
                 </p>
-                <div>
-                  <a class="button" href="https://www.turboconsolelog.com/sponsorship?showSponsor=true">Donate</a>
+
+                <h3 class="info-color">🔄 Correct Log Messages Instantly</h3>
+                <p class="text">
+                    Introducing the new **"Correct Log Messages"** command:  
+                    <br/><br/>
+                    **Command:** "turboConsoleLog.correctAllLogMessages"  
+                    **Shortcut:** (Alt + Shift + X)  
+                    <br/><br/>
+                    This allows you to **update filenames and line numbers inside logs** after code changes, keeping everything accurate.
+                </p>
+            </div>
+
+            <div class="section-container">
+                <h2 class="secondary-color">🐞 Incremental Bug Fixes & Optimizations</h2>
+                <p class="text">
+                    As part of our ongoing improvements, we've made **minor fixes** to ensure Turbo Console Log runs smoother than ever.
+                </p>
+                <ul class="list">
+                    <li>Improved <span class="strong">log placement accuracy</span> in complex expressions.</li>
+                    <li>Better handling of <span class="strong">nested objects, ternary expressions, and template literals.</span></li>
+                    <li>Refined detection logic for <span class="strong">function assignments and array elements.</span></li>
+                </ul>
+            </div>
+
+            <div class="section-container">
+                <h2 class="secondary-color">💙 Support Turbo Console Log 🚀</h2>
+                <p class="text">
+                    Thank you for using <span class="strong">Turbo Console Log!</span> Your <span class="strong">support keeps this project alive.</span>  
+                    <br/><br/>
+                    <span class="strong">Last month's sponsorship campaign was a success!</span>  
+                    If this extension <span class="strong">saves you time</span>, consider making a small donation to help us continue improving it.  
+                </p>
+                <div class="button-container">
+                  <a class="button" href="https://www.turboconsolelog.io/sponsorship?showSponsor=true">SPONSOR</a>
                 </div>
-                <p class="text">
-                    Note: We will ask u twice a month to support the project upon each release, if you are not interested in supporting the project, you can dismiss the notification.
-                </p>
+               <p class="text">
+                <b>Note:</b> We’ll gently remind you <span class="strong">twice a month</span> (with each release) to support the project.
+                If you're not interested, simply dismiss the notification. We appreciate your support!
+              </p>
+            </div>
+
+            <div class="section-container">
+                <h2 class="secondary-color">📖 Read More:</h2>
+                <ul class="list">
+                    <li><a href="https://www.turboconsolelog.io/articles/release-2110">Full Release Notes</a></li>
+                    <li><a href="https://www.turboconsolelog.io/articles/sponsorship-campaign">Sponsorship Campaign</a></li>
+                    <li><a href="https://www.turboconsolelog.io/articles/release-plan-2025">2025 Release Plan</a></li>
+                </ul>
             </div>
           </div>
-  
-          <script>
-            const vscode = acquireVsCodeApi();
-            document.querySelector('.button').addEventListener('click', () => {
-              vscode.postMessage({ command: 'executeCommand' });
-            });
-          </script>
         </body>
       </html>
     `;
