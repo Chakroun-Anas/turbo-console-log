@@ -2,6 +2,14 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.11.2] - 2025-02-03
+
+### 🔥 Improved Engagement & Support Visibility
+
+- **Updated web view to prioritize sponsorship visibility** by making the primary call-to-action directly link to the sponsorship page.
+
+💡 _This change is designed to increase engagement, which is crucial for the long-term sustainability of the project. By improving the way sponsorship is presented, we aim to secure more support from developers who rely on Turbo Console Log._ 🚀
+
 ## [2.11.1] - 2025-02-03
 
 ### 🛠️ Patch Fixes

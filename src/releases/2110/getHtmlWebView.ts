@@ -32,17 +32,17 @@ export function getHtmlWevView(): string {
             <h1 class="primary-color">🚀 Turbo Console Log Release 2.11.0 💫</h1>
             
             <div class="image-container">
-              <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-campaign.9fe6b2af.webp&w=640&q=75" 
-                   alt="Turbo Console Log Sponsorship Campaign" />
+              <a href="https://www.turboconsolelog.io/sponsorship?showSponsor=true">
+                <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-campaign.9fe6b2af.webp&w=640&q=75" 
+                     alt="Support Turbo Console Log - Sponsor Now!" />
+              </a>
             </div>
 
             <p class="text">
                 <span class="strong">Turbo Console Log v2.11.0 brings two highly requested features!</span>
                 We're excited to introduce **enhanced log control and an all-new command for correcting log messages**.  
                 <br/><br/>
-                <span class="strong">This is the first of many bi-weekly releases</span>, ensuring continuous refinement and expansion of the extension.  
-                <br/><br/>
-                Read more about the new release cycle and roadmap <a href="https://www.turboconsolelog.io/articles/release-plan-2025">here</a>.
+                If Turbo Console Log has saved you time, consider supporting its future so we can keep building **faster releases and new features**!
             </p>
 
             <div class="section-container">
@@ -84,16 +84,14 @@ export function getHtmlWevView(): string {
                 <p class="text">
                     Thank you for using <span class="strong">Turbo Console Log!</span> Your <span class="strong">support keeps this project alive.</span>  
                     <br/><br/>
-                    <span class="strong">Last month's sponsorship campaign was a success!</span>  
-                    If this extension <span class="strong">saves you time</span>, consider making a small donation to help us continue improving it.  
+                    If this extension <span class="strong">helps speed up your workflow</span>, consider making a small donation to help us continue improving it.  
                 </p>
                 <div class="button-container">
                   <a class="button" href="https://www.turboconsolelog.io/sponsorship?showSponsor=true">SPONSOR</a>
                 </div>
-               <p class="text">
-                <b>Note:</b> We’ll gently remind you <span class="strong">twice a month</span> (with each release) to support the project.
-                If you're not interested, simply dismiss the notification. We appreciate your support!
-              </p>
+                <p class="text">
+                  <b>Note:</b> This release is part of our **new bi-weekly cycle**! Expect **frequent updates and new features** ahead. 🚀  
+                </p>
             </div>
 
             <div class="section-container">
