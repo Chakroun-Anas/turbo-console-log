@@ -73,5 +73,29 @@ export default (): void => {
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
       }
     });
+    it('Should insert turbo message in the right location given a chained call context', async () => {
+      const { activeTextEditor } = vscode.window;
+      expectActiveTextEditorWithFile(activeTextEditor, 'functionCall.ts');
+      if (activeTextEditor) {
+        activeTextEditor.selections = [
+          new vscode.Selection(
+            new NaturalEditorPosition(18, 9),
+            new NaturalEditorPosition(18, 14),
+          ),
+        ];
+        await vscode.commands.executeCommand(
+          'turboConsoleLog.displayLogMessage',
+          [],
+        );
+        await Promise.all(
+          documentLinesChanged(activeTextEditor.document, [
+            naturalEditorLine(19),
+          ]),
+        );
+        const textDocument = activeTextEditor.document;
+        const logMessage = textDocument.lineAt(naturalEditorLine(19)).text;
+        expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
+      }
+    });
   });
 };

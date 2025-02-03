@@ -6,6 +6,7 @@ import { getHtmlWevView as release2110HtmlWebView } from './releases/2110';
 import { readFromGlobalState, writeToGlobalState } from './helpers';
 
 const DONATION_LINK = 'https://turboconsolelog.io/sponsorship?showSponsor=true';
+const latestReleaseVersion = '2.11.0';
 
 const RELEASE_NOTES: Record<
   string,
@@ -60,36 +61,30 @@ function getExtensionProperties(
 function showReleaseHtmlWebViewAndNotification(
   context: vscode.ExtensionContext,
 ): void {
-  const installedVersion = vscode.extensions.getExtension(
-    'chakrounanas.turbo-console-log',
-  )?.packageJSON.version;
-  const releaseNote = RELEASE_NOTES[installedVersion];
-  if (installedVersion && releaseNote && releaseNote.notification) {
-    const wasNotificationShown = readFromGlobalState(
+  const wasNotificationShown = readFromGlobalState(
+    context,
+    `IS_NOTIFICATION_SHOWN_${latestReleaseVersion}`,
+  );
+  if (!wasNotificationShown) {
+    openWhatsNewWebView(RELEASE_NOTES[latestReleaseVersion].webViewHtml);
+    setTimeout(() => {
+      vscode.window
+        .showInformationMessage(
+          `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
+          'Sponsor',
+          'Dismiss',
+        )
+        .then((selection) => {
+          if (selection === 'Sponsor') {
+            vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
+          }
+        });
+    }, 1000 * 30); // 30 seconds
+    writeToGlobalState(
       context,
-      `IS_NOTIFICATION_SHOWN_${installedVersion}`,
+      `IS_NOTIFICATION_SHOWN_${latestReleaseVersion}`,
+      true,
     );
-    if (!wasNotificationShown) {
-      openWhatsNewWebView(releaseNote.webViewHtml);
-      setTimeout(() => {
-        vscode.window
-          .showInformationMessage(
-            `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
-            'Sponsor',
-            'Dismiss',
-          )
-          .then((selection) => {
-            if (selection === 'Sponsor') {
-              vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
-            }
-          });
-      }, 1000 * 30); // 30 seconds
-      writeToGlobalState(
-        context,
-        `IS_NOTIFICATION_SHOWN_${installedVersion}`,
-        true,
-      );
-    }
   }
 }
 

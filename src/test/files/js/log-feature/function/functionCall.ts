@@ -13,3 +13,9 @@ const CustomIcon = styled(Image, {
     return iconBackgroundColor(props.$backgroundColor);
   }};
 `;
+
+function Form({ handle }: AcceleratorStripePaiementProps) {
+  const theme = useTheme();
+  const stripe = useCool();
+  const elements = useElements();
+}

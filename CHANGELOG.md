@@ -2,7 +2,17 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
-## [2.11.0] - 2025-02-02
+## [2.11.1] - 2025-02-03
+
+### 🛠️ Patch Fixes
+
+- **Fixed log insertion in function parameter destructuring**.
+- **Resolved an issue with log placement inside template literals and JSX expressions**.
+- **Ensured the update notification is only shown once per major release** to avoid unnecessary prompts for users updating from patch versions.
+
+📢 This is a **patch update** to refine stability and user experience after **v2.11.0**.
+
+## [2.11.0] - 2025-02-03
 
 ### ✨ New Features
 

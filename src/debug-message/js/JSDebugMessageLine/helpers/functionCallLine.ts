@@ -34,6 +34,13 @@ export function functionCallLine(
   totalOpenedParentheses += parenthesisOcurrences.openedElementOccurrences;
   totalClosedParentheses += parenthesisOcurrences.closedElementOccurrences;
 
+  if (
+    totalOpenedBackticks === totalClosedBrackets &&
+    totalClosedParentheses === totalOpenedParentheses
+  ) {
+    return selectionLine + 1;
+  }
+
   let currentLineNum = selectionLine + 1;
 
   while (currentLineNum < document.lineCount) {
