@@ -2,6 +2,14 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.11.3] - 2025-02-05
+
+### 🎯 Refining the Sponsorship Flow for Better Engagement
+
+**Web view adjustments** to further refine the sponsorship experience knowing that users who **already installed v2.11.0 or beyond** will not see the web view upon patch updates.
+
+💡 This update is a small but necessary patch to fine-tune our sponsorship model, ensuring that engagement remains meaningful without unnecessary distractions. While it brings a minor adjustment ahead of the next bi-weekly release, it’s a crucial step in optimizing the sustainability of Turbo Console Log 🚀
+
 ## [2.11.2] - 2025-02-03
 
 ### 🔥 Improved Engagement & Support Visibility

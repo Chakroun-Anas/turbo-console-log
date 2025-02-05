@@ -5,7 +5,7 @@ import { getAllCommands } from './commands/';
 import { getHtmlWevView as release2110HtmlWebView } from './releases/2110';
 import { readFromGlobalState, writeToGlobalState } from './helpers';
 
-const DONATION_LINK = 'https://turboconsolelog.io/sponsorship?showSponsor=true';
+const DONATION_LINK = 'https://turboconsolelog.io/sponsorship';
 const latestReleaseVersion = '2.11.0';
 
 const RELEASE_NOTES: Record<
@@ -71,7 +71,7 @@ function showReleaseHtmlWebViewAndNotification(
       vscode.window
         .showInformationMessage(
           `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
-          'Sponsor',
+          'Sponsorship',
           'Dismiss',
         )
         .then((selection) => {

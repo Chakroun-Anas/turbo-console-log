@@ -13,7 +13,7 @@ export function getHtmlWevView(): string {
             .container { max-width: 800px; margin: 0 auto; line-height: 1.6; text-align: center; }
             .section-container { margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.08); border-radius: 8px; text-align: left; }
             .text { max-width: 600px; margin: 0 auto 10px; }
-            .button-container { text-align: center; margin-top: 30px; margin-bottom: 25px; }
+            .button-container { text-align: center; margin-top: 30px; margin-bottom: 25px;}
             .button {
               background: #FF6B6B; color: black; padding: 14px 24px; font-weight: bold;
               text-decoration: none; border-radius: 6px; display: inline-block;
@@ -29,13 +29,16 @@ export function getHtmlWevView(): string {
         </head>
         <body>
           <div class="container">
-            <h1 class="primary-color">🚀 Turbo Console Log Release 2.11.0 💫</h1>
-            
+            <h1 class="primary-color" style="margin-bottom: 0px;">🚀 Turbo Console Log Release 2.11.0 💫</h1>
+            <p style="margin-top: 0px;"><a href="">full release notes</a></p>
             <div class="image-container">
-              <a href="https://www.turboconsolelog.io/sponsorship?showSponsor=true">
-                <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-campaign.9fe6b2af.webp&w=640&q=75" 
-                     alt="Support Turbo Console Log - Sponsor Now!" />
+              <a href="https://www.turboconsolelog.io/sponsorship">
+                  <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-campaign.9fe6b2af.webp&w=640&q=75" 
+                      alt="Support Turbo Console Log - Sponsor Now!" />
               </a>
+              <p style="text-align: center; font-size: 14px; color: #bbb; margin-top: 5px;">
+                  Clicking this image will take you to the <a href="https://www.turboconsolelog.io/sponsorship" style="color: #ffcc00;">Sponsorship Page 💚</a>
+              </p>
             </div>
 
             <p class="text">
@@ -81,14 +84,17 @@ export function getHtmlWevView(): string {
 
             <div class="section-container">
                 <h2 class="secondary-color">💙 Support Turbo Console Log 🚀</h2>
-                <p class="text">
-                    Thank you for using <span class="strong">Turbo Console Log!</span> Your <span class="strong">support keeps this project alive.</span>  
-                    <br/><br/>
-                    If this extension <span class="strong">helps speed up your workflow</span>, consider making a small donation to help us continue improving it.  
-                </p>
-                <div class="button-container">
-                  <a class="button" href="https://www.turboconsolelog.io/sponsorship?showSponsor=true">SPONSOR</a>
-                </div>
+               <p class="text">
+                  <span class="strong">Turbo Console Log exists because of developers like you! 🚀</span>  
+                  <br/><br/>
+                  If this extension <span class="strong">saves you time, effort, and frustration</span>, consider supporting its future.  
+                  <br/><br/>
+                  Your support fuels bug fixes, new features, and ensures that Turbo Console Log keeps evolving for nearly <span class="strong">2 million developers—including YOU!</span>
+              </p>
+              <div class="button-container">
+                  <a class="button" href="https://www.turboconsolelog.io/sponsorship" style="color: white;">TAKE ME TO SPONSORSHIP</a>
+              </div>
+
                 <p class="text">
                   <b>Note:</b> This release is part of our **new bi-weekly cycle**! Expect **frequent updates and new features** ahead. 🚀  
                 </p>

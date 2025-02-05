@@ -1,17 +1,17 @@
 # Turbo Console Log 🚀
 
-[Official Website](https://www.turboconsolelog.io) 🎨 \
-[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)📝
+[Official Website](https://www.turboconsolelog.io) 🎨  
+[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log) 📝
 
 ## 🌟 Why Turbo Console Log?
 
 Turbo Console Log is a **developer’s best friend** when it comes to debugging.
 
-Used by **1.7 million developers**, it simplifies inserting meaningful log messages and makes debugging **faster and more efficient**.
+Trusted by **nearly 2 million developers**, it simplifies inserting meaningful log messages and makes debugging **faster and more efficient**.
 
-**🚀 Key Benefits:**
+### **🚀 Key Benefits:**
 
-✔️ Save time by **automating console.log statements**.  
+✔️ **Save time** by automating console.log statements.  
 ✔️ **Instantly add context** like function names, variables, and file locations.  
 ✔️ **Customize logs** to match your workflow.
 
@@ -51,6 +51,8 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 📖 **Explore Settings**: [Settings Documentation](https://www.turboconsolelog.io/documentation/settings)
 
+---
+
 ## ✉️ Stay in the Loop – Join the Newsletter
 
 🚀 **Get early access to new features, exclusive updates, and behind-the-scenes insights!**  
@@ -60,16 +62,19 @@ Be the first to know about **Turbo Console Log improvements, new releases, and s
 
 ---
 
-## 💙 Support the Project
+## 💙 Support Turbo Console Log
 
-Turbo Console Log is **free & open-source**, maintained with **passion and community support**.
+Turbo Console Log is **free & open-source**, maintained with passion by developers like you.
 
-If you find it useful and want to contribute, consider:
+If you’ve found value in it, you can help keep it growing:
 
-⭐ **Starring the repo on GitHub** → [GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)  
-💖 **Supporting via sponsorship** → [Become a Sponsor](https://www.turboconsolelog.io/sponsorship?showSponsor=true)
+🔗 **[Visit the Sponsorship Page](https://www.turboconsolelog.io/sponsorship)**
 
-Your support **helps us improve and maintain the project**—but whether or not you contribute, we're happy you're here! 🚀
+Your support fuels **bug fixes, improvements, and new features**, ensuring Turbo Console Log continues evolving for **millions of developers—including YOU!**
+
+Whether you contribute or not, we’re happy to have you as part of this journey! 🚀
+
+---
 
 ## 📢 Stay Updated
 
@@ -78,9 +83,11 @@ Your support **helps us improve and maintain the project**—but whether or not 
 
 ## 📧 Contact
 
-📩 **Support:** [support@turboconsolelog.io](mailto:support@turboconsolelog.io) \
-📩 **Feedback:** [feedback@turboconsolelog.io](mailto:feedback@turboconsolelog.io) \
+📩 **Support:** [support@turboconsolelog.io](mailto:support@turboconsolelog.io)  
+📩 **Feedback:** [feedback@turboconsolelog.io](mailto:feedback@turboconsolelog.io)  
 📩 **Sponsorship:** [sponsorship@turboconsolelog.io](mailto:sponsorship@turboconsolelog.io)
+
+---
 
 ## 🎯 Contribute
 
