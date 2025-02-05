@@ -30,7 +30,7 @@ export function getHtmlWevView(): string {
         <body>
           <div class="container">
             <h1 class="primary-color" style="margin-bottom: 0px;">🚀 Turbo Console Log Release 2.11.0 💫</h1>
-            <p style="margin-top: 0px;"><a href="">full release notes</a></p>
+            <p style="margin-top: 0px;"><a href="https://www.turboconsolelog.io/articles/release-2110">full release notes</a></p>
             <div class="image-container">
               <a href="https://www.turboconsolelog.io/sponsorship">
                   <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-campaign.9fe6b2af.webp&w=640&q=75" 

@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.11.4] - 2025-02-05
+
+Fix - Correct v2.11.0 full release notes link URL in the release web view
+
 ## [2.11.3] - 2025-02-05
 
 ### 🎯 Refining the Sponsorship Flow for Better Engagement
