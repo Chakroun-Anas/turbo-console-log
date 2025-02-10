@@ -32,12 +32,12 @@ export function getHtmlWevView(): string {
             <h1 class="primary-color" style="margin-bottom: 0px;">🚀 Turbo Console Log Release 2.11.0 💫</h1>
             <p style="margin-top: 0px;"><a href="https://www.turboconsolelog.io/articles/release-2110">full release notes</a></p>
             <div class="image-container">
-              <a href="https://www.turboconsolelog.io/sponsorship">
+              <a href="https://www.turboconsolelog.io/sponsorship?showSponsor=true">
                   <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-campaign.9fe6b2af.webp&w=640&q=75" 
                       alt="Support Turbo Console Log - Sponsor Now!" />
               </a>
               <p style="text-align: center; font-size: 14px; color: #bbb; margin-top: 5px;">
-                  Clicking this image will take you to the <a href="https://www.turboconsolelog.io/sponsorship" style="color: #ffcc00;">Sponsorship Page 💚</a>
+                  Clicking this image will take you to the <a href="https://www.turboconsolelog.io/sponsorship?showSponsor=true" style="color: #ffcc00;">Sponsorship Page 💚</a>
               </p>
             </div>
 
@@ -92,7 +92,7 @@ export function getHtmlWevView(): string {
                   Your support fuels bug fixes, new features, and ensures that Turbo Console Log keeps evolving for nearly <span class="strong">2 million developers—including YOU!</span>
               </p>
               <div class="button-container">
-                  <a class="button" href="https://www.turboconsolelog.io/sponsorship" style="color: white;">TAKE ME TO SPONSORSHIP</a>
+                  <a class="button" href="https://www.turboconsolelog.io/sponsorship?showSponsor=true" style="color: white;">TAKE ME TO SPONSORSHIP</a>
               </div>
 
                 <p class="text">

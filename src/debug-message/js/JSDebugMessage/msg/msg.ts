@@ -52,11 +52,16 @@ function constructDebuggingMsg(
   debuggingMsgContent: string,
   spacesBeforeMsg: string,
 ): string {
-  const wrappingMsg = `console.${extensionProperties.logType}(${
-    extensionProperties.quote
-  }${extensionProperties.logMessagePrefix} ${'-'.repeat(
-    debuggingMsgContent.length - 16,
-  )}${extensionProperties.logMessagePrefix}${extensionProperties.quote})${
+  const logFunction =
+    extensionProperties.logFunction !== 'log'
+      ? extensionProperties.logFunction
+      : `console.${extensionProperties.logType}`;
+  console.log(logFunction);
+  const wrappingMsg = `${logFunction}(${extensionProperties.quote}${
+    extensionProperties.logMessagePrefix
+  } ${'-'.repeat(debuggingMsgContent.length - 16)}${
+    extensionProperties.logMessagePrefix
+  }${extensionProperties.quote})${
     extensionProperties.addSemicolonInTheEnd ? ';' : ''
   }`;
   const debuggingMsg: string = extensionProperties.wrapLogMessage

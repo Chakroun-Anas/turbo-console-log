@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.11.5] - 2025-02-10
+
+- Fixed an issue where `wrapLogMessage` did not respect custom log functions. [#227 – custom "log function" does not apply on "Wrap Log Message](https://github.com/Chakroun-Anas/turbo-console-log/issues/227)
+
 ## [2.11.4] - 2025-02-05
 
 Fix - Correct v2.11.0 full release notes link URL in the release web view
