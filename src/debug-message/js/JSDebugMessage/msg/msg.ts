@@ -56,7 +56,6 @@ function constructDebuggingMsg(
     extensionProperties.logFunction !== 'log'
       ? extensionProperties.logFunction
       : `console.${extensionProperties.logType}`;
-  console.log(logFunction);
   const wrappingMsg = `${logFunction}(${extensionProperties.quote}${
     extensionProperties.logMessagePrefix
   } ${'-'.repeat(debuggingMsgContent.length - 16)}${
