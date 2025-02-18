@@ -22,14 +22,18 @@ const logMessageTypeVerificationPriority = _.sortBy(
       logMessageType: LogMessageType.FunctionCallAssignment,
       priority: 5,
     },
-    { logMessageType: LogMessageType.Ternary, priority: 6 },
-    { logMessageType: LogMessageType.NullishCoalescing, priority: 7 },
-    { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 8 },
-    { logMessageType: LogMessageType.NamedFunction, priority: 9 },
-    { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 10 },
-    { logMessageType: LogMessageType.PrimitiveAssignment, priority: 11 },
-    { logMessageType: LogMessageType.MultilineParenthesis, priority: 12 },
-    { logMessageType: LogMessageType.MultilineBraces, priority: 13 },
+    {
+      logMessageType: LogMessageType.TypedFunctionCallAssignment,
+      priority: 6,
+    },
+    { logMessageType: LogMessageType.Ternary, priority: 7 },
+    { logMessageType: LogMessageType.NullishCoalescing, priority: 8 },
+    { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 9 },
+    { logMessageType: LogMessageType.NamedFunction, priority: 10 },
+    { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 11 },
+    { logMessageType: LogMessageType.PrimitiveAssignment, priority: 12 },
+    { logMessageType: LogMessageType.MultilineParenthesis, priority: 13 },
+    { logMessageType: LogMessageType.MultilineBraces, priority: 14 },
   ],
   'priority',
 );
@@ -274,6 +278,18 @@ export function logMessage(
       return {
         isChecked:
           lineCodeProcessing.isFunctionCall(currentLineText) &&
+          lineCodeProcessing.isAssignedToVariable(currentLineText),
+      };
+    },
+    [LogMessageType.TypedFunctionCallAssignment]: () => {
+      if (document.lineCount === selectionLine + 1) {
+        return {
+          isChecked: false,
+        };
+      }
+      return {
+        isChecked:
+          lineCodeProcessing.isTypedFunctionCallAssignment(currentLineText) &&
           lineCodeProcessing.isAssignedToVariable(currentLineText),
       };
     },

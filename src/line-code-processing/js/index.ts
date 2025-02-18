@@ -101,6 +101,15 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
       locWithoutWhiteSpaces,
     );
   }
+  isTypedFunctionCallAssignment(loc: string): boolean {
+    const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
+
+    // Match assignments where the right-hand side is a function call with generics
+    return /(?:const|let|var)?\s*[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*[a-zA-Z_$][a-zA-Z0-9_$]*\s*<[^<>]*$/.test(
+      locWithoutWhiteSpaces,
+    );
+  }
+
   isTernaryExpressionAssignment(loc: string): boolean {
     return /^\s*(export\s+)?(const|let|var)\s+[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*(\/\/.*\s*)*[^?:]+\s*\?.+:.+;$/.test(
       loc,
