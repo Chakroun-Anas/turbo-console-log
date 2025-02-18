@@ -3,10 +3,11 @@ import { jsDebugMessage } from './debug-message/js';
 import { Command, ExtensionProperties } from './entities';
 import { getAllCommands } from './commands/';
 import { getHtmlWevView as release2110HtmlWebView } from './releases/2110';
+import { getHtmlWevView as release2120HtmlWebView } from './releases/2120';
 import { readFromGlobalState, writeToGlobalState } from './helpers';
 
-const DONATION_LINK = 'https://turboconsolelog.io/sponsorship';
-const latestReleaseVersion = '2.11.0';
+const DONATION_LINK = 'https://turboconsolelog.io/sponsorship?showSponsor=true';
+const latestReleaseVersion = '2.12.0';
 
 const RELEASE_NOTES: Record<
   string,
@@ -16,6 +17,11 @@ const RELEASE_NOTES: Record<
     webViewHtml: release2110HtmlWebView(),
     notification:
       "We've introduced an **automatic log correction** feature!\n\nYour logs now **update themselves** after refactoring – no manual edits needed!\n\n🚀 Try It Now\n\nRun the new command: `turboConsoleLog.correctAllLogMessages`",
+  },
+  '2.12.0': {
+    webViewHtml: release2120HtmlWebView(),
+    notification:
+      'Turbo Console Log v2.12.0 is out! This release makes the extension MORE STABLE than ever with critical bug fixes, more details in the release note.',
   },
 };
 
@@ -70,8 +76,8 @@ function showReleaseHtmlWebViewAndNotification(
     setTimeout(() => {
       vscode.window
         .showInformationMessage(
-          `Your support is critical to keep Turbo Console Log alive! Consider sponsoring the project.`,
-          'Sponsorship',
+          `Turbo Console Log needs YOUR support more than ever! Please Consider sponsoring the project!`,
+          'Sponsor',
           'Dismiss',
         )
         .then((selection) => {
@@ -79,7 +85,7 @@ function showReleaseHtmlWebViewAndNotification(
             vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
           }
         });
-    }, 1000 * 30); // 30 seconds
+    }, 1000 * 15); // Show after 15 seconds
     writeToGlobalState(
       context,
       `IS_NOTIFICATION_SHOWN_${latestReleaseVersion}`,
