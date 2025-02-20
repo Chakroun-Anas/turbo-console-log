@@ -32,7 +32,7 @@ export function getHtmlWevView(): string {
             <h1 class="primary-color" style="margin-bottom: 0px;">Turbo Console Log Release v2.12.0: More Stable, But an uncertain future!</h1>
             <div class="image-container">
               <a href="https://www.turboconsolelog.io/sponsorship?showSponsor=true">
-                  <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-v2120.95fd728e.webp&w=1200&q=75" 
+                  <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-v2120.f901973f.webp&w=1080&q=75" 
                       alt="Support Turbo Console Log - Sponsor Now!" style="width: 420px; height: 256px" />
               </a>
             </div>

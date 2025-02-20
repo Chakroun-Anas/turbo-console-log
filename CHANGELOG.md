@@ -2,6 +2,12 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.12.1] - 2025-02-20
+
+### 🛠️ Patch
+
+- The sponsorship campaign illustration link in the latest release web view has been updated.
+
 ## [2.12.0] - 2025-02-18
 
 **🛠️ Improved Stability Release**
