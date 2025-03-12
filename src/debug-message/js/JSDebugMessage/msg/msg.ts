@@ -56,7 +56,6 @@ function constructDebuggingMsg(
     extensionProperties.logFunction !== 'log'
       ? extensionProperties.logFunction
       : `console.${extensionProperties.logType}`;
-  console.log(logFunction);
   const wrappingMsg = `${logFunction}(${extensionProperties.quote}${
     extensionProperties.logMessagePrefix
   } ${'-'.repeat(debuggingMsgContent.length - 16)}${
@@ -100,58 +99,70 @@ function constructDebuggingMsgContent(
   >,
   lineCodeProcessing: LineCodeProcessing,
 ): string {
+  const {
+    includeFilename,
+    includeLineNum,
+    logFunction,
+    logType,
+    logMessagePrefix,
+    logMessageSuffix,
+    delimiterInsideMessage,
+    insertEmptyLineBeforeLogMessage,
+    quote,
+    insertEnclosingClass,
+    insertEnclosingFunction,
+  } = extensionProperties;
   const fileName = document.fileName.includes('/')
     ? document.fileName.split('/')[document.fileName.split('/').length - 1]
     : document.fileName.split('\\')[document.fileName.split('\\').length - 1];
-  const funcThatEncloseTheVar: string = enclosingBlockName(
-    document,
-    lineOfSelectedVar,
-    'function',
-    lineCodeProcessing,
-  );
-  const classThatEncloseTheVar: string = enclosingBlockName(
-    document,
-    lineOfSelectedVar,
-    'class',
-    lineCodeProcessing,
-  );
+  let classThatEncloseTheVar = '';
+  if (insertEnclosingClass) {
+    classThatEncloseTheVar = enclosingBlockName(
+      document,
+      lineOfSelectedVar,
+      'class',
+      lineCodeProcessing,
+    );
+  }
+  let funcThatEncloseTheVar = '';
+  if (insertEnclosingFunction) {
+    funcThatEncloseTheVar = enclosingBlockName(
+      document,
+      lineOfSelectedVar,
+      'function',
+      lineCodeProcessing,
+    );
+  }
   const semicolon: string = extensionProperties.addSemicolonInTheEnd ? ';' : '';
-  const includeFilename = extensionProperties.includeFilename;
-  const includeLineNum = extensionProperties.includeLineNum;
   return `${
-    extensionProperties.logFunction !== 'log'
-      ? extensionProperties.logFunction
-      : `console.${extensionProperties.logType}`
-  }(${extensionProperties.quote}${extensionProperties.logMessagePrefix}${
-    extensionProperties.logMessagePrefix.length !== 0 &&
-    extensionProperties.logMessagePrefix !==
-      `${extensionProperties.delimiterInsideMessage} `
-      ? ` ${extensionProperties.delimiterInsideMessage} `
-      : ''
+    logFunction !== 'log' ? logFunction : `console.${logType}`
+  }(${quote}${logMessagePrefix}${
+    logMessagePrefix.length !== 0 &&
+    delimiterInsideMessage.length !== 0 &&
+    logMessagePrefix !== `${delimiterInsideMessage} `
+      ? ` ${delimiterInsideMessage} `
+      : ' '
   }${
     includeFilename || includeLineNum
       ? `${includeFilename ? fileName : ''}${includeLineNum ? ':' : ''}${
           includeLineNum
-            ? lineOfLogMsg +
-              (extensionProperties.insertEmptyLineBeforeLogMessage ? 2 : 1)
+            ? lineOfLogMsg + (insertEmptyLineBeforeLogMessage ? 2 : 1)
             : ''
-        } ${extensionProperties.delimiterInsideMessage} `
+        }${delimiterInsideMessage ? ` ${delimiterInsideMessage} ` : ' '}`
       : ''
   }${
-    extensionProperties.insertEnclosingClass
-      ? classThatEncloseTheVar.length > 0
-        ? `${classThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
-        : ``
+    classThatEncloseTheVar.length > 0
+      ? `${classThatEncloseTheVar}${
+          delimiterInsideMessage ? ` ${delimiterInsideMessage} ` : ''
+        }`
       : ''
   }${
-    extensionProperties.insertEnclosingFunction
-      ? funcThatEncloseTheVar.length > 0
-        ? `${funcThatEncloseTheVar} ${extensionProperties.delimiterInsideMessage} `
-        : ''
+    funcThatEncloseTheVar.length > 0
+      ? `${funcThatEncloseTheVar}${
+          delimiterInsideMessage ? ` ${delimiterInsideMessage} ` : ' '
+        }`
       : ''
-  }${selectedVar}${extensionProperties.logMessageSuffix}${
-    extensionProperties.quote
-  }, ${selectedVar})${semicolon}`;
+  }${selectedVar}${logMessageSuffix}${quote}, ${selectedVar})${semicolon}`;
 }
 
 export function msg(

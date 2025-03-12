@@ -6,6 +6,7 @@ export interface LineCodeFunctionProcessing {
   isFunctionDeclaration(loc: string): boolean;
   isObjectFunctionCall(loc: string): boolean;
   isFunctionCall(loc: string): boolean;
+  isTypedFunctionCallAssignment(loc: string): boolean;
   getFunctionName(loc: string): string;
   isAnonymousFunction(loc: string): boolean;
   isArgumentOfAnonymousFunction(loc: string, argument: string): boolean;

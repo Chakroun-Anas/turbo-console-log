@@ -55,7 +55,7 @@ export function functionCallLine(
     // Track template literals (Styled Component template strings)
     if (currentLineText.includes('`')) totalOpenedBackticks++;
 
-    if (currentLineNum === document.lineCount - 1) {
+    if (currentLineNum === document.lineCount) {
       break;
     }
 

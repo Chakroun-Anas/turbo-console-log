@@ -2,6 +2,28 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.12.2] - 2025-02-20
+
+### 🛠️ Patch
+
+- The sponsorship campaign illustration link in the latest release web view has been updated.
+
+Thank u so much for your support (https://www.turboconsolelog.io/sponsorship?showSponsor=true) 💚 🚀
+
+## [2.12.1] - 2025-02-20
+
+### 🛠️ Patch
+
+- The sponsorship campaign illustration link in the latest release web view has been updated.
+
+## [2.12.0] - 2025-02-18
+
+**🛠️ Improved Stability Release**
+
+- Typed Function Call Logging Fix [#236 – Typescript function type parameters multiline brackets support](https://github.com/Chakroun-Anas/turbo-console-log/issues/236)
+- Fixed Function Call Assignment Edge Case [#231 – Some issues in Vue3 project](https://github.com/Chakroun-Anas/turbo-console-log/issues/231)
+- Whitespace Character Bug Resolved [#212 – Whitespace character bug](https://github.com/Chakroun-Anas/turbo-console-log/issues/227)
+
 ## [2.11.5] - 2025-02-10
 
 - Fixed an issue where `wrapLogMessage` did not respect custom log functions. [#227 – custom "log function" does not apply on "Wrap Log Message](https://github.com/Chakroun-Anas/turbo-console-log/issues/227)

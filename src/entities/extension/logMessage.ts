@@ -7,6 +7,7 @@ export enum LogMessageType {
   NamedFunction = 'NamedFunction',
   NamedFunctionAssignment = 'NamedFunctionAssignment',
   FunctionCallAssignment = 'FunctionCallAssignment',
+  TypedFunctionCallAssignment = 'TypedFunctionCallAssignment',
   ObjectFunctionCallAssignment = 'ObjectFunctionCallAssignment',
   ObjectLiteral = 'ObjectLiteral',
   PrimitiveAssignment = 'PrimitiveAssignment',

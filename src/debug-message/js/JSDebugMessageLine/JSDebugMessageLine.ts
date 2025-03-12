@@ -17,6 +17,7 @@ import {
   templateStringLine,
   nullishCoalescingLine,
   primitiveAssignmentLine,
+  typedFunctionCallLine,
 } from './helpers';
 
 export const jsDebugMessageLine: DebugMessageLine = {
@@ -54,6 +55,8 @@ export const jsDebugMessageLine: DebugMessageLine = {
         return functionCallLine(document, selectionLine);
       case LogMessageType.FunctionCallAssignment:
         return functionCallLine(document, selectionLine);
+      case LogMessageType.TypedFunctionCallAssignment:
+        return typedFunctionCallLine(document, selectionLine);
       case LogMessageType.ArrayAssignment:
         return arrayLine(document, selectionLine);
       case LogMessageType.MultilineParenthesis:

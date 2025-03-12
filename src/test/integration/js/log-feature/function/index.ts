@@ -9,7 +9,9 @@ import functionWithDecoratorsTest from './functionWithDecorators';
 import oneLineFunctionParamTest from './oneLineFunctionParam';
 import promiseAnonymousFunctionTest from './promiseAnonymousFunction';
 import functionCallAssignedToVariableTest from './functionCall';
+import typedFunctionCallAssignment from './typedFunctionCall';
 import functionObjectPropertyTests from './objectProperty';
+import functionCallAsLastStatement from './functionCallAsLastStatement';
 export default (): void => {
   describe('Function Context', () => {
     anonymousFunctionsTest();
@@ -22,5 +24,7 @@ export default (): void => {
     promiseAnonymousFunctionTest();
     functionCallAssignedToVariableTest();
     functionObjectPropertyTests();
+    functionCallAsLastStatement();
+    typedFunctionCallAssignment();
   });
 };

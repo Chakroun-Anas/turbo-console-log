@@ -6,6 +6,7 @@ import functionNameTest from './function-name.test';
 import namedFunctionDeclaration from './named-function-declaration.test';
 import objectFunctionCallTest from './object-function-call.test';
 import functionCallTest from './function-call.test';
+import typedFunctionCallTests from './typed-function-call.test';
 import functionObjPropAssignmentTests from './object-property-assignment.test';
 
 export default (): void => {
@@ -18,5 +19,6 @@ export default (): void => {
     objectFunctionCallTest();
     functionCallTest();
     functionObjPropAssignmentTests();
+    typedFunctionCallTests();
   });
 };
