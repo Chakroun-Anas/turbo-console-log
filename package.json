@@ -166,9 +166,9 @@
     "watch": "npm run esbuild --watch",
     "lint": "eslint src --ext ts",
     "pretest": "yarn run esbuild-base",
-    "test-compile": "rm -rf out && tsc -p ./ && mkdir out/test/files && cp -r src/test/files/ out/test/files/",
-    "test": "npm run test-compile && node ./out/test/runTests.js",
-    "test:unit": "npm run test-compile && mocha --require ts-node/register 'src/test/unit/**/*.test.ts'"
+    "test:compile": "rm -rf out && tsc -p ./ && mkdir out/test/files && cp -r src/test/files/ out/test/files/",
+    "test": "npm run test:compile && node ./out/test/runTests.js",
+    "test:unit": "npm run test:compile && mocha --require ts-node/register 'src/test/unit/**/*.test.ts'"
   },
   "devDependencies": {
     "@types/chai": "^5.0.0",
