@@ -88,6 +88,16 @@ function baseDebuggingMsg(
   );
 }
 
+function debuggingMsgQuote(settingQuote: string, selectedVar: string): string {
+  if (selectedVar.includes(`"`)) {
+    return '`';
+  }
+  if (selectedVar.includes(`'`)) {
+    return '"';
+  }
+  return settingQuote;
+}
+
 function constructDebuggingMsgContent(
   document: TextDocument,
   selectedVar: string,
@@ -134,9 +144,10 @@ function constructDebuggingMsgContent(
     );
   }
   const semicolon: string = extensionProperties.addSemicolonInTheEnd ? ';' : '';
+  const quoteToUse: string = debuggingMsgQuote(quote, selectedVar);
   return `${
     logFunction !== 'log' ? logFunction : `console.${logType}`
-  }(${quote}${logMessagePrefix}${
+  }(${quoteToUse}${logMessagePrefix}${
     logMessagePrefix.length !== 0 &&
     delimiterInsideMessage.length !== 0 &&
     logMessagePrefix !== `${delimiterInsideMessage} `
@@ -162,7 +173,7 @@ function constructDebuggingMsgContent(
           delimiterInsideMessage ? ` ${delimiterInsideMessage} ` : ' '
         }`
       : ''
-  }${selectedVar}${logMessageSuffix}${quote}, ${selectedVar})${semicolon}`;
+  }${selectedVar}${logMessageSuffix}${quoteToUse}, ${selectedVar})${semicolon}`;
 }
 
 export function msg(

@@ -18,6 +18,7 @@ import {
   nullishCoalescingLine,
   primitiveAssignmentLine,
   typedFunctionCallLine,
+  multilineBracesLine,
 } from './helpers';
 
 export const jsDebugMessageLine: DebugMessageLine = {
@@ -71,13 +72,11 @@ export const jsDebugMessageLine: DebugMessageLine = {
       case LogMessageType.NullishCoalescing:
         return nullishCoalescingLine(document, selectionLine);
       case LogMessageType.MultilineBraces:
-        // Deconstructing assignment
-        if ((logMsg?.metadata as LogContextMetadata)?.closingContextLine) {
-          return (
-            (logMsg?.metadata as LogContextMetadata)?.closingContextLine + 1
-          );
-        }
-        return selectionLine + 1;
+        return multilineBracesLine(
+          selectedVar,
+          selectionLine,
+          (logMsg?.metadata as LogContextMetadata)?.closingContextLine,
+        );
       default:
         return selectionLine + 1;
     }

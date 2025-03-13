@@ -8,6 +8,7 @@ import { arrayLine } from './arrayLine';
 import { templateStringLine } from './templateStringLine';
 import { nullishCoalescingLine } from './nullishCoalescingLine';
 import { primitiveAssignmentLine } from './primitiveAssignmentLine';
+import { multilineBracesLine } from './multiLineBracesLine';
 export {
   ternaryExpressionLine,
   objectLiteralLine,
@@ -19,4 +20,5 @@ export {
   templateStringLine,
   nullishCoalescingLine,
   primitiveAssignmentLine,
+  multilineBracesLine,
 };
