@@ -2,6 +2,51 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.13.0] - 2025-03-13
+
+### 🚀 First Mars Release: Smarter, More Precise, and Evolving!
+
+This release is all about **precision and reliability**! We tackled several long-standing issues to ensure that log messages are placed exactly where they should be.  
+Big thanks to the community for the **huge support** in the last release! ❤️ Let's keep the momentum going!
+
+### 🛠️ Fixes & Improvements:
+
+- **Corrected Log Placement in Object Assignments**
+
+  - Logs now appear **immediately after object literal assignments**, fixing previous misplacements.
+  - 📌 [Issue #252](https://github.com/Chakroun-Anas/turbo-console-log/issues/252)
+
+- **Accurate Log Placement for Array Assignments with TypeScript**
+
+  - Resolved a bug where logs were placed incorrectly in **TypeScript array assignments**.
+  - 📌 [Issue #253](https://github.com/Chakroun-Anas/turbo-console-log/issues/253)
+
+- **Precise Log Placement for Single-Line Expressions**
+
+  - Ensures that logs appear **immediately after complete single-line expressions**, rather than after enclosing brackets.
+  - 📌 [Issue #254](https://github.com/Chakroun-Anas/turbo-console-log/issues/254)
+
+- **Smart Quote Selection for Log Messages**
+  - The extension now intelligently selects **the correct quote style** (`'`, `"`, or \``) based on the variable content.
+  - 📌 Improvement linked to [Issue #254](https://github.com/Chakroun-Anas/turbo-console-log/issues/254)
+
+### 🔥 Addressing False Claims:
+
+A recent **false claim on GitHub** labeled Turbo Console Log as "spam adware." Let's set the record straight:  
+✅ The web view **only appears once per bi-weekly release** (or upon first installation).  
+✅ It **can be dismissed** and won’t reappear until the next release.  
+✅ Turbo Console Log is **completely free & open-source**, with no paywalls.  
+✅ We follow a **structured, predictable release schedule** for transparency.  
+📌 [Read our full response here](https://github.com/Chakroun-Anas/turbo-console-log/issues/250)
+
+### ❤️ How You Can Help:
+
+If Turbo Console Log **saves you time**, consider supporting its development:  
+🔹 **Sponsor the project:** [turboconsolelog.io/sponsorship](https://www.turboconsolelog.io/sponsorship?showSponsor=true)  
+🔹 **Spread the word & share the extension** 🚀
+
+Thank you all! **Turbo Console Log keeps evolving, and it's all thanks to you!** ❤️
+
 ## [2.12.2] - 2025-02-20
 
 ### 🛠️ Patch

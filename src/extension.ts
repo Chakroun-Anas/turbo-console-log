@@ -4,10 +4,11 @@ import { Command, ExtensionProperties } from './entities';
 import { getAllCommands } from './commands/';
 import { getHtmlWevView as release2110HtmlWebView } from './releases/2110';
 import { getHtmlWevView as release2120HtmlWebView } from './releases/2120';
+import { getHtmlWevView as release2130HtmlWebView } from './releases/2130';
 import { readFromGlobalState, writeToGlobalState } from './helpers';
 
 const DONATION_LINK = 'https://turboconsolelog.io/sponsorship?showSponsor=true';
-const latestReleaseVersion = '2.12.0';
+const latestReleaseVersion = '2.13.0';
 
 const RELEASE_NOTES: Record<
   string,
@@ -22,6 +23,11 @@ const RELEASE_NOTES: Record<
     webViewHtml: release2120HtmlWebView(),
     notification:
       'Turbo Console Log v2.12.0 is out! This release makes the extension MORE STABLE than ever with critical bug fixes, more details in the release note.',
+  },
+  '2.13.0': {
+    webViewHtml: release2130HtmlWebView(),
+    notification:
+      'Turbo Console Log v2.13.0 is here! 🚀\n\nThis release brings **smarter log placement**, improved **quote selection**, and **better TypeScript support**.\n\n🔹 Logs now appear exactly where they should in **object & array assignments**.\n🔹 **Single-line expressions** are now handled with precision.\n🔹 **Quote selection** intelligently adapts to variable content.\n\n🔍 Read the full release notes to explore all the fixes & improvements!',
   },
 };
 
@@ -76,7 +82,7 @@ function showReleaseHtmlWebViewAndNotification(
     setTimeout(() => {
       vscode.window
         .showInformationMessage(
-          `Turbo Console Log needs YOUR support more than ever! Please Consider sponsoring the project!`,
+          `Turbo Console Log still needs YOUR support! Please Consider sponsoring the project 💚`,
           'Sponsor',
           'Dismiss',
         )
@@ -97,7 +103,7 @@ function showReleaseHtmlWebViewAndNotification(
 function openWhatsNewWebView(htmlContent: string) {
   const panel = vscode.window.createWebviewPanel(
     'turboConsoleLogUpdates',
-    '🚀 Turbo Console Log – What’s New',
+    '🚀 Turbo Console Log - Release v2.13.0 Notes',
     vscode.ViewColumn.One,
     { enableScripts: true },
   );
