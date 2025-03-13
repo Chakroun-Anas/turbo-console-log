@@ -17,6 +17,7 @@ export default (): void => {
                     }, true, false, 'hie'];`,
         `export const SLIDE_LEFT_ANIMATION = [`,
         `config.module.rules = [`,
+        'const routes: Routes = [',
       ];
       arrayAssignmentLOCs.forEach((arrayAssignmentLOC) => {
         expect(

@@ -19,3 +19,10 @@ async function webpackFinal(config) {
 
   return config;
 }
+
+const routes: Routes = [
+  {
+    path: '',
+    component: AboutPage,
+  },
+];
