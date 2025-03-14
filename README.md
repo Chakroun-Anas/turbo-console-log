@@ -15,21 +15,35 @@ Trusted by **nearly 2 million developers**, it simplifies inserting meaningful l
 ✔️ **Instantly add context** like function names, variables, and file locations.  
 ✔️ **Customize logs** to match your workflow.
 
-## 💡 What’s New in v2.11.0?
+## 🔥 What’s New in v2.13.0? – First Mars Release 🚀
 
-### ✅ **Automatic Log Correction**
+**Precision & Reliability Upgrades!**  
+This release tackles **long-standing issues** to ensure logs are placed exactly where they should be.
 
-- No more **manual updates** after refactoring!
-- Use `turboConsoleLog.correctAllLogMessages` to **fix log messages instantly**.
-- **Shortcut:** (Alt + Shift + X)
+### ✅ **Major Fixes & Improvements**
 
-### ⚙️ **More Control Over Log Messages**
+- **Corrected Log Placement in Object Assignments**
 
-- **New Settings:**
-  - ✅ `includeFilename` → Show the filename in logs.
-  - ✅ `includeLineNum` → Show the line number in logs.
+  - Logs now appear **immediately after object literal assignments**, fixing previous misplacements.
+  - 📌 [Issue #252](https://github.com/Chakroun-Anas/turbo-console-log/issues/252)
 
-📌 Full release details: [v2.11.0 Changelog](https://github.com/Chakroun-Anas/turbo-console-log/blob/master/CHANGELOG.md)
+- **Accurate Log Placement for Array Assignments with TypeScript**
+
+  - Resolved a bug where logs were placed incorrectly in **TypeScript array assignments**.
+  - 📌 [Issue #253](https://github.com/Chakroun-Anas/turbo-console-log/issues/253)
+
+- **Precise Log Placement for Single-Line Expressions**
+
+  - Logs now appear **immediately after complete single-line expressions**, rather than after enclosing brackets.
+  - 📌 [Issue #254](https://github.com/Chakroun-Anas/turbo-console-log/issues/254)
+
+- **Smart Quote Selection for Log Messages**
+  - Turbo Console Log now intelligently selects **the correct quote style** (`'`, `"`, or \``) based on the variable content.
+  - 📌 Improvement linked to [Issue #254](https://github.com/Chakroun-Anas/turbo-console-log/issues/254)
+
+📌 **Full Release Details:** [v2.13.0 Changelog](https://github.com/Chakroun-Anas/turbo-console-log/blob/master/CHANGELOG.md)
+
+---
 
 ## 🚀 Features at a Glance
 
@@ -40,13 +54,15 @@ Trusted by **nearly 2 million developers**, it simplifies inserting meaningful l
 
 📖 **Full Documentation**: [Turbo Console Log Docs](https://www.turboconsolelog.io/documentation/features)
 
+---
+
 ## 🔧 Configuration & Customization
 
 Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ✅ Prefixes & Suffixes  
 ✅ Log Function (`console.log`, `console.warn`, `console.error`, etc.)  
-✅ Quote Type (`'` or `"`)  
+✅ Quote Type (`'`, `"`, or \``)  
 ✅ Filename & Line Number Inclusion
 
 📖 **Explore Settings**: [Settings Documentation](https://www.turboconsolelog.io/documentation/settings)

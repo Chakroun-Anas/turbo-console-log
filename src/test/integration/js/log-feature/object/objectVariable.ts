@@ -5,6 +5,8 @@ import {
   openDocument,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
+  NaturalEditorPosition,
+  naturalEditorLine,
 } from '../../../helpers';
 import { ProgrammingLanguage } from '../../../../../entities';
 
@@ -84,6 +86,30 @@ export default (): void => {
         );
         const textDocument = activeTextEditor.document;
         const logMessage = textDocument.lineAt(46).text;
+        expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
+      }
+    });
+    it('Should insert the log message in the right line when it comes to a literal object assignment', async () => {
+      const { activeTextEditor } = vscode.window;
+      expectActiveTextEditorWithFile(activeTextEditor, 'objectVariable.js');
+      if (activeTextEditor) {
+        activeTextEditor.selections = [
+          new vscode.Selection(
+            new NaturalEditorPosition(48, 1),
+            new vscode.Position(48, 15),
+          ),
+        ];
+        await vscode.commands.executeCommand(
+          'turboConsoleLog.displayLogMessage',
+          [],
+        );
+        await Promise.all(
+          documentLinesChanged(activeTextEditor.document, [
+            naturalEditorLine(52),
+          ]),
+        );
+        const textDocument = activeTextEditor.document;
+        const logMessage = textDocument.lineAt(naturalEditorLine(52)).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
       }
     });

@@ -5,6 +5,7 @@ import objectContextTests from './object';
 import variableTests from './variable';
 import operatorsTests from './operators';
 import arrayTests from './array';
+import expressionTests from './expression';
 
 export default (): void => {
   describe('Insert log message feature', () => {
@@ -14,5 +15,6 @@ export default (): void => {
     objectContextTests();
     operatorsTests();
     arrayTests();
+    expressionTests();
   });
 };

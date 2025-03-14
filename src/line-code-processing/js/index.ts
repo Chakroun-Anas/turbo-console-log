@@ -29,20 +29,18 @@ export class JSLineCodeProcessing implements LineCodeProcessing {
     return /.*=.*/.test(loc);
   }
   isObjectLiteralAssignedToVariable(loc: string): boolean {
-    const locWithoutExtraSpaces = loc.replace(/\s+/g, ' ').trim(); // Preserve structure but clean spaces
-    return /^(export\s+)?(const|let|var)\s+[\w$]+(\s*:\s*[\w<>{},[\]\s]+)?\s*=\s*\{/.test(
+    const locWithoutExtraSpaces = loc.replace(/\s+/g, ' ').trim();
+
+    return /^(export\s+)?(const|let|var)?\s*[\w$.]+\s*(:\s*[\w<>{},[\]\s]+)?\s*=\s*\{(?![^}]*=>)/.test(
       locWithoutExtraSpaces,
     );
   }
   isArrayAssignedToVariable(loc: string): boolean {
     const locWithoutWhiteSpaces = loc.replace(/\s/g, '');
-
-    // Detects both standard & multi-line array assignments
-    return /^(const|let|var|\w+(\.\w+)*)\s*=\s*\[.*|\.\.\.\w+\(.*\),?$/.test(
+    return /^(const|let|var|\w+(\.\w+)*)(\s*:\s*[\w<>{}[\], ]+)?\s*=\s*\[/.test(
       locWithoutWhiteSpaces,
     );
   }
-
   doesContainClassDeclaration(loc: string): boolean {
     return /class(\s+).*{/.test(loc);
   }

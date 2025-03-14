@@ -44,3 +44,8 @@ export const buttonsType = {
   // pen eraser
   eraser: 32,
 };
+
+config.resolve = {
+  ...config.resolve,
+  ...nextWebpackConfig.resolve,
+};
