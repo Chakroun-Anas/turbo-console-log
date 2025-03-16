@@ -4,6 +4,7 @@ import objectVariableTest from './objectVariable';
 import objectFunctionCall from './objFunctionCall';
 import objFunctionCallNoAssignmentTest from './objFunctionCallNoAssignment';
 import objWithTypeTest from './objWithType';
+import objectLiteralTests from './objectLiteral';
 
 export default (): void => {
   describe('Object context', () => {
@@ -12,5 +13,6 @@ export default (): void => {
     objectFunctionCall();
     objFunctionCallNoAssignmentTest();
     objWithTypeTest();
+    objectLiteralTests();
   });
 };
