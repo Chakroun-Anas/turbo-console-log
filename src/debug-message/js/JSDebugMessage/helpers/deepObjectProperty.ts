@@ -17,7 +17,12 @@ export function deepObjectProperty(
   const propertyNameRegexMatch = propertyNameRegex.exec(lineText);
   if (propertyNameRegexMatch) {
     const multilineBracesVariable: MultilineContextVariable | null =
-      getMultiLineContextVariable(document, line, BracketType.CURLY_BRACES);
+      getMultiLineContextVariable(
+        document,
+        line,
+        BracketType.CURLY_BRACES,
+        true,
+      );
     if (multilineBracesVariable) {
       return deepObjectProperty(
         document,

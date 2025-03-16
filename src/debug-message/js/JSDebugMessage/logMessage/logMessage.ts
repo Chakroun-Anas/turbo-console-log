@@ -49,11 +49,13 @@ export function logMessage(
     document,
     selectionLine,
     BracketType.PARENTHESIS,
+    true,
   );
   const multilineBracesVariable = getMultiLineContextVariable(
     document,
     selectionLine,
     BracketType.CURLY_BRACES,
+    true,
   );
   const logMsgTypesChecks: {
     [key in LogMessageType]: () => {
@@ -190,6 +192,7 @@ export function logMessage(
             document,
             deepObjectPropertyResult.line,
             BracketType.CURLY_BRACES,
+            true,
           );
           return {
             isChecked: true,

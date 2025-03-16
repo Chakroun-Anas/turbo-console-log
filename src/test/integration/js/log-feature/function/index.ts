@@ -12,6 +12,7 @@ import functionCallAssignedToVariableTest from './functionCall';
 import typedFunctionCallAssignment from './typedFunctionCall';
 import functionObjectPropertyTests from './objectProperty';
 import functionCallAsLastStatement from './functionCallAsLastStatement';
+import variableWithinReturnStatement from './variableWithinReturnStatement';
 export default (): void => {
   describe('Function Context', () => {
     anonymousFunctionsTest();
@@ -26,5 +27,6 @@ export default (): void => {
     functionObjectPropertyTests();
     functionCallAsLastStatement();
     typedFunctionCallAssignment();
+    variableWithinReturnStatement();
   });
 };
