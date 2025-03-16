@@ -89,6 +89,11 @@ function baseDebuggingMsg(
 }
 
 function debuggingMsgQuote(settingQuote: string, selectedVar: string): string {
+  const trimmedVar = selectedVar.trim();
+  // If the variable starts with `{`, it's likely an object literal → use backticks
+  if (trimmedVar.startsWith('{')) {
+    return '`';
+  }
   if (selectedVar.includes(`"`)) {
     return '`';
   }
