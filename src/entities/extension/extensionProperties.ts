@@ -13,6 +13,7 @@ export type ExtensionProperties = {
   quote: string;
   logType: enumLogType;
   logFunction: string;
+  disableWhatsNew: boolean;
 };
 
 enum enumLogType {

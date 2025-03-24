@@ -105,6 +105,11 @@
           "type": "string",
           "default": "log",
           "description": "Specify a log function (when specified logType will be ignored)"
+        },
+        "turboConsoleLog.disableWhatsNew": {
+          "type": "boolean",
+          "default": false,
+          "description": "Disable the What's New notification and WebView after updating to a new version"
         }
       }
     },

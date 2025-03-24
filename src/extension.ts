@@ -66,6 +66,7 @@ function getExtensionProperties(
     includeFilename: workspaceConfig.includeFilename ?? false,
     logType: workspaceConfig.logType ?? 'log',
     logFunction: workspaceConfig.logFunction ?? 'log',
+    disableWhatsNew: workspaceConfig.disableWhatsNew ?? false,
   };
 }
 
@@ -73,6 +74,10 @@ function getExtensionProperties(
 function showReleaseHtmlWebViewAndNotification(
   context: vscode.ExtensionContext,
 ): void {
+  const config: vscode.WorkspaceConfiguration =
+    vscode.workspace.getConfiguration('turboConsoleLog');
+  if (getExtensionProperties(config).disableWhatsNew) return;
+
   const wasNotificationShown = readFromGlobalState(
     context,
     `IS_NOTIFICATION_SHOWN_${latestReleaseVersion}`,
