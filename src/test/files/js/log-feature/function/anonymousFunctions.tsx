@@ -69,3 +69,16 @@ const SearchInput = (props: any) => {
     </div>
   )
 }
+
+function cleanData(rawStr) {
+  const now = new Date();
+  const json = JSON.parse(rawStr);
+  return json
+    .map(raw => ({
+      ...raw,
+      createdAt: now - new Date(raw.createdAt),
+      msSinceLastAccessed: now - new Date(raw.lastAccessedAt),
+    }))
+    // Order: oldest last access time first
+    .sort((a, b) => b.msSinceLastAccessed - a.msSinceLastAccessed);
+}
