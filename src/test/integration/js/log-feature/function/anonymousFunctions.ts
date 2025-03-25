@@ -328,6 +328,42 @@ export default (): void => {
           ).to.equal(true);
         }
       });
+      it('Should ensures the tranformaion when dealing with a returned object', async () => {
+        const { activeTextEditor } = vscode.window;
+        expectActiveTextEditorWithFile(
+          activeTextEditor,
+          'anonymousFunctions.tsx',
+        );
+        if (activeTextEditor) {
+          activeTextEditor.selections = [
+            new vscode.Selection(
+              new NaturalEditorPosition(77, 11),
+              new NaturalEditorPosition(77, 13),
+            ),
+          ];
+          await vscode.commands.executeCommand(
+            'turboConsoleLog.displayLogMessage',
+            [],
+          );
+          await Promise.all(
+            documentLinesChanged(activeTextEditor.document, [
+              naturalEditorLine(78),
+            ]),
+          );
+          const textDocument = activeTextEditor.document;
+          expect(
+            /console\.log\(.*/.test(
+              textDocument.lineAt(naturalEditorLine(78)).text,
+            ),
+          ).to.equal(true);
+          expect(
+            /return {...raw/.test(
+              textDocument.lineAt(naturalEditorLine(79)).text,
+            ),
+          );
+          expect(/}/.test(textDocument.lineAt(naturalEditorLine(82)).text));
+        }
+      });
     });
   });
 };

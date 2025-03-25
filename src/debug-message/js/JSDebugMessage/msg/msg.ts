@@ -29,7 +29,7 @@ function hasFunctionBody(
     const currentLineText = document.lineAt(currentLineNum).text.trim();
 
     // ✅ Count `{` and `}`
-    totalOpenedBraces += (currentLineText.match(/{/g) || []).length;
+    totalOpenedBraces += (currentLineText.match(/(?<!\()\{/g) || []).length;
 
     // ✅ If `{` exists → The function has a body
     if (totalOpenedBraces > 0) {
