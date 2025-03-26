@@ -29,7 +29,7 @@ function hasFunctionBody(
     const currentLineText = document.lineAt(currentLineNum).text.trim();
 
     // ✅ Count `{` and `}`
-    totalOpenedBraces += (currentLineText.match(/{/g) || []).length;
+    totalOpenedBraces += (currentLineText.match(/(?<!\()\{/g) || []).length;
 
     // ✅ If `{` exists → The function has a body
     if (totalOpenedBraces > 0) {
@@ -89,6 +89,11 @@ function baseDebuggingMsg(
 }
 
 function debuggingMsgQuote(settingQuote: string, selectedVar: string): string {
+  const trimmedVar = selectedVar.trim();
+  // If the variable starts with `{`, it's likely an object literal → use backticks
+  if (trimmedVar.startsWith('{')) {
+    return '`';
+  }
   if (selectedVar.includes(`"`)) {
     return '`';
   }

@@ -47,10 +47,10 @@ export class JSDebugMessageAnonymous {
       tabSize,
     )}`;
     const isCalledInsideFunction = /\)\s*;?$/.test(selectedVarPropLoc);
-    const isNextLineCallToOtherFunction = document
+    const trimmedNextLined = document
       .lineAt(selectedPropLine.lineNumber + 1)
-      .text.trim()
-      .startsWith('.');
+      .text.trim();
+    const isNextLineCallToOtherFunction = /^\.\s*\w+/.test(trimmedNextLined);
     const anonymousFunctionClosedParenthesisLine = closingContextLine(
       document,
       selectedPropLine.lineNumber,
@@ -87,13 +87,22 @@ export class JSDebugMessageAnonymous {
             new Position(currentLine.lineNumber, 0),
             `${spacesBeforeCurrentLine}${
               addReturnKeyword ? 'return ' : '\t'
-            }${currentLine.text.trim().replace(/\)\s*$/, '')}\n`,
+            }${currentLine.text
+              .trim()
+              .replace(
+                anonymousFunctionRightPart.startsWith('({')
+                  ? /\)+\s*$/
+                  : /\)\s*$/,
+                '',
+              )}\n`,
           );
         } else {
           textEditor.insert(
             new Position(currentLine.lineNumber, 0),
-            `${spacesBeforeCurrentLine}${
-              addReturnKeyword ? 'return ' : '\t'
+            `${spacesBeforeCurrentLine}${addReturnKeyword ? 'return ' : '\t'}${
+              addReturnKeyword && anonymousFunctionRightPart.startsWith('({')
+                ? '{'
+                : ''
             }${currentLine.text.trim()}\n`,
           );
         }
@@ -108,33 +117,29 @@ export class JSDebugMessageAnonymous {
           addSemicolonInTheEnd && !isReturnBlockMultiLine ? ';' : ''
         })\n`,
       );
-    } else {
-      const nextLineText = document.lineAt(
-        selectedPropLine.lineNumber + 1,
-      ).text;
-      const nextLineIsEndWithinTheMainFunction = /^\)/.test(
-        nextLineText.trim(),
-      );
-      textEditor.insert(
-        new Position(selectedPropLine.lineNumber, 0),
-        `${spacesBeforeLinesToInsert}${debuggingMsg}\n`,
-      );
-      textEditor.insert(
-        new Position(selectedPropLine.lineNumber, 0),
-        `${spacesBeforeLinesToInsert}return ${anonymousFunctionRightPart}${
-          addSemicolonInTheEnd ? ';' : ''
-        }\n`,
-      );
-      textEditor.insert(
-        new Position(selectedPropLine.lineNumber, 0),
-        `${spacesBeforeSelectedVarLine}}${isCalledInsideFunction ? ')' : ''}${
-          addSemicolonInTheEnd &&
-          !isNextLineCallToOtherFunction &&
-          !nextLineIsEndWithinTheMainFunction
-            ? ';'
-            : ''
-        }${nextLineText === '' ? '' : '\n'}`,
-      );
+      return;
     }
+    const nextLineText = document.lineAt(selectedPropLine.lineNumber + 1).text;
+    const nextLineIsEndWithinTheMainFunction = /^\)/.test(nextLineText.trim());
+    textEditor.insert(
+      new Position(selectedPropLine.lineNumber, 0),
+      `${spacesBeforeLinesToInsert}${debuggingMsg}\n`,
+    );
+    textEditor.insert(
+      new Position(selectedPropLine.lineNumber, 0),
+      `${spacesBeforeLinesToInsert}return ${anonymousFunctionRightPart}${
+        addSemicolonInTheEnd ? ';' : ''
+      }\n`,
+    );
+    textEditor.insert(
+      new Position(selectedPropLine.lineNumber, 0),
+      `${spacesBeforeSelectedVarLine}}${isCalledInsideFunction ? ')' : ''}${
+        addSemicolonInTheEnd &&
+        !isNextLineCallToOtherFunction &&
+        !nextLineIsEndWithinTheMainFunction
+          ? ';'
+          : ''
+      }${nextLineText === '' ? '' : '\n'}`,
+    );
   }
 }

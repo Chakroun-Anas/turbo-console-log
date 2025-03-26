@@ -7,7 +7,7 @@ export function getMultiLineContextVariable(
   document: TextDocument,
   lineNum: number,
   bracketType: BracketType,
-  innerScope = true,
+  innerScope: boolean,
 ): MultilineContextVariable | null {
   const { openingBrackets, closingBrackets } = locBrackets(
     document.lineAt(lineNum).text,

@@ -53,7 +53,7 @@ export function functionCallLine(
     totalClosedParentheses += (currentLineText.match(/\)/g) || []).length;
 
     // Track template literals (Styled Component template strings)
-    if (currentLineText.includes('`')) totalOpenedBackticks++;
+    totalOpenedBackticks += (currentLineText.match(/`/g) || []).length;
 
     if (currentLineNum === document.lineCount) {
       break;

@@ -5,10 +5,10 @@ import { getAllCommands } from './commands/';
 import { getHtmlWevView as release2110HtmlWebView } from './releases/2110';
 import { getHtmlWevView as release2120HtmlWebView } from './releases/2120';
 import { getHtmlWevView as release2130HtmlWebView } from './releases/2130';
+import { getHtmlWevView as release2140HtmlWebView } from './releases/2140';
 import { readFromGlobalState, writeToGlobalState } from './helpers';
 
-const DONATION_LINK = 'https://turboconsolelog.io/sponsorship?showSponsor=true';
-const latestReleaseVersion = '2.13.0';
+const latestReleaseVersion = '2.14.0';
 
 const RELEASE_NOTES: Record<
   string,
@@ -28,6 +28,21 @@ const RELEASE_NOTES: Record<
     webViewHtml: release2130HtmlWebView(),
     notification:
       'Turbo Console Log v2.13.0 is here! 🚀\n\nThis release brings **smarter log placement**, improved **quote selection**, and **better TypeScript support**.\n\n🔹 Logs now appear exactly where they should in **object & array assignments**.\n🔹 **Single-line expressions** are now handled with precision.\n🔹 **Quote selection** intelligently adapts to variable content.\n\n🔍 Read the full release notes to explore all the fixes & improvements!',
+  },
+  '2.14.0': {
+    webViewHtml: release2140HtmlWebView(),
+    notification: `Turbo Console Log v2.14.0 is live! 🔥
+
+This update sharpens the engine with **precision fixes** and paves the way for what's next.
+
+✅ Improved function call log placement  
+✅ Better quote handling in object logs  
+✅ Edge-case fix for anonymous arrow functions  
+✅ More accurate positioning around returns
+
+🎯 It’s all about **stability, trust, and long-term value**.
+
+📰 Read the full release note to dive in!`,
   },
 };
 
@@ -79,19 +94,6 @@ function showReleaseHtmlWebViewAndNotification(
   );
   if (!wasNotificationShown) {
     openWhatsNewWebView(RELEASE_NOTES[latestReleaseVersion].webViewHtml);
-    setTimeout(() => {
-      vscode.window
-        .showInformationMessage(
-          `Turbo Console Log still needs YOUR support! Please Consider sponsoring the project 💚`,
-          'Sponsor',
-          'Dismiss',
-        )
-        .then((selection) => {
-          if (selection === 'Sponsor') {
-            vscode.env.openExternal(vscode.Uri.parse(DONATION_LINK));
-          }
-        });
-    }, 1000 * 15); // Show after 15 seconds
     writeToGlobalState(
       context,
       `IS_NOTIFICATION_SHOWN_${latestReleaseVersion}`,
@@ -103,7 +105,7 @@ function showReleaseHtmlWebViewAndNotification(
 function openWhatsNewWebView(htmlContent: string) {
   const panel = vscode.window.createWebviewPanel(
     'turboConsoleLogUpdates',
-    '🚀 Turbo Console Log - Release v2.13.0 Notes',
+    '🚀 Turbo Console Log - Release v2.14.0 Notes',
     vscode.ViewColumn.One,
     { enableScripts: true },
   );
