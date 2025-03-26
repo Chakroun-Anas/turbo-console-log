@@ -15,33 +15,35 @@ Trusted by **nearly 2 million developers**, it simplifies inserting meaningful l
 ✔️ **Instantly add context** like function names, variables, and file locations.  
 ✔️ **Customize logs** to match your workflow.
 
-## 🔥 What’s New in v2.13.0? – First Mars Release 🚀
+## 🔥 What’s New in v2.14.0? – Second Mars Release 🚀
 
-**Precision & Reliability Upgrades!**  
-This release tackles **long-standing issues** to ensure logs are placed exactly where they should be.
+This release focuses on **fine-tuning the engine** behind log insertion. We tackled subtle edge cases around insertion precision, quote consistency, and function call tracking, making your debugging experience even smoother and more reliable.
 
-### ✅ **Major Fixes & Improvements**
+Huge thanks to everyone reporting issues and helping the extension evolve — your feedback drives this project forward! ❤️
 
-- **Corrected Log Placement in Object Assignments**
+### 🛠️ Fixes & Improvements:
 
-  - Logs now appear **immediately after object literal assignments**, fixing previous misplacements.
-  - 📌 [Issue #252](https://github.com/Chakroun-Anas/turbo-console-log/issues/252)
+- **Fix: Logs Appearing Outside Functions Due to Ignored Return Statements**
 
-- **Accurate Log Placement for Array Assignments with TypeScript**
+  - Logs now correctly appear _inside_ functions, taking return statements into account when necessary.
+  - 📌 [Issue #256](https://github.com/Chakroun-Anas/turbo-console-log/issues/256)
 
-  - Resolved a bug where logs were placed incorrectly in **TypeScript array assignments**.
-  - 📌 [Issue #253](https://github.com/Chakroun-Anas/turbo-console-log/issues/253)
+- **Fix: Incorrect Quote Usage in Object Log Statements**
 
-- **Precise Log Placement for Single-Line Expressions**
+  - When logging objects, the extension now consistently selects the **correct quote style** based on context.
+  - 📌 [Issue #259](https://github.com/Chakroun-Anas/turbo-console-log/issues/259)
 
-  - Logs now appear **immediately after complete single-line expressions**, rather than after enclosing brackets.
-  - 📌 [Issue #254](https://github.com/Chakroun-Anas/turbo-console-log/issues/254)
+- **Fix: Incorrect Log Line Computation in Function Calls**
 
-- **Smart Quote Selection for Log Messages**
-  - Turbo Console Log now intelligently selects **the correct quote style** (`'`, `"`, or \``) based on the variable content.
-  - 📌 Improvement linked to [Issue #254](https://github.com/Chakroun-Anas/turbo-console-log/issues/254)
+  - Resolved an issue where logs appeared at the **wrong line position** after function calls.
+  - 📌 [Issue #260](https://github.com/Chakroun-Anas/turbo-console-log/issues/260)
 
-📌 **Full Release Details:** [v2.13.0 Changelog](https://github.com/Chakroun-Anas/turbo-console-log/blob/master/CHANGELOG.md)
+- **Fix: Anonymous arrow function transformation when returning inline object**
+
+  - Resolved an issue where anonymous arrow functions returning inline objects were incorrectly transformed during log insertion.
+  - 📌 [Issue #262](https://github.com/Chakroun-Anas/turbo-console-log/issues/262)
+
+**Full Release Details:** https://github.com/Chakroun-Anas/turbo-console-log/issues/257
 
 ---
 
