@@ -88,9 +88,10 @@ npm run test
 
 ### <span style="color:khaki">**Running the tests with the debugger**</span>
 
+1. <span style="color:deepskyblue">Compile</span> the source code with the command `npm run test:compile`
 1. Open the <span style="color:deepskyblue">**Debug View**</span> by clicking on the <span style="color:deepskyblue">**Debug**</span> icon in the <span style="color:deepskyblue">**Activity Bar**</span> on the left side of the <span style="color:deepskyblue">**VS Code**</span> window.
-2. Select the <span style="color:deepskyblue">**Test: All**</span> configuration.
-3. Press <span style="color:deepskyblue">**F5**</span> or click on the <span style="color:deepskyblue">**Start Debugging**</span> button.
+1. Select the <span style="color:deepskyblue">**Test: All**</span> configuration.
+1. Press <span style="color:deepskyblue">**F5**</span> or click on the <span style="color:deepskyblue">**Start Debugging**</span> button.
 
 if you are interested in running a specific test, you will need to locate use the test file and add `.only` to the test function, be careful please not to commit this change.
 

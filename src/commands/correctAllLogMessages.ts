@@ -20,6 +20,7 @@ export function correctAllLogMessagesCommand(): Command {
     handler: async (
       extensionProperties: ExtensionProperties,
       jsDebugMessage: DebugMessage,
+      args?: Array<unknown>,
     ) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
@@ -35,8 +36,10 @@ export function correctAllLogMessagesCommand(): Command {
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         extensionProperties.logFunction,
+        extensionProperties.logType,
         extensionProperties.logMessagePrefix,
         extensionProperties.delimiterInsideMessage,
+        args
       );
 
       const edits: { range: vscode.Range; newText: string }[] = [];

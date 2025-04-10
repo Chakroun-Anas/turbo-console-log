@@ -11,11 +11,11 @@ export type ExtensionProperties = {
   includeFilename: boolean;
   includeLineNum: boolean;
   quote: string;
-  logType: enumLogType;
+  logType: LogType;
   logFunction: string;
 };
 
-enum enumLogType {
+enum LogType {
   log = 'log',
   warn = 'warn',
   error = 'error',
