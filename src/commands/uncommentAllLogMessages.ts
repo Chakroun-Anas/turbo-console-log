@@ -9,9 +9,11 @@ export function uncommentAllLogMessagesCommand(): Command {
       {
         delimiterInsideMessage,
         logMessagePrefix,
+        logType,
         logFunction,
       }: ExtensionProperties,
       jsDebugMessage: DebugMessage,
+      args?: unknown[],
     ) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
@@ -23,8 +25,10 @@ export function uncommentAllLogMessagesCommand(): Command {
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         logFunction,
+        logType,
         logMessagePrefix,
         delimiterInsideMessage,
+        args,
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ spaces, lines }) => {

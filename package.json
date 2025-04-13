@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "2.14.0",
+  "version": "2.15.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -12,7 +12,6 @@
     "Other"
   ],
   "activationEvents": [
-    "onStartupFinished",
     "onLanguage:javascript",
     "onLanguage:javascriptreact",
     "onLanguage:typescript",
@@ -164,7 +163,7 @@
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "watch": "npm run esbuild --watch",
-    "lint": "eslint src --ext ts",
+    "lint": "tsc --noEmit && eslint src --ext ts",
     "pretest": "yarn run esbuild-base",
     "test:compile": "rm -rf out && tsc -p ./ && mkdir out/test/files && cp -r src/test/files/ out/test/files/",
     "test": "npm run test:compile && node ./out/test/runTests.js",
@@ -179,6 +178,7 @@
     "@types/vscode": "^1.50.0",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
+    "@vscode/test-electron": "^2.4.1",
     "chai": "^4.3.7",
     "chalk": "^4.1.0",
     "esbuild": "^0.17.7",

@@ -22,9 +22,11 @@ export interface DebugMessage {
   ): void;
   detectAll(
     document: TextDocument,
-    logFunction: string,
-    logMessagePrefix: string,
-    delimiterInsideMessage: string,
+    logFunction: ExtensionProperties['logFunction'],
+    logType: ExtensionProperties['logType'],
+    logMessagePrefix: ExtensionProperties['logMessagePrefix'],
+    delimiterInsideMessage: ExtensionProperties['delimiterInsideMessage'],
+    args?: unknown[],
   ): Message[];
   enclosingBlockName(
     document: TextDocument,
