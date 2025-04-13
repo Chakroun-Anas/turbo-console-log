@@ -6,9 +6,10 @@ import { getHtmlWevView as release2110HtmlWebView } from './releases/2110';
 import { getHtmlWevView as release2120HtmlWebView } from './releases/2120';
 import { getHtmlWevView as release2130HtmlWebView } from './releases/2130';
 import { getHtmlWevView as release2140HtmlWebView } from './releases/2140';
+import { getHtmlWebView as release2150HtmlWebView } from './releases/2150';
 import { readFromGlobalState, writeToGlobalState } from './helpers';
 
-const latestReleaseVersion = '2.14.0';
+const latestReleaseVersion = '2.15.0';
 
 const RELEASE_NOTES: Record<
   string,
@@ -43,6 +44,22 @@ This update sharpens the engine with **precision fixes** and paves the way for w
 🎯 It’s all about **stability, trust, and long-term value**.
 
 📰 Read the full release note to dive in!`,
+  },
+  '2.15.0': {
+    webViewHtml: release2150HtmlWebView(),
+    notification: `Turbo Console Log v2.15.0 is here! ✨
+
+This release marks a **pivot point** toward a more sustainable future — without compromising the open-source core.
+
+✅ Fixed command issues when using a custom log function (issue-265)
+✅ Hit a huge milestone: **100+ passing tests**  
+🙏 Special thanks to **tzarger** for reporting the key bug!
+
+🧠 PRO version is coming in May — packed with new visual tools!
+
+🤍 Turbo still needs your support more than ever — donations help us stay free, stable, and independent.
+
+📖 Check the full release notes to get all the details!`,
   },
 };
 
@@ -105,7 +122,7 @@ function showReleaseHtmlWebViewAndNotification(
 function openWhatsNewWebView(htmlContent: string) {
   const panel = vscode.window.createWebviewPanel(
     'turboConsoleLogUpdates',
-    '🚀 Turbo Console Log - Release v2.14.0 Notes',
+    '🚀 Turbo Console Log - Release v2.15.0 Notes',
     vscode.ViewColumn.One,
     { enableScripts: true },
   );
