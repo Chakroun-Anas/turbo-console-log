@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.15.1] - 2025-04-13
+
+Enable extension on onStartupFinished event
+
 ## [2.15.0] - 2025-04-13
 
 ### ✨ Highlights
