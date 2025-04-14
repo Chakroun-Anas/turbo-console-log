@@ -42,14 +42,16 @@ export function getHtmlWebView(): string {
             <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fturbo-console-log-icon.a3aba0a3.png&w=64&q=75" style="height: 24px; width: 24px;" alt="Turbo Console Log Logo" />
             Turbo Console Log v2.15.0: April’s Only Drop!
           </h1>
-          <div style="width: 100%; display: flex; justify-content: center; margin-top: 20px;">
-            <a style="text-decoration: none; color: white;" href="https://www.turboconsolelog.io/articles/release-2150">
-              <div class="release-illustration-container">
-                <h2>Release v2.15.0</h2>
-              </div>
-              <p style="text-decoration: underline;">👉 Read the full release article 🗞️</p>
-            </a>
-          </div>
+                 <div class="image-container">
+            <a href="https://www.turboconsolelog.io/sponsorship?showSponsor=true">
+           <div style="text-align: center;">
+    <a href="https://www.turboconsolelog.io/sponsorship?showSponsor=true">
+                  <img src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fsponsorship-v2120.f901973f.webp&w=1080&q=75" 
+                      alt="Support Turbo Console Log - Sponsor Now!" style="width: 420px; height: 256px" />
+              </a>
+    <p style="color: #FFC947; font-size: 12px; margin-top: 0px;">
+        <strong>Clicking the image will redirect u to the sponsorship dialog in the extension website 💖</strong>
+    </p>
 
           <div class="section-container">
             <h2 class="secondary-color">🐛 What’s Fixed</h2>
@@ -97,6 +99,7 @@ export function getHtmlWebView(): string {
           <div class="section-container">
             <h2 class="secondary-color">📚 More to Explore</h2>
             <ul class="list">
+              <li><a href="https://www.turboconsolelog.io/articles/release-2150">Full Release Notes</a></li>
               <li><a href="https://www.turboconsolelog.io/articles/debugging-science-art">Debugging Between Science & Art 📘</a></li>
               <li><a href="https://www.turboconsolelog.io/articles/release-plan-2025">2025 Release Plan & Vision 📅</a></li>
             </ul>
