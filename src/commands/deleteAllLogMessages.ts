@@ -10,8 +10,10 @@ export function deleteAllLogMessagesCommand(): Command {
         delimiterInsideMessage,
         logMessagePrefix,
         logFunction,
+        logType,
       }: ExtensionProperties,
       jsDebugMessage: DebugMessage,
+      args?: unknown[],
     ) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
@@ -22,8 +24,10 @@ export function deleteAllLogMessagesCommand(): Command {
       const logMessages: Message[] = jsDebugMessage.detectAll(
         document,
         logFunction,
+        logType,
         logMessagePrefix,
         delimiterInsideMessage,
+        args,
       );
       editor.edit((editBuilder) => {
         logMessages.forEach(({ lines }) => {

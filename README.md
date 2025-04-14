@@ -15,37 +15,42 @@ Trusted by **nearly 2 million developers**, it simplifies inserting meaningful l
 ✔️ **Instantly add context** like function names, variables, and file locations.  
 ✔️ **Customize logs** to match your workflow.
 
-## 🔥 What’s New in v2.14.0? – Second Mars Release 🚀
+## 🔥 What’s New in v2.15.0? – Only April Release ‼️
 
-This release focuses on **fine-tuning the engine** behind log insertion. We tackled subtle edge cases around insertion precision, quote consistency, and function call tracking, making your debugging experience even smoother and more reliable.
+This sprint was tough — financially, mentally, and logistically. We had to step back from our bi-weekly rhythm and focus on delivering **one solid, meaningful release** for April. And we made it count. 💪
 
-Huge thanks to everyone reporting issues and helping the extension evolve — your feedback drives this project forward! ❤️
+### 🛠️ Fixes & Improvements
 
-### 🛠️ Fixes & Improvements:
+- **✅ All Commands Now Support Custom Log Functions**
 
-- **Fix: Logs Appearing Outside Functions Due to Ignored Return Statements**
+  - Commands like Comment, Uncomment, Delete, and Correct Log Messages now fully support a custom log function.
+  - No more broken commands when personalizing your logging setup!
+  - 📌 [Issue #265](https://github.com/Chakroun-Anas/turbo-console-log/issues/265)
+  - Shoutout to **tzarger** for surfacing this! 👏
 
-  - Logs now correctly appear _inside_ functions, taking return statements into account when necessary.
-  - 📌 [Issue #256](https://github.com/Chakroun-Anas/turbo-console-log/issues/256)
-
-- **Fix: Incorrect Quote Usage in Object Log Statements**
-
-  - When logging objects, the extension now consistently selects the **correct quote style** based on context.
-  - 📌 [Issue #259](https://github.com/Chakroun-Anas/turbo-console-log/issues/259)
-
-- **Fix: Incorrect Log Line Computation in Function Calls**
-
-  - Resolved an issue where logs appeared at the **wrong line position** after function calls.
-  - 📌 [Issue #260](https://github.com/Chakroun-Anas/turbo-console-log/issues/260)
-
-- **Fix: Anonymous arrow function transformation when returning inline object**
-
-  - Resolved an issue where anonymous arrow functions returning inline objects were incorrectly transformed during log insertion.
-  - 📌 [Issue #262](https://github.com/Chakroun-Anas/turbo-console-log/issues/262)
-
-**Full Release Details:** https://github.com/Chakroun-Anas/turbo-console-log/issues/257
+- **🔢 Reached 100+ Passing Tests**
+  - Turbo is now backed by over **100 unit and integration tests** — pushing toward rock-solid reliability.
 
 ---
+
+### 🧠 PRO Version Drops in May!
+
+We’re building something bigger — **Turbo Console Log PRO** will introduce:
+
+- A new **graphical panel** to visually interact with logs and features.
+- Based on a **one-time purchase**, no subscriptions. Just value.
+- Built to support Turbo's long-term sustainability, without compromising the free version.
+
+💌 [Join the newsletter](https://www.turboconsolelog.io/join) to get early access, previews, and launch info.
+
+---
+
+### 💸 Turbo Needs You — Now More Than Ever
+
+We’re still in a fragile transition phase.  
+If Turbo helps you daily — this is your moment to give back and keep it alive.
+
+👉 [Become a sponsor](https://www.turboconsolelog.io/sponsorship) and support open-source that supports you.
 
 ## 🚀 Features at a Glance
 

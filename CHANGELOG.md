@@ -2,6 +2,39 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.15.3] - 2025-04-13
+
+V2.15.0 Release note illustration included in the release web view (The web view won't be shown again if already viewed, thank you!)
+
+## [2.15.2] - 2025-04-13
+
+V2.15.0 Release note illustration included in the release web view (The web view won't be shown again if already viewed, thank you!)
+
+## [2.15.1] - 2025-04-13
+
+Enable extension on onStartupFinished event
+
+## [2.15.0] - 2025-04-13
+
+### ✨ Highlights
+
+- This is the **only release of April** due to financial and burnout constraints — focused on stability and preparing for the upcoming PRO version.
+
+### ✅ Fixed
+
+- Fixed: All core commands (Comment, Uncomment, Delete, Correct Log Messages) now fully support custom log functions.
+  - Thanks to [tzarger](https://github.com/Chakroun-Anas/turbo-console-log/issues/265) for reporting this issue!
+
+### 🧪 Tests
+
+- Passed the **100+ unit and integration test** milestone — increasing overall confidence and stability.
+
+### 📦 Upcoming
+
+- **Turbo Console Log PRO** coming in May!
+  - Includes a graphical panel for enhanced UX.
+  - One-time purchase, no subscription.
+
 ## [2.14.0] - 2025-03-26
 
 ### 🧠 Stability & Sharpness: Turbo Console Log is Getting Smarter
