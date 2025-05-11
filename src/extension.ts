@@ -2,14 +2,17 @@ import * as vscode from 'vscode';
 import { jsDebugMessage } from './debug-message/js';
 import { Command, ExtensionProperties } from './entities';
 import { getAllCommands } from './commands/';
+import { getHtmlWebView as freshInstallHtmlWebView } from './releases/fresh-install';
 import { getHtmlWevView as release2110HtmlWebView } from './releases/2110';
 import { getHtmlWevView as release2120HtmlWebView } from './releases/2120';
 import { getHtmlWevView as release2130HtmlWebView } from './releases/2130';
 import { getHtmlWevView as release2140HtmlWebView } from './releases/2140';
 import { getHtmlWebView as release2150HtmlWebView } from './releases/2150';
+import { getHtmlWebView as release2160HtmlWebView } from './releases/2160';
 import { readFromGlobalState, writeToGlobalState } from './helpers';
 
-const latestReleaseVersion = '2.15.0';
+const previousReleaseVersion = '2.15.0';
+const latestReleaseVersion = '2.16.0';
 
 const RELEASE_NOTES: Record<
   string,
@@ -61,6 +64,24 @@ This release marks a **pivot point** toward a more sustainable future — withou
 
 📖 Check the full release notes to get all the details!`,
   },
+  '2.16.0': {
+    webViewHtml: release2160HtmlWebView(),
+    notification: `Turbo Console Log v2.16.0 is live! 🌟
+
+This update is all about **first impressions and future vision**.
+
+🆕 Introduced a custom webview for fresh installs — new users now get a tailored onboarding experience  
+♻️ Existing users still get updates, but with a cleaner path and a **PRO teaser** included
+
+🎯 Laid the groundwork for **Turbo Console Log PRO** — launching by the end of May:
+- A new panel listing all active log entries
+- Visual actions to quickly remove, clean, or group logs
+- A one-time license. No subscription. Yours forever.
+
+💬 Want to support development or get early access? Donations are still open and appreciated more than ever.
+
+This is just the beginning. Let's build the future of debugging — together. 🚀`,
+  },
 };
 
 export function activate(context: vscode.ExtensionContext): void {
@@ -105,12 +126,34 @@ function getExtensionProperties(
 function showReleaseHtmlWebViewAndNotification(
   context: vscode.ExtensionContext,
 ): void {
-  const wasNotificationShown = readFromGlobalState(
+  const wasPreviousReleaseWebviewShown = readFromGlobalState(
+    context,
+    `IS_NOTIFICATION_SHOWN_${previousReleaseVersion}`,
+  );
+  const wasLatestReleaseWebviewShown = readFromGlobalState(
     context,
     `IS_NOTIFICATION_SHOWN_${latestReleaseVersion}`,
   );
-  if (!wasNotificationShown) {
-    openWhatsNewWebView(RELEASE_NOTES[latestReleaseVersion].webViewHtml);
+
+  // Fresh install of the extension
+  if (!wasPreviousReleaseWebviewShown && !wasLatestReleaseWebviewShown) {
+    openWhatsNewWebView(
+      `🚀 Welcome To Turbo Console Log Family 🎊`,
+      freshInstallHtmlWebView(),
+    );
+    writeToGlobalState(
+      context,
+      `IS_NOTIFICATION_SHOWN_${latestReleaseVersion}`,
+      true,
+    );
+    return;
+  }
+  // Existing users updating the extension
+  if (!wasLatestReleaseWebviewShown) {
+    openWhatsNewWebView(
+      `🚀 Turbo Console Log - Release ${latestReleaseVersion} Notes`,
+      RELEASE_NOTES[latestReleaseVersion].webViewHtml,
+    );
     writeToGlobalState(
       context,
       `IS_NOTIFICATION_SHOWN_${latestReleaseVersion}`,
@@ -119,10 +162,10 @@ function showReleaseHtmlWebViewAndNotification(
   }
 }
 
-function openWhatsNewWebView(htmlContent: string) {
+function openWhatsNewWebView(title: string, htmlContent: string) {
   const panel = vscode.window.createWebviewPanel(
     'turboConsoleLogUpdates',
-    '🚀 Turbo Console Log - Release v2.15.0 Notes',
+    title,
     vscode.ViewColumn.One,
     { enableScripts: true },
   );
