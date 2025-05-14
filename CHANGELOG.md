@@ -2,6 +2,31 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.16.0] - 2025-05-12
+
+### ✨ What's New
+
+- Introduced **tailored release webviews**:
+
+  - New users now get a dedicated welcome screen upon fresh install
+  - Existing users get update-focused release notes with relevant info
+
+- 🛡️ **Codebase audit completed** — all known vulnerabilities resolved
+- 🧪 100% test pass rate (109 tests) across the extension
+- 📦 Internal cleanup to support future stability and PRO enhancements
+
+### 🧠 What's Coming
+
+- **Turbo Console Log PRO** — launching next:
+  - Visual log panel
+  - File, Folder and Workspace graphical actions
+  - One-time license, no subscription
+
+➡️ Stay in the loop: [Join the newsletter](https://www.turboconsolelog.io/join)
+➡️ Support development: [Sponsor the project](https://www.turboconsolelog.io/sponsorship?showSponsor=true)
+
+Release article 🗞️: https://www.turboconsolelog.io/articles/release-2160
+
 ## [2.15.3] - 2025-04-13
 
 V2.15.0 Release note illustration included in the release web view (The web view won't be shown again if already viewed, thank you!)
