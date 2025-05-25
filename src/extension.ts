@@ -10,6 +10,8 @@ import { getHtmlWevView as release2140HtmlWebView } from './releases/2140';
 import { getHtmlWebView as release2150HtmlWebView } from './releases/2150';
 import { getHtmlWebView as release2160HtmlWebView } from './releases/2160';
 import { readFromGlobalState, writeToGlobalState } from './helpers';
+import { TurboProFreemiumTreeProvider } from './pro';
+import { runProBundle } from './commands/activateTurboProBundle';
 
 const previousReleaseVersion = '2.15.0';
 const latestReleaseVersion = '2.16.0';
@@ -85,18 +87,52 @@ This is just the beginning. Let's build the future of debugging — together. �
 };
 
 export function activate(context: vscode.ExtensionContext): void {
+  console.log('🧠 Global Storage Path:', context.globalStorageUri.fsPath);
   const config: vscode.WorkspaceConfiguration =
     vscode.workspace.getConfiguration('turboConsoleLog');
-  const properties: ExtensionProperties = getExtensionProperties(config);
+  const extensionProperties: ExtensionProperties =
+    getExtensionProperties(config);
   const commands: Array<Command> = getAllCommands();
 
   for (const { name, handler } of commands) {
     vscode.commands.registerCommand(name, (args: unknown[]) => {
-      handler(properties, jsDebugMessage, args);
+      handler({
+        extensionProperties,
+        debugMessage: jsDebugMessage,
+        args,
+        context,
+      });
     });
   }
-
+  const version = vscode.extensions.getExtension(
+    'ChakrounAnas.turbo-console-log',
+  )?.packageJSON.version;
+  const proLicenseKey = readFromGlobalState<string>(context, 'license-key');
+  const proBundle = readFromGlobalState<string>(
+    context,
+    `pro-bundle-${version}`,
+  );
   showReleaseHtmlWebViewAndNotification(context);
+  if (proLicenseKey && proBundle) {
+    runProBundle(
+      context,
+      extensionProperties,
+      proLicenseKey,
+      version,
+      proBundle,
+      true,
+    );
+    // writeToGlobalState(context, 'license-key', null);
+    // writeToGlobalState(context, `pro-bundle-${version}`, proBundle);
+    return;
+  }
+  const freemiumProvider = new TurboProFreemiumTreeProvider();
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider(
+      'turboConsoleLogProView',
+      freemiumProvider,
+    ),
+  );
 }
 
 function getExtensionProperties(

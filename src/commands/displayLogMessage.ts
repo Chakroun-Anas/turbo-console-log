@@ -1,15 +1,11 @@
 import * as vscode from 'vscode';
-import { DebugMessage } from '../debug-message';
-import { Command, ExtensionProperties } from '../entities';
+import { Command } from '../entities';
 import { getTabSize } from '../utilities';
 
 export function displayLogMessageCommand(): Command {
   return {
     name: 'turboConsoleLog.displayLogMessage',
-    handler: async (
-      extensionProperties: ExtensionProperties,
-      jsDebugMessage: DebugMessage,
-    ) => {
+    handler: async ({ extensionProperties, debugMessage }) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
@@ -31,7 +27,7 @@ export function displayLogMessageCommand(): Command {
         const lineOfSelectedVar: number = selection.active.line;
         if (selectedVar.trim().length !== 0) {
           await editor.edit((editBuilder) => {
-            jsDebugMessage.msg(
+            debugMessage.msg(
               editBuilder,
               document,
               selectedVar,

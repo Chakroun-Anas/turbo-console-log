@@ -1,27 +1,19 @@
 import * as vscode from 'vscode';
-import { DebugMessage } from '../debug-message';
-import { Command, ExtensionProperties, Message } from '../entities';
+import { Command, Message } from '../entities';
 
 export function commentAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.commentAllLogMessages',
-    handler: async (
-      {
-        delimiterInsideMessage,
-        logMessagePrefix,
-        logFunction,
-        logType,
-      }: ExtensionProperties,
-      jsDebugMessage: DebugMessage,
-      args?: unknown[],
-    ) => {
+    handler: async ({ extensionProperties, debugMessage, args }) => {
+      const { logFunction, logType, logMessagePrefix, delimiterInsideMessage } =
+        extensionProperties;
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
         return;
       }
       const document: vscode.TextDocument = editor.document;
-      const logMessages: Message[] = jsDebugMessage.detectAll(
+      const logMessages: Message[] = debugMessage.detectAll(
         document,
         logFunction,
         logType,
