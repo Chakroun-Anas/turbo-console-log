@@ -3,6 +3,7 @@ import { commentAllLogMessagesCommand } from './commentAllLogMessages';
 import { uncommentAllLogMessagesCommand } from './uncommentAllLogMessages';
 import { deleteAllLogMessagesCommand } from './deleteAllLogMessages';
 import { correctAllLogMessagesCommand } from './correctAllLogMessages';
+import { activateTurboProBundleCommand } from './activateTurboProBundle';
 import { Command } from '../entities';
 export function getAllCommands(): Array<Command> {
   return [
@@ -11,5 +12,6 @@ export function getAllCommands(): Array<Command> {
     uncommentAllLogMessagesCommand(),
     deleteAllLogMessagesCommand(),
     correctAllLogMessagesCommand(),
+    activateTurboProBundleCommand(),
   ];
 }

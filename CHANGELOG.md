@@ -2,6 +2,31 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.17.0] - 2025-05-27
+
+### 🚀 The First PRO Release (Pre-Launch Phase)
+
+- 🆕 **New command**: `activateTurboProBundle`  
+  → Allows early adopters to activate their PRO license key and unlock premium features
+
+- 🔐 **License key support**  
+  → PRO activation now persists securely via global storage
+
+- 🧠 **Dynamic PRO bundle execution**  
+  → Loads the PRO module at runtime with full isolation and validation
+
+- 🌐 **Freemium panel for non-activated users**  
+  → Encourages newsletter signup, activation, and educates on PRO availability
+
+- 🎉 **Early adopters (newsletter subscribers)** will receive a personal license key with **lifetime access to Turbo PRO**
+
+🔐 PRO sits on top of the free version — open source stays free forever.  
+📩 [Join the newsletter](https://www.turboconsolelog.io/join) to get early access and launch updates.
+
+> This is a **pre-launch milestone** — PRO is live for early testers and will roll out publicly next week. Thank you for being part of the journey.
+
+📖 [Read the full release article](https://www.turboconsolelog.io/articles/release-2170)
+
 ## [2.16.0] - 2025-05-12
 
 ### ✨ What's New

@@ -56,14 +56,16 @@ export function getHtmlWebView(): string {
 
       <!-- PRO version section -->
 
-      <h2 style="margin-top: 2rem; color: #ffcb6b;">🧠 PRO Is Coming in May</h2>
-      <p>We're cooking up <strong>Turbo Console Log PRO</strong> — a forever-license upgrade that includes:</p>
+      <h2 style="margin-top: 2rem; color: #ffcb6b;">✨ What’s New in v2.17.0?</h2>
+      <p>This update is 🔥 historic — <strong>Turbo Console Log PRO is officially live for early adopters!</strong></p>
       <ul>
-        <li>A smart panel that lists turbo logs in the current opened folder or workspace 📋</li>
-        <li>Visual buttons to execute turbo commands on a file or a folder files recursively ⚡️</li>
-        <li>More functionalities & Support to come forever ♾️</li>
+        <li><strong>🆕 New Command:</strong> <code>activateTurboProBundle</code> — Activate PRO via command palette</li>
+        <li><strong>🔐 License Key Support:</strong> Secure activation with persistent license storage</li>
+        <li><strong>🧠 Dynamic Runtime Execution:</strong> Loads the PRO module with full isolation</li>
+        <li><strong>🌐 Freemium Panel:</strong> Guides non-activated users toward activation</li>
+        <li><strong>🎁 Lifetime License:</strong> Newsletter subscribers receive a free PRO key</li>
       </ul>
-      <p>PRO will sit on top of the free version, which stays 100% open and powerful for everyone.</p>
+      <a href="https://www.turboconsolelog.io/articles/release-2170" target="_blank">Read full release notes</a>
 
       <!-- Newsletter section -->
 

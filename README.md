@@ -37,37 +37,31 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ---
 
-## ✨ What’s New in v2.16.0? – The May Kickoff
+## ✨ What’s New in v2.17.0? – The First PRO Release (Pre-Launch Phase)
 
-This update introduces subtle but foundational improvements:
+This update is 🔥 historic — **Turbo Console Log PRO is officially live for early adopters!**
 
-- **🆕 Tailored Webviews**
+- **🆕 New Command:**  
+  `activateTurboProBundle` — Allows early adopters to activate their PRO license key and unlock premium features
 
-  - New users now get a dedicated welcome screen
-  - Existing users receive an update-focused release view
-  - Designed to increase clarity and respect user context
+- **🔐 License Key Support:**  
+  Secure activation flow with license key persistence via global state
 
-- **🛡️ Security & Stability**
+- **🧠 Dynamic Runtime Execution:**  
+  PRO module loads at runtime with full isolation and validation
 
-  - All known audit vulnerabilities resolved via `npm audit fix`
-  - Turbo Console Log now ships with **zero security issues**
+- **🌐 Freemium VSCode Panel (for non-activated users):**  
+  Helps users join the newsletter, understand PRO, and activate when ready
 
-- **✅ Code Quality**
-  - 109 passing unit and integration tests
-  - Codebase cleanup ahead of future enhancements
-
----
-
-## 🧠 PRO Version Drops in the Next Release!
-
-We’re building something bigger — **Turbo Console Log PRO** will introduce:
-
-- A new **graphical panel** to visually interact with your logs
-- Folder-wide log control — group, clean, remove recursively
-- Built on a **one-time license**, no subscriptions
+- **🎁 Lifetime License for Early Adopters:**  
+  Newsletter subscribers before launch automatically receive a free PRO key
 
 🔐 PRO sits on top of the free version — open source stays free forever.  
 📩 [Join the newsletter](https://www.turboconsolelog.io/join) to get early access and launch updates.
+
+> 🧪 This is a **pre-launch milestone** — PRO goes fully public next week. Thank you for being part of the journey.
+
+📖 **[Read the full release article](https://www.turboconsolelog.io/articles/release-2170)**
 
 ---
 

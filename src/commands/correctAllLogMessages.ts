@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
-import { DebugMessage } from '../debug-message';
-import { Command, ExtensionProperties, Message } from '../entities';
+import { Command, Message } from '../entities';
 import { showNotification } from '../ui';
 
 function getFilenameFromLogMessage(
@@ -17,11 +16,7 @@ function getFilenameFromLogMessage(
 export function correctAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.correctAllLogMessages',
-    handler: async (
-      extensionProperties: ExtensionProperties,
-      jsDebugMessage: DebugMessage,
-      args?: Array<unknown>,
-    ) => {
+    handler: async ({ extensionProperties, debugMessage, args }) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
@@ -33,13 +28,13 @@ export function correctAllLogMessagesCommand(): Command {
         ? document.fileName.split('/').pop()
         : document.fileName.split('\\').pop();
 
-      const logMessages: Message[] = jsDebugMessage.detectAll(
+      const logMessages: Message[] = debugMessage.detectAll(
         document,
         extensionProperties.logFunction,
         extensionProperties.logType,
         extensionProperties.logMessagePrefix,
         extensionProperties.delimiterInsideMessage,
-        args
+        args,
       );
 
       const edits: { range: vscode.Range; newText: string }[] = [];

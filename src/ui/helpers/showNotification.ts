@@ -1,5 +1,10 @@
 import * as vscode from 'vscode';
 
+/**
+ *
+ * @param message - Notification message
+ * @param duration - Duration in milliseconds
+ */
 export function showNotification(message: string, duration: number): void {
   vscode.window.withProgress(
     { location: vscode.ProgressLocation.Notification },
