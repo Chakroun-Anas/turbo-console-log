@@ -13,43 +13,45 @@ export class TurboProFreemiumTreeProvider
   getChildren(): vscode.TreeItem[] {
     const items: vscode.TreeItem[] = [];
 
-    const announcement = new vscode.TreeItem('🎉 Turbo Pro is now live!');
+    const announcement = new vscode.TreeItem(
+      'Turbo Pro is live for Early Adopters!',
+    );
     announcement.iconPath = new vscode.ThemeIcon('megaphone');
-    announcement.tooltip = 'Announcing the early access release of Turbo Pro';
+    announcement.tooltip =
+      'Turbo Console Log Pro is now available for early adopters!';
     announcement.command = {
       command: 'vscode.open',
-      title: 'Pro Release Article',
+      title: 'Read Release Notes',
       arguments: [
         vscode.Uri.parse(
-          'https://www.turboconsolelog.io/articles/release-2170',
+          'https://www.turboconsolelog.io/articles/release-2180',
         ),
       ],
     };
 
     const activateItem = new vscode.TreeItem(
-      '🚀 Early Adopters → Activate PRO Bundle',
+      'Got a key? → Activate Your PRO Bundle!',
     );
-    activateItem.command = {
-      command: 'vscode.open',
-      title: 'Activate PRO',
-      arguments: [vscode.Uri.parse('https://www.turboconsolelog.io/pro')],
-    };
     activateItem.iconPath = new vscode.ThemeIcon('key');
     activateItem.tooltip =
-      'Go to turboconsolelog.io/pro to activate your license';
+      'Activate your PRO license key at turboconsolelog.io/pro';
+    activateItem.command = {
+      command: 'vscode.open',
+      title: 'Activate PRO Bundle!',
+      arguments: [vscode.Uri.parse('https://www.turboconsolelog.io/pro')],
+    };
 
-    const newsletterItem = new vscode.TreeItem(
-      '📬 Not invited? Join the newsletter!',
-    );
-    newsletterItem.command = {
+    const joinItem = new vscode.TreeItem('Missed it? Subscribe for updates!');
+    joinItem.iconPath = new vscode.ThemeIcon('mail');
+    joinItem.tooltip =
+      'Join the newsletter and get notified when Pro launches publicly';
+    joinItem.command = {
       command: 'vscode.open',
       title: 'Join Newsletter',
       arguments: [vscode.Uri.parse('https://www.turboconsolelog.io/join')],
     };
-    newsletterItem.iconPath = new vscode.ThemeIcon('mail');
-    newsletterItem.tooltip = 'Stay tuned for the public release next week';
 
-    items.push(announcement, activateItem, newsletterItem);
+    items.push(announcement, activateItem, joinItem);
     return items;
   }
 

@@ -2,6 +2,25 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [2.18.0] - 2025-05-30
+
+### 🔧 Foundation Strengthening Before Public PRO Launch (June 9)
+
+- 📢 **Panel messaging refined**  
+  → Updated wording to clearly distinguish early access from public launch and avoid confusion
+
+- ✍️ **New release article published**  
+  → Clarifies the early adopter policy, lifetime key eligibility, and next steps  
+  📖 [Read the full article](https://www.turboconsolelog.io/articles/release-2180)
+
+- 🧭 **Roadmap page improved**  
+  → Clear structure with updated focus, future enhancements, and community-driven direction
+
+- 💌 **Join & sponsorship pages rewritten**  
+  → Better persuasion, stronger CTAs, and reduced friction to subscribe or support
+
+📖 [Read the full release article](https://www.turboconsolelog.io/articles/release-2180)
+
 ## [2.17.0] - 2025-05-27
 
 ### 🚀 The First PRO Release (Pre-Launch Phase)

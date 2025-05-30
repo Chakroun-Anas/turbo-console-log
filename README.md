@@ -37,7 +37,7 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ---
 
-## ✨ What’s New in v2.17.0? – The First PRO Release (Pre-Launch Phase)
+## ✨ What’s New in v2.18.0? – The First PRO Release (Pre-Launch Phase)
 
 This update is 🔥 historic — **Turbo Console Log PRO is officially live for early adopters!**
 
@@ -57,7 +57,7 @@ This update is 🔥 historic — **Turbo Console Log PRO is officially live for 
   Newsletter subscribers before launch automatically receive a free PRO key
 
 🔐 PRO sits on top of the free version — open source stays free forever.  
-📩 [Join the newsletter](https://www.turboconsolelog.io/join) to get early access and launch updates.
+📩 [Join the newsletter](https://www.turboconsolelog.io/join) to get gifts and launch updates.
 
 > 🧪 This is a **pre-launch milestone** — PRO goes fully public next week. Thank you for being part of the journey.
 
