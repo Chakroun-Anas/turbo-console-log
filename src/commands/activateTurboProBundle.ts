@@ -20,54 +20,121 @@ function isOnline(): Promise<boolean> {
   });
 }
 
-export function runProBundle(
+function writeProBundleToCache(
   context: vscode.ExtensionContext,
-  extensionProperties: ExtensionProperties,
   licenseKey: string,
-  version: string,
   proBundle: string,
-  isFromCache: boolean = false,
+  version: string,
+): void {
+  writeToGlobalState(context, 'license-key', licenseKey);
+  writeToGlobalState(context, 'pro-bundle', proBundle);
+  writeToGlobalState(context, 'version', version);
+}
+
+export function proBundleNeedsUpdate(
+  currentVersion: string,
+  proBundleVersion?: string,
+): boolean {
+  function compareVersions(v1: string, v2?: string): number {
+    if (!v2) return 1;
+    const a = v1.split('.').map(Number);
+    const b = v2.split('.').map(Number);
+    for (let i = 0; i < 3; i++) {
+      const numA = a[i] ?? 0;
+      const numB = b[i] ?? 0;
+      if (numA > numB) return 1;
+      if (numA < numB) return -1;
+    }
+    return 0;
+  }
+  return compareVersions(currentVersion, proBundleVersion) > 0;
+}
+
+export async function updateProBundle(
+  context: vscode.ExtensionContext,
+  proVersion: string,
+  licenseKey: string,
+  extensionProperties: ExtensionProperties,
+) {
+  const isUserConnectedToInternet = await isOnline();
+
+  if (!isUserConnectedToInternet) {
+    await vscode.window.showErrorMessage(
+      '📡 No internet connection. Please connect and try again.',
+    );
+    return;
+  }
+  try {
+    const proBundle = await fetchProBundle(licenseKey, proVersion);
+    writeProBundleToCache(context, licenseKey, proBundle, proVersion);
+    runProBundle(extensionProperties, proBundle);
+    showNotification(
+      `Pro Bundle Updated Successfully v${proVersion} 🚀 🎉`,
+      10000,
+    );
+  } catch (error) {
+    console.error('Turbo Pro activation failed: ', error);
+    const genericErrorMsg =
+      'Something went wrong, please contact the support at support@turboconsolelog.io';
+    if (error instanceof AxiosError) {
+      const errorMsg = error.response?.data?.error;
+      vscode.window.showErrorMessage(errorMsg ?? genericErrorMsg);
+      return;
+    }
+    showNotification(
+      'Something went wrong, please contact the support at support@turboconsolelog.io',
+      5000,
+    );
+  }
+}
+
+export function runProBundle(
+  extensionProperties: ExtensionProperties,
+  proBundle: string,
 ): void {
   const exports: Record<string, unknown> = {};
   const module = { exports };
 
-  try {
-    const turboConsoleLogProFactory = new Function(
-      'exports',
-      'module',
-      'vscode',
-      'fs',
-      'path',
-      'detectAll',
-      proBundle,
-    );
+  const turboConsoleLogProFactory = new Function(
+    'exports',
+    'module',
+    'vscode',
+    'fs',
+    'path',
+    'detectAll',
+    proBundle,
+  );
 
-    turboConsoleLogProFactory(exports, module, vscode, fs, path, detectAll);
+  turboConsoleLogProFactory(exports, module, vscode, fs, path, detectAll);
 
-    const turboConsoleLogPro =
-      exports.turboConsoleLogPro || module.exports?.turboConsoleLogPro;
-
-    if (typeof turboConsoleLogPro === 'function') {
+  const turboConsoleLogPro =
+    exports.turboConsoleLogPro || module.exports?.turboConsoleLogPro;
+  if (typeof turboConsoleLogPro === 'function') {
+    try {
       turboConsoleLogPro(extensionProperties);
-      if (!isFromCache) {
-        writeToGlobalState(context, 'license-key', licenseKey);
-        writeToGlobalState(context, `pro-bundle-${version}`, proBundle);
-        showNotification(
-          'Turbo Console Log Pro Activated Successfully 🚀 🎉',
-          10000,
-        );
-      }
-    } else {
-      vscode.window.showErrorMessage(
+    } catch (error) {
+      console.error('Error running Turbo Console Log Pro:', error);
+      throw new Error(
         'Failed to load Turbo Console Log Pro — the bundle may be corrupted. Please contact support@turboconsolelog.io',
       );
     }
-  } catch (error) {
-    console.error('❌ Failed to execute PRO bundle:', error);
-    vscode.window.showErrorMessage(
-      'Failed to activate PRO bundle. Please contact support@turboconsolelog.io',
-    );
   }
+}
+
+async function fetchProBundle(
+  licenseKey: string,
+  proVersion: string,
+): Promise<string> {
+  const response = await axios.get(
+    'https://www.turboconsolelog.io/api/activateTurboProBundle',
+    {
+      params: {
+        licenseKey,
+        targetVersion: proVersion,
+      },
+    },
+  );
+  return response.data.turboProBundle;
 }
 
 export function activateTurboProBundleCommand(): Command {
@@ -106,30 +173,17 @@ export function activateTurboProBundleCommand(): Command {
         return;
       }
 
-      // FIXME: U DONT WANT TO CHIP ON PROD TARGETTING LOCALHOST :D
       try {
         // Network request to check the key validation
-
         const version = vscode.extensions.getExtension(
           'ChakrounAnas.turbo-console-log',
         )?.packageJSON.version;
-        const res = await axios.get(
-          'https://www.turboconsolelog.io/api/activateTurboProBundle',
-          {
-            params: {
-              licenseKey,
-              targetVersion: version,
-            },
-          },
-        );
-
-        const proBundle = res.data.turboProBundle;
-        runProBundle(
-          context,
-          extensionProperties,
-          licenseKey,
-          version,
-          proBundle,
+        const proBundle = await fetchProBundle(licenseKey, version);
+        runProBundle(extensionProperties, proBundle);
+        writeProBundleToCache(context, licenseKey, proBundle, version);
+        showNotification(
+          'Turbo Console Log Pro Activated Successfully 🚀 🎉',
+          10000,
         );
       } catch (error) {
         console.error('Turbo Pro activation failed: ', error);

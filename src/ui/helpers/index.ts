@@ -1,2 +1,3 @@
 import { showNotification } from './showNotification';
-export { showNotification };
+import { showReleaseHtmlWebViewAndNotification } from './showReleaseHtmlWebViewAndNotification';
+export { showNotification, showReleaseHtmlWebViewAndNotification };

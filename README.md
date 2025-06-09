@@ -37,31 +37,36 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ---
 
-## ✨ What’s New in v2.18.0? – The First PRO Release (Pre-Launch Phase)
+## ✨ What’s New in v3.0.0? – Turbo PRO Official Launch
 
-This update is 🔥 historic — **Turbo Console Log PRO is officially live for early adopters!**
+This release marks a major milestone — **Turbo Console Log PRO is now publicly available** for everyone!
 
-- **🆕 New Command:**  
-  `activateTurboProBundle` — Allows early adopters to activate their PRO license key and unlock premium features
+- **👑 Turbo PRO Released:**  
+  A new paid tier with powerful capabilities built directly into VSCode
 
-- **🔐 License Key Support:**  
-  Secure activation flow with license key persistence via global state
+- **🌲 Tree Panel View:**  
+  Instantly see all turbo logs grouped by file and line
 
-- **🧠 Dynamic Runtime Execution:**  
-  PRO module loads at runtime with full isolation and validation
+- **⚡ Real-Time Sync:**  
+  Logs update live as you debug across files
 
-- **🌐 Freemium VSCode Panel (for non-activated users):**  
-  Helps users join the newsletter, understand PRO, and activate when ready
+- **🚦 Contextual Actions:**  
+  Right-click to comment, delete, or correct logs from the Turbo panel
 
-- **🎁 Lifetime License for Early Adopters:**  
-  Newsletter subscribers before launch automatically receive a free PRO key
+- **🧠 Memory-Friendly Debugging:**  
+  Logs persist and reappear even after restarting VSCode
 
-🔐 PRO sits on top of the free version — open source stays free forever.  
-📩 [Join the newsletter](https://www.turboconsolelog.io/join) to get gifts and launch updates.
+- **🔐 License System Activated:**  
+  Secure, offline-friendly key activation with a lifetime model
 
-> 🧪 This is a **pre-launch milestone** — PRO goes fully public next week. Thank you for being part of the journey.
+🔐 PRO builds on top of the free version — open source remains free forever.
 
-📖 **[Read the full release article](https://www.turboconsolelog.io/articles/release-2170)**
+📖 **Read the full release article:**
+
+→ [Turbo PRO Launch](https://www.turboconsolelog.io/articles/release-300)  
+→ [Debugging with Memory — Why Turbo PRO Panel Matters](https://www.turboconsolelog.io/articles/debugging-memory)
+
+📩 [Join the newsletter](https://www.turboconsolelog.io/join) to get updates and gifts.
 
 ---
 

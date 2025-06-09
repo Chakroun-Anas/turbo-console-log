@@ -96,11 +96,18 @@ export function correctAllLogMessagesCommand(): Command {
           );
         })
         .then(() => {
-          if (edits.length !== 0) {
-            showNotification(
-              `${updatedCount} log messages have been updated`,
-              5000,
-            );
+          if (extensionProperties.logCorrectionNotificationEnabled) {
+            const editCount = edits.length;
+            if (editCount !== 0) {
+              if (editCount === 1) {
+                showNotification(`1 log message has been updated`, 5000);
+                return;
+              }
+              showNotification(
+                `${updatedCount} log messages have been updated`,
+                5000,
+              );
+            }
           }
         });
     },
