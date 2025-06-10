@@ -4,6 +4,7 @@ export type ExtensionProperties = {
   logMessageSuffix: string;
   addSemicolonInTheEnd: boolean;
   insertEnclosingClass: boolean;
+  logCorrectionNotificationEnabled: boolean;
   insertEnclosingFunction: boolean;
   insertEmptyLineBeforeLogMessage: boolean;
   insertEmptyLineAfterLogMessage: boolean;

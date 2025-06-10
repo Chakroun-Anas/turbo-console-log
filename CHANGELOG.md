@@ -2,6 +2,40 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.0.0] - 2025-06-09
+
+### 🚀 Turbo Console Log PRO Launches — A New Era of Debugging Begins
+
+- 👑 **Turbo PRO officially released**  
+  → A new paid tier with powerful new capabilities built directly into the extension
+
+- 🌲 **Tree Panel View**  
+  → Instantly see all turbo logs grouped by file and line
+
+- ⚡ **Real-Time Sync**  
+  → Logs update live as you debug across files
+
+- 🖱️ **Contextual Actions**  
+  → Right-click to comment, delete, or correct logs directly from the panel
+
+- 🧠 **Memory-Friendly Debugging**  
+  → Logs persist and reappear on reload — no more lost context
+
+- 🔐 **License System Activated**  
+  → Secure, offline-friendly license key flow with lifetime ownership model
+
+- 🛠️ **New Setting: `logCorrectionNotificationEnabled`**
+
+  → Control whether notifications appear when Turbo automatically corrects log metadata  
+  → **Default: `false`** — especially tuned for a quieter experience in Turbo PRO’s real-time sync mode
+
+- ✍️ **New release article and companion piece published**
+
+  📖 [Read the full launch article](https://www.turboconsolelog.io/articles/release-300)  
+  📘 [Debugging with Memory — Why Turbo PRO Panel Matters!](https://www.turboconsolelog.io/articles/debugging-memory)
+
+🔥 The foundation is set — this is Turbo Console Log’s most powerful release ever.
+
 ## [2.18.0] - 2025-05-30
 
 ### 🔧 Foundation Strengthening Before Public PRO Launch (June 9)
