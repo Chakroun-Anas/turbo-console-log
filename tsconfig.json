@@ -4,17 +4,21 @@
     "target": "es6",
     "outDir": "out",
     "lib": ["es6"],
+    "types": ["mocha"],
     "sourceMap": true,
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
+  "include": ["**/*.ts"],
   "exclude": [
     "node_modules",
     ".vscode-test",
-    "src/test/files",
-    "out/test/files"
+    "src/mocha-tests/files",
+    "out/mocha-tests/files",
+    "jest.config.ts",
+    "src/jest-tests"
   ],
   "linterOptions": {
     "exclude": ["src/test/files/js/**"]
