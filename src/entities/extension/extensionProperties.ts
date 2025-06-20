@@ -16,7 +16,7 @@ export type ExtensionProperties = {
   logFunction: string;
 };
 
-enum LogType {
+export enum LogType {
   log = 'log',
   warn = 'warn',
   error = 'error',

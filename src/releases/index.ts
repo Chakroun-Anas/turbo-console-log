@@ -1,2 +1,8 @@
 import { releaseNotes } from './releaseNotes';
-export { releaseNotes };
+import { getPreviousWebViewReleaseVersion } from './getPreviousWebViewReleaseVersion';
+import { getLatestWebViewReleaseVersion } from './getLatestWebViewReleaseVersion';
+export {
+  releaseNotes,
+  getPreviousWebViewReleaseVersion,
+  getLatestWebViewReleaseVersion,
+};

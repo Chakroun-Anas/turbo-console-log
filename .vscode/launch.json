@@ -10,14 +10,14 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
-      "name": "Test: All",
+      "name": "VSCode Integration Tests",
       "type": "extensionHost",
       "request": "launch",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/testsRunner"
+        "--extensionTestsPath=${workspaceFolder}/out/mocha-tests/testsRunner"
       ],
-      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "outFiles": ["${workspaceFolder}/out/mocha-tests/**/*.js"],
       "preLaunchTask": "${defaultBuildTask}"
     }
   ]

@@ -2,18 +2,19 @@ import * as vscode from 'vscode';
 import { jsDebugMessage } from './debug-message/js';
 import { Command, ExtensionProperties } from './entities';
 import { getAllCommands } from './commands/';
-import { readFromGlobalState } from './helpers';
+import { readFromGlobalState, getExtensionProperties } from './helpers';
 import { TurboProFreemiumTreeProvider } from './pro';
+import { showReleaseHtmlWebViewAndNotification } from './ui/helpers';
 import {
+  releaseNotes,
+  getLatestWebViewReleaseVersion,
+  getPreviousWebViewReleaseVersion,
+} from './releases';
+import {
+  proBundleNeedsUpdate,
   runProBundle,
   updateProBundle,
-  proBundleNeedsUpdate,
-} from './commands/activateTurboProBundle';
-import { showReleaseHtmlWebViewAndNotification } from './ui/helpers';
-import { releaseNotes } from './releases';
-
-const previousWebViewReleaseVersion = '2.16.0';
-const latestWebViewReleaseVersion = '3.0.0';
+} from './pro/utilities';
 
 export function activate(context: vscode.ExtensionContext): void {
   const config: vscode.WorkspaceConfiguration =
@@ -35,6 +36,8 @@ export function activate(context: vscode.ExtensionContext): void {
   const version = vscode.extensions.getExtension(
     'ChakrounAnas.turbo-console-log',
   )?.packageJSON.version;
+  const previousWebViewReleaseVersion = getPreviousWebViewReleaseVersion();
+  const latestWebViewReleaseVersion = getLatestWebViewReleaseVersion();
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');
   const proBundle = readFromGlobalState<string>(context, 'pro-bundle');
   const proBundleVersion = readFromGlobalState<string>(context, 'version');
@@ -61,29 +64,4 @@ export function activate(context: vscode.ExtensionContext): void {
       freemiumProvider,
     ),
   );
-}
-
-function getExtensionProperties(
-  workspaceConfig: vscode.WorkspaceConfiguration,
-) {
-  return {
-    wrapLogMessage: workspaceConfig.wrapLogMessage ?? false,
-    logMessagePrefix: workspaceConfig.logMessagePrefix ?? '🚀',
-    logMessageSuffix: workspaceConfig.logMessageSuffix ?? ':',
-    addSemicolonInTheEnd: workspaceConfig.addSemicolonInTheEnd ?? false,
-    insertEnclosingClass: workspaceConfig.insertEnclosingClass ?? true,
-    logCorrectionNotificationEnabled:
-      workspaceConfig.logCorrectionNotificationEnabled ?? false,
-    insertEnclosingFunction: workspaceConfig.insertEnclosingFunction ?? true,
-    insertEmptyLineBeforeLogMessage:
-      workspaceConfig.insertEmptyLineBeforeLogMessage ?? false,
-    insertEmptyLineAfterLogMessage:
-      workspaceConfig.insertEmptyLineAfterLogMessage ?? false,
-    quote: workspaceConfig.quote ?? '"',
-    delimiterInsideMessage: workspaceConfig.delimiterInsideMessage ?? '~',
-    includeLineNum: workspaceConfig.includeLineNum ?? false,
-    includeFilename: workspaceConfig.includeFilename ?? false,
-    logType: workspaceConfig.logType ?? 'log',
-    logFunction: workspaceConfig.logFunction ?? 'log',
-  };
 }

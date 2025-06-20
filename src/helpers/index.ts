@@ -1,3 +1,4 @@
 import { readFromGlobalState } from './readFromGlobalState';
 import { writeToGlobalState } from './writeToGlobalState';
-export { readFromGlobalState, writeToGlobalState };
+import { getExtensionProperties } from './getExtensionProperties';
+export { readFromGlobalState, writeToGlobalState, getExtensionProperties };
