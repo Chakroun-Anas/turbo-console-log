@@ -1,5 +1,4 @@
 import { TextDocument } from 'vscode';
-import _ from 'lodash';
 import { BracketType, LogMessageType, LogMessage } from '../../../../entities';
 import {
   getMultiLineContextVariable,
@@ -8,35 +7,32 @@ import {
 import { LineCodeProcessing } from '../../../../line-code-processing';
 import { deepObjectProperty } from '../helpers/deepObjectProperty';
 
-const logMessageTypeVerificationPriority = _.sortBy(
-  [
-    { logMessageType: LogMessageType.Decorator, priority: 0 },
-    { logMessageType: LogMessageType.TemplateString, priority: 1 },
-    { logMessageType: LogMessageType.ArrayAssignment, priority: 2 },
-    { logMessageType: LogMessageType.ObjectLiteral, priority: 3 },
-    {
-      logMessageType: LogMessageType.ObjectFunctionCallAssignment,
-      priority: 4,
-    },
-    {
-      logMessageType: LogMessageType.FunctionCallAssignment,
-      priority: 5,
-    },
-    {
-      logMessageType: LogMessageType.TypedFunctionCallAssignment,
-      priority: 6,
-    },
-    { logMessageType: LogMessageType.Ternary, priority: 7 },
-    { logMessageType: LogMessageType.NullishCoalescing, priority: 8 },
-    { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 9 },
-    { logMessageType: LogMessageType.NamedFunction, priority: 10 },
-    { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 11 },
-    { logMessageType: LogMessageType.PrimitiveAssignment, priority: 12 },
-    { logMessageType: LogMessageType.MultilineParenthesis, priority: 13 },
-    { logMessageType: LogMessageType.MultilineBraces, priority: 14 },
-  ],
-  'priority',
-);
+const logMessageTypeVerificationPriority = [
+  { logMessageType: LogMessageType.Decorator, priority: 0 },
+  { logMessageType: LogMessageType.TemplateString, priority: 1 },
+  { logMessageType: LogMessageType.ArrayAssignment, priority: 2 },
+  { logMessageType: LogMessageType.ObjectLiteral, priority: 3 },
+  {
+    logMessageType: LogMessageType.ObjectFunctionCallAssignment,
+    priority: 4,
+  },
+  {
+    logMessageType: LogMessageType.FunctionCallAssignment,
+    priority: 5,
+  },
+  {
+    logMessageType: LogMessageType.TypedFunctionCallAssignment,
+    priority: 6,
+  },
+  { logMessageType: LogMessageType.Ternary, priority: 7 },
+  { logMessageType: LogMessageType.NullishCoalescing, priority: 8 },
+  { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 9 },
+  { logMessageType: LogMessageType.NamedFunction, priority: 10 },
+  { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 11 },
+  { logMessageType: LogMessageType.PrimitiveAssignment, priority: 12 },
+  { logMessageType: LogMessageType.MultilineParenthesis, priority: 13 },
+  { logMessageType: LogMessageType.MultilineBraces, priority: 14 },
+].sort((a, b) => a.priority - b.priority);
 
 export function logMessage(
   document: TextDocument,

@@ -1,4 +1,3 @@
-import { omit } from 'lodash';
 import { TextEditorEdit, TextDocument, Position } from 'vscode';
 import {
   ExtensionProperties,
@@ -17,6 +16,15 @@ import {
   emptyBlockDebuggingMsg,
 } from '../helpers';
 import { JSDebugMessageAnonymous } from '../../JSDebugMessageAnonymous';
+
+function omit<T extends object, K extends keyof T>(
+  obj: T,
+  keys: K[],
+): Omit<T, K> {
+  const clone = { ...obj };
+  keys.forEach((key) => delete clone[key]);
+  return clone;
+}
 
 function hasFunctionBody(
   document: TextDocument,

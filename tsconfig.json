@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es6",
+    "target": "es2024",
     "outDir": "out",
-    "lib": ["es6"],
     "types": ["mocha"],
     "sourceMap": true,
     "rootDir": "src",
