@@ -3,7 +3,7 @@ import { jsDebugMessage } from './debug-message/js';
 import { Command, ExtensionProperties } from './entities';
 import { getAllCommands } from './commands/';
 import { readFromGlobalState, getExtensionProperties } from './helpers';
-import { TurboProFreemiumTreeProvider } from './pro';
+import { TurboProShowcasePanel } from './pro';
 import { showReleaseHtmlWebViewAndNotification } from './ui/helpers';
 import {
   releaseNotes,
@@ -57,11 +57,11 @@ export function activate(context: vscode.ExtensionContext): void {
     runProBundle(extensionProperties, proBundle);
     return;
   }
-  const freemiumProvider = new TurboProFreemiumTreeProvider();
+  vscode.commands.executeCommand('setContext', 'turboConsoleLog:isPro', false);
   context.subscriptions.push(
-    vscode.window.registerTreeDataProvider(
-      'turboConsoleLogProView',
-      freemiumProvider,
+    vscode.window.registerWebviewViewProvider(
+      TurboProShowcasePanel.viewType,
+      new TurboProShowcasePanel(context),
     ),
   );
 }

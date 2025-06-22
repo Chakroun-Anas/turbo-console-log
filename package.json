@@ -175,7 +175,7 @@
       "activitybar": [
         {
           "id": "turboConsoleLogProPanelContainer",
-          "title": "Turbo Console Log PRO",
+          "title": "Turbo Console Log",
           "icon": "images/icon.png"
         }
       ]
@@ -184,8 +184,16 @@
       "turboConsoleLogProPanelContainer": [
         {
           "id": "turboConsoleLogProView",
-          "name": "Turbo Console Log PRO",
-          "icon": "images/icon.png"
+          "name": "PRO Panel",
+          "icon": "images/icon.png",
+          "when": "turboConsoleLog:isPro"
+        },
+        {
+          "id": "turboConsoleLogFreemiumPanel",
+          "name": "Become Pro",
+          "icon": "images/icon.png",
+          "type": "webview",
+          "when": "!turboConsoleLog:isPro"
         }
       ]
     },

@@ -14,6 +14,9 @@ jest.mock('../../ui/helpers');
 jest.mock('../../pro', () => {
   return {
     TurboProFreemiumTreeProvider: jest.fn().mockImplementation(() => ({})),
+    TurboProShowcasePanel: class {
+      static viewType = 'mocked.panel.viewType';
+    },
   };
 });
 
@@ -25,6 +28,7 @@ jest.mock('../../pro/utilities', () => ({
 
 describe.only('activate - command registration', () => {
   const registerCommandMock = jest.fn();
+  const executeCommandMock = jest.fn();
   const getConfigurationMock = jest.fn();
 
   beforeEach(() => {
@@ -51,11 +55,20 @@ describe.only('activate - command registration', () => {
         registerTreeDataProvider: mockedRegisterTreeDataProvider,
       },
     });
+    Object.defineProperty(vscode, 'window', {
+      value: {
+        ...vscode.window,
+        registerTreeDataProvider: mockedRegisterTreeDataProvider,
+      },
+    });
 
     // Mock VSCode API
     jest
       .spyOn(vscode.commands, 'registerCommand')
       .mockImplementation(registerCommandMock);
+    jest
+      .spyOn(vscode.commands, 'executeCommand')
+      .mockImplementation(executeCommandMock);
     jest
       .spyOn(vscode.workspace, 'getConfiguration')
       .mockImplementation(getConfigurationMock);
