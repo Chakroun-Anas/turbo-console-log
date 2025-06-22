@@ -2,8 +2,17 @@ import * as vscode from 'vscode';
 import { jsDebugMessage } from './debug-message/js';
 import { Command, ExtensionProperties } from './entities';
 import { getAllCommands } from './commands/';
-import { readFromGlobalState, getExtensionProperties } from './helpers';
-import { TurboProFreemiumTreeProvider } from './pro';
+import {
+  readFromGlobalState,
+  getExtensionProperties,
+  activateRepairMode,
+  activateFreemiumMode,
+} from './helpers';
+import {
+  TurboProBundleRepairPanel,
+  TurboProFreemiumTreeProvider,
+  TurboProShowcasePanel,
+} from './pro';
 import { showReleaseHtmlWebViewAndNotification } from './ui/helpers';
 import {
   releaseNotes,
@@ -16,7 +25,9 @@ import {
   updateProBundle,
 } from './pro/utilities';
 
-export function activate(context: vscode.ExtensionContext): void {
+export async function activate(
+  context: vscode.ExtensionContext,
+): Promise<void> {
   const config: vscode.WorkspaceConfiguration =
     vscode.workspace.getConfiguration('turboConsoleLog');
   const extensionProperties: ExtensionProperties =
@@ -33,6 +44,29 @@ export function activate(context: vscode.ExtensionContext): void {
       });
     });
   }
+
+  const turboProShowCasePanel = new TurboProShowcasePanel();
+  const turboProBundleRepairPanel = new TurboProBundleRepairPanel('');
+  const freemiumProvider = new TurboProFreemiumTreeProvider();
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      TurboProShowcasePanel.viewType,
+      turboProShowCasePanel,
+    ),
+  );
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider(
+      'turboConsoleLogProView',
+      freemiumProvider,
+    ),
+  );
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      TurboProBundleRepairPanel.viewType,
+      turboProBundleRepairPanel,
+    ),
+  );
+
   const version = vscode.extensions.getExtension(
     'ChakrounAnas.turbo-console-log',
   )?.packageJSON.version;
@@ -46,22 +80,47 @@ export function activate(context: vscode.ExtensionContext): void {
     previousWebViewReleaseVersion,
     latestWebViewReleaseVersion,
   );
-  if (proLicenseKey && proBundle) {
+  const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
+  if (isProUser) {
     if (
       releaseNotes[version]?.isPro &&
       proBundleNeedsUpdate(version, proBundleVersion)
     ) {
-      updateProBundle(context, version, proLicenseKey, extensionProperties);
+      try {
+        await updateProBundle(
+          context,
+          version,
+          proLicenseKey,
+          extensionProperties,
+        );
+      } catch (error) {
+        turboProBundleRepairPanel.setProBundleRemovalReason(
+          (error as { message?: string })?.message ?? '',
+        );
+        activateRepairMode();
+        vscode.commands.registerCommand(
+          'turboConsoleLog.retryProUpdate',
+          async () => {
+            try {
+              await updateProBundle(
+                context,
+                version,
+                proLicenseKey,
+                extensionProperties,
+              );
+            } catch (error) {
+              turboProBundleRepairPanel.setProBundleRemovalReason(
+                (error as { message?: string })?.message ?? '',
+              );
+            }
+          },
+        );
+        return;
+      }
       return;
     }
     runProBundle(extensionProperties, proBundle);
     return;
   }
-  const freemiumProvider = new TurboProFreemiumTreeProvider();
-  context.subscriptions.push(
-    vscode.window.registerTreeDataProvider(
-      'turboConsoleLogProView',
-      freemiumProvider,
-    ),
-  );
+  activateFreemiumMode();
 }

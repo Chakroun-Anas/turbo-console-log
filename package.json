@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -175,7 +175,7 @@
       "activitybar": [
         {
           "id": "turboConsoleLogProPanelContainer",
-          "title": "Turbo Console Log PRO",
+          "title": "Turbo Console Log",
           "icon": "images/icon.png"
         }
       ]
@@ -184,8 +184,23 @@
       "turboConsoleLogProPanelContainer": [
         {
           "id": "turboConsoleLogProView",
-          "name": "Turbo Console Log PRO",
-          "icon": "images/icon.png"
+          "name": "PRO Panel",
+          "icon": "images/icon.png",
+          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro"
+        },
+        {
+          "id": "turboConsoleLogFreemiumPanel",
+          "name": "Become Pro",
+          "icon": "images/icon.png",
+          "type": "webview",
+          "when": "turboConsoleLog:isInitialized && !turboConsoleLog:isPro && !turboConsoleLog:isRepairMode"
+        },
+        {
+          "id": "turboConsoleLogBundleRepairPanel",
+          "name": "Bundle Repair Mode",
+          "icon": "images/icon.png",
+          "type": "webview",
+          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isRepairMode"
         }
       ]
     },
@@ -268,6 +283,8 @@
     "isPreReleaseVersion": false
   },
   "dependencies": {
-    "axios": "^1.9.0"
+    "axios": "^1.9.0",
+    "ignore": "^7.0.5",
+    "p-limit": "^6.2.0"
   }
 }
