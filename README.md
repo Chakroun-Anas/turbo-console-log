@@ -37,36 +37,36 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ---
 
-## ✨ What’s New in v3.0.0? – Turbo PRO Official Launch
+## ⚡ What’s New in v3.0.1? – Turbo PRO v2: Faster, Smarter, Stronger
 
-This release marks a major milestone — **Turbo Console Log PRO is now publicly available** for everyone!
+This update brings a major leap forward in performance, reliability, and developer experience.  
+**Turbo PRO v2** is here — rebuilt with stability and speed in mind, thanks to direct input from our early adopters 🤍
 
-- **👑 Turbo PRO Released:**  
-  A new paid tier with powerful capabilities built directly into VSCode
+- **🚀 Massive Performance Boost:**  
+  Faster startup, faster syncing, and smoother tree rendering across large projects
 
-- **🌲 Tree Panel View:**  
-  Instantly see all turbo logs grouped by file and line
+- **🧠 Smarter Log Detection:**  
+  False positives are drastically reduced for a cleaner, more accurate panel
 
-- **⚡ Real-Time Sync:**  
-  Logs update live as you debug across files
+- **🔁 Self-Healing Update System:**  
+  New retry & repair flow prevents update failures and guides recovery
 
-- **🚦 Contextual Actions:**  
-  Right-click to comment, delete, or correct logs from the Turbo panel
+- **✅ Test Coverage Upgraded:**  
+  Introduced Jest to strengthen the unit testing pipeline
 
-- **🧠 Memory-Friendly Debugging:**  
-  Logs persist and reappear even after restarting VSCode
+- **🔐 Better License Handling:**  
+  Clearer feedback and error resilience when activating or updating your license
 
-- **🔐 License System Activated:**  
-  Secure, offline-friendly key activation with a lifetime model
+- **🎯 More Activations per Version:**  
+  5 activations instead of 3 — more flexibility across your devices
 
-🔐 PRO builds on top of the free version — open source remains free forever.
+📚 **Want the full breakdown?**
 
-📖 **Read the full release article:**
+→ [Release 3.1.0 – Full Update Overview](https://www.turboconsolelog.io/articles/release-310)  
+→ [How Turbo Pro Works – Technical Deep Dive](https://www.turboconsolelog.io/articles/pro-v2-technical-overview)  
+→ [Benchmark Pro v2 ⚡️](https://www.turboconsolelog.io/articles/benchmark-pro-v2) Real-world speed across React, Storybook & Vite
 
-→ [Turbo PRO Launch](https://www.turboconsolelog.io/articles/release-300)  
-→ [Debugging with Memory — Why Turbo PRO Panel Matters](https://www.turboconsolelog.io/articles/debugging-memory)
-
-📩 [Join the newsletter](https://www.turboconsolelog.io/join) to get updates and gifts.
+📩 [Join the newsletter](https://www.turboconsolelog.io/join) to get future updates, exclusive dev content, and free resources.
 
 ---
 

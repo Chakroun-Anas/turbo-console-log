@@ -2,6 +2,36 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.1.0] - 2025-06-25
+
+### ⚡ Turbo Pro v2 — Performance Unleashed & Rock-Solid Reliability
+
+- 🚀 **Massive performance boost**  
+  → Faster boot time, instant tree rendering, and snappier log syncing across large workspaces
+
+- 🧠 **False positive log detection drastically reduced**  
+  → Improved filtering and smarter engine prevent logs from wrongly appearing or being lost
+
+- 🔁 **Smarter update & self-repair flow**  
+  → If a Pro update fails, users now see a dedicated Repair panel with retry mechanism
+
+- ✅ **Increased test coverage with Jest**  
+  → Introduced Jest to strengthen unit testing across core logic
+
+- 🔐 **Improved Pro license handling**  
+  → Better feedback, error resilience, and auto-repair if something goes wrong in the update phase
+
+- 🎯 **Raised activation limit**  
+  → From 3 to 5 activations per version to better support multi-device setups
+
+- ✍️ **New technical articles released**
+
+  📖 [Release 3.1.0 – Full Update Overview](https://www.turboconsolelog.io/articles/release-310)  
+  🧬 [How Turbo Pro Works – Technical Deep Dive](https://www.turboconsolelog.io/articles/pro-v2-technical-overview)  
+  ⚡️ [Benchmark Pro v2](https://www.turboconsolelog.io/articles/benchmark-pro-v2) Real-world speed across React, Storybook & Vite
+
+🔥 This update turns Turbo Pro into a fully production-grade experience — faster, safer, and smarter than ever.
+
 ## [3.0.0] - 2025-06-09
 
 ### 🚀 Turbo Console Log PRO Launches — A New Era of Debugging Begins

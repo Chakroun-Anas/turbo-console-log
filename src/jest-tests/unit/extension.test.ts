@@ -11,11 +11,16 @@ jest.mock('../../helpers');
 jest.mock('../../releases');
 jest.mock('../../ui/helpers');
 
+const setProBundleRemovalReasonMock = jest.fn();
 jest.mock('../../pro', () => {
   return {
     TurboProFreemiumTreeProvider: jest.fn().mockImplementation(() => ({})),
     TurboProShowcasePanel: class {
-      static viewType = 'mocked.panel.viewType';
+      static viewType = 'mocked.panel.showCasePanel';
+    },
+    TurboProBundleRepairPanel: class {
+      static viewType = 'mocked.panel.proBundleRepairPanel';
+      setProBundleRemovalReason = setProBundleRemovalReasonMock;
     },
   };
 });
@@ -185,6 +190,139 @@ describe.only('activate - command registration', () => {
       'PRO_BUNDLE_CODE',
     );
 
+    expect(proUtilities.updateProBundle).not.toHaveBeenCalled();
+  });
+  it('falls back to repair mode if updateProBundle throws', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Simulate Pro state
+    (helpers.readFromGlobalState as jest.Mock).mockImplementation(
+      (_context, key: string) => {
+        if (key === 'license-key') return 'LICENSE123';
+        if (key === 'pro-bundle') return 'PRO_BUNDLE_CODE';
+        if (key === 'version') return '2.0.0';
+        return undefined;
+      },
+    );
+
+    // Set up release metadata
+    const releaseNote: { webViewHtml: string; isPro: boolean } = {
+      webViewHtml: '<html></html>',
+      isPro: true,
+    };
+    (releases.releaseNotes as Record<string, typeof releaseNote>)['3.0.0'] =
+      releaseNote;
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.0.0' },
+    } as vscode.Extension<never>);
+
+    // Confirming the update
+    (proUtilities.proBundleNeedsUpdate as jest.Mock).mockReturnValue(true);
+
+    // Force update failure
+    const errorMessage = 'Update failed due to some reason';
+    (proUtilities.updateProBundle as jest.Mock).mockRejectedValue(
+      new Error(errorMessage),
+    );
+
+    // Mock activateRepairMode
+    (helpers.activateRepairMode as jest.Mock).mockImplementation(() => {});
+
+    await activate(fakeContext);
+
+    // Assertion zone
+
+    expect(proUtilities.updateProBundle).toHaveBeenCalledWith(
+      fakeContext,
+      '3.0.0',
+      'LICENSE123',
+      expect.anything(), // ExtensionProperties
+    );
+    expect(helpers.activateRepairMode).toHaveBeenCalled();
+
+    expect(setProBundleRemovalReasonMock).toHaveBeenCalledWith(errorMessage);
+
+    expect(registerCommandMock).toHaveBeenCalledWith(
+      'turboConsoleLog.retryProUpdate',
+      expect.any(Function),
+    );
+  });
+  it('executes retryProUpdate and calls updateProBundle again', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Simulate Pro state
+    (helpers.readFromGlobalState as jest.Mock).mockImplementation((_, key) => {
+      if (key === 'license-key') return 'LICENSE123';
+      if (key === 'pro-bundle') return 'PRO_BUNDLE_CODE';
+      if (key === 'version') return '2.0.0';
+      return undefined;
+    });
+
+    // Mock release notes
+    (
+      releases.releaseNotes as Record<
+        string,
+        { webViewHtml: string; isPro: boolean }
+      >
+    )['3.0.0'] = {
+      webViewHtml: '<html></html>',
+      isPro: true,
+    };
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.0.0' },
+    } as vscode.Extension<never>);
+
+    // Simulate update failure during activation
+    (proUtilities.proBundleNeedsUpdate as jest.Mock).mockReturnValue(true);
+    const firstCall = jest.fn().mockRejectedValue(new Error('initial fail'));
+    const secondCall = jest.fn().mockResolvedValue(undefined);
+    (proUtilities.updateProBundle as jest.Mock)
+      .mockImplementationOnce(firstCall)
+      .mockImplementationOnce(secondCall);
+
+    // Ensure repair mode and side effects are mocked
+    (helpers.activateRepairMode as jest.Mock).mockImplementation(() => {});
+
+    await activate(fakeContext);
+
+    // 🧠 Lookup the registered retry command
+    const retryCall = registerCommandMock.mock.calls.find(
+      ([name]) => name === 'turboConsoleLog.retryProUpdate',
+    );
+    expect(retryCall).toBeDefined();
+
+    // 💥 Call the handler manually to simulate retry
+    const retryHandler = retryCall?.[1];
+    await retryHandler();
+
+    // ✅ updateProBundle called again on retry
+    expect(secondCall).toHaveBeenCalledWith(
+      fakeContext,
+      '3.0.0',
+      'LICENSE123',
+      expect.anything(),
+    );
+  });
+  it('activates freemium mode when no license or bundle are found', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Simulate freemium state
+    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    await activate(fakeContext);
+
+    expect(helpers.activateFreemiumMode).toHaveBeenCalledTimes(1);
+    expect(proUtilities.runProBundle).not.toHaveBeenCalled();
     expect(proUtilities.updateProBundle).not.toHaveBeenCalled();
   });
 });

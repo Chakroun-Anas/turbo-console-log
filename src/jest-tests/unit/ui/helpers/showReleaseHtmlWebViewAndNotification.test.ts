@@ -8,7 +8,7 @@ jest.mock('../../../../helpers');
 jest.mock('../../../../ui/helpers/openWebView');
 jest.mock('../../../../releases/fresh-install');
 
-describe.only('showReleaseHtmlWebViewAndNotification', () => {
+describe('showReleaseHtmlWebViewAndNotification', () => {
   const readMock = helpers.readFromGlobalState as jest.Mock;
   const writeMock = helpers.writeToGlobalState as jest.Mock;
   const openWebViewMock = openWebViewModule.openWebView as jest.Mock;

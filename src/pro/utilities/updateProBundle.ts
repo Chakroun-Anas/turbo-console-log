@@ -14,12 +14,14 @@ export async function updateProBundle(
   extensionProperties: ExtensionProperties,
 ) {
   const isUserConnectedToInternet = await isOnline();
+  const errorMsg =
+    'Something went wrong while updating your Pro bundle, please check the Turbo Pro panel for more context and a chance to retry!';
 
   if (!isUserConnectedToInternet) {
-    await vscode.window.showErrorMessage(
-      '📡 No internet connection. Please connect and try again.',
+    vscode.window.showErrorMessage(errorMsg);
+    throw new Error(
+      '📡 No internet connection. Please connect and try again from the panel!',
     );
-    return;
   }
   try {
     const proBundle = await fetchProBundle(licenseKey, proVersion);
@@ -30,17 +32,13 @@ export async function updateProBundle(
       10000,
     );
   } catch (error) {
-    console.error('Turbo Pro activation failed: ', error);
-    const genericErrorMsg =
-      'Something went wrong, please contact the support at support@turboconsolelog.io';
+    console.error('Turbo Pro update failed: ', error);
+    let errorMsg =
+      (error as { message?: string })?.message ?? 'Something went wrong!';
     if (error instanceof AxiosError) {
-      const errorMsg = error.response?.data?.error;
-      vscode.window.showErrorMessage(errorMsg ?? genericErrorMsg);
-      return;
+      errorMsg = error.response?.data?.error;
     }
-    showNotification(
-      'Something went wrong, please contact the support at support@turboconsolelog.io',
-      5000,
-    );
+    vscode.window.showErrorMessage(errorMsg);
+    throw new Error(errorMsg);
   }
 }

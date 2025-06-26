@@ -1,3 +1,8 @@
 import { TurboProFreemiumTreeProvider } from './TurboProFreemiumTreeProvider';
 import { TurboProShowcasePanel } from './TurboProShowcasePanel';
-export { TurboProFreemiumTreeProvider, TurboProShowcasePanel };
+import { TurboProBundleRepairPanel } from './TurboProBundleRepairPanel';
+export {
+  TurboProFreemiumTreeProvider,
+  TurboProShowcasePanel,
+  TurboProBundleRepairPanel,
+};

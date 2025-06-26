@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
   public static readonly viewType = 'turboConsoleLogFreemiumPanel';
 
-  constructor(private readonly context: vscode.ExtensionContext) {}
+  constructor() {}
 
   resolveWebviewView(webviewView: vscode.WebviewView) {
     webviewView.webview.options = {
