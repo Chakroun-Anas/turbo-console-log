@@ -2,6 +2,34 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.1.1] – 2025-07-02
+
+### 🛠 Patch Release — Turbo Core Fixes & Pro UX Enhancements
+
+This update delivers key fixes and UX improvements that enhance the experience across both the core extension and Turbo Pro.
+
+#### 🧠 Turbo Core Fixes
+
+- ✅ Fixed logging for **functions with empty parameters**
+- 🧩 Correctly detects **object property access assigned to a variable**
+- 🔄 Properly handles **multiline assignment statements**
+- 💾 **Auto-save now triggered** after executing the `'correctAllLogMessages'` command
+- 🧪 Added 20+ new unit tests to help stabilize the extension —  
+  bringing total test coverage to over 150 between unit and integration tests (with more coming)
+
+#### 🚀 Turbo Pro Enhancements
+
+- 📁 **Recursive `.gitignore` rules** now fully applied to the Turbo VDOM
+- 🌳 **Log tree syncs instantly** when logs are removed from a file
+- 🧭 Smoother UX for those using the **Turbo panel in the secondary sidebar** (recommended setup)
+- ⚡ **No need to re-save files after auto-correction** — Turbo now applies changes instantly and reliably
+
+Enjoy the extra stability and smoother workflow —  
+and stay tuned: more upgrades are coming consistently! 🚀
+
+👉 [Read the full v3.1.1 release article](https://www.turboconsolelog.io/articles/release-311)  
+👉 [Recommended PRO UX: Keep Logs Visible with Dual Sidebars](https://www.turboconsolelog.io/articles/turbo-pro-side-panel-tip)
+
 ## [3.1.0] - 2025-06-25
 
 ### ⚡ Turbo Pro v2 — Performance Unleashed & Rock-Solid Reliability
