@@ -253,6 +253,7 @@ export function msg(
       lineOfLogMsg,
       debuggingMsgContent,
       spacesBeforeMsg,
+      tabSize,
     );
     return;
   }

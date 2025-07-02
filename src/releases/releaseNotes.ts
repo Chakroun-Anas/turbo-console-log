@@ -43,4 +43,8 @@ export const releaseNotes: Record<
     webViewHtml: release301HtmlWebView(),
     isPro: true,
   },
+  '3.1.1': {
+    webViewHtml: release301HtmlWebView(),
+    isPro: true,
+  },
 };

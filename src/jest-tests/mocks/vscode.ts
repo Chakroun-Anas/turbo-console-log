@@ -21,3 +21,10 @@ export const workspace = {
 export const extensions = {
   getExtension: jest.fn(() => ({ packageJSON: { version: '3.0.0' } })),
 };
+
+export class Position {
+  constructor(
+    readonly line: number,
+    readonly character: number,
+  ) {}
+}

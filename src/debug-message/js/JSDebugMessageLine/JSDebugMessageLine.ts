@@ -20,6 +20,7 @@ import {
   primitiveAssignmentLine,
   typedFunctionCallLine,
   multilineBracesLine,
+  propertyAccessAssignmentLine,
 } from './helpers';
 
 /**
@@ -101,6 +102,8 @@ export const jsDebugMessageLine: DebugMessageLine = {
     switch (logMsg.logMessageType) {
       case LogMessageType.PrimitiveAssignment:
         return primitiveAssignmentLine(document, selectionLine);
+      case LogMessageType.PropertyAccessAssignment:
+        return propertyAccessAssignmentLine(document, selectionLine);
       case LogMessageType.ObjectLiteral:
         return objectLiteralLine(document, selectionLine);
       case LogMessageType.NamedFunctionAssignment:

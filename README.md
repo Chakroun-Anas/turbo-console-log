@@ -37,36 +37,30 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ---
 
-## ⚡ What’s New in v3.0.1? – Turbo PRO v2: Faster, Smarter, Stronger
+## ⚡ What’s New in v3.1.1? – Core Fixes & Pro UX Polish
 
-This update brings a major leap forward in performance, reliability, and developer experience.  
-**Turbo PRO v2** is here — rebuilt with stability and speed in mind, thanks to direct input from our early adopters 🤍
+This update delivers key fixes and UX improvements that enhance the experience across both the core extension and Turbo Pro.
 
-- **🚀 Massive Performance Boost:**  
-  Faster startup, faster syncing, and smoother tree rendering across large projects
+### 🔧 Core Improvements
 
-- **🧠 Smarter Log Detection:**  
-  False positives are drastically reduced for a cleaner, more accurate panel
+- ✅ **Functions with empty parameters** are now correctly logged
+- 🧩 **Object property assignments** are accurately detected
+- 🔄 **Multiline assignments** are now handled correctly
+- 💾 **Auto-save is now triggered** after running **'correctAllLogMessages'**
+- 🧪 **20+ new unit tests** added — total coverage now exceeds 150 tests (unit + integration)
 
-- **🔁 Self-Healing Update System:**  
-  New retry & repair flow prevents update failures and guides recovery
+### 🚀 Turbo Pro Enhancements
 
-- **✅ Test Coverage Upgraded:**  
-  Introduced Jest to strengthen the unit testing pipeline
+- 📁 Recursive **`.gitignore` rules** now respected in the Turbo VDOM
+- 🌳 **Tree view syncs instantly** after log removal
+- 🧭 Improved UX when Turbo panel is in the **secondary sidebar** (our recommended setup)
+- ⚡ **No manual save required** after auto-correction — Turbo handles it live!
 
-- **🔐 Better License Handling:**  
-  Clearer feedback and error resilience when activating or updating your license
+Enjoy the extra stability and smoother workflow —  
+and stay tuned: more upgrades are coming consistently! 🚀
 
-- **🎯 More Activations per Version:**  
-  5 activations instead of 3 — more flexibility across your devices
-
-📚 **Want the full breakdown?**
-
-→ [Release 3.1.0 – Full Update Overview](https://www.turboconsolelog.io/articles/release-310)  
-→ [How Turbo Pro Works – Technical Deep Dive](https://www.turboconsolelog.io/articles/pro-v2-technical-overview)  
-→ [Benchmark Pro v2 ⚡️](https://www.turboconsolelog.io/articles/benchmark-pro-v2) Real-world speed across React, Storybook & Vite
-
-📩 [Join the newsletter](https://www.turboconsolelog.io/join) to get future updates, exclusive dev content, and free resources.
+👉 Read the full release article: [v3.1.1 Release Notes](https://www.turboconsolelog.io/articles/release-311)  
+👉 Best PRO setup tip: [Keep Logs Visible with Dual Sidebars](https://www.turboconsolelog.io/articles/turbo-pro-side-panel-tip)
 
 ---
 
