@@ -15,6 +15,7 @@ const config: Config = {
     ],
   },
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
     '^vscode$': '<rootDir>/src/jest-tests/mocks/vscode.ts',
     '^p-limit$': '<rootDir>/src/jest-tests/mocks/pLimit.ts',
   },
