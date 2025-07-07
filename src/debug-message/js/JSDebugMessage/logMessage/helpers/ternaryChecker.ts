@@ -1,25 +1,44 @@
+import * as ts from 'typescript';
 import { TextDocument } from 'vscode';
-import { LineCodeProcessing } from '../../../../../line-code-processing';
 
 export function ternaryChecker(
   document: TextDocument,
-  lineCodeProcessing: LineCodeProcessing,
+  _lineCodeProcessing: unknown,
   selectionLine: number,
-) {
-  const currentLineText: string = document.lineAt(selectionLine).text;
-  const MAX_TERNARY_LOOKAHEAD = 20;
-  let concatenatedLines = currentLineText.trim(); // Start with the current line
+): { isChecked: boolean } {
+  const sourceText = document.getText();
+  const sourceFile = ts.createSourceFile(
+    document.fileName,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    /*setParentNodes*/ true,
+  );
 
-  // Grab the next `MAX_TERNARY_LOOKAHEAD` lines and concatenate
-  for (let i = 1; i < MAX_TERNARY_LOOKAHEAD; i++) {
-    if (selectionLine + i < document.lineCount) {
-      concatenatedLines += document.lineAt(selectionLine + i).text.trim();
-    } else {
-      break;
+  let isChecked = false;
+
+  ts.forEachChild(sourceFile, function visit(node: ts.Node): void {
+    if (isChecked) return;
+
+    const startLine = document.positionAt(node.getStart()).line;
+    const endLine = document.positionAt(node.getEnd()).line;
+    if (selectionLine < startLine || selectionLine > endLine) return;
+
+    if (ts.isVariableStatement(node)) {
+      for (const decl of node.declarationList.declarations) {
+        if (decl.initializer && containsTernary(decl.initializer)) {
+          isChecked = true;
+          return;
+        }
+      }
     }
-  }
-  return {
-    isChecked:
-      lineCodeProcessing.isTernaryExpressionAssignment(concatenatedLines),
-  };
+
+    ts.forEachChild(node, visit);
+  });
+
+  return { isChecked };
+}
+
+function containsTernary(node: ts.Node): boolean {
+  if (ts.isConditionalExpression(node)) return true;
+  return ts.forEachChild(node, containsTernary) ?? false;
 }
