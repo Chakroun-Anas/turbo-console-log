@@ -11,7 +11,6 @@ import {
   multilineBracesChecker,
   multilineParenthesisChecker,
   namedFunctionAssignmentChecker,
-  namedFunctionChecker,
   nullishCoalescingChecker,
   objectFunctionCallAssignmentChecker,
   objectLiteralChecker,
@@ -100,8 +99,6 @@ export function logMessage(
         lineCodeProcessing,
         selectionLine,
       ),
-    [LogMessageType.NamedFunction]: () =>
-      namedFunctionChecker(document, lineCodeProcessing, selectionLine),
     [LogMessageType.NamedFunctionAssignment]: () =>
       namedFunctionAssignmentChecker(
         document,

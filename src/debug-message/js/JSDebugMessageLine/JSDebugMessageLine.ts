@@ -37,7 +37,6 @@ function isWithinReturnStatement(
   if (
     [
       LogMessageType.NamedFunctionAssignment,
-      LogMessageType.NamedFunction,
       LogMessageType.FunctionParameter,
     ].includes(logMsg.logMessageType)
   ) {

@@ -6,9 +6,9 @@ describe('isEmptyBlockContext', () => {
   it('returns true for an empty MultilineParenthesis block', () => {
     const doc = makeTextDocument(['someFunc(foo, bar) { }']);
     const logMessage: LogMessage = {
-      logMessageType: LogMessageType.NamedFunction,
+      logMessageType: LogMessageType.FunctionParameter,
       metadata: {
-        line: 0,
+        closingContextLine: 0,
       },
     };
     const result = isEmptyBlockContext(doc, logMessage);

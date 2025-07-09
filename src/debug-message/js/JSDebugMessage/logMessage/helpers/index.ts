@@ -10,7 +10,6 @@ import { multilineBracesChecker } from './multilineBracesChecker';
 import { multiLineAnonymousFunctionChecker } from './multiLineAnonymousFunctionChecker';
 import { namedFunctionAssignmentChecker } from './namedFunctionAssignmentChecker';
 import { ternaryChecker } from './ternaryChecker';
-import { namedFunctionChecker } from './namedFunctionChecker';
 import { functionCallAssignmentChecker } from './functionCallAssignmentChecker';
 import { nullishCoalescingChecker } from './nullishCoalescingChecker';
 import { templateStringChecker } from './templateStringChecker';
@@ -29,7 +28,6 @@ export {
   multiLineAnonymousFunctionChecker,
   namedFunctionAssignmentChecker,
   ternaryChecker,
-  namedFunctionChecker,
   functionCallAssignmentChecker,
   nullishCoalescingChecker,
   templateStringChecker,

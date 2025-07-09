@@ -21,7 +21,6 @@ export function isEmptyBlockContext(
           )
           .text.replace(/\s/g, ''),
       );
-    case LogMessageType.NamedFunction:
     case LogMessageType.NamedFunctionAssignment:
       return EMPTY_BLOCK_REGEX.test(
         document
