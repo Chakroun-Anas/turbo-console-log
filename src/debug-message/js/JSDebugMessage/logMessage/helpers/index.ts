@@ -15,6 +15,7 @@ import { functionCallAssignmentChecker } from './functionCallAssignmentChecker';
 import { nullishCoalescingChecker } from './nullishCoalescingChecker';
 import { templateStringChecker } from './templateStringChecker';
 import { propertyAccessAssignmentChecker } from './propertyAccessAssignmentChecker';
+import { functionParameterChecker } from './functionParamterChecker';
 export {
   logTypeOrder,
   objectLiteralChecker,
@@ -33,4 +34,5 @@ export {
   nullishCoalescingChecker,
   templateStringChecker,
   propertyAccessAssignmentChecker,
+  functionParameterChecker,
 };

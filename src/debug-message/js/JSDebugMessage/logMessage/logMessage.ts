@@ -5,6 +5,7 @@ import {
   arrayAssignmentChecker,
   decoratorChecker,
   functionCallAssignmentChecker,
+  functionParameterChecker,
   logTypeOrder,
   multiLineAnonymousFunctionChecker,
   multilineBracesChecker,
@@ -59,6 +60,8 @@ export function logMessage(
       objectLiteralChecker(document, lineCodeProcessing, selectionLine),
 
     [LogMessageType.Decorator]: () => decoratorChecker(document, selectionLine),
+    [LogMessageType.FunctionParameter]: () =>
+      functionParameterChecker(document, selectionLine, selectedVar),
     [LogMessageType.ArrayAssignment]: () =>
       arrayAssignmentChecker(document, lineCodeProcessing, selectionLine),
     [LogMessageType.TemplateString]: () =>
