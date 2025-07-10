@@ -146,7 +146,7 @@ export const jsDebugMessageLine: DebugMessageLine = {
       case LogMessageType.TemplateString:
         return templateStringLine(document, selectionLine);
       case LogMessageType.Ternary:
-        return ternaryExpressionLine(document, selectionLine);
+        return ternaryExpressionLine(document, selectionLine, selectedVar);
       case LogMessageType.NullishCoalescing:
         return nullishCoalescingLine(document, selectionLine);
       case LogMessageType.MultilineBraces:

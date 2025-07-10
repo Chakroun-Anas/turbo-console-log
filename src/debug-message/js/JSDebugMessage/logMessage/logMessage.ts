@@ -66,7 +66,7 @@ export function logMessage(
     [LogMessageType.TemplateString]: () =>
       templateStringChecker(document, selectionLine),
     [LogMessageType.Ternary]: () =>
-      ternaryChecker(document, lineCodeProcessing, selectionLine),
+      ternaryChecker(document, selectionLine, selectedVar),
     [LogMessageType.NullishCoalescing]: () =>
       nullishCoalescingChecker(document, lineCodeProcessing, selectionLine),
     [LogMessageType.MultilineBraces]: () =>
