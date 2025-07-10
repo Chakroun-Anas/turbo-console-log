@@ -1,3 +1,3 @@
 export function getPreviousWebViewReleaseVersion(): string {
-  return '3.0.0';
+  return '3.1.0';
 }
