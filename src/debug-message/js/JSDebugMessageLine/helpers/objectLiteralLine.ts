@@ -13,11 +13,14 @@ export function objectLiteralLine(
     nbrOfOpenedBrackets += (currentLineText.match(/{/g) || []).length;
     nbrOfClosedBrackets += (currentLineText.match(/}/g) || []).length;
     currentLineNum++;
-    if (nbrOfOpenedBrackets === nbrOfClosedBrackets) {
+    if (
+      nbrOfOpenedBrackets > 0 &&
+      nbrOfOpenedBrackets === nbrOfClosedBrackets
+    ) {
       break;
     }
   }
-  return nbrOfClosedBrackets === nbrOfOpenedBrackets
+  return nbrOfOpenedBrackets > 0 && nbrOfClosedBrackets === nbrOfOpenedBrackets
     ? currentLineNum
     : selectionLine + 1;
 }

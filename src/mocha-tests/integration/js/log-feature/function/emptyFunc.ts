@@ -62,13 +62,14 @@ export default (): void => {
             new NaturalEditorPosition(14, 25),
           ),
         ];
+        expect(true).to.equal(true);
         await vscode.commands.executeCommand(
           'turboConsoleLog.displayLogMessage',
           [],
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine(15),
+            naturalEditorLine(14),
           ]),
         );
         const textDocument = activeTextEditor.document;

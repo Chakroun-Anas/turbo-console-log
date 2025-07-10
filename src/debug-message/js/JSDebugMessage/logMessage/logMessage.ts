@@ -5,12 +5,12 @@ import {
   arrayAssignmentChecker,
   decoratorChecker,
   functionCallAssignmentChecker,
+  functionParameterChecker,
   logTypeOrder,
   multiLineAnonymousFunctionChecker,
   multilineBracesChecker,
   multilineParenthesisChecker,
   namedFunctionAssignmentChecker,
-  namedFunctionChecker,
   nullishCoalescingChecker,
   objectFunctionCallAssignmentChecker,
   objectLiteralChecker,
@@ -59,12 +59,14 @@ export function logMessage(
       objectLiteralChecker(document, lineCodeProcessing, selectionLine),
 
     [LogMessageType.Decorator]: () => decoratorChecker(document, selectionLine),
+    [LogMessageType.FunctionParameter]: () =>
+      functionParameterChecker(document, selectionLine, selectedVar),
     [LogMessageType.ArrayAssignment]: () =>
       arrayAssignmentChecker(document, lineCodeProcessing, selectionLine),
     [LogMessageType.TemplateString]: () =>
       templateStringChecker(document, selectionLine),
     [LogMessageType.Ternary]: () =>
-      ternaryChecker(document, lineCodeProcessing, selectionLine),
+      ternaryChecker(document, selectionLine, selectedVar),
     [LogMessageType.NullishCoalescing]: () =>
       nullishCoalescingChecker(document, lineCodeProcessing, selectionLine),
     [LogMessageType.MultilineBraces]: () =>
@@ -97,8 +99,6 @@ export function logMessage(
         lineCodeProcessing,
         selectionLine,
       ),
-    [LogMessageType.NamedFunction]: () =>
-      namedFunctionChecker(document, lineCodeProcessing, selectionLine),
     [LogMessageType.NamedFunctionAssignment]: () =>
       namedFunctionAssignmentChecker(
         document,

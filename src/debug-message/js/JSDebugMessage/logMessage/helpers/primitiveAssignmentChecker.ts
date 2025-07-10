@@ -1,35 +1,83 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
 import { LineCodeProcessing } from '../../../../../line-code-processing';
 
+/**
+ * Returns true when the RHS of the variable declaration is a
+ * primitive literal OR a plain identifier / dotted path
+ * (e.g. foo, foo.bar.baz) — but NOT an object/array/func/etc.
+ */
+function isPrimitiveInitializer(expr: ts.Expression): boolean {
+  switch (expr.kind) {
+    case ts.SyntaxKind.NumericLiteral:
+    case ts.SyntaxKind.StringLiteral:
+    case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
+    case ts.SyntaxKind.TrueKeyword:
+    case ts.SyntaxKind.FalseKeyword:
+    case ts.SyntaxKind.NullKeyword:
+      return true;
+
+    case ts.SyntaxKind.Identifier:
+      return (
+        (expr as ts.Identifier).escapedText === 'undefined' || // special-case
+        true
+      ); // any other bare identifier
+
+    case ts.SyntaxKind.PropertyAccessExpression: {
+      // ensure every segment is a simple identifier (foo.bar.baz)
+      let node: ts.Expression = expr;
+      while (ts.isPropertyAccessExpression(node)) {
+        if (!ts.isIdentifier(node.name)) return false;
+        node = node.expression;
+      }
+      return ts.isIdentifier(node);
+    }
+
+    default:
+      return false;
+  }
+}
+
 export function primitiveAssignmentChecker(
   document: TextDocument,
-  lineCodeProcessing: LineCodeProcessing,
+  _lineCodeProcessing: LineCodeProcessing,
   selectionLine: number,
-) {
-  const currentLineText = document.lineAt(selectionLine).text;
-  const trimmedLine = currentLineText.trim();
+): { isChecked: boolean } {
+  const sourceFile = ts.createSourceFile(
+    document.fileName,
+    document.getText(),
+    ts.ScriptTarget.Latest,
+    /*setParentNodes*/ true,
+  );
 
-  // 1️⃣ Still make sure it's an assignment
-  if (!lineCodeProcessing.isAssignedToVariable(trimmedLine)) {
-    return { isChecked: false };
-  }
+  let isChecked = false;
 
-  // 2️⃣ Grab RHS
-  const assignmentMatch = trimmedLine.match(/=\s*(.+)$/);
-  if (!assignmentMatch) return { isChecked: false };
+  ts.forEachChild(sourceFile, function visit(node: ts.Node): void {
+    if (isChecked) return;
 
-  const rhs = assignmentMatch[1].trim();
+    const start = document.positionAt(node.getStart()).line;
+    const end = document.positionAt(node.getEnd()).line;
+    if (selectionLine < start || selectionLine > end) return;
 
-  // 3️⃣ NEW: if RHS ends with a continuation token, it's NOT primitive
-  if (/[.[]$|(?:\?\.)$/.test(rhs)) {
-    return { isChecked: false };
-  }
+    if (ts.isVariableStatement(node)) {
+      for (const decl of node.declarationList.declarations) {
+        // 🛑 Bail out if it's destructuring!
+        if (
+          ts.isObjectBindingPattern(decl.name) ||
+          ts.isArrayBindingPattern(decl.name)
+        ) {
+          return;
+        }
 
-  // 4️⃣ Primitive literal / plain identifier test (unchanged)
-  const isPrimitive =
-    /^(\d+(\.\d+)?|['"`][\s\S]*['"`]|true|false|null|undefined|\w+(?:\.\w+)*);?$/.test(
-      rhs,
-    );
+        if (decl.initializer && isPrimitiveInitializer(decl.initializer)) {
+          isChecked = true;
+          return;
+        }
+      }
+    }
 
-  return { isChecked: isPrimitive };
+    ts.forEachChild(node, visit);
+  });
+
+  return { isChecked };
 }

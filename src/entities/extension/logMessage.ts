@@ -4,7 +4,6 @@ export enum LogMessageType {
   MultiLineAnonymousFunction = 'MultiLineAnonymousFunction',
   MultilineBraces = 'MultilineBraces',
   MultilineParenthesis = 'MultilineParenthesis',
-  NamedFunction = 'NamedFunction',
   NamedFunctionAssignment = 'NamedFunctionAssignment',
   FunctionCallAssignment = 'FunctionCallAssignment',
   TypedFunctionCallAssignment = 'TypedFunctionCallAssignment',
@@ -15,6 +14,7 @@ export enum LogMessageType {
   TemplateString = 'TemplateString',
   NullishCoalescing = 'NullishCoalescing',
   PropertyAccessAssignment = 'PropertyAccessAssignment',
+  FunctionParameter = 'FunctionParameter',
 }
 
 export type LogContextMetadata = {

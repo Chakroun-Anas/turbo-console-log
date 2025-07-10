@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automating the process of writing meaningful log messages.",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -263,7 +263,6 @@
     "prettier": "^3.5.3",
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1",
     "vscode-test": "^1.6.1"
   },
@@ -283,6 +282,7 @@
     "isPreReleaseVersion": false
   },
   "dependencies": {
+    "typescript": "^5.8.3",
     "axios": "^1.9.0",
     "ignore": "^7.0.5",
     "p-limit": "^6.2.0"

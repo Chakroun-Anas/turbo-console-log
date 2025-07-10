@@ -11,6 +11,18 @@ describe('getExtensionProperties', () => {
     expect(props.addSemicolonInTheEnd).toBe(false);
   });
 
+  it('apply formatting values when default config is altered', () => {
+    const config = createMockWorkspaceConfig({
+      logMessagePrefix: '',
+      delimiterInsideMessage: '',
+      logMessageSuffix: '',
+    });
+    const props = getExtensionProperties(config);
+    expect(props.logMessagePrefix).toBe('🚀');
+    expect(props.delimiterInsideMessage).toBe('~');
+    expect(props.logMessageSuffix).toBe(':');
+  });
+
   it('uses provided overrides', () => {
     const config = createMockWorkspaceConfig({
       wrapLogMessage: true,

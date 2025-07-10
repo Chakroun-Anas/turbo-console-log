@@ -37,7 +37,7 @@ function isWithinReturnStatement(
   if (
     [
       LogMessageType.NamedFunctionAssignment,
-      LogMessageType.NamedFunction,
+      LogMessageType.FunctionParameter,
     ].includes(logMsg.logMessageType)
   ) {
     return -1;
@@ -104,6 +104,11 @@ export const jsDebugMessageLine: DebugMessageLine = {
         return primitiveAssignmentLine(document, selectionLine);
       case LogMessageType.PropertyAccessAssignment:
         return propertyAccessAssignmentLine(document, selectionLine);
+      case LogMessageType.FunctionParameter:
+        return (
+          (logMsg?.metadata as LogContextMetadata)?.closingContextLine ||
+          selectionLine + 1
+        );
       case LogMessageType.ObjectLiteral:
         return objectLiteralLine(document, selectionLine);
       case LogMessageType.NamedFunctionAssignment:
@@ -141,7 +146,7 @@ export const jsDebugMessageLine: DebugMessageLine = {
       case LogMessageType.TemplateString:
         return templateStringLine(document, selectionLine);
       case LogMessageType.Ternary:
-        return ternaryExpressionLine(document, selectionLine);
+        return ternaryExpressionLine(document, selectionLine, selectedVar);
       case LogMessageType.NullishCoalescing:
         return nullishCoalescingLine(document, selectionLine);
       case LogMessageType.MultilineBraces:

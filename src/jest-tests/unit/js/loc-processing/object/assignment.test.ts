@@ -40,6 +40,30 @@ describe('Assignment of object literal to a variable', () => {
       'let obj = {x, y, z};',
       "const FLAG_CONFIG = {'OSSNextMajor':getNextMajorFlagValue,",
       '  config.resolve = {...config.resolve,',
+      `const renameFiles: Record<string, string | undefined> = {
+          _gitignore: '.gitignore',
+      }`,
+      `const settings: MyConfig | null = {
+        darkMode: true,
+      };`,
+      `const map: Record<string, () => number> = {
+        counter: () => 1,
+      };`,
+      `const shape: Shape & { id?: string } = {
+        width: 20,
+        id: '123',
+      };`,
+      `const status: 'pending' | 'success' | 'error' = {
+        state: 'pending',
+      };`,
+      `const box: T extends string ? StringBox : NumberBox = {
+        value: 'data',
+      };`,
+      `const value:
+        | FooType
+        | BarType = {
+        hello: true,
+      };`,
     ];
     objLiteralAssignmentLOCs.forEach((objLiteralAssignmentLOC) => {
       expect(
@@ -59,6 +83,10 @@ describe('Assignment of object literal to a variable', () => {
                         return true;
                     }`,
       `sayHello(someObj: { someProp: string }): number {`,
+      `const getObj = () => {`,
+      `onChange={(_)=>{
+
+      }}`,
     ];
 
     nonObjLiteralAssignmentLOCs.forEach((nonObjLiteralAssignmentLOC) => {

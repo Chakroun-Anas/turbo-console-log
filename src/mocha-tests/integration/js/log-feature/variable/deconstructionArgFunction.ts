@@ -5,6 +5,8 @@ import {
   openDocument,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
+  NaturalEditorPosition,
+  naturalEditorLine,
 } from '../../../helpers';
 import { ProgrammingLanguage } from '../../../../../entities';
 
@@ -32,8 +34,8 @@ export default (): void => {
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new vscode.Position(13, 42),
-            new vscode.Position(13, 46),
+            new NaturalEditorPosition(14, 42),
+            new vscode.Position(14, 46),
           ),
         ];
         await vscode.commands.executeCommand(
@@ -41,10 +43,14 @@ export default (): void => {
           [],
         );
         await Promise.all(
-          documentLinesChanged(activeTextEditor.document, [14]),
+          documentLinesChanged(activeTextEditor.document, [
+            naturalEditorLine(15),
+          ]),
         );
         expect(
-          /console\.log\(.*/.test(activeTextEditor.document.lineAt(14).text),
+          /console\.log\(.*/.test(
+            activeTextEditor.document.lineAt(naturalEditorLine(15)).text,
+          ),
         ).to.equal(true);
       }
     });

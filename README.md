@@ -37,30 +37,25 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ---
 
-## ⚡ What’s New in v3.1.1? – Core Fixes & Pro UX Polish
+## 🚀 What’s New in v3.2.0? – AST Introduction & Core Detection Fixes
 
-This update delivers key fixes and UX improvements that enhance the experience across both the core extension and Turbo Pro.
+This release introduces AST parsing for specific cases, increasing log placement accuracy without affecting performance.
 
-### 🔧 Core Improvements
+### 🧠 AST-Based Enhancements
 
-- ✅ **Functions with empty parameters** are now correctly logged
-- 🧩 **Object property assignments** are accurately detected
-- 🔄 **Multiline assignments** are now handled correctly
-- 💾 **Auto-save is now triggered** after running **'correctAllLogMessages'**
-- 🧪 **20+ new unit tests** added — total coverage now exceeds 150 tests (unit + integration)
+- 📐 **AST Support:** Introduced AST parsing for ternary expressions and function parameters
+- 🧠 **More reliable Log Placement:** Improved accuracy for ternary expressions and function parameters
+- 🧪 **Test Coverage:** New test cases added to validate AST logic and key edge scenarios
 
-### 🚀 Turbo Pro Enhancements
+### 🔧 Core Fixes
 
-- 📁 Recursive **`.gitignore` rules** now respected in the Turbo VDOM
-- 🌳 **Tree view syncs instantly** after log removal
-- 🧭 Improved UX when Turbo panel is in the **secondary sidebar** (our recommended setup)
-- ⚡ **No manual save required** after auto-correction — Turbo handles it live!
+- 🐛 **Object Literal Detection:** Fixed handling of assignments with complex type annotations
+- 🛠️ **Default Config Values:** Now correctly respects default values, reducing false positives
 
-Enjoy the extra stability and smoother workflow —  
-and stay tuned: more upgrades are coming consistently! 🚀
+---
 
-👉 Read the full release article: [v3.1.1 Release Notes](https://www.turboconsolelog.io/articles/release-311)  
-👉 Best PRO setup tip: [Keep Logs Visible with Dual Sidebars](https://www.turboconsolelog.io/articles/turbo-pro-side-panel-tip)
+👉 [Read the full v3.2.0 release article](https://www.turboconsolelog.io/articles/release-320)  
+👉 [Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)
 
 ---
 

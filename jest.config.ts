@@ -4,9 +4,7 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['<rootDir>/src/jest-tests/**/*.test.ts'],
-  // testMatch: [
-  //   '<rootDir>/src/jest-tests/**/propertyAccessAssignmentLine.test.ts',
-  // ],
+  // testMatch: ['<rootDir>/src/jest-tests/**/ternaryExpressionLine.test.ts'],
   moduleFileExtensions: ['ts', 'js'],
   transform: {
     '^.+\\.ts$': [
@@ -17,6 +15,7 @@ const config: Config = {
     ],
   },
   moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
     '^vscode$': '<rootDir>/src/jest-tests/mocks/vscode.ts',
     '^p-limit$': '<rootDir>/src/jest-tests/mocks/pLimit.ts',
   },

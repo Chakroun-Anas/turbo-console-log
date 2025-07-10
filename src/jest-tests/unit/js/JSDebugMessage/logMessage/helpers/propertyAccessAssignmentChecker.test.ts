@@ -1,5 +1,5 @@
-import { propertyAccessAssignmentChecker } from '../../../../../../debug-message/js/JSDebugMessage/logMessage/helpers/';
-import { LineCodeProcessing } from '../../../../../../line-code-processing';
+import { propertyAccessAssignmentChecker } from '@/debug-message/js/JSDebugMessage/logMessage/helpers/';
+import { LineCodeProcessing } from '@/line-code-processing';
 
 describe('propertyAccessAssignmentChecker', () => {
   it('detects valid property access assignment', () => {

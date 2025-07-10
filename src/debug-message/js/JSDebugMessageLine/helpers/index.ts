@@ -10,6 +10,7 @@ import { nullishCoalescingLine } from './nullishCoalescingLine';
 import { primitiveAssignmentLine } from './primitiveAssignmentLine';
 import { multilineBracesLine } from './multiLineBracesLine';
 import { propertyAccessAssignmentLine } from './propertyAccessAssignmentLine';
+import { functionParameterLine } from './functionParamterLine';
 export {
   ternaryExpressionLine,
   objectLiteralLine,
@@ -23,4 +24,5 @@ export {
   primitiveAssignmentLine,
   multilineBracesLine,
   propertyAccessAssignmentLine,
+  functionParameterLine,
 };

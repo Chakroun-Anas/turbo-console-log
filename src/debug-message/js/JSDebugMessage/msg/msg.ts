@@ -241,7 +241,8 @@ export function msg(
   const selectedVarLineLoc = selectedVarLine.text;
   if (isEmptyBlockContext(document, logMsg)) {
     const emptyBlockLine =
-      logMsg.logMessageType === LogMessageType.MultilineParenthesis
+      logMsg.logMessageType === LogMessageType.MultilineParenthesis ||
+      logMsg.logMessageType === LogMessageType.FunctionParameter
         ? document.lineAt(
             (logMsg.metadata as LogContextMetadata).closingContextLine,
           )

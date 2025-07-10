@@ -1,69 +1,126 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function ternaryExpressionLine(
   document: TextDocument,
   selectionLine: number,
-  lines = 20,
+  variableName: string,
 ): number {
-  let concatenatedLines = cleanCode(document.lineAt(selectionLine).text);
-  let lineIndex = selectionLine;
-  const MAX_LOOKAHEAD = lines; // Look ahead for multi-line expressions
+  const text = document.getText();
+  const sf = ts.createSourceFile(
+    document.fileName,
+    text,
+    ts.ScriptTarget.Latest,
+    /* setParentNodes */ true,
+  );
 
-  let totalOpenedParentheses = 0;
-  let totalClosedParentheses = 0;
-  let totalOpenedBraces = 0;
-  let totalClosedBraces = 0;
-  let foundTernaryOperator = false;
-  let foundColon = false;
-
-  for (let i = 1; i < MAX_LOOKAHEAD; i++) {
-    if (lineIndex + 1 >= document.lineCount) break; // Stop if out of bounds
-
-    lineIndex++;
-    const nextLine = cleanCode(document.lineAt(lineIndex).text);
-
-    if (nextLine === '') continue; // Skip empty/comment-only lines
-
-    concatenatedLines += ' ' + nextLine;
-
-    // Count parentheses and curly braces
-    totalOpenedParentheses += (nextLine.match(/\(/g) || []).length;
-    totalClosedParentheses += (nextLine.match(/\)/g) || []).length;
-    totalOpenedBraces += (nextLine.match(/{/g) || []).length;
-    totalClosedBraces += (nextLine.match(/}/g) || []).length;
-
-    // Detect ternary structure
-    if (/\?/.test(nextLine) && !/\?\./.test(nextLine))
-      foundTernaryOperator = true; // Ignore `?.`
-    if (/:/.test(nextLine)) foundColon = true;
-
-    // If we detect a complete ternary expression
-    if (
-      foundTernaryOperator &&
-      foundColon &&
-      /[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*.+\?.+:.+/.test(concatenatedLines) &&
-      totalOpenedParentheses === totalClosedParentheses &&
-      totalOpenedBraces === totalClosedBraces
-    ) {
-      // Ensure the next line isn't another variable assignment before stopping
-      if (lineIndex + 1 === document.lineCount) {
-        return lineIndex + 1;
-      }
-      const followingLine = cleanCode(
-        document.lineAt(lineIndex + 1)?.text || '',
-      );
-      if (!/^\s*[a-zA-Z_$][a-zA-Z0-9_$]*\s*=/.test(followingLine)) {
-        return lineIndex + 1; // Insert log after the full expression
-      }
+  // ─── 1) Scope to the variable declarator if possible ─────────────────────
+  let condNode: ts.ConditionalExpression | undefined;
+  const decl = findVariableDeclaration(sf, variableName);
+  if (decl && decl.initializer) {
+    if (ts.isConditionalExpression(decl.initializer)) {
+      condNode = decl.initializer;
+    } else {
+      condNode = findFirstConditional(decl.initializer);
     }
   }
 
-  return selectionLine + 1; // Default fallback (log on next line)
+  // ─── 2) Fallback: find any ternary whose condition contains our variable ───
+  if (!condNode) {
+    const candidates: ts.ConditionalExpression[] = [];
+    (function collect(n: ts.Node) {
+      if (
+        ts.isConditionalExpression(n) &&
+        containsIdentifier(n.condition, variableName)
+      ) {
+        candidates.push(n);
+      }
+      ts.forEachChild(n, collect);
+    })(sf);
+
+    if (candidates.length) {
+      // prefer those covering your cursor line
+      const covering = candidates.filter((n) => {
+        const start = document.positionAt(n.getStart()).line;
+        const end = document.positionAt(n.getEnd()).line;
+        return selectionLine >= start && selectionLine <= end;
+      });
+      const pool = covering.length ? covering : candidates;
+
+      // pick the smallest span
+      let best = pool[0];
+      let bestSpan =
+        document.positionAt(best.getEnd()).line -
+        document.positionAt(best.getStart()).line;
+      for (const c of pool) {
+        const span =
+          document.positionAt(c.getEnd()).line -
+          document.positionAt(c.getStart()).line;
+        if (span < bestSpan) {
+          best = c;
+          bestSpan = span;
+        }
+      }
+      condNode = best;
+    }
+  }
+
+  // ─── 3) Nothing matched? just next line ─────────────────────────────────
+  if (!condNode) {
+    return selectionLine + 1;
+  }
+
+  // ─── 4) Crawl the *entire* ternary subtree for its deepest end line ──────
+  let maxEndLine = 0;
+  (function crawl(n: ts.Node) {
+    const line = document.positionAt(n.getEnd()).line;
+    if (line > maxEndLine) maxEndLine = line;
+    ts.forEachChild(n, crawl);
+  })(condNode);
+
+  // ─── 5) Return one line past the deepest descendant ────────────────────
+  return maxEndLine + 1;
 }
 
-/**
- * Removes inline comments (`// ...`) and trims unnecessary spaces.
- */
-function cleanCode(line: string): string {
-  return line.replace(/\/\/.*/, '').trim(); // Remove everything after `//`
+// ─── Helpers ────────────────────────────────────────────────────────────
+
+function findVariableDeclaration(
+  root: ts.Node,
+  name: string,
+): ts.VariableDeclaration | undefined {
+  let found: ts.VariableDeclaration | undefined;
+  ts.forEachChild(root, function walk(n) {
+    if (
+      ts.isVariableDeclaration(n) &&
+      ts.isIdentifier(n.name) &&
+      n.name.text === name
+    ) {
+      found = n;
+      return;
+    }
+    ts.forEachChild(n, walk);
+  });
+  return found;
+}
+
+function findFirstConditional(
+  root: ts.Node,
+): ts.ConditionalExpression | undefined {
+  let found: ts.ConditionalExpression | undefined;
+  ts.forEachChild(root, function walk(n) {
+    if (found) return;
+    if (ts.isConditionalExpression(n)) {
+      found = n;
+      return;
+    }
+    ts.forEachChild(n, walk);
+  });
+  return found;
+}
+
+function containsIdentifier(node: ts.Node, name: string): boolean {
+  if (ts.isIdentifier(node) && node.text === name) return true;
+  return ts.forEachChild(node, (child) =>
+    containsIdentifier(child, name),
+  ) as boolean;
 }
