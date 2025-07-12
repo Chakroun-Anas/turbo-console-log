@@ -3,7 +3,6 @@ import { LogMessageType, LogMessage } from '../../../../entities';
 import { LineCodeProcessing } from '../../../../line-code-processing';
 import {
   arrayAssignmentChecker,
-  decoratorChecker,
   functionCallAssignmentChecker,
   functionParameterChecker,
   logTypeOrder,
@@ -57,8 +56,6 @@ export function logMessage(
   } = {
     [LogMessageType.ObjectLiteral]: () =>
       objectLiteralChecker(document, lineCodeProcessing, selectionLine),
-
-    [LogMessageType.Decorator]: () => decoratorChecker(document, selectionLine),
     [LogMessageType.FunctionParameter]: () =>
       functionParameterChecker(document, selectionLine, selectedVar),
     [LogMessageType.ArrayAssignment]: () =>

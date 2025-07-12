@@ -1,6 +1,5 @@
 import { logTypeOrder } from './logTypeOrder';
 import { objectLiteralChecker } from './objectLiteralChecker';
-import { decoratorChecker } from './decoratorChecker';
 import { arrayAssignmentChecker } from './arrayAssignmentChecker';
 import { multilineParenthesisChecker } from './multilineParenthesisChecker';
 import { primitiveAssignmentChecker } from './primitiveAssignmentChecker';
@@ -18,7 +17,6 @@ import { functionParameterChecker } from './functionParamterChecker';
 export {
   logTypeOrder,
   objectLiteralChecker,
-  decoratorChecker,
   arrayAssignmentChecker,
   multilineParenthesisChecker,
   primitiveAssignmentChecker,

@@ -113,15 +113,6 @@ export const jsDebugMessageLine: DebugMessageLine = {
         return objectLiteralLine(document, selectionLine);
       case LogMessageType.NamedFunctionAssignment:
         return functionAssignmentLine(document, selectionLine, selectedVar);
-      case LogMessageType.Decorator:
-        return (
-          (getMultiLineContextVariable(
-            document,
-            selectionLine,
-            BracketType.PARENTHESIS,
-            false,
-          )?.closingContextLine || selectionLine) + 1
-        );
       case LogMessageType.MultiLineAnonymousFunction:
         return (
           functionClosedLine(

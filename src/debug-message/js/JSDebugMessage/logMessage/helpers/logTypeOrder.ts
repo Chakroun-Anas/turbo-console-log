@@ -1,7 +1,6 @@
 import { LogMessageType } from '../../../../../entities';
 
 export const logTypeOrder = [
-  { logMessageType: LogMessageType.Decorator, priority: 0 },
   { logMessageType: LogMessageType.TemplateString, priority: 1 },
   { logMessageType: LogMessageType.ArrayAssignment, priority: 2 },
   { logMessageType: LogMessageType.FunctionParameter, priority: 3 },
