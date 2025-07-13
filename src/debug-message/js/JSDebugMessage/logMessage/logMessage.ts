@@ -83,11 +83,7 @@ export function logMessage(
       );
     },
     [LogMessageType.FunctionCallAssignment]: () =>
-      functionCallAssignmentChecker(
-        document,
-        lineCodeProcessing,
-        selectionLine,
-      ),
+      functionCallAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.TypedFunctionCallAssignment]: () =>
       typedFunctionCallAssignmentChecker(
         document,

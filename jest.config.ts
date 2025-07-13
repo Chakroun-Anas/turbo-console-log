@@ -4,7 +4,9 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['<rootDir>/src/jest-tests/**/*.test.ts'],
-  // testMatch: ['<rootDir>/src/jest-tests/**/arrayLine.test.ts'],
+  // testMatch: [
+  //   '<rootDir>/src/jest-tests/**/functionCallAssignmentChecker.test.ts',
+  // ],
   moduleFileExtensions: ['ts', 'js'],
   transform: {
     '^.+\\.ts$': [
