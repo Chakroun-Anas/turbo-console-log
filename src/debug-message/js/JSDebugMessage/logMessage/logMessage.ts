@@ -61,7 +61,7 @@ export function logMessage(
     [LogMessageType.ArrayAssignment]: () =>
       arrayAssignmentChecker(document, lineCodeProcessing, selectionLine),
     [LogMessageType.TemplateString]: () =>
-      templateStringChecker(document, selectionLine),
+      templateStringChecker(document, selectionLine, selectedVar),
     [LogMessageType.Ternary]: () =>
       ternaryChecker(document, selectionLine, selectedVar),
     [LogMessageType.NullishCoalescing]: () =>
