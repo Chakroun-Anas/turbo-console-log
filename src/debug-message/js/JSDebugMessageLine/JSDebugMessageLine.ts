@@ -128,7 +128,7 @@ export const jsDebugMessageLine: DebugMessageLine = {
       case LogMessageType.TypedFunctionCallAssignment:
         return typedFunctionCallLine(document, selectionLine);
       case LogMessageType.ArrayAssignment:
-        return arrayLine(document, selectionLine);
+        return arrayLine(document, selectionLine, selectedVar);
       case LogMessageType.MultilineParenthesis:
         return (
           ((logMsg?.metadata as LogContextMetadata)?.closingContextLine ||

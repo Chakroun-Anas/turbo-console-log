@@ -1,8 +1,8 @@
-import { LogMessageType } from '../../../../../entities';
+import { LogMessageType } from '@/entities';
 
 export const logTypeOrder = [
   { logMessageType: LogMessageType.TemplateString, priority: 1 }, // AST
-  { logMessageType: LogMessageType.ArrayAssignment, priority: 2 }, // REGEX
+  { logMessageType: LogMessageType.ArrayAssignment, priority: 2 }, // AST
   { logMessageType: LogMessageType.FunctionParameter, priority: 3 }, // AST
   { logMessageType: LogMessageType.ObjectLiteral, priority: 4 }, // AST
   {
