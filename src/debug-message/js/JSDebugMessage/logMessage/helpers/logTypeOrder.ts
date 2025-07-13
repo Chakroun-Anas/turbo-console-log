@@ -4,9 +4,9 @@ export const logTypeOrder = [
   { logMessageType: LogMessageType.TemplateString, priority: 1 }, // AST
   { logMessageType: LogMessageType.ArrayAssignment, priority: 2 }, // REGEX
   { logMessageType: LogMessageType.FunctionParameter, priority: 3 }, // AST
-  { logMessageType: LogMessageType.ObjectLiteral, priority: 4 }, // REGEX
+  { logMessageType: LogMessageType.ObjectLiteral, priority: 4 }, // AST
   {
-    logMessageType: LogMessageType.ObjectFunctionCallAssignment, // REGEX
+    logMessageType: LogMessageType.ObjectFunctionCallAssignment, // AST
     priority: 5,
   },
   {

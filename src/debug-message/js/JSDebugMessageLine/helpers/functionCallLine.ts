@@ -1,79 +1,61 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
-import { BracketType } from '../../../../entities';
-import { locOpenedClosedElementOccurrences } from './locOpenedClosedElementOccurrences';
 
 export function functionCallLine(
   document: TextDocument,
   selectionLine: number,
+  variableName: string,
 ): number {
-  let currentLineText: string = document.lineAt(selectionLine).text;
-
-  // Track if we're inside a Styled Component template literal
-  const insideTemplateLiteral =
-    currentLineText.includes('`') && !currentLineText.includes('`;');
-
-  let totalOpenedBrackets = 0;
-  let totalClosedBrackets = 0;
-  let totalOpenedParentheses = 0;
-  let totalClosedParentheses = 0;
-  let totalOpenedBackticks = insideTemplateLiteral ? 1 : 0;
-
-  const curlyBracesOcurrences = locOpenedClosedElementOccurrences(
-    currentLineText,
-    BracketType.CURLY_BRACES,
+  const sourceFile = ts.createSourceFile(
+    'file.ts',
+    document.getText(),
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
   );
 
-  totalOpenedBrackets += curlyBracesOcurrences.openedElementOccurrences;
-  totalClosedBrackets += curlyBracesOcurrences.closedElementOccurrences;
+  let targetEnd = -1;
 
-  const parenthesisOcurrences = locOpenedClosedElementOccurrences(
-    currentLineText,
-    BracketType.PARENTHESIS,
-  );
+  ts.forEachChild(sourceFile, function visit(node: ts.Node): void {
+    if (ts.isVariableDeclaration(node)) {
+      const isIdentifier =
+        ts.isIdentifier(node.name) && node.name.text === variableName;
 
-  totalOpenedParentheses += parenthesisOcurrences.openedElementOccurrences;
-  totalClosedParentheses += parenthesisOcurrences.closedElementOccurrences;
+      const isDestructuring =
+        ts.isObjectBindingPattern(node.name) ||
+        ts.isArrayBindingPattern(node.name);
 
-  if (
-    totalOpenedBackticks === totalClosedBrackets &&
-    totalClosedParentheses === totalOpenedParentheses
-  ) {
-    return selectionLine + 1;
-  }
+      if (!isIdentifier && !isDestructuring) {
+        ts.forEachChild(node, visit);
+        return;
+      }
 
-  let currentLineNum = selectionLine + 1;
+      const initializer = node.initializer;
 
-  while (currentLineNum < document.lineCount) {
-    currentLineText = document.lineAt(currentLineNum).text;
+      if (!initializer) return;
 
-    // 🚀 Improved: Count ALL occurrences of '{', '}', '(', and ')'
-    totalOpenedBrackets += (currentLineText.match(/{/g) || []).length;
-    totalClosedBrackets += (currentLineText.match(/}/g) || []).length;
-    totalOpenedParentheses += (currentLineText.match(/\(/g) || []).length;
-    totalClosedParentheses += (currentLineText.match(/\)/g) || []).length;
+      const isRelevantCall =
+        ts.isCallExpression(initializer) ||
+        (ts.isAsExpression(initializer) &&
+          ts.isCallExpression(initializer.expression)) ||
+        (ts.isParenthesizedExpression(initializer) &&
+          ts.isCallExpression(initializer.expression));
 
-    // Track template literals (Styled Component template strings)
-    totalOpenedBackticks += (currentLineText.match(/`/g) || []).length;
+      if (!isRelevantCall) return;
 
-    if (currentLineNum === document.lineCount) {
-      break;
+      const { line } = document.positionAt(node.getStart());
+
+      if (line === selectionLine) {
+        targetEnd = node.getEnd();
+        return;
+      }
     }
 
-    currentLineNum++;
+    ts.forEachChild(node, visit);
+  });
 
-    // 🚀 Stop scanning when we close all brackets, parentheses, and backticks
-    if (
-      totalOpenedBrackets === totalClosedBrackets &&
-      totalOpenedParentheses === totalClosedParentheses &&
-      totalOpenedBackticks % 2 === 0
-    ) {
-      break;
-    }
-  }
+  if (targetEnd === -1) return selectionLine + 1;
 
-  return totalOpenedBrackets === totalClosedBrackets &&
-    totalOpenedParentheses === totalClosedParentheses &&
-    totalOpenedBackticks % 2 === 0
-    ? currentLineNum
-    : selectionLine + 1;
+  const { line: endLine } = document.positionAt(targetEnd);
+  return endLine + 1;
 }

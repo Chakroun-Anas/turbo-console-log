@@ -122,9 +122,9 @@ export const jsDebugMessageLine: DebugMessageLine = {
           ) + 1
         );
       case LogMessageType.ObjectFunctionCallAssignment:
-        return functionCallLine(document, selectionLine);
+        return functionCallLine(document, selectionLine, selectedVar);
       case LogMessageType.FunctionCallAssignment:
-        return functionCallLine(document, selectionLine);
+        return functionCallLine(document, selectionLine, selectedVar);
       case LogMessageType.TypedFunctionCallAssignment:
         return typedFunctionCallLine(document, selectionLine);
       case LogMessageType.ArrayAssignment:

@@ -76,12 +76,10 @@ export function logMessage(
     [LogMessageType.MultilineParenthesis]: () =>
       multilineParenthesisChecker(document, lineCodeProcessing, selectionLine),
     [LogMessageType.ObjectFunctionCallAssignment]: () => {
-      const fullRhs = getFullRhs(document, selectionLine);
       return objectFunctionCallAssignmentChecker(
         document,
         selectionLine,
-        fullRhs,
-        lineCodeProcessing,
+        selectedVar,
       );
     },
     [LogMessageType.FunctionCallAssignment]: () =>
