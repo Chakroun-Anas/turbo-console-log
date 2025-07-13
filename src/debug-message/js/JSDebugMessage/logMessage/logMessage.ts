@@ -55,7 +55,7 @@ export function logMessage(
     };
   } = {
     [LogMessageType.ObjectLiteral]: () =>
-      objectLiteralChecker(document, lineCodeProcessing, selectionLine),
+      objectLiteralChecker(document, selectionLine, selectedVar),
     [LogMessageType.FunctionParameter]: () =>
       functionParameterChecker(document, selectionLine, selectedVar),
     [LogMessageType.ArrayAssignment]: () =>

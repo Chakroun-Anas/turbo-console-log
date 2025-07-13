@@ -1,26 +1,41 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function objectLiteralLine(
   document: TextDocument,
   selectionLine: number,
+  variableName: string,
 ): number {
-  const currentLineText: string = document.lineAt(selectionLine).text;
-  let nbrOfOpenedBrackets: number = (currentLineText.match(/{/g) || []).length;
-  let nbrOfClosedBrackets: number = (currentLineText.match(/}/g) || []).length;
-  let currentLineNum: number = selectionLine + 1;
-  while (currentLineNum < document.lineCount) {
-    const currentLineText: string = document.lineAt(currentLineNum).text;
-    nbrOfOpenedBrackets += (currentLineText.match(/{/g) || []).length;
-    nbrOfClosedBrackets += (currentLineText.match(/}/g) || []).length;
-    currentLineNum++;
+  const code = document.getText();
+  const sourceFile = ts.createSourceFile(
+    'temp.ts',
+    code,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
+
+  let insertionLine = selectionLine + 1;
+
+  function visit(node: ts.Node) {
     if (
-      nbrOfOpenedBrackets > 0 &&
-      nbrOfOpenedBrackets === nbrOfClosedBrackets
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.name.text === variableName &&
+      node.initializer &&
+      ts.isObjectLiteralExpression(node.initializer)
     ) {
-      break;
+      const { line: endLine } = sourceFile.getLineAndCharacterOfPosition(
+        node.initializer.getEnd(),
+      );
+      insertionLine = endLine + 1;
+      return;
     }
+
+    ts.forEachChild(node, visit);
   }
-  return nbrOfOpenedBrackets > 0 && nbrOfClosedBrackets === nbrOfOpenedBrackets
-    ? currentLineNum
-    : selectionLine + 1;
+
+  visit(sourceFile);
+
+  return insertionLine;
 }

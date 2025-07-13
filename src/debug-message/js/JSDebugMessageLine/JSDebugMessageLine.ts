@@ -110,7 +110,7 @@ export const jsDebugMessageLine: DebugMessageLine = {
           selectionLine + 1
         );
       case LogMessageType.ObjectLiteral:
-        return objectLiteralLine(document, selectionLine);
+        return objectLiteralLine(document, selectionLine, selectedVar);
       case LogMessageType.NamedFunctionAssignment:
         return functionAssignmentLine(document, selectionLine, selectedVar);
       case LogMessageType.MultiLineAnonymousFunction:
