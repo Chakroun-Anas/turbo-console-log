@@ -10,12 +10,8 @@ export const logTypeOrder = [
     priority: 5,
   },
   {
-    logMessageType: LogMessageType.FunctionCallAssignment, // REGEX
+    logMessageType: LogMessageType.FunctionCallAssignment, // AST
     priority: 6,
-  },
-  {
-    logMessageType: LogMessageType.TypedFunctionCallAssignment, // REGEX
-    priority: 7,
   },
   { logMessageType: LogMessageType.Ternary, priority: 8 }, // AST
   { logMessageType: LogMessageType.NullishCoalescing, priority: 9 }, // REGEX

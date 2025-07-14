@@ -18,7 +18,7 @@ import {
   templateStringLine,
   nullishCoalescingLine,
   primitiveAssignmentLine,
-  typedFunctionCallLine,
+  // typedFunctionCallLine,
   multilineBracesLine,
   propertyAccessAssignmentLine,
 } from './helpers';
@@ -125,8 +125,6 @@ export const jsDebugMessageLine: DebugMessageLine = {
         return functionCallLine(document, selectionLine, selectedVar);
       case LogMessageType.FunctionCallAssignment:
         return functionCallLine(document, selectionLine, selectedVar);
-      case LogMessageType.TypedFunctionCallAssignment:
-        return typedFunctionCallLine(document, selectionLine);
       case LogMessageType.ArrayAssignment:
         return arrayLine(document, selectionLine, selectedVar);
       case LogMessageType.MultilineParenthesis:

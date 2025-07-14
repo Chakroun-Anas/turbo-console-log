@@ -4,7 +4,6 @@ import { arrayAssignmentChecker } from './arrayAssignmentChecker';
 import { multilineParenthesisChecker } from './multilineParenthesisChecker';
 import { primitiveAssignmentChecker } from './primitiveAssignmentChecker';
 import { objectFunctionCallAssignmentChecker } from './objectFunctionCallAssignmentChecker';
-import { typedFunctionCallAssignmentChecker } from './typedFunctionCallAssignmentChecker';
 import { multilineBracesChecker } from './multilineBracesChecker';
 import { multiLineAnonymousFunctionChecker } from './multiLineAnonymousFunctionChecker';
 import { namedFunctionAssignmentChecker } from './namedFunctionAssignmentChecker';
@@ -21,7 +20,6 @@ export {
   multilineParenthesisChecker,
   primitiveAssignmentChecker,
   objectFunctionCallAssignmentChecker,
-  typedFunctionCallAssignmentChecker,
   multilineBracesChecker,
   multiLineAnonymousFunctionChecker,
   namedFunctionAssignmentChecker,

@@ -17,7 +17,6 @@ import {
   propertyAccessAssignmentChecker,
   templateStringChecker,
   ternaryChecker,
-  typedFunctionCallAssignmentChecker,
 } from './helpers';
 
 function getFullRhs(document: TextDocument, startLine: number): string {
@@ -84,12 +83,6 @@ export function logMessage(
     },
     [LogMessageType.FunctionCallAssignment]: () =>
       functionCallAssignmentChecker(document, selectionLine, selectedVar),
-    [LogMessageType.TypedFunctionCallAssignment]: () =>
-      typedFunctionCallAssignmentChecker(
-        document,
-        lineCodeProcessing,
-        selectionLine,
-      ),
     [LogMessageType.NamedFunctionAssignment]: () =>
       namedFunctionAssignmentChecker(
         document,
