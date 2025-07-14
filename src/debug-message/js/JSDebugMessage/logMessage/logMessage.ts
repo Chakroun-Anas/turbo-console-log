@@ -3,6 +3,7 @@ import { LogMessageType, LogMessage } from '../../../../entities';
 import { LineCodeProcessing } from '../../../../line-code-processing';
 import {
   arrayAssignmentChecker,
+  binaryExpressionChecker,
   functionCallAssignmentChecker,
   functionParameterChecker,
   logTypeOrder,
@@ -10,7 +11,6 @@ import {
   multilineBracesChecker,
   multilineParenthesisChecker,
   namedFunctionAssignmentChecker,
-  nullishCoalescingChecker,
   objectFunctionCallAssignmentChecker,
   objectLiteralChecker,
   primitiveAssignmentChecker,
@@ -63,8 +63,8 @@ export function logMessage(
       templateStringChecker(document, selectionLine, selectedVar),
     [LogMessageType.Ternary]: () =>
       ternaryChecker(document, selectionLine, selectedVar),
-    [LogMessageType.NullishCoalescing]: () =>
-      nullishCoalescingChecker(document, lineCodeProcessing, selectionLine),
+    [LogMessageType.BinaryExpression]: () =>
+      binaryExpressionChecker(document, selectionLine, selectedVar),
     [LogMessageType.MultilineBraces]: () =>
       multilineBracesChecker(
         document,

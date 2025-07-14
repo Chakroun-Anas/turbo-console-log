@@ -9,10 +9,10 @@ import { multiLineAnonymousFunctionChecker } from './multiLineAnonymousFunctionC
 import { namedFunctionAssignmentChecker } from './namedFunctionAssignmentChecker';
 import { ternaryChecker } from './ternaryChecker';
 import { functionCallAssignmentChecker } from './functionCallAssignmentChecker';
-import { nullishCoalescingChecker } from './nullishCoalescingChecker';
 import { templateStringChecker } from './templateStringChecker';
 import { propertyAccessAssignmentChecker } from './propertyAccessAssignmentChecker';
 import { functionParameterChecker } from './functionParamterChecker';
+import { binaryExpressionChecker } from './binaryExpressionChecker';
 export {
   logTypeOrder,
   objectLiteralChecker,
@@ -25,8 +25,8 @@ export {
   namedFunctionAssignmentChecker,
   ternaryChecker,
   functionCallAssignmentChecker,
-  nullishCoalescingChecker,
   templateStringChecker,
   propertyAccessAssignmentChecker,
   functionParameterChecker,
+  binaryExpressionChecker,
 };

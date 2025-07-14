@@ -9,8 +9,8 @@ export enum LogMessageType {
   ObjectLiteral = 'ObjectLiteral',
   PrimitiveAssignment = 'PrimitiveAssignment',
   Ternary = 'Ternary',
+  BinaryExpression = 'BinaryExpression',
   TemplateString = 'TemplateString',
-  NullishCoalescing = 'NullishCoalescing',
   PropertyAccessAssignment = 'PropertyAccessAssignment',
   FunctionParameter = 'FunctionParameter',
 }

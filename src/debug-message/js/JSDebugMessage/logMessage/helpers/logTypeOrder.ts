@@ -13,8 +13,8 @@ export const logTypeOrder = [
     logMessageType: LogMessageType.FunctionCallAssignment, // AST
     priority: 6,
   },
-  { logMessageType: LogMessageType.Ternary, priority: 8 }, // AST
-  { logMessageType: LogMessageType.NullishCoalescing, priority: 9 }, // REGEX
+  { logMessageType: LogMessageType.Ternary, priority: 7 }, // AST
+  { logMessageType: LogMessageType.BinaryExpression, priority: 8 }, // AST
   { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 10 }, // REGEX
   { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 11 }, // REGEX
   { logMessageType: LogMessageType.PrimitiveAssignment, priority: 12 }, // AST

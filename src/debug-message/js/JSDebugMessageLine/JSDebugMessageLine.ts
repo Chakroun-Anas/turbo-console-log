@@ -16,11 +16,10 @@ import {
   functionCallLine,
   arrayLine,
   templateStringLine,
-  nullishCoalescingLine,
   primitiveAssignmentLine,
-  // typedFunctionCallLine,
   multilineBracesLine,
   propertyAccessAssignmentLine,
+  binaryExpressionLine,
 } from './helpers';
 
 /**
@@ -134,10 +133,10 @@ export const jsDebugMessageLine: DebugMessageLine = {
         );
       case LogMessageType.TemplateString:
         return templateStringLine(document, selectionLine, selectedVar);
+      case LogMessageType.BinaryExpression:
+        return binaryExpressionLine(document, selectionLine, selectedVar);
       case LogMessageType.Ternary:
         return ternaryExpressionLine(document, selectionLine, selectedVar);
-      case LogMessageType.NullishCoalescing:
-        return nullishCoalescingLine(document, selectionLine);
       case LogMessageType.MultilineBraces:
         return multilineBracesLine(
           selectedVar,
