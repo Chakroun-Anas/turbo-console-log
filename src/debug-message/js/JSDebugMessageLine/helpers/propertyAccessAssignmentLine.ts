@@ -1,40 +1,77 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function propertyAccessAssignmentLine(
   document: TextDocument,
   selectionLine: number,
+  variableName: string,
 ): number {
-  let currentLine = selectionLine;
+  const text = document.getText();
+  const sourceFile = ts.createSourceFile(
+    document.fileName,
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+  );
 
-  while (currentLine + 1 < document.lineCount) {
-    const thisLineText = document.lineAt(currentLine).text.trim();
-    const nextLineText = document.lineAt(currentLine + 1).text.trim();
+  let insertionLine = selectionLine + 1;
 
-    // 🚩 1. Does *this* line clearly continue onto the next?
-    // eslint-disable-next-line no-useless-escape
-    if (/[.\[]$/.test(thisLineText) || /\?\.$/.test(thisLineText)) {
-      currentLine++;
-      continue;
-    }
-
-    // 🚩 2. Is next line obviously the start of something new?
+  ts.forEachChild(sourceFile, function visit(node) {
+    // Case 1: const foo = obj.prop;
     if (
-      nextLineText === '' ||
-      /^[a-zA-Z_$][\w$]*\s*=/.test(nextLineText) || // new assignment
-      /^[)}\];]/.test(nextLineText) // closing block
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.name.text === variableName &&
+      node.initializer
     ) {
-      break;
+      const nodeStart = document.positionAt(node.getStart()).line;
+      const nodeEnd = document.positionAt(node.getEnd()).line;
+      if (selectionLine < nodeStart || selectionLine > nodeEnd) return;
+
+      const unwrapped = unwrap(node.initializer);
+      if (
+        ts.isPropertyAccessExpression(unwrapped) ||
+        ts.isElementAccessExpression(unwrapped) ||
+        ts.isNonNullChain(unwrapped)
+      ) {
+        insertionLine = nodeEnd + 1;
+      }
     }
 
-    // 🚩 3. Does the next line *begin* with a continuation token?
-    // eslint-disable-next-line no-useless-escape
-    if (/^[.\[]/.test(nextLineText) || /^\?\./.test(nextLineText)) {
-      currentLine++;
-      continue;
+    // Case 2: this.foo = obj.prop;
+    if (
+      ts.isExpressionStatement(node) &&
+      ts.isBinaryExpression(node.expression) &&
+      node.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken
+    ) {
+      const nodeStart = document.positionAt(node.getStart()).line;
+      const nodeEnd = document.positionAt(node.getEnd()).line;
+      if (selectionLine < nodeStart || selectionLine > nodeEnd) return;
+
+      const left = node.expression.left;
+
+      if (
+        ts.isPropertyAccessExpression(left) &&
+        ts.isIdentifier(left.name) &&
+        left.getText() === variableName
+      ) {
+        insertionLine = nodeEnd + 1;
+      }
     }
 
-    break; // none of the continuation rules matched
+    ts.forEachChild(node, visit);
+  });
+
+  return insertionLine;
+}
+
+function unwrap(expr: ts.Expression): ts.Expression {
+  while (
+    ts.isAsExpression(expr) ||
+    ts.isParenthesizedExpression(expr) ||
+    ts.isNonNullExpression(expr)
+  ) {
+    expr = expr.expression;
   }
-
-  return currentLine + 1;
+  return expr;
 }

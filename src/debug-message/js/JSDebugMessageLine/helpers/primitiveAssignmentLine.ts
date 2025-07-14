@@ -1,24 +1,55 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function primitiveAssignmentLine(
   document: TextDocument,
   selectionLine: number,
+  variableName: string,
 ): number {
-  const lineText = document.lineAt(selectionLine).text;
+  const sourceFile = ts.createSourceFile(
+    document.fileName,
+    document.getText(),
+    ts.ScriptTarget.Latest,
+    true,
+  );
 
-  // Check if the line ends with an assignment operator (=) or is incomplete
-  if (lineText.trim().endsWith('=') || lineText.trim().endsWith(':')) {
-    // Find the next line that is NOT an empty line or a continuation
-    let nextLine = selectionLine + 1;
-    while (
-      nextLine < document.lineCount &&
-      (document.lineAt(nextLine).text.trim() === '' ||
-        document.lineAt(nextLine).text.trim().startsWith('.'))
+  let line = selectionLine + 1;
+
+  ts.forEachChild(sourceFile, function visit(node) {
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.name.text === variableName &&
+      node.initializer
     ) {
-      nextLine++;
-    }
-    return nextLine + 1;
-  }
+      const start = document.positionAt(node.getStart()).line;
+      const end = document.positionAt(node.getEnd()).line;
+      if (selectionLine < start || selectionLine > end) return;
 
-  return selectionLine + 1;
+      const endLine = document.positionAt(node.initializer.getEnd()).line;
+      line = endLine + 1;
+    }
+
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isObjectBindingPattern(node.name)
+    ) {
+      const binding = node.name.elements.find(
+        (el) => ts.isIdentifier(el.name) && el.name.text === variableName,
+      );
+
+      if (binding && node.initializer) {
+        const start = document.positionAt(node.getStart()).line;
+        const end = document.positionAt(node.getEnd()).line;
+        if (selectionLine < start || selectionLine > end) return;
+
+        const endLine = document.positionAt(node.initializer.getEnd()).line;
+        line = endLine + 1;
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  });
+
+  return line;
 }

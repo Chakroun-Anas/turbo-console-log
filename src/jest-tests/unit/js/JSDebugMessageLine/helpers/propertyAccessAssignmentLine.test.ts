@@ -1,60 +1,79 @@
-import { makeTextDocument } from '../../../../mocks/helpers/';
-import { propertyAccessAssignmentLine } from '../../../../../debug-message/js/JSDebugMessageLine/helpers/propertyAccessAssignmentLine';
+import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { propertyAccessAssignmentLine } from '@/debug-message/js/JSDebugMessageLine/helpers/propertyAccessAssignmentLine';
 
-describe('propertyAccessAssignmentLine', () => {
-  it('returns next line after a one-line property access assignment', () => {
-    const lines = ['const env = process.env.NODE_ENV;'];
-    const doc = makeTextDocument(lines);
+describe('propertyAccessAssignmentLine – insert after property access assignment', () => {
+  const cases = [
+    {
+      name: 'one-line property access',
+      lines: ['const env = process.env.NODE_ENV;'],
+      selectionLine: 0,
+      variableName: 'env',
+      expectedLine: 1,
+    },
+    {
+      name: 'multiline dot-chain (method 1)',
+      lines: [
+        'const currentRoot = vscode',
+        '  .workspace?.workspaceFolders?.[0]?.uri.fsPath;',
+        'if (currentRoot) { console.log(currentRoot); }',
+      ],
+      selectionLine: 0,
+      variableName: 'currentRoot',
+      expectedLine: 2,
+    },
+    {
+      name: 'multiline dot-chain (method 2)',
+      lines: [
+        'const currentRoot = vscode.',
+        '  workspace?.workspaceFolders?.[0]?.uri.fsPath;',
+        'async function newChapter(): Promise<boolean> {',
+        'return true;',
+        '}',
+      ],
+      selectionLine: 0,
+      variableName: 'currentRoot',
+      expectedLine: 2,
+    },
+    {
+      name: 'breaks on new assignment',
+      lines: ['const a = obj.prop;', 'const b = 42;'],
+      selectionLine: 0,
+      variableName: 'a',
+      expectedLine: 1,
+    },
+    {
+      name: 'bracket-first continuation',
+      lines: ['const first = list', '  [0].title;', 'console.log(first);'],
+      selectionLine: 0,
+      variableName: 'first',
+      expectedLine: 2,
+    },
+    {
+      name: 'deep property access inside method assignment (this.subscription)',
+      lines: [
+        'function someFunc() {',
+        '  this.subscription = this.userService.currentUser.subscribe(',
+        '    (userData: User) => {',
+        '      this.canModify = userData.username === this.comment.author.username;',
+        '    },',
+        '  );',
+        '}',
+      ],
+      selectionLine: 1,
+      variableName: 'this.subscription',
+      expectedLine: 6,
+    },
+  ];
 
-    const result = propertyAccessAssignmentLine(doc, 0);
-
-    expect(result).toBe(1);
-  });
-  it('deals with complex snippets right after the declaration access assignment', () => {
-    const snippets: { name: string; lines: string[]; expected: number }[] = [
-      {
-        name: 'multiline dot-chain',
-        lines: [
-          'const currentRoot = vscode', // 0
-          '  .workspace?.workspaceFolders?.[0]?.uri.fsPath;', // 1 (continues)
-          'if (currentRoot) { console.log(currentRoot); }', // 2
-        ],
-        expected: 2, // should insert after continuation block
-      },
-      {
-        name: 'multiline dot-chain',
-        lines: [
-          'const currentRoot = vscode.', // 0
-          '  workspace?.workspaceFolders?.[0]?.uri.fsPath;', // 1 (continues)
-          'async function newChapter(): Promise<boolean> {', // 2
-          'return true;', // 3
-          '}', // 4
-        ],
-        expected: 2, // should insert after continuation block
-      },
-      {
-        name: 'breaks on new assignment',
-        lines: [
-          'const a = obj.prop;', // 0
-          'const b = 42;', // 1 -> new assignment, stop here
-        ],
-        expected: 1,
-      },
-      {
-        name: 'bracket-first continuation',
-        lines: [
-          'const first = list', // 0
-          '  [0].title;', // 1 (starts with [)
-          'console.log(first);', // 2
-        ],
-        expected: 2,
-      },
-    ];
-    for (const snippet of snippets) {
-      const { lines, expected } = snippet;
-      const doc = makeTextDocument(lines);
-      const result = propertyAccessAssignmentLine(doc, 0);
-      expect(result).toBe(expected);
-    }
-  });
+  for (const test of cases) {
+    it(`should return correct insertion line – ${test.name}`, () => {
+      const doc = makeTextDocument(test.lines);
+      const result = propertyAccessAssignmentLine(
+        doc,
+        test.selectionLine,
+        test.variableName,
+      );
+      expect(result).toBe(test.expectedLine);
+    });
+  }
 });

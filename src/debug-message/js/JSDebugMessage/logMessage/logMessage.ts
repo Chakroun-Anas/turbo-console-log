@@ -18,28 +18,6 @@ import {
   ternaryChecker,
 } from './helpers';
 
-function getFullRhs(document: TextDocument, startLine: number): string {
-  let rhs = document.lineAt(startLine).text.trim();
-  let line = startLine + 1;
-
-  while (line < document.lineCount) {
-    const nextLineText = document.lineAt(line).text.trim();
-    const shouldContinue =
-      // eslint-disable-next-line no-useless-escape
-      /[.\[]$/.test(rhs) || // RHS ends with . or [
-      /\?\.$/.test(rhs) || // RHS ends with ?.
-      // eslint-disable-next-line no-useless-escape
-      /^[.\[]/.test(nextLineText) || // next line starts with . or [
-      /^\?\./.test(nextLineText); // next line starts with ?.
-    if (!shouldContinue) break;
-
-    rhs += nextLineText;
-    line++;
-  }
-
-  return rhs;
-}
-
 export function logMessage(
   document: TextDocument,
   selectionLine: number,
@@ -85,10 +63,13 @@ export function logMessage(
     [LogMessageType.NamedFunctionAssignment]: () =>
       namedFunctionAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.PrimitiveAssignment]: () =>
-      primitiveAssignmentChecker(document, lineCodeProcessing, selectionLine),
+      primitiveAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.PropertyAccessAssignment]: () => {
-      const fullRhs = getFullRhs(document, selectionLine);
-      return propertyAccessAssignmentChecker(lineCodeProcessing, fullRhs);
+      return propertyAccessAssignmentChecker(
+        document,
+        selectionLine,
+        selectedVar,
+      );
     },
   };
 

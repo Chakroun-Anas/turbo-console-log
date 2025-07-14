@@ -99,9 +99,13 @@ export const jsDebugMessageLine: DebugMessageLine = {
     }
     switch (logMsg.logMessageType) {
       case LogMessageType.PrimitiveAssignment:
-        return primitiveAssignmentLine(document, selectionLine);
+        return primitiveAssignmentLine(document, selectionLine, selectedVar);
       case LogMessageType.PropertyAccessAssignment:
-        return propertyAccessAssignmentLine(document, selectionLine);
+        return propertyAccessAssignmentLine(
+          document,
+          selectionLine,
+          selectedVar,
+        );
       case LogMessageType.FunctionParameter:
         return (
           (logMsg?.metadata as LogContextMetadata)?.closingContextLine ||
