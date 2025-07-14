@@ -16,7 +16,6 @@ export const logTypeOrder = [
   { logMessageType: LogMessageType.Ternary, priority: 7 }, // AST
   { logMessageType: LogMessageType.BinaryExpression, priority: 8 }, // AST
   { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 10 }, // AST
-  { logMessageType: LogMessageType.MultiLineAnonymousFunction, priority: 11 }, // REGEX
   { logMessageType: LogMessageType.PrimitiveAssignment, priority: 12 }, // AST
   { logMessageType: LogMessageType.PropertyAccessAssignment, priority: 13 }, // REGEX
   { logMessageType: LogMessageType.MultilineParenthesis, priority: 14 }, // REGEX

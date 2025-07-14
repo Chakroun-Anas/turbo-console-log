@@ -12,7 +12,6 @@ import {
   ternaryExpressionLine,
   objectLiteralLine,
   functionAssignmentLine,
-  functionClosedLine,
   functionCallLine,
   arrayLine,
   templateStringLine,
@@ -112,14 +111,6 @@ export const jsDebugMessageLine: DebugMessageLine = {
         return objectLiteralLine(document, selectionLine, selectedVar);
       case LogMessageType.NamedFunctionAssignment:
         return functionAssignmentLine(document, selectionLine, selectedVar);
-      case LogMessageType.MultiLineAnonymousFunction:
-        return (
-          functionClosedLine(
-            document,
-            selectionLine,
-            BracketType.CURLY_BRACES,
-          ) + 1
-        );
       case LogMessageType.ObjectFunctionCallAssignment:
         return functionCallLine(document, selectionLine, selectedVar);
       case LogMessageType.FunctionCallAssignment:

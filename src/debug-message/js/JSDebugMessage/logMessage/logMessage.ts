@@ -7,7 +7,6 @@ import {
   functionCallAssignmentChecker,
   functionParameterChecker,
   logTypeOrder,
-  multiLineAnonymousFunctionChecker,
   multilineBracesChecker,
   multilineParenthesisChecker,
   namedFunctionAssignmentChecker,
@@ -85,12 +84,6 @@ export function logMessage(
       functionCallAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.NamedFunctionAssignment]: () =>
       namedFunctionAssignmentChecker(document, selectionLine, selectedVar),
-    [LogMessageType.MultiLineAnonymousFunction]: () =>
-      multiLineAnonymousFunctionChecker(
-        document,
-        lineCodeProcessing,
-        selectionLine,
-      ),
     [LogMessageType.PrimitiveAssignment]: () =>
       primitiveAssignmentChecker(document, lineCodeProcessing, selectionLine),
     [LogMessageType.PropertyAccessAssignment]: () => {

@@ -1,6 +1,6 @@
 export enum LogMessageType {
   ArrayAssignment = 'ArrayAssignment',
-  MultiLineAnonymousFunction = 'MultiLineAnonymousFunction',
+  // MultiLineAnonymousFunction = 'MultiLineAnonymousFunction',
   MultilineBraces = 'MultilineBraces',
   MultilineParenthesis = 'MultilineParenthesis',
   NamedFunctionAssignment = 'NamedFunctionAssignment',
