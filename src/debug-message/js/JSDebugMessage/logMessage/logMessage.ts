@@ -84,11 +84,7 @@ export function logMessage(
     [LogMessageType.FunctionCallAssignment]: () =>
       functionCallAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.NamedFunctionAssignment]: () =>
-      namedFunctionAssignmentChecker(
-        document,
-        lineCodeProcessing,
-        selectionLine,
-      ),
+      namedFunctionAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.MultiLineAnonymousFunction]: () =>
       multiLineAnonymousFunctionChecker(
         document,

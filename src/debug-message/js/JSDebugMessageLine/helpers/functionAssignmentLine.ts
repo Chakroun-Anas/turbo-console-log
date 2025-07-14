@@ -1,43 +1,73 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
-import { closingElementLine } from './closingElementLine';
-import { BracketType } from '../../../../entities';
 
 export function functionAssignmentLine(
   document: TextDocument,
   selectionLine: number,
   selectedVar: string,
 ): number {
-  const currentLineText = document.lineAt(selectionLine).text.trim();
+  const text = document.getText();
+  const sourceFile = ts.createSourceFile(
+    document.fileName,
+    text,
+    ts.ScriptTarget.Latest,
+    true,
+  );
 
-  // Check if it's an object property function (e.g., `actions: function() {`)
-  const isObjectPropertyFunction =
-    /^\s*[a-zA-Z_$][\w$]*\s*:\s*function\s*\(/.test(currentLineText);
+  let insertionLine = selectionLine + 1;
 
-  if (isObjectPropertyFunction) {
-    return selectionLine + 1; // 🔥 Simplified! Just place the log on the next line.
-  }
-
-  if (/{/.test(currentLineText)) {
+  ts.forEachChild(sourceFile, function visit(node) {
+    // Case ①: const fn = (...) => {...} or function (...) {...}
     if (
-      document.lineAt(selectionLine).text.split('=')[1]?.includes(selectedVar)
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.name.text === selectedVar &&
+      node.initializer
     ) {
-      return selectionLine + 1;
+      const unwrapped = unwrap(node.initializer);
+      if (ts.isFunctionExpression(unwrapped) || ts.isArrowFunction(unwrapped)) {
+        insertionLine = getFunctionBodyEndLine(unwrapped, document) + 1;
+        return;
+      }
     }
-    return (
-      closingElementLine(document, selectionLine, BracketType.CURLY_BRACES) + 1
-    );
-  } else {
-    const closedParenthesisLine = closingElementLine(
-      document,
-      selectionLine,
-      BracketType.PARENTHESIS,
-    );
-    return (
-      closingElementLine(
-        document,
-        closedParenthesisLine,
-        BracketType.CURLY_BRACES,
-      ) + 1
-    );
+
+    // Case ②: obj.fn = (...) => {...}
+    if (
+      ts.isExpressionStatement(node) &&
+      ts.isBinaryExpression(node.expression) &&
+      node.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+      ts.isPropertyAccessExpression(node.expression.left) &&
+      node.expression.left.name.text === selectedVar
+    ) {
+      const rhs = unwrap(node.expression.right);
+      if (ts.isFunctionExpression(rhs) || ts.isArrowFunction(rhs)) {
+        insertionLine = getFunctionBodyEndLine(rhs, document) + 1;
+        return;
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  });
+
+  return insertionLine;
+}
+
+function unwrap(expr: ts.Expression): ts.Expression {
+  while (
+    ts.isParenthesizedExpression(expr) ||
+    ts.isAsExpression(expr) ||
+    ts.isTypeAssertionExpression(expr)
+  ) {
+    expr = expr.expression;
   }
+  return expr;
+}
+
+function getFunctionBodyEndLine(
+  node: ts.FunctionExpression | ts.ArrowFunction,
+  document: TextDocument,
+): number {
+  if (!node.body) return 0;
+  const endPos = ts.isBlock(node.body) ? node.body.end : node.body.getEnd();
+  return document.positionAt(endPos).line;
 }
