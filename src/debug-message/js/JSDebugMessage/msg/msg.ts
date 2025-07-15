@@ -7,7 +7,6 @@ import {
 } from '@/entities';
 import { NamedFunctionMetadata } from '@/entities/extension/logMessage';
 import { logMessage } from '../logMessage';
-import { LineCodeProcessing } from '@/line-code-processing';
 import { DebugMessageLine } from '../../../DebugMessageLine';
 import { enclosingBlockName } from '../enclosingBlockName';
 import {
@@ -120,7 +119,6 @@ function constructDebuggingMsgContent(
     ExtensionProperties,
     'wrapLogMessage' | 'insertEmptyLineAfterLogMessage'
   >,
-  lineCodeProcessing: LineCodeProcessing,
 ): string {
   const {
     includeFilename,
@@ -144,7 +142,6 @@ function constructDebuggingMsgContent(
       document,
       lineOfSelectedVar,
       'class',
-      lineCodeProcessing,
     );
   }
   let funcThatEncloseTheVar = '';
@@ -153,7 +150,6 @@ function constructDebuggingMsgContent(
       document,
       lineOfSelectedVar,
       'function',
-      lineCodeProcessing,
     );
   }
   const semicolon: string = extensionProperties.addSemicolonInTheEnd ? ';' : '';
@@ -196,7 +192,6 @@ export function msg(
   lineOfSelectedVar: number,
   tabSize: number,
   extensionProperties: ExtensionProperties,
-  lineCodeProcessing: LineCodeProcessing,
   debugMessageLine: DebugMessageLine,
   jsDebugMessageAnonymous: JSDebugMessageAnonymous,
 ): void {
@@ -204,7 +199,6 @@ export function msg(
     document,
     lineOfSelectedVar,
     selectedVar,
-    // lineCodeProcessing,
   );
   const lineOfLogMsg: number = debugMessageLine.line(
     document,
@@ -230,7 +224,6 @@ export function msg(
       'wrapLogMessage',
       'insertEmptyLineAfterLogMessage',
     ]),
-    lineCodeProcessing,
   );
   const debuggingMsg: string = constructDebuggingMsg(
     extensionProperties,

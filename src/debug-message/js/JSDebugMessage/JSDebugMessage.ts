@@ -36,7 +36,6 @@ export const jsDebugMessage: DebugMessage = {
       lineOfSelectedVar,
       tabSize,
       extensionProperties,
-      jsLineCodeProcessing,
       jsDebugMessageLine,
       jsDebugMessageAnonymous,
     );
@@ -46,24 +45,14 @@ export const jsDebugMessage: DebugMessage = {
     selectionLine: number,
     selectedVar: string,
   ): LogMessage {
-    return logMessage(
-      document,
-      selectionLine,
-      selectedVar,
-      // jsLineCodeProcessing,
-    );
+    return logMessage(document, selectionLine, selectedVar);
   },
   enclosingBlockName(
     document: TextDocument,
     lineOfSelectedVar: number,
     blockType: BlockType,
   ): string {
-    return enclosingBlockName(
-      document,
-      lineOfSelectedVar,
-      blockType,
-      jsLineCodeProcessing,
-    );
+    return enclosingBlockName(document, lineOfSelectedVar, blockType);
   },
   detectAll(
     document: TextDocument,
