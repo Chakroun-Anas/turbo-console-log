@@ -1,26 +1,39 @@
 import { Position, TextDocument, TextEditorEdit, TextLine } from 'vscode';
 import { BracketType } from '../../entities';
-import { LineCodeProcessing } from '../../line-code-processing';
 import { spacesBeforeLine, closingContextLine } from '../../utilities';
 
 export class JSDebugMessageAnonymous {
-  lineCodeProcessing: LineCodeProcessing;
-  constructor(lineCodeProcessing: LineCodeProcessing) {
-    this.lineCodeProcessing = lineCodeProcessing;
-  }
+  // FIXME: Should be refactord to be AST based
   isAnonymousFunctionContext(
     selectedVar: string,
     selectedVarLineLoc: string,
   ): boolean {
+    function isAnonymousFunction(loc: string): boolean {
+      return /.*=>.*/.test(loc);
+    }
+    function isArgumentOfAnonymousFunction(
+      loc: string,
+      argument: string,
+    ): boolean {
+      if (isAnonymousFunction(loc)) {
+        const match = loc.match(/(\(.*\)|\w+)\s*=>/);
+        return match !== null && match[1].includes(argument);
+      }
+      return false;
+    }
+    function shouldTransformAnonymousFunction(loc: string): boolean {
+      if (isAnonymousFunction(loc)) {
+        if (/.*=>\s+{/.test(loc)) {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    }
     return (
-      this.lineCodeProcessing.isAnonymousFunction(selectedVarLineLoc) &&
-      this.lineCodeProcessing.isArgumentOfAnonymousFunction(
-        selectedVarLineLoc,
-        selectedVar,
-      ) &&
-      this.lineCodeProcessing.shouldTransformAnonymousFunction(
-        selectedVarLineLoc,
-      )
+      isAnonymousFunction(selectedVarLineLoc) &&
+      isArgumentOfAnonymousFunction(selectedVarLineLoc, selectedVar) &&
+      shouldTransformAnonymousFunction(selectedVarLineLoc)
     );
   }
 

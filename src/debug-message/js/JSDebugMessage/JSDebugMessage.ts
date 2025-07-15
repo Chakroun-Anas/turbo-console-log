@@ -10,15 +10,10 @@ import { logMessage } from './logMessage';
 import { enclosingBlockName } from './enclosingBlockName';
 import { detectAll } from './detectAll';
 import { msg } from './msg';
-import { JSLineCodeProcessing } from '../../../line-code-processing/js';
-import { LineCodeProcessing } from '../../../line-code-processing';
 import { JSDebugMessageAnonymous } from '../JSDebugMessageAnonymous';
 import { jsDebugMessageLine } from '../JSDebugMessageLine/';
 
-const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
-const jsDebugMessageAnonymous = new JSDebugMessageAnonymous(
-  jsLineCodeProcessing,
-);
+const jsDebugMessageAnonymous = new JSDebugMessageAnonymous();
 
 export const jsDebugMessage: DebugMessage = {
   msg(
