@@ -1,14 +1,11 @@
 import { TextDocument } from 'vscode';
-import { LogMessageType, LogMessage } from '../../../../entities';
-import { LineCodeProcessing } from '../../../../line-code-processing';
+import { LogMessageType, LogMessage, LogContextMetadata } from '@/entities';
 import {
   arrayAssignmentChecker,
   binaryExpressionChecker,
   functionCallAssignmentChecker,
   functionParameterChecker,
   logTypeOrder,
-  multilineBracesChecker,
-  multilineParenthesisChecker,
   namedFunctionAssignmentChecker,
   objectFunctionCallAssignmentChecker,
   objectLiteralChecker,
@@ -16,18 +13,19 @@ import {
   propertyAccessAssignmentChecker,
   templateStringChecker,
   ternaryChecker,
+  rawPropertyAccessChecker,
+  propertyMethodCallChecker,
 } from './helpers';
 
 export function logMessage(
   document: TextDocument,
   selectionLine: number,
   selectedVar: string,
-  lineCodeProcessing: LineCodeProcessing,
 ): LogMessage {
   const logMsgTypesChecks: {
     [key in LogMessageType]: () => {
       isChecked: boolean;
-      metadata?: Pick<LogMessage, 'metadata'>;
+      metadata?: Pick<LogMessage, 'metadata'> | LogContextMetadata;
     };
   } = {
     [LogMessageType.ObjectLiteral]: () =>
@@ -42,15 +40,10 @@ export function logMessage(
       ternaryChecker(document, selectionLine, selectedVar),
     [LogMessageType.BinaryExpression]: () =>
       binaryExpressionChecker(document, selectionLine, selectedVar),
-    [LogMessageType.MultilineBraces]: () =>
-      multilineBracesChecker(
-        document,
-        lineCodeProcessing,
-        selectedVar,
-        selectionLine,
-      ),
-    [LogMessageType.MultilineParenthesis]: () =>
-      multilineParenthesisChecker(document, lineCodeProcessing, selectionLine),
+    [LogMessageType.RawPropertyAccess]: () =>
+      rawPropertyAccessChecker(document, selectionLine, selectedVar),
+    [LogMessageType.PropertyMethodCall]: () =>
+      propertyMethodCallChecker(document, selectionLine, selectedVar),
     [LogMessageType.ObjectFunctionCallAssignment]: () => {
       return objectFunctionCallAssignmentChecker(
         document,

@@ -96,7 +96,7 @@ export default (): void => {
         activeTextEditor.selections = [
           new vscode.Selection(
             new NaturalEditorPosition(48, 1),
-            new vscode.Position(48, 15),
+            new NaturalEditorPosition(48, 15),
           ),
         ];
         await vscode.commands.executeCommand(

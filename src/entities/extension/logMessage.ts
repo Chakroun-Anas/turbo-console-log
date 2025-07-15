@@ -1,9 +1,10 @@
 export enum LogMessageType {
   ArrayAssignment = 'ArrayAssignment',
   // MultiLineAnonymousFunction = 'MultiLineAnonymousFunction',
-  MultilineBraces = 'MultilineBraces',
-  MultilineParenthesis = 'MultilineParenthesis',
+  // MultilineBraces = 'MultilineBraces',
+  // MultilineParenthesis = 'MultilineParenthesis',
   NamedFunctionAssignment = 'NamedFunctionAssignment',
+  RawPropertyAccess = 'RawPropertyAccess',
   FunctionCallAssignment = 'FunctionCallAssignment',
   ObjectFunctionCallAssignment = 'ObjectFunctionCallAssignment',
   ObjectLiteral = 'ObjectLiteral',
@@ -13,6 +14,7 @@ export enum LogMessageType {
   TemplateString = 'TemplateString',
   PropertyAccessAssignment = 'PropertyAccessAssignment',
   FunctionParameter = 'FunctionParameter',
+  PropertyMethodCall = 'PropertyMethodCall',
 }
 
 export type LogContextMetadata = {

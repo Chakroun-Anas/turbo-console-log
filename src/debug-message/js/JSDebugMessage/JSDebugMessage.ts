@@ -50,7 +50,7 @@ export const jsDebugMessage: DebugMessage = {
       document,
       selectionLine,
       selectedVar,
-      jsLineCodeProcessing,
+      // jsLineCodeProcessing,
     );
   },
   enclosingBlockName(

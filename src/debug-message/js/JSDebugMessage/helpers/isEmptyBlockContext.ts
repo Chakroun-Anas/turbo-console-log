@@ -12,7 +12,6 @@ export function isEmptyBlockContext(
   logMessage: LogMessage,
 ): boolean {
   switch (logMessage.logMessageType) {
-    case LogMessageType.MultilineParenthesis:
     case LogMessageType.FunctionParameter:
       return /\){.*}/.test(
         document

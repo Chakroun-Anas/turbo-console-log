@@ -5,9 +5,9 @@ import {
   LogMessage,
   LogMessageType,
   MultilineContextVariable,
-} from '../../../entities';
+} from '@/entities';
+import { getMultiLineContextVariable } from '@/utilities';
 import { DebugMessageLine } from '../../DebugMessageLine';
-import { getMultiLineContextVariable } from '../../../utilities';
 import {
   ternaryExpressionLine,
   objectLiteralLine,
@@ -16,9 +16,10 @@ import {
   arrayLine,
   templateStringLine,
   primitiveAssignmentLine,
-  multilineBracesLine,
   propertyAccessAssignmentLine,
   binaryExpressionLine,
+  rawPropertyAccessLine,
+  propertyMethodCallLine,
 } from './helpers';
 
 /**
@@ -121,23 +122,16 @@ export const jsDebugMessageLine: DebugMessageLine = {
         return functionCallLine(document, selectionLine, selectedVar);
       case LogMessageType.ArrayAssignment:
         return arrayLine(document, selectionLine, selectedVar);
-      case LogMessageType.MultilineParenthesis:
-        return (
-          ((logMsg?.metadata as LogContextMetadata)?.closingContextLine ||
-            selectionLine) + 1
-        );
+      case LogMessageType.RawPropertyAccess:
+        return rawPropertyAccessLine(document, selectionLine, selectedVar);
+      case LogMessageType.PropertyMethodCall:
+        return propertyMethodCallLine(document, selectionLine, selectedVar);
       case LogMessageType.TemplateString:
         return templateStringLine(document, selectionLine, selectedVar);
       case LogMessageType.BinaryExpression:
         return binaryExpressionLine(document, selectionLine, selectedVar);
       case LogMessageType.Ternary:
         return ternaryExpressionLine(document, selectionLine, selectedVar);
-      case LogMessageType.MultilineBraces:
-        return multilineBracesLine(
-          selectedVar,
-          selectionLine,
-          (logMsg?.metadata as LogContextMetadata)?.closingContextLine,
-        );
       default:
         return selectionLine + 1;
     }

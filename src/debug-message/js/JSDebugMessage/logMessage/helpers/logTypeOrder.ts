@@ -13,11 +13,14 @@ export const logTypeOrder = [
     logMessageType: LogMessageType.FunctionCallAssignment, // AST
     priority: 6,
   },
-  { logMessageType: LogMessageType.Ternary, priority: 7 }, // AST
-  { logMessageType: LogMessageType.BinaryExpression, priority: 8 }, // AST
-  { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 10 }, // AST
-  { logMessageType: LogMessageType.PrimitiveAssignment, priority: 13 }, // AST
-  { logMessageType: LogMessageType.PropertyAccessAssignment, priority: 12 }, // AST
-  { logMessageType: LogMessageType.MultilineParenthesis, priority: 14 }, // REGEX
-  { logMessageType: LogMessageType.MultilineBraces, priority: 15 }, // REGEX
+  {
+    logMessageType: LogMessageType.PropertyMethodCall,
+    priority: 7, // AST
+  },
+  { logMessageType: LogMessageType.Ternary, priority: 8 }, // AST
+  { logMessageType: LogMessageType.BinaryExpression, priority: 9 }, // AST
+  { logMessageType: LogMessageType.RawPropertyAccess, priority: 10 }, // AST
+  { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 11 }, // AST
+  { logMessageType: LogMessageType.PrimitiveAssignment, priority: 12 }, // AST
+  { logMessageType: LogMessageType.PropertyAccessAssignment, priority: 13 }, // AST
 ].sort((a, b) => a.priority - b.priority);

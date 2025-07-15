@@ -9,6 +9,8 @@ import { multilineBracesLine } from './multiLineBracesLine';
 import { propertyAccessAssignmentLine } from './propertyAccessAssignmentLine';
 import { functionParameterLine } from './functionParamterLine';
 import { binaryExpressionLine } from './binaryExpressionLine';
+import { rawPropertyAccessLine } from './rawPropertyAccessLine';
+import { propertyMethodCallLine } from './propertyMethodCallLine';
 export {
   ternaryExpressionLine,
   objectLiteralLine,
@@ -21,4 +23,6 @@ export {
   propertyAccessAssignmentLine,
   functionParameterLine,
   binaryExpressionLine,
+  rawPropertyAccessLine,
+  propertyMethodCallLine,
 };

@@ -4,10 +4,10 @@ import {
   LogMessage,
   LogContextMetadata,
   LogMessageType,
-} from '../../../../entities';
-import { NamedFunctionMetadata } from '../../../../entities/extension/logMessage';
+} from '@/entities';
+import { NamedFunctionMetadata } from '@/entities/extension/logMessage';
 import { logMessage } from '../logMessage';
-import { LineCodeProcessing } from '../../../../line-code-processing';
+import { LineCodeProcessing } from '@/line-code-processing';
 import { DebugMessageLine } from '../../../DebugMessageLine';
 import { enclosingBlockName } from '../enclosingBlockName';
 import {
@@ -204,7 +204,7 @@ export function msg(
     document,
     lineOfSelectedVar,
     selectedVar,
-    lineCodeProcessing,
+    // lineCodeProcessing,
   );
   const lineOfLogMsg: number = debugMessageLine.line(
     document,
@@ -241,7 +241,6 @@ export function msg(
   const selectedVarLineLoc = selectedVarLine.text;
   if (isEmptyBlockContext(document, logMsg)) {
     const emptyBlockLine =
-      logMsg.logMessageType === LogMessageType.MultilineParenthesis ||
       logMsg.logMessageType === LogMessageType.FunctionParameter
         ? document.lineAt(
             (logMsg.metadata as LogContextMetadata).closingContextLine,
