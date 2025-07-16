@@ -35,7 +35,7 @@ export function functionParameterLine(
     const braceLineText = document.lineAt(braceLine).text;
 
     const inlineEmpty = /\{\s*\}/.test(braceLineText); // fixed logic
-    if (inlineEmpty) return braceLine;
+    if (inlineEmpty) return braceLine + 1;
 
     const braceAtLineEnd = braceLineText.trim().endsWith('{');
     const target = braceAtLineEnd ? braceLine + 1 : braceLine;

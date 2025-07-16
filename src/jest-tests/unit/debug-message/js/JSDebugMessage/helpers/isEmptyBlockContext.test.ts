@@ -7,11 +7,8 @@ describe('isEmptyBlockContext', () => {
     const doc = makeTextDocument(['someFunc(foo, bar) { }']);
     const logMessage: LogMessage = {
       logMessageType: LogMessageType.FunctionParameter,
-      metadata: {
-        closingContextLine: 0,
-      },
     };
-    const result = isEmptyBlockContext(doc, logMessage);
+    const result = isEmptyBlockContext(doc, logMessage, 1);
     expect(result).toBe(true);
   });
   it('returns true for an empty NamedFunctionAssignment block', () => {
@@ -20,11 +17,11 @@ describe('isEmptyBlockContext', () => {
     const logMessage: LogMessage = {
       logMessageType: LogMessageType.NamedFunctionAssignment,
       metadata: {
-        line: 0,
+        line: 1,
       },
     };
 
-    const result = isEmptyBlockContext(doc, logMessage);
+    const result = isEmptyBlockContext(doc, logMessage, 1);
     expect(result).toBe(true);
   });
 });

@@ -1,4 +1,4 @@
-import { BracketType } from '../../../../entities';
+import { BracketType } from '@/entities';
 
 export function locOpenedClosedElementOccurrences(
   loc: string,

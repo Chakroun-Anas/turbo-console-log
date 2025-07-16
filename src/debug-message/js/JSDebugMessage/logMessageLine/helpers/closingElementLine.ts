@@ -1,5 +1,5 @@
 import { TextDocument } from 'vscode';
-import { BracketType } from '../../../../entities';
+import { BracketType } from '@/entities';
 import { locOpenedClosedElementOccurrences } from './locOpenedClosedElementOccurrences';
 
 export function closingElementLine(

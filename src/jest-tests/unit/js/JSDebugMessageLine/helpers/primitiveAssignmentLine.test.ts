@@ -1,5 +1,5 @@
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
-import { primitiveAssignmentLine } from '@/debug-message/js/JSDebugMessageLine/helpers/primitiveAssignmentLine';
+import { primitiveAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/primitiveAssignmentLine';
 
 describe('primitiveAssignmentLine', () => {
   const passingCases = [

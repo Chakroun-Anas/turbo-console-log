@@ -11,7 +11,6 @@ import { enclosingBlockName } from './enclosingBlockName';
 import { detectAll } from './detectAll';
 import { msg } from './msg';
 import { JSDebugMessageAnonymous } from '../JSDebugMessageAnonymous';
-import { jsDebugMessageLine } from '../JSDebugMessageLine/';
 
 const jsDebugMessageAnonymous = new JSDebugMessageAnonymous();
 
@@ -31,7 +30,6 @@ export const jsDebugMessage: DebugMessage = {
       lineOfSelectedVar,
       tabSize,
       extensionProperties,
-      jsDebugMessageLine,
       jsDebugMessageAnonymous,
     );
   },
@@ -64,19 +62,6 @@ export const jsDebugMessage: DebugMessage = {
       logMessagePrefix,
       delimiterInsideMessage,
       args,
-    );
-  },
-  line(
-    document: TextDocument,
-    selectionLine: number,
-    selectedVar: string,
-    logMsg: LogMessage,
-  ): number {
-    return jsDebugMessageLine.line(
-      document,
-      selectionLine,
-      selectedVar,
-      logMsg,
     );
   },
 };

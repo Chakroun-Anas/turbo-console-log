@@ -1,5 +1,3 @@
-import { functionParameterLine } from '@/debug-message/js/JSDebugMessageLine/helpers';
-import { LogMessage } from '@/entities';
 import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
@@ -39,13 +37,6 @@ export function functionParameterChecker(
   });
   return {
     isChecked: match,
-    metadata: {
-      closingContextLine: functionParameterLine(
-        document,
-        selectionLine,
-        variableName,
-      ),
-    } as Pick<LogMessage, 'metadata'>,
   };
 }
 

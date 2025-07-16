@@ -1,4 +1,4 @@
-import { functionAssignmentLine } from '@/debug-message/js/JSDebugMessageLine/helpers/functionAssignmentLine';
+import { functionAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/functionAssignmentLine';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
 describe('functionAssignmentLine – insert after function assignments', () => {

@@ -1,4 +1,4 @@
-import { propertyMethodCallLine } from '@/debug-message/js/JSDebugMessageLine/helpers/propertyMethodCallLine';
+import { propertyMethodCallLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/propertyMethodCallLine';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
 describe('propertyMethodCallLine', () => {

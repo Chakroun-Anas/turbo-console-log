@@ -5,5 +5,4 @@ export const makeDebugMessage = (): DebugMessage => ({
   logMessage: jest.fn(),
   detectAll: jest.fn(),
   enclosingBlockName: jest.fn(),
-  line: jest.fn(),
 });

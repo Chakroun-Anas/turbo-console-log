@@ -1,4 +1,4 @@
-import { objectLiteralLine } from '@/debug-message/js/JSDebugMessageLine/helpers/objectLiteralLine';
+import { objectLiteralLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/objectLiteralLine';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
 const testCases = [

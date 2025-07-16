@@ -239,7 +239,7 @@
     "pretest": "yarn run esbuild-base",
     "test:compile": "rm -rf out && tsc -p ./ && mkdir out/mocha-tests/files && cp -r src/mocha-tests/files/ out/mocha-tests/files/",
     "test": "npm run test:compile && npm run test:jest && node ./out/mocha-tests/runTests.js",
-    "test:jest": "jest --config jest.config.ts --coverage"
+    "test:jest": "jest --config jest.config.ts"
   },
   "devDependencies": {
     "@types/chai": "^5.0.0",

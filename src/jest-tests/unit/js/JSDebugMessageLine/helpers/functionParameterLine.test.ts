@@ -1,4 +1,4 @@
-import { functionParameterLine } from '@/debug-message/js/JSDebugMessageLine/helpers';
+import { functionParameterLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers';
 
 const testCases = [
@@ -28,7 +28,7 @@ const testCases = [
     lines: ['function noop(name) {}'],
     selectionLine: 0,
     variableName: 'name',
-    expected: 0,
+    expected: 1,
   },
   {
     name: 'concise arrow without block',

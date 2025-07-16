@@ -1,4 +1,4 @@
-import { rawPropertyAccessLine } from '@/debug-message/js/JSDebugMessageLine/helpers/rawPropertyAccessLine';
+import { rawPropertyAccessLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/rawPropertyAccessLine';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
 describe('rawPropertyAccessLine', () => {

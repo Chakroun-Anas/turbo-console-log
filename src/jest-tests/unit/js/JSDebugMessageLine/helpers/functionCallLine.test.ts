@@ -1,4 +1,4 @@
-import { functionCallLine } from '@/debug-message/js/JSDebugMessageLine/helpers/functionCallLine';
+import { functionCallLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/functionCallLine';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
 const testCases = [

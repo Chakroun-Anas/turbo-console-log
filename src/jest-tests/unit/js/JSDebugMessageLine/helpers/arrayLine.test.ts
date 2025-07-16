@@ -1,5 +1,5 @@
 // arrayAssignmentLine.test.ts
-import { arrayLine } from '@/debug-message/js/JSDebugMessageLine/helpers/arrayLine';
+import { arrayLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/arrayLine';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
 const testCases = [

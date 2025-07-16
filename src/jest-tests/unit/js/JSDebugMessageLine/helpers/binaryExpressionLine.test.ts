@@ -1,4 +1,4 @@
-import { binaryExpressionLine } from '@/debug-message/js/JSDebugMessageLine/helpers/binaryExpressionLine';
+import { binaryExpressionLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/binaryExpressionLine';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
 describe('binaryExpressionLine – insertion line after binary expression', () => {

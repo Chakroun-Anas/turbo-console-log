@@ -3,11 +3,8 @@ import {
   ExtensionProperties,
   LogMessage,
   LogContextMetadata,
-  LogMessageType,
 } from '@/entities';
-import { NamedFunctionMetadata } from '@/entities/extension/logMessage';
 import { logMessage } from '../logMessage';
-import { DebugMessageLine } from '../../../DebugMessageLine';
 import { enclosingBlockName } from '../enclosingBlockName';
 import {
   spacesBeforeLogMsg,
@@ -15,6 +12,7 @@ import {
   emptyBlockDebuggingMsg,
 } from '../helpers';
 import { JSDebugMessageAnonymous } from '../../JSDebugMessageAnonymous';
+import { line as logMessageLine } from '../logMessageLine';
 
 function omit<T extends object, K extends keyof T>(
   obj: T,
@@ -192,7 +190,6 @@ export function msg(
   lineOfSelectedVar: number,
   tabSize: number,
   extensionProperties: ExtensionProperties,
-  debugMessageLine: DebugMessageLine,
   jsDebugMessageAnonymous: JSDebugMessageAnonymous,
 ): void {
   const logMsg: LogMessage = logMessage(
@@ -200,7 +197,7 @@ export function msg(
     lineOfSelectedVar,
     selectedVar,
   );
-  const lineOfLogMsg: number = debugMessageLine.line(
+  const lineOfLogMsg: number = logMessageLine(
     document,
     lineOfSelectedVar,
     selectedVar,
@@ -232,13 +229,8 @@ export function msg(
   );
   const selectedVarLine = document.lineAt(lineOfSelectedVar);
   const selectedVarLineLoc = selectedVarLine.text;
-  if (isEmptyBlockContext(document, logMsg)) {
-    const emptyBlockLine =
-      logMsg.logMessageType === LogMessageType.FunctionParameter
-        ? document.lineAt(
-            (logMsg.metadata as LogContextMetadata).closingContextLine,
-          )
-        : document.lineAt((logMsg.metadata as NamedFunctionMetadata).line);
+  if (isEmptyBlockContext(document, logMsg, lineOfLogMsg)) {
+    const emptyBlockLine = document.lineAt(lineOfLogMsg - 1);
     emptyBlockDebuggingMsg(
       document,
       textEditor,
