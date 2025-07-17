@@ -10,9 +10,6 @@ import { logMessage } from './logMessage';
 import { enclosingBlockName } from './enclosingBlockName';
 import { detectAll } from './detectAll';
 import { msg } from './msg';
-import { JSDebugMessageAnonymous } from '../JSDebugMessageAnonymous';
-
-const jsDebugMessageAnonymous = new JSDebugMessageAnonymous();
 
 export const jsDebugMessage: DebugMessage = {
   msg(
@@ -30,7 +27,6 @@ export const jsDebugMessage: DebugMessage = {
       lineOfSelectedVar,
       tabSize,
       extensionProperties,
-      jsDebugMessageAnonymous,
     );
   },
   logMessage(

@@ -160,7 +160,7 @@ export default (): void => {
             [],
           );
           await Promise.all(
-            documentLinesChanged(activeTextEditor.document, [11, 12, 13]),
+            documentLinesChanged(activeTextEditor.document, [11]),
           );
           const textDocument = activeTextEditor.document;
           expect(
@@ -199,7 +199,7 @@ export default (): void => {
             [],
           );
           await Promise.all(
-            documentLinesChanged(activeTextEditor.document, [18, 19, 20]),
+            documentLinesChanged(activeTextEditor.document, [18]),
           );
           const textDocument = activeTextEditor.document;
           expect(
@@ -238,7 +238,7 @@ export default (): void => {
             [],
           );
           await Promise.all(
-            documentLinesChanged(activeTextEditor.document, [26, 27, 28]),
+            documentLinesChanged(activeTextEditor.document, [26]),
           );
           const textDocument = activeTextEditor.document;
           expect(
@@ -255,7 +255,7 @@ export default (): void => {
             ),
           ).to.equal(true);
           expect(
-            /}\)/.test(textDocument.lineAt(naturalEditorLine(30)).text),
+            /}/.test(textDocument.lineAt(naturalEditorLine(30)).text),
           ).to.equal(true);
         }
       });
@@ -277,7 +277,7 @@ export default (): void => {
             [],
           );
           await Promise.all(
-            documentLinesChanged(activeTextEditor.document, [34, 35, 36]),
+            documentLinesChanged(activeTextEditor.document, [34]),
           );
           const textDocument = activeTextEditor.document;
           expect(
@@ -294,7 +294,7 @@ export default (): void => {
             ),
           ).to.equal(true);
           expect(
-            /}\)/.test(textDocument.lineAt(naturalEditorLine(39)).text),
+            /}/.test(textDocument.lineAt(naturalEditorLine(39)).text),
           ).to.equal(true);
         }
       });

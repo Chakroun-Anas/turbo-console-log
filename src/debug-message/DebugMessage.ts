@@ -4,7 +4,7 @@ import {
   ExtensionProperties,
   LogMessage,
   Message,
-} from '../entities';
+} from '@/entities';
 
 export interface DebugMessage {
   logMessage(

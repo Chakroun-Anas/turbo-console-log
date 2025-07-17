@@ -6,13 +6,13 @@ import {
 } from '@/entities';
 import { logMessage } from '../logMessage';
 import { enclosingBlockName } from '../enclosingBlockName';
-import {
-  spacesBeforeLogMsg,
-  isEmptyBlockContext,
-  emptyBlockDebuggingMsg,
-} from '../helpers';
-import { JSDebugMessageAnonymous } from '../../JSDebugMessageAnonymous';
+import { spacesBeforeLogMsg } from '../helpers';
 import { line as logMessageLine } from '../logMessageLine';
+import {
+  applyTransformedCode,
+  needTransformation,
+  performTransformation,
+} from '../transformer';
 
 function omit<T extends object, K extends keyof T>(
   obj: T,
@@ -21,35 +21,6 @@ function omit<T extends object, K extends keyof T>(
   const clone = { ...obj };
   keys.forEach((key) => delete clone[key]);
   return clone;
-}
-
-function hasFunctionBody(
-  document: TextDocument,
-  functionStartLine: number,
-): boolean {
-  let currentLineNum = functionStartLine;
-  let totalOpenedBraces = 0;
-
-  while (currentLineNum < document.lineCount) {
-    const currentLineText = document.lineAt(currentLineNum).text.trim();
-
-    // ✅ Count `{` and `}`
-    totalOpenedBraces += (currentLineText.match(/(?<!\()\{/g) || []).length;
-
-    // ✅ If `{` exists → The function has a body
-    if (totalOpenedBraces > 0) {
-      return true;
-    }
-
-    currentLineNum++;
-
-    // ✅ Stop early if we reach a new statement without finding `{`
-    if (/^\S/.test(currentLineText) && totalOpenedBraces === 0) {
-      return false;
-    }
-  }
-
-  return false;
 }
 
 function constructDebuggingMsg(
@@ -190,7 +161,6 @@ export function msg(
   lineOfSelectedVar: number,
   tabSize: number,
   extensionProperties: ExtensionProperties,
-  jsDebugMessageAnonymous: JSDebugMessageAnonymous,
 ): void {
   const logMsg: LogMessage = logMessage(
     document,
@@ -227,36 +197,18 @@ export function msg(
     debuggingMsgContent,
     spacesBeforeMsg,
   );
-  const selectedVarLine = document.lineAt(lineOfSelectedVar);
-  const selectedVarLineLoc = selectedVarLine.text;
-  if (isEmptyBlockContext(document, logMsg, lineOfLogMsg)) {
-    const emptyBlockLine = document.lineAt(lineOfLogMsg - 1);
-    emptyBlockDebuggingMsg(
+  if (needTransformation(document, lineOfSelectedVar, selectedVar)) {
+    const transformedCode = performTransformation(
       document,
-      textEditor,
-      emptyBlockLine,
-      lineOfLogMsg,
-      debuggingMsgContent,
-      spacesBeforeMsg,
-      tabSize,
-    );
-    return;
-  }
-  if (
-    jsDebugMessageAnonymous.isAnonymousFunctionContext(
+      lineOfSelectedVar,
       selectedVar,
-      selectedVarLineLoc,
-    ) &&
-    !hasFunctionBody(document, lineOfSelectedVar)
-  ) {
-    jsDebugMessageAnonymous.anonymousPropDebuggingMsg(
-      document,
-      textEditor,
-      tabSize,
-      extensionProperties.addSemicolonInTheEnd,
-      selectedVarLine,
-      debuggingMsgContent,
+      debuggingMsg,
+      {
+        addSemicolonInTheEnd: extensionProperties.addSemicolonInTheEnd,
+        tabSize: tabSize,
+      },
     );
+    applyTransformedCode(document, transformedCode);
     return;
   }
   baseDebuggingMsg(
