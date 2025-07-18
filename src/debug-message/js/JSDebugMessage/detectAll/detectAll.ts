@@ -1,10 +1,6 @@
 import type { TextDocument } from 'vscode';
-import {
-  Message,
-  BracketType,
-  ExtensionProperties,
-} from '../../../../entities';
-import { closingContextLine } from '../../../../utilities';
+import { Message, BracketType, ExtensionProperties } from '@/entities';
+import { closingContextLine } from '@/utilities';
 import { spacesBeforeLogMsg } from '../helpers';
 import { logFunctionToUse } from './helpers';
 

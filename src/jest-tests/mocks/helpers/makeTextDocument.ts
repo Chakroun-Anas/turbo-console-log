@@ -45,6 +45,10 @@ export const makeTextDocument = (
     lineAt: (i: number) => ({
       text: lines[i],
       firstNonWhitespaceCharacterIndex: lines[i].search(/\S|$/),
+      rangeIncludingLineBreak: new Range(
+        new Position(i, 0),
+        new Position(i, lines[i].length + 1), // +1 for line break
+      ),
     }),
     positionAt: (offset: number) => {
       let total = 0;
