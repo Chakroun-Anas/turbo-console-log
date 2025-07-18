@@ -1,0 +1,1 @@
+export { formatDelimiter } from './formatDelimiter';

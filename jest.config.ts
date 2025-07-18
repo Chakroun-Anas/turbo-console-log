@@ -4,7 +4,7 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['<rootDir>/src/jest-tests/**/*.test.ts'],
-  // testMatch: ['<rootDir>/src/jest-tests/**/correctAllLogMessages.test.ts'],
+  // testMatch: ['<rootDir>/src/jest-tests/**/uncommentAllLogMessages.test.ts'],
   moduleFileExtensions: ['ts', 'js'],
   transform: {
     '^.+\\.ts$': [
@@ -19,7 +19,10 @@ const config: Config = {
     '^vscode$': '<rootDir>/src/jest-tests/mocks/vscode.ts',
     '^p-limit$': '<rootDir>/src/jest-tests/mocks/pLimit.ts',
   },
-  coveragePathIgnorePatterns: ['<rootDir>/src/jest-tests/'],
+  coveragePathIgnorePatterns: [
+    '<rootDir>/src/jest-tests/',
+    '<rootDir>/src/debug-message/js/index.ts',
+  ],
 };
 
 export default config;

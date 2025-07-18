@@ -1,0 +1,1 @@
+export { buildLogMessage } from './buildLogMessage';
