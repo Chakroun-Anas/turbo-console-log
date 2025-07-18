@@ -4,7 +4,7 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['<rootDir>/src/jest-tests/**/*.test.ts'],
-  // testMatch: ['<rootDir>/src/jest-tests/**/activateTurboProBundle.test.ts'],
+  // testMatch: ['<rootDir>/src/jest-tests/**/getExtensionProperties.test.ts'],
   moduleFileExtensions: ['ts', 'js'],
   transform: {
     '^.+\\.ts$': [
