@@ -2,6 +2,8 @@ export const window = {
   showInformationMessage: jest.fn(),
   registerWebviewViewProvider: jest.fn(),
   showErrorMessage: jest.fn(),
+  showInputBox: jest.fn(),
+  showWarningMessage: jest.fn(),
   withProgress: jest.fn((_opts, cb) => cb({ report: jest.fn() })),
 };
 
