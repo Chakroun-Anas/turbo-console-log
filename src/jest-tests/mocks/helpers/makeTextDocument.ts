@@ -1,8 +1,11 @@
 import { TextDocument, Range, Position } from 'vscode';
 
-export const makeTextDocument = (lines: string[]): TextDocument =>
+export const makeTextDocument = (
+  lines: string[],
+  fileName: string = 'mockDocument.ts',
+): TextDocument =>
   ({
-    fileName: 'mockDocument.ts',
+    fileName,
     lineCount: lines.length,
     getText: (range?: Range) => {
       if (!range) return lines.join('\n');
