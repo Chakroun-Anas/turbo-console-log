@@ -1,12 +1,12 @@
+import { rawPropertyAccessLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
-import { propertyAccessAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
-import testCases from './cases/';
+import testCases from './cases';
 
-describe('propertyAccessAssignmentLine – insert after property access assignment', () => {
+describe('rawPropertyAccessLine', () => {
   for (const test of testCases) {
     it(`should return correct insertion line – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
-      const result = propertyAccessAssignmentLine(
+      const result = rawPropertyAccessLine(
         doc,
         test.selectionLine,
         test.variableName,

@@ -1,6 +1,6 @@
 import { templateStringLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
-import testCases from './cases/';
+import testCases from './cases';
 
 describe('templateStringLine', () => {
   for (const doc of testCases) {

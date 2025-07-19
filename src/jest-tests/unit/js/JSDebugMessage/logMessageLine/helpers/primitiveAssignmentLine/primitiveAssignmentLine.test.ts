@@ -1,6 +1,6 @@
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 import { primitiveAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
-import testCases from './cases/';
+import testCases from './cases';
 
 describe('primitiveAssignmentLine', () => {
   for (const test of testCases) {

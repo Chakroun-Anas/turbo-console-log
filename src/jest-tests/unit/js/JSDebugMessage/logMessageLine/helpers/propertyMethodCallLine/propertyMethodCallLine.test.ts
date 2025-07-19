@@ -1,6 +1,6 @@
 import { propertyMethodCallLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
-import testCases from './cases/';
+import testCases from './cases';
 
 describe('propertyMethodCallLine', () => {
   for (const test of testCases) {
