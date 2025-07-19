@@ -7,8 +7,6 @@ export function binaryExpressionChecker(
   variableName: string,
 ): { isChecked: boolean } {
   const wanted = variableName.trim();
-  if (!wanted) return { isChecked: false };
-
   const sourceFile = ts.createSourceFile(
     document.fileName,
     document.getText(),
@@ -44,11 +42,7 @@ export function binaryExpressionChecker(
         ts.isArrayBindingPattern(node.name)
       ) {
         const binding = findBindingElement(node.name, wanted);
-        if (
-          binding &&
-          binding.initializer &&
-          containsBinary(binding.initializer)
-        ) {
+        if (binding && node.initializer && containsBinary(node.initializer)) {
           isChecked = true;
           return;
         }
@@ -81,19 +75,12 @@ function findBindingElement(
       const inner = findBindingElement(name, wanted);
       if (inner) return inner;
     }
-
-    if (ts.isIdentifier(name) && ts.isObjectBindingPattern(el.name)) {
-      const inner = findBindingElement(el.name, wanted);
-      if (inner) return inner;
-    }
   }
 
   return undefined;
 }
 
 function containsBinary(node: ts.Node): boolean {
-  if (!node) return false;
-
   if (
     ts.isParenthesizedExpression(node) ||
     ts.isAsExpression(node) ||
