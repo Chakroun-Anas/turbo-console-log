@@ -1,5 +1,5 @@
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
-import { primitiveAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/primitiveAssignmentLine';
+import { primitiveAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
 import testCases from './cases/';
 
 describe('primitiveAssignmentLine', () => {

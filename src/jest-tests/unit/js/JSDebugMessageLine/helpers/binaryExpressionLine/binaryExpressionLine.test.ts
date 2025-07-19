@@ -1,4 +1,4 @@
-import { binaryExpressionLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/binaryExpressionLine';
+import { binaryExpressionLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 import documents from './cases';
 

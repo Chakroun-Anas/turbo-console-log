@@ -1,4 +1,4 @@
-import { templateStringLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/templateStringLine';
+import { templateStringLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 import testCases from './cases/';
 

@@ -1,4 +1,4 @@
-import { functionAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/functionAssignmentLine';
+import { functionAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 import cases from './cases';
 

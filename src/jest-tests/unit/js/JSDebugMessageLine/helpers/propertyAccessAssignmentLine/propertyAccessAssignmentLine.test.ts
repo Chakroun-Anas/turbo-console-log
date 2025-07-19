@@ -1,5 +1,5 @@
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
-import { propertyAccessAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers/propertyAccessAssignmentLine';
+import { propertyAccessAssignmentLine } from '@/debug-message/js/JSDebugMessage/logMessageLine/helpers';
 import testCases from './cases/';
 
 describe('propertyAccessAssignmentLine – insert after property access assignment', () => {
