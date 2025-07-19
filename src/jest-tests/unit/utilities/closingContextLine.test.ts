@@ -1,5 +1,5 @@
-import { closingContextLine } from '../../../utilities/closingContextLine';
-import { BracketType } from '../../../entities';
+import { BracketType } from '@/entities';
+import { closingContextLine } from '@/utilities';
 import { makeTextDocument } from '../../mocks/helpers';
 
 const locBracketsMock = jest.fn();
