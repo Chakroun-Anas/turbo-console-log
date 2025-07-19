@@ -1,4 +1,4 @@
-import vscode from 'vscode';
+import * as vscode from 'vscode';
 
 export async function applyTransformedCode(
   document: vscode.TextDocument,
