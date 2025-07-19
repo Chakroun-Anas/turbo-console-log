@@ -6,3 +6,4 @@ node_modules
 coverage
 .test-extensions
 scripts/tmp
+.github/copilot-instructions.md
