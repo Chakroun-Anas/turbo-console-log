@@ -2,7 +2,7 @@
  * Adds a prefix to the log message parts.
  */
 
-import { formatDelimiter } from '../formatDelimiter';
+import { resolveDelimiterSpacing } from '../resolveDelimiterSpacing';
 
 /**
  * Adds a prefix to the log message parts.
@@ -14,7 +14,7 @@ export function addPrefix(prefix: string, delimiter: string): string[] {
   const parts: string[] = [];
   if (prefix.length > 0) {
     parts.push(prefix);
-    parts.push(formatDelimiter(prefix, delimiter));
+    parts.push(resolveDelimiterSpacing(prefix, delimiter));
   }
   return parts;
 }

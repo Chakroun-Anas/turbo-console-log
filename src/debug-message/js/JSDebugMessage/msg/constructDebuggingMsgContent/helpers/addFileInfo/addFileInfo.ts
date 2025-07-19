@@ -2,7 +2,7 @@
  * Adds file information (filename and line number) to the log message parts.
  */
 
-import { formatDelimiter } from '../formatDelimiter';
+import { resolveDelimiterSpacing } from '../resolveDelimiterSpacing';
 
 /**
  * Adds file information (filename and line number) to the log message parts.
@@ -25,7 +25,7 @@ export function addFileInfo(
     const filePart = includeFilename ? fileName : '';
     const linePart = includeLineNum ? `:${lineNum}` : '';
     parts.push(`${filePart}${linePart}`);
-    parts.push(formatDelimiter('', delimiter));
+    parts.push(resolveDelimiterSpacing('', delimiter));
   }
   return parts;
 }

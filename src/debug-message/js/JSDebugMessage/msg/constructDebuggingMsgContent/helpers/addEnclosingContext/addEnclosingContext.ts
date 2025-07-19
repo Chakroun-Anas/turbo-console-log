@@ -2,7 +2,7 @@
  * Adds enclosing context (class and function names) to the log message parts.
  */
 
-import { formatDelimiter } from '../formatDelimiter';
+import { resolveDelimiterSpacing } from '../resolveDelimiterSpacing';
 
 /**
  * Adds enclosing context (class and function names) to the log message parts.
@@ -19,11 +19,11 @@ export function addEnclosingContext(
   const parts: string[] = [];
   if (className.length > 0) {
     parts.push(className);
-    parts.push(formatDelimiter('', delimiter, false));
+    parts.push(resolveDelimiterSpacing('', delimiter, false));
   }
   if (functionName.length > 0) {
     parts.push(functionName);
-    parts.push(formatDelimiter('', delimiter));
+    parts.push(resolveDelimiterSpacing('', delimiter));
   }
   return parts;
 }
