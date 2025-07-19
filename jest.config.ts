@@ -4,7 +4,7 @@ const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: ['<rootDir>/src/jest-tests/**/*.test.ts'],
-  // testMatch: ['<rootDir>/src/jest-tests/unit/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/resolveDelimiterSpacing/resolveDelimiterSpacing.test.ts'],
+  // testMatch: ['<rootDir>/src/jest-tests/unit/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/addPrefix/addPrefix.test.ts'],
   moduleFileExtensions: ['ts', 'js'],
   transform: {
     '^.+\\.ts$': [
