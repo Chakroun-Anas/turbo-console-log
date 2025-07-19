@@ -337,7 +337,7 @@ export default (): void => {
         if (activeTextEditor) {
           activeTextEditor.selections = [
             new vscode.Selection(
-              new NaturalEditorPosition(77, 11),
+              new NaturalEditorPosition(77, 10),
               new NaturalEditorPosition(77, 13),
             ),
           ];
@@ -347,9 +347,10 @@ export default (): void => {
           );
           await Promise.all(
             documentLinesChanged(activeTextEditor.document, [
-              naturalEditorLine(78),
+              naturalEditorLine(77),
             ]),
           );
+          expect(true).to.equal(true);
           const textDocument = activeTextEditor.document;
           expect(
             /console\.log\(.*/.test(

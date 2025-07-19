@@ -1,0 +1,11 @@
+// Object with spread assignment
+export default {
+  name: 'object with spread assignment',
+  lines: [
+    'function mergeUser(user, extra) {',
+    '  return { ...user.profile, ...extra };',
+    '}',
+  ],
+  selectionLine: 1,
+  variableName: 'user.profile',
+};

@@ -6,6 +6,7 @@ import {
   LogMessageType,
   LogMessage,
   LogContextMetadata,
+  WithinReturnStatementMetadata,
 } from './extension/logMessage';
 import { LogBracket } from './extension/logBracket';
 import { Command } from './extension/Command';
@@ -23,4 +24,5 @@ export {
   Message,
   MultilineContextVariable,
   ProgrammingLanguage,
+  WithinReturnStatementMetadata,
 };

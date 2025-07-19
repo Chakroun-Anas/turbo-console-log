@@ -12,6 +12,7 @@ import { functionParameterChecker } from './functionParamterChecker';
 import { binaryExpressionChecker } from './binaryExpressionChecker';
 import { rawPropertyAccessChecker } from './rawPropertyAccessChecker';
 import { propertyMethodCallChecker } from './propertyMethodCallChecker';
+import { withinReturnStatementChecker } from './withinReturnStatementChecker';
 export {
   logTypeOrder,
   objectLiteralChecker,
@@ -27,4 +28,5 @@ export {
   binaryExpressionChecker,
   rawPropertyAccessChecker,
   propertyMethodCallChecker,
+  withinReturnStatementChecker,
 };

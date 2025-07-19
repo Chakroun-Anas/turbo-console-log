@@ -9,18 +9,19 @@ export const logTypeOrder = [
     logMessageType: LogMessageType.ObjectFunctionCallAssignment, // AST
     priority: 5,
   },
+  { logMessageType: LogMessageType.WithinReturnStatement, priority: 6 },
   {
     logMessageType: LogMessageType.FunctionCallAssignment, // AST
-    priority: 6,
+    priority: 7,
   },
   {
     logMessageType: LogMessageType.PropertyMethodCall,
-    priority: 7, // AST
+    priority: 8, // AST
   },
-  { logMessageType: LogMessageType.Ternary, priority: 8 }, // AST
-  { logMessageType: LogMessageType.BinaryExpression, priority: 9 }, // AST
-  { logMessageType: LogMessageType.RawPropertyAccess, priority: 10 }, // AST
-  { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 11 }, // AST
-  { logMessageType: LogMessageType.PrimitiveAssignment, priority: 12 }, // AST
-  { logMessageType: LogMessageType.PropertyAccessAssignment, priority: 13 }, // AST
+  { logMessageType: LogMessageType.Ternary, priority: 9 }, // AST
+  { logMessageType: LogMessageType.BinaryExpression, priority: 10 }, // AST
+  { logMessageType: LogMessageType.RawPropertyAccess, priority: 11 }, // AST
+  { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 12 }, // AST
+  { logMessageType: LogMessageType.PrimitiveAssignment, priority: 13 }, // AST
+  { logMessageType: LogMessageType.PropertyAccessAssignment, priority: 14 }, // AST
 ].sort((a, b) => a.priority - b.priority);

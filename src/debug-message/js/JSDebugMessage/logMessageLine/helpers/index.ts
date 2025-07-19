@@ -10,6 +10,7 @@ import { functionParameterLine } from './functionParamterLine';
 import { binaryExpressionLine } from './binaryExpressionLine';
 import { rawPropertyAccessLine } from './rawPropertyAccessLine';
 import { propertyMethodCallLine } from './propertyMethodCallLine';
+import { withinReturnStatementLine } from './withinReturnStatementLine';
 export {
   ternaryExpressionLine,
   objectLiteralLine,
@@ -23,4 +24,5 @@ export {
   binaryExpressionLine,
   rawPropertyAccessLine,
   propertyMethodCallLine,
+  withinReturnStatementLine,
 };

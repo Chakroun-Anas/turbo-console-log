@@ -15,6 +15,7 @@ import {
   ternaryChecker,
   rawPropertyAccessChecker,
   propertyMethodCallChecker,
+  withinReturnStatementChecker,
 } from './helpers';
 
 export function logMessage(
@@ -28,6 +29,8 @@ export function logMessage(
       metadata?: Pick<LogMessage, 'metadata'> | LogContextMetadata;
     };
   } = {
+    [LogMessageType.WithinReturnStatement]: () =>
+      withinReturnStatementChecker(document, selectionLine, selectedVar),
     [LogMessageType.ObjectLiteral]: () =>
       objectLiteralChecker(document, selectionLine, selectedVar),
     [LogMessageType.FunctionParameter]: () =>

@@ -1,8 +1,5 @@
 export enum LogMessageType {
   ArrayAssignment = 'ArrayAssignment',
-  // MultiLineAnonymousFunction = 'MultiLineAnonymousFunction',
-  // MultilineBraces = 'MultilineBraces',
-  // MultilineParenthesis = 'MultilineParenthesis',
   NamedFunctionAssignment = 'NamedFunctionAssignment',
   RawPropertyAccess = 'RawPropertyAccess',
   FunctionCallAssignment = 'FunctionCallAssignment',
@@ -15,6 +12,7 @@ export enum LogMessageType {
   PropertyAccessAssignment = 'PropertyAccessAssignment',
   FunctionParameter = 'FunctionParameter',
   PropertyMethodCall = 'PropertyMethodCall',
+  WithinReturnStatement = 'WithinReturnStatement',
 }
 
 export type LogContextMetadata = {
@@ -31,11 +29,16 @@ export type TernaryExpressionMetadata = {
   lines: number;
 };
 
+export type WithinReturnStatementMetadata = {
+  returnStatementLine: number;
+};
+
 export type LogMessage = {
   logMessageType: LogMessageType;
   metadata?:
     | LogContextMetadata
     | NamedFunctionMetadata
     | TernaryExpressionMetadata
+    | WithinReturnStatementMetadata
     | unknown;
 };
