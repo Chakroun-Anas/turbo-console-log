@@ -35,6 +35,7 @@ export function functionCallLine(
   let targetEnd = -1;
 
   ts.forEachChild(sourceFile, function visit(node: ts.Node): void {
+    // Handle variable declarations (existing logic)
     if (ts.isVariableDeclaration(node)) {
       const isIdentifier =
         ts.isIdentifier(node.name) && node.name.text === variableName;
@@ -67,6 +68,32 @@ export function functionCallLine(
       if (selectionLine >= startLine && selectionLine <= endLine) {
         targetEnd = getFullExpressionEnd(initializer);
         return;
+      }
+    }
+
+    if (
+      ts.isExpressionStatement(node) &&
+      ts.isBinaryExpression(node.expression)
+    ) {
+      const { left, right, operatorToken } = node.expression;
+      // Only handle '=' assignments
+      if (operatorToken.kind !== ts.SyntaxKind.EqualsToken) return;
+
+      // Match left side: identifier or element access
+      let leftText = '';
+      if (ts.isIdentifier(left)) {
+        leftText = left.text;
+      } else if (ts.isElementAccessExpression(left)) {
+        leftText = left.getText();
+      }
+
+      if (leftText === variableName && ts.isCallExpression(right)) {
+        const startLine = document.positionAt(node.getStart()).line;
+        const endLine = document.positionAt(node.getEnd()).line;
+        if (selectionLine >= startLine && selectionLine <= endLine) {
+          targetEnd = node.getEnd();
+          return;
+        }
       }
     }
 

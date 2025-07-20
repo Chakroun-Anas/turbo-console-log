@@ -19,6 +19,7 @@ export function objectFunctionCallAssignmentChecker(
   ts.forEachChild(sourceFile, function visit(node) {
     if (isChecked) return;
 
+    // Handle variable declarations (existing logic)
     if (ts.isVariableStatement(node)) {
       for (const decl of node.declarationList.declarations) {
         const { name, initializer } = decl;
@@ -103,6 +104,31 @@ export function objectFunctionCallAssignmentChecker(
             }
           }
         }
+      }
+    }
+
+    // New logic: handle assignment expressions (e.g., optionalDependencies[key] = optionalDependencies[key].replace(...))
+    if (
+      ts.isExpressionStatement(node) &&
+      ts.isBinaryExpression(node.expression)
+    ) {
+      const { left, right } = node.expression;
+      const startLine = document.positionAt(node.getStart()).line;
+      const endLine = document.positionAt(node.getEnd()).line;
+      // Only check if selectionLine matches
+      if (selectionLine < startLine || selectionLine > endLine) return;
+
+      // Match left side: identifier or element access
+      let leftText = '';
+      if (ts.isIdentifier(left)) {
+        leftText = left.text;
+      } else if (ts.isElementAccessExpression(left)) {
+        leftText = left.getText();
+      }
+
+      if (leftText === variableName && ts.isCallExpression(right)) {
+        isChecked = true;
+        return;
       }
     }
 

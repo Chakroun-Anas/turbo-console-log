@@ -17,6 +17,7 @@ import case16 from './16';
 import case17 from './17';
 import case18 from './18';
 import case19 from './19';
+import case20 from './20';
 
 const testCases = [
   case1,
@@ -38,6 +39,7 @@ const testCases = [
   case17,
   case18,
   case19,
+  case20,
 ];
 
 export default testCases;
