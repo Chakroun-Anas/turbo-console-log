@@ -1,6 +1,24 @@
 import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
+function getFullExpressionEnd(initializer: ts.Expression): number {
+  let current: ts.Node = initializer;
+
+  // Go up while parent is part of the expression (e.g. .catch, .then, etc.)
+  while (
+    current.parent &&
+    (ts.isCallExpression(current.parent) ||
+      ts.isPropertyAccessExpression(current.parent) ||
+      ts.isAwaitExpression(current.parent) ||
+      ts.isAsExpression(current.parent) ||
+      ts.isParenthesizedExpression(current.parent))
+  ) {
+    current = current.parent;
+  }
+
+  return current.end;
+}
+
 export function functionCallLine(
   document: TextDocument,
   selectionLine: number,
@@ -31,7 +49,6 @@ export function functionCallLine(
       }
 
       const initializer = node.initializer;
-
       if (!initializer) return;
 
       const isRelevantCall =
@@ -39,7 +56,8 @@ export function functionCallLine(
         (ts.isAsExpression(initializer) &&
           ts.isCallExpression(initializer.expression)) ||
         (ts.isParenthesizedExpression(initializer) &&
-          ts.isCallExpression(initializer.expression));
+          ts.isCallExpression(initializer.expression)) ||
+        ts.isAwaitExpression(initializer);
 
       if (!isRelevantCall) return;
 
@@ -47,7 +65,7 @@ export function functionCallLine(
       const endLine = document.positionAt(node.getEnd()).line;
 
       if (selectionLine >= startLine && selectionLine <= endLine) {
-        targetEnd = node.getEnd();
+        targetEnd = getFullExpressionEnd(initializer);
         return;
       }
     }
