@@ -1,27 +1,20 @@
 import { LogMessageType } from '@/entities';
 
 export const logTypeOrder = [
-  { logMessageType: LogMessageType.TemplateString, priority: 1 }, // AST
-  { logMessageType: LogMessageType.ArrayAssignment, priority: 2 }, // AST
-  { logMessageType: LogMessageType.FunctionParameter, priority: 3 }, // AST
-  { logMessageType: LogMessageType.ObjectLiteral, priority: 4 }, // AST
-  {
-    logMessageType: LogMessageType.ObjectFunctionCallAssignment, // AST
-    priority: 5,
-  },
-  { logMessageType: LogMessageType.WithinReturnStatement, priority: 6 },
-  {
-    logMessageType: LogMessageType.FunctionCallAssignment, // AST
-    priority: 7,
-  },
-  {
-    logMessageType: LogMessageType.PropertyMethodCall,
-    priority: 8, // AST
-  },
-  { logMessageType: LogMessageType.Ternary, priority: 9 }, // AST
-  { logMessageType: LogMessageType.BinaryExpression, priority: 10 }, // AST
-  { logMessageType: LogMessageType.RawPropertyAccess, priority: 11 }, // AST
-  { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 12 }, // AST
-  { logMessageType: LogMessageType.PrimitiveAssignment, priority: 13 }, // AST
-  { logMessageType: LogMessageType.PropertyAccessAssignment, priority: 14 }, // AST
-].sort((a, b) => a.priority - b.priority);
+  { logMessageType: LogMessageType.NamedFunctionAssignment, priority: 1 },
+  { logMessageType: LogMessageType.FunctionParameter, priority: 2 },
+  { logMessageType: LogMessageType.ObjectFunctionCallAssignment, priority: 3 },
+  { logMessageType: LogMessageType.FunctionCallAssignment, priority: 4 },
+  { logMessageType: LogMessageType.PropertyAccessAssignment, priority: 5 },
+
+  { logMessageType: LogMessageType.ObjectLiteral, priority: 6 },
+  { logMessageType: LogMessageType.ArrayAssignment, priority: 7 },
+  { logMessageType: LogMessageType.TemplateString, priority: 8 },
+  { logMessageType: LogMessageType.WithinReturnStatement, priority: 9 },
+
+  { logMessageType: LogMessageType.PropertyMethodCall, priority: 10 },
+  { logMessageType: LogMessageType.Ternary, priority: 11 },
+  { logMessageType: LogMessageType.BinaryExpression, priority: 12 },
+  { logMessageType: LogMessageType.RawPropertyAccess, priority: 13 },
+  { logMessageType: LogMessageType.PrimitiveAssignment, priority: 14 },
+];
