@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { TextDocument, Position } from 'vscode';
+import { TextDocument } from 'vscode';
 
 /**
  * Determines the appropriate line to insert a log
@@ -10,9 +10,6 @@ export function functionParameterLine(
   selectionLine: number,
   variableName: string,
 ): number {
-  const lineText = document.lineAt(selectionLine).text;
-  const col = Math.max(lineText.indexOf(variableName), 0); // fallback to 0
-  const offset = document.offsetAt(new Position(selectionLine, col));
   const source = ts.createSourceFile(
     document.fileName,
     document.getText(),
@@ -20,11 +17,17 @@ export function functionParameterLine(
     true,
   );
 
-  const leaf = findNodeAtOffset(source, offset);
-  if (!leaf) return selectionLine + 1;
+  // Find the parameter node that matches our variable name and is on the selection line
+  const parameterNode = findParameterNodeOnLine(
+    source,
+    selectionLine,
+    variableName,
+    document,
+  );
+  if (!parameterNode) return selectionLine + 1;
 
-  // Climb to the enclosing function-like node
-  let node: ts.Node | undefined = leaf;
+  // Find the function that contains this parameter
+  let node: ts.Node | undefined = parameterNode;
   while (node && !isFunctionLike(node)) node = node.parent;
   if (!node) return selectionLine + 1;
 
@@ -34,7 +37,7 @@ export function functionParameterLine(
     const braceLine = bracePos.line;
     const braceLineText = document.lineAt(braceLine).text;
 
-    const inlineEmpty = /\{\s*\}/.test(braceLineText); // fixed logic
+    const inlineEmpty = /\{\s*\}/.test(braceLineText);
     if (inlineEmpty) return braceLine + 1;
 
     const braceAtLineEnd = braceLineText.trim().endsWith('{');
@@ -49,16 +52,44 @@ export function functionParameterLine(
 
 /*──────────── helpers ────────────*/
 
-function findNodeAtOffset(root: ts.Node, offset: number): ts.Node | null {
-  let found: ts.Node | null = null;
-  function visit(n: ts.Node) {
-    if (offset >= n.getFullStart() && offset <= n.getEnd()) {
-      found = n;
-      ts.forEachChild(n, visit);
+function findParameterNodeOnLine(
+  root: ts.Node,
+  selectionLine: number,
+  variableName: string,
+  document: TextDocument,
+): ts.Node | null {
+  let foundParameter: ts.Node | null = null;
+
+  function visit(node: ts.Node): void {
+    // Check if this node is a parameter identifier that matches our criteria
+    if (ts.isIdentifier(node) && node.text === variableName) {
+      const nodePos = document.positionAt(node.getStart());
+      if (nodePos.line === selectionLine) {
+        // Check if this identifier is actually a parameter or part of a parameter destructuring
+        let parent = node.parent;
+
+        // Handle direct parameter case
+        if (parent && ts.isParameter(parent) && parent.name === node) {
+          foundParameter = node;
+          return;
+        }
+
+        // Handle destructuring pattern case (e.g., { title, onClick })
+        while (parent) {
+          if (ts.isParameter(parent)) {
+            foundParameter = node;
+            return;
+          }
+          parent = parent.parent;
+        }
+      }
     }
+
+    ts.forEachChild(node, visit);
   }
+
   visit(root);
-  return found;
+  return foundParameter;
 }
 
 function isFunctionLike(n: ts.Node): n is ts.FunctionLikeDeclaration {
