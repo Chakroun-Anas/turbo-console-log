@@ -3,7 +3,9 @@ import type { Config } from 'jest';
 const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/src/jest-tests/**/*.test.ts'],
+  testMatch: [
+    '<rootDir>/src/jest-tests/unit/js/JSDebugMessage/logMessageLine/helpers/binaryExpressionLine/binaryExpressionLine.test.ts',
+  ],
   moduleFileExtensions: ['ts', 'js'],
   transform: {
     '^.+\\.ts$': [

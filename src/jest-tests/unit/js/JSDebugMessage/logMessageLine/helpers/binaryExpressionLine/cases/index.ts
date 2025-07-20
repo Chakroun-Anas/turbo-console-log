@@ -6,7 +6,18 @@ import case5 from './5';
 import case6 from './6';
 import case7 from './7';
 import case8 from './8';
+import case9 from './9';
 
-const documents = [case1, case2, case3, case4, case5, case6, case7, case8];
+const documents = [
+  case1,
+  case2,
+  case3,
+  case4,
+  case5,
+  case6,
+  case7,
+  case8,
+  case9,
+];
 
 export default documents;
