@@ -5,7 +5,7 @@ const config: Config = {
   testEnvironment: 'node',
   testMatch: ['<rootDir>/src/jest-tests/**/*.test.ts'],
   // testMatch: [
-  //   '<rootDir>/src/jest-tests/unit/js/JSDebugMessage/logMessage/helpers/functionCallAssignmentChecker/functionCallAssignmentChecker.test.ts',
+  //   '<rootDir>/src/jest-tests/unit/js/JSDebugMessage/logMessageLine/helpers/functionCallLine/functionCallLine.test.ts',
   // ],
   moduleFileExtensions: ['ts', 'js'],
   transform: {

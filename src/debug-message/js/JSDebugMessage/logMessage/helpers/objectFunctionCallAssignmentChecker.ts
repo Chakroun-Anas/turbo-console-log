@@ -19,65 +19,88 @@ export function objectFunctionCallAssignmentChecker(
   ts.forEachChild(sourceFile, function visit(node) {
     if (isChecked) return;
 
-    if (ts.isVariableDeclaration(node)) {
-      const { name, initializer } = node;
-      const { line } = document.positionAt(node.getStart());
+    if (ts.isVariableStatement(node)) {
+      for (const decl of node.declarationList.declarations) {
+        const { name, initializer } = decl;
+        const startLine = document.positionAt(decl.getStart()).line;
+        const endLine = document.positionAt(decl.getEnd()).line;
 
-      if (line !== selectionLine || !initializer) return;
+        if (
+          selectionLine < startLine ||
+          selectionLine > endLine ||
+          !initializer
+        )
+          continue;
 
-      const isTargetVar = (n: ts.BindingName) =>
-        ts.isIdentifier(n) && n.text === variableName;
+        const isTargetVar = (n: ts.BindingName) =>
+          ts.isIdentifier(n) && n.text === variableName;
 
-      // Case: const result = obj.method() or exec(...)
-      if (isTargetVar(name) && ts.isCallExpression(initializer)) {
-        isChecked = true;
-        return;
-      }
+        // Case: const result = obj.method() or exec(...)
+        if (isTargetVar(name) && ts.isCallExpression(initializer)) {
+          isChecked = true;
+          return;
+        }
 
-      // Case: const { data } = obj.method()
-      if (
-        ts.isObjectBindingPattern(name) &&
-        name.elements.some(
-          (el) =>
-            ts.isBindingElement(el) &&
-            ts.isIdentifier(el.name) &&
-            el.name.text === variableName,
-        ) &&
-        ts.isCallExpression(initializer)
-      ) {
-        isChecked = true;
-        return;
-      }
+        // Case: const { data } = obj.method()
+        if (
+          ts.isObjectBindingPattern(name) &&
+          name.elements.some(
+            (el) =>
+              ts.isBindingElement(el) &&
+              ts.isIdentifier(el.name) &&
+              el.name.text === variableName,
+          ) &&
+          ts.isCallExpression(initializer)
+        ) {
+          isChecked = true;
+          return;
+        }
 
-      // Case: const result = wrapperFn({ queryFn: () => obj.method() })
-      if (isTargetVar(name) && ts.isCallExpression(initializer)) {
-        for (const arg of initializer.arguments) {
-          if (
-            ts.isObjectLiteralExpression(arg) &&
-            arg.properties.some((prop) => {
-              if (
-                ts.isPropertyAssignment(prop) &&
-                (ts.isFunctionExpression(prop.initializer) ||
-                  ts.isArrowFunction(prop.initializer))
-              ) {
-                return ts.forEachChild(
-                  prop.initializer,
-                  function searchNestedCall(n): boolean {
-                    if (
-                      ts.isCallExpression(n) &&
-                      ts.isPropertyAccessExpression(n.expression)
-                    ) {
-                      return true;
-                    }
-                    return ts.forEachChild(n, searchNestedCall) || false;
-                  },
-                );
-              }
-              return false;
-            })
-          ) {
-            isChecked = true;
-            return;
+        // Case: const [githubSha] = process.argv.slice(2)
+        if (
+          ts.isArrayBindingPattern(name) &&
+          name.elements.some(
+            (el) =>
+              ts.isBindingElement(el) &&
+              ts.isIdentifier(el.name) &&
+              el.name.text === variableName,
+          ) &&
+          ts.isCallExpression(initializer)
+        ) {
+          isChecked = true;
+          return;
+        }
+
+        // Case: const result = wrapperFn({ queryFn: () => obj.method() })
+        if (isTargetVar(name) && ts.isCallExpression(initializer)) {
+          for (const arg of initializer.arguments) {
+            if (
+              ts.isObjectLiteralExpression(arg) &&
+              arg.properties.some((prop) => {
+                if (
+                  ts.isPropertyAssignment(prop) &&
+                  (ts.isFunctionExpression(prop.initializer) ||
+                    ts.isArrowFunction(prop.initializer))
+                ) {
+                  return ts.forEachChild(
+                    prop.initializer,
+                    function searchNestedCall(n): boolean {
+                      if (
+                        ts.isCallExpression(n) &&
+                        ts.isPropertyAccessExpression(n.expression)
+                      ) {
+                        return true;
+                      }
+                      return ts.forEachChild(n, searchNestedCall) || false;
+                    },
+                  );
+                }
+                return false;
+              })
+            ) {
+              isChecked = true;
+              return;
+            }
           }
         }
       }

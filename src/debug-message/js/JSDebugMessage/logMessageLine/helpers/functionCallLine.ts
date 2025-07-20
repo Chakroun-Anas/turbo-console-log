@@ -43,9 +43,10 @@ export function functionCallLine(
 
       if (!isRelevantCall) return;
 
-      const { line } = document.positionAt(node.getStart());
+      const startLine = document.positionAt(node.getStart()).line;
+      const endLine = document.positionAt(node.getEnd()).line;
 
-      if (line === selectionLine) {
+      if (selectionLine >= startLine && selectionLine <= endLine) {
         targetEnd = node.getEnd();
         return;
       }
