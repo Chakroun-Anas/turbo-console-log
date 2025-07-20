@@ -1,0 +1,85 @@
+export default {
+  case1: {
+    name: 'should detect property access in if condition',
+    lines: [
+      'if (process.env.GITHUB_ACTIONS === "true") {',
+      '  console.log("In GitHub Actions");',
+      '}',
+    ],
+    selectionLine: 0,
+    variableName: 'process.env.GITHUB_ACTIONS',
+    expected: true,
+  },
+  case2: {
+    name: 'should detect property access in complex if condition',
+    lines: [
+      'if (',
+      '  process.env.GITHUB_ACTIONS === "true" &&',
+      '  process.env.GITHUB_EVENT_NAME === "pull_request"',
+      ') {',
+      '  console.log("Complex condition");',
+      '}',
+    ],
+    selectionLine: 1,
+    variableName: 'process.env.GITHUB_ACTIONS',
+    expected: true,
+  },
+  case3: {
+    name: 'should not detect property access in while loop condition',
+    lines: ['while (config.retryCount > 0) {', '  config.retryCount--;', '}'],
+    selectionLine: 0,
+    variableName: 'config.retryCount',
+    expected: false,
+  },
+  case4: {
+    name: 'should not detect property access in for loop condition',
+    lines: [
+      'for (let i = 0; i < arr.length; i++) {',
+      '  console.log(arr[i]);',
+      '}',
+    ],
+    selectionLine: 0,
+    variableName: 'arr.length',
+    expected: false,
+  },
+  case5: {
+    name: 'should not detect property access in ternary condition',
+    lines: ['const result = user.isActive ? "active" : "inactive";'],
+    selectionLine: 0,
+    variableName: 'user.isActive',
+    expected: false,
+  },
+  case6: {
+    name: 'should not detect when variable is not in condition',
+    lines: [
+      'if (someOtherVariable === "true") {',
+      '  console.log(process.env.GITHUB_ACTIONS);',
+      '}',
+    ],
+    selectionLine: 1,
+    variableName: 'process.env.GITHUB_ACTIONS',
+    expected: false,
+  },
+  case7: {
+    name: 'should not detect when selection is outside condition',
+    lines: [
+      'if (process.env.GITHUB_ACTIONS === "true") {',
+      '  console.log("Inside block");',
+      '}',
+    ],
+    selectionLine: 1,
+    variableName: 'process.env.GITHUB_ACTIONS',
+    expected: false,
+  },
+  case8: {
+    name: 'should handle nested property access',
+    lines: [
+      'if (app.config.database.host === "localhost") {',
+      '  connectToLocal();',
+      '}',
+    ],
+    selectionLine: 0,
+    variableName: 'app.config.database.host',
+    expected: true,
+  },
+};

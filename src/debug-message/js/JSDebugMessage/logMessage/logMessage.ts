@@ -16,6 +16,7 @@ import {
   rawPropertyAccessChecker,
   propertyMethodCallChecker,
   withinReturnStatementChecker,
+  withinConditionBlockChecker,
 } from './helpers';
 
 export function logMessage(
@@ -31,6 +32,8 @@ export function logMessage(
   } = {
     [LogMessageType.WithinReturnStatement]: () =>
       withinReturnStatementChecker(document, selectionLine, selectedVar),
+    [LogMessageType.WithinConditionBlock]: () =>
+      withinConditionBlockChecker(document, selectionLine, selectedVar),
     [LogMessageType.ObjectLiteral]: () =>
       objectLiteralChecker(document, selectionLine, selectedVar),
     [LogMessageType.FunctionParameter]: () =>

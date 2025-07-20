@@ -13,6 +13,7 @@ export enum LogMessageType {
   FunctionParameter = 'FunctionParameter',
   PropertyMethodCall = 'PropertyMethodCall',
   WithinReturnStatement = 'WithinReturnStatement',
+  WithinConditionBlock = 'WithinConditionBlock',
 }
 
 export type LogContextMetadata = {

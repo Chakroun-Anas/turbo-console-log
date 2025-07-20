@@ -15,6 +15,7 @@ export const logTypeOrder = [
   { logMessageType: LogMessageType.PropertyMethodCall, priority: 10 },
   { logMessageType: LogMessageType.Ternary, priority: 11 },
   { logMessageType: LogMessageType.BinaryExpression, priority: 12 },
-  { logMessageType: LogMessageType.RawPropertyAccess, priority: 13 },
-  { logMessageType: LogMessageType.PrimitiveAssignment, priority: 14 },
+  { logMessageType: LogMessageType.WithinConditionBlock, priority: 13 },
+  { logMessageType: LogMessageType.RawPropertyAccess, priority: 14 },
+  { logMessageType: LogMessageType.PrimitiveAssignment, priority: 15 },
 ];

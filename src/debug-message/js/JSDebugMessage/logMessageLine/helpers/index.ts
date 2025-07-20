@@ -11,6 +11,7 @@ import { binaryExpressionLine } from './binaryExpressionLine';
 import { rawPropertyAccessLine } from './rawPropertyAccessLine';
 import { propertyMethodCallLine } from './propertyMethodCallLine';
 import { withinReturnStatementLine } from './withinReturnStatementLine';
+import { withinConditionBlockLine } from './withinConditionBlockLine';
 export {
   ternaryExpressionLine,
   objectLiteralLine,
@@ -25,4 +26,5 @@ export {
   rawPropertyAccessLine,
   propertyMethodCallLine,
   withinReturnStatementLine,
+  withinConditionBlockLine,
 };

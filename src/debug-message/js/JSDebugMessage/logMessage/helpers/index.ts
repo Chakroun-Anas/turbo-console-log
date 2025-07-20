@@ -13,6 +13,7 @@ import { binaryExpressionChecker } from './binaryExpressionChecker';
 import { rawPropertyAccessChecker } from './rawPropertyAccessChecker';
 import { propertyMethodCallChecker } from './propertyMethodCallChecker';
 import { withinReturnStatementChecker } from './withinReturnStatementChecker';
+import { withinConditionBlockChecker } from './withinConditionBlockChecker';
 export {
   logTypeOrder,
   objectLiteralChecker,
@@ -29,4 +30,5 @@ export {
   rawPropertyAccessChecker,
   propertyMethodCallChecker,
   withinReturnStatementChecker,
+  withinConditionBlockChecker,
 };

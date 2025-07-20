@@ -14,6 +14,7 @@ import {
   propertyMethodCallLine,
   functionParameterLine,
   withinReturnStatementLine,
+  withinConditionBlockLine,
 } from './helpers';
 
 export function line(
@@ -25,6 +26,9 @@ export function line(
   switch (logMsg.logMessageType) {
     case LogMessageType.WithinReturnStatement: {
       return withinReturnStatementLine(document, selectionLine, selectedVar);
+    }
+    case LogMessageType.WithinConditionBlock: {
+      return withinConditionBlockLine(document, selectionLine, selectedVar);
     }
     case LogMessageType.PrimitiveAssignment:
       return primitiveAssignmentLine(document, selectionLine, selectedVar);
