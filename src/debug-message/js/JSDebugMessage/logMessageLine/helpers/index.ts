@@ -12,6 +12,7 @@ import { rawPropertyAccessLine } from './rawPropertyAccessLine';
 import { propertyMethodCallLine } from './propertyMethodCallLine';
 import { withinReturnStatementLine } from './withinReturnStatementLine';
 import { withinConditionBlockLine } from './withinConditionBlockLine';
+import { wanderingExpressionLine } from './wanderingExpressionLine';
 export {
   ternaryExpressionLine,
   objectLiteralLine,
@@ -27,4 +28,5 @@ export {
   propertyMethodCallLine,
   withinReturnStatementLine,
   withinConditionBlockLine,
+  wanderingExpressionLine,
 };

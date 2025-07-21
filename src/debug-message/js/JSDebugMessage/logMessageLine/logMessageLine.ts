@@ -15,6 +15,7 @@ import {
   functionParameterLine,
   withinReturnStatementLine,
   withinConditionBlockLine,
+  wanderingExpressionLine,
 } from './helpers';
 
 export function line(
@@ -56,6 +57,8 @@ export function line(
       return binaryExpressionLine(document, selectionLine, selectedVar);
     case LogMessageType.Ternary:
       return ternaryExpressionLine(document, selectionLine, selectedVar);
+    case LogMessageType.WanderingExpression:
+      return wanderingExpressionLine(document, selectionLine, selectedVar);
     default:
       return selectionLine + 1;
   }

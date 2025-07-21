@@ -14,6 +14,7 @@ import { rawPropertyAccessChecker } from './rawPropertyAccessChecker';
 import { propertyMethodCallChecker } from './propertyMethodCallChecker';
 import { withinReturnStatementChecker } from './withinReturnStatementChecker';
 import { withinConditionBlockChecker } from './withinConditionBlockChecker';
+import { wanderingExpressionChecker } from './wanderingExpressionChecker';
 export {
   logTypeOrder,
   objectLiteralChecker,
@@ -31,4 +32,5 @@ export {
   propertyMethodCallChecker,
   withinReturnStatementChecker,
   withinConditionBlockChecker,
+  wanderingExpressionChecker,
 };

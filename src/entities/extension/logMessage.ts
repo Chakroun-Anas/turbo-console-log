@@ -14,6 +14,7 @@ export enum LogMessageType {
   PropertyMethodCall = 'PropertyMethodCall',
   WithinReturnStatement = 'WithinReturnStatement',
   WithinConditionBlock = 'WithinConditionBlock',
+  WanderingExpression = 'WanderingExpression',
 }
 
 export type LogContextMetadata = {

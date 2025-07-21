@@ -18,4 +18,5 @@ export const logTypeOrder = [
   { logMessageType: LogMessageType.WithinConditionBlock, priority: 13 },
   { logMessageType: LogMessageType.RawPropertyAccess, priority: 14 },
   { logMessageType: LogMessageType.PrimitiveAssignment, priority: 15 },
+  { logMessageType: LogMessageType.WanderingExpression, priority: 16 },
 ];

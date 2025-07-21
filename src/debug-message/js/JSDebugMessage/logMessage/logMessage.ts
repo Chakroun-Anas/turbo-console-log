@@ -17,6 +17,7 @@ import {
   propertyMethodCallChecker,
   withinReturnStatementChecker,
   withinConditionBlockChecker,
+  wanderingExpressionChecker,
 } from './helpers';
 
 export function logMessage(
@@ -63,6 +64,8 @@ export function logMessage(
       namedFunctionAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.PrimitiveAssignment]: () =>
       primitiveAssignmentChecker(document, selectionLine, selectedVar),
+    [LogMessageType.WanderingExpression]: () =>
+      wanderingExpressionChecker(document, selectionLine, selectedVar),
     [LogMessageType.PropertyAccessAssignment]: () => {
       return propertyAccessAssignmentChecker(
         document,

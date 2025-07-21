@@ -3,8 +3,8 @@ import type { Config } from 'jest';
 const config: Config = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  // testMatch: ['<rootDir>/src/jest-tests/**/*.test.ts'],
-  testMatch: ['<rootDir>/src/jest-tests/**/detectAll.test.ts'],
+  testMatch: ['<rootDir>/src/jest-tests/**/*.test.ts'],
+  // testMatch: ['<rootDir>/src/jest-tests/**/detectAll.test.ts'],
   moduleFileExtensions: ['ts', 'js'],
   transform: {
     '^.+\\.ts$': [
