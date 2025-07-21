@@ -2,21 +2,26 @@ import { addFileInfo } from '@/debug-message/js/JSDebugMessage/msg/constructDebu
 import { resolveDelimiterSpacing } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/resolveDelimiterSpacing';
 
 // Mock the resolveDelimiterSpacing dependency
-jest.mock('@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/resolveDelimiterSpacing');
+jest.mock(
+  '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/resolveDelimiterSpacing',
+);
 
 describe('addFileInfo', () => {
   // Mock function
-  const mockResolveDelimiterSpacing = resolveDelimiterSpacing as jest.MockedFunction<typeof resolveDelimiterSpacing>;
+  const mockResolveDelimiterSpacing =
+    resolveDelimiterSpacing as jest.MockedFunction<
+      typeof resolveDelimiterSpacing
+    >;
 
   // Test data
   const fileName = 'testFile.js';
   const lineNum = 42;
-  const delimiter = ' | ';
+  const delimiter = '|';
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Set up default mock return value
-    mockResolveDelimiterSpacing.mockReturnValue(' | ');
+    mockResolveDelimiterSpacing.mockReturnValue(` ${delimiter} `);
   });
 
   describe('when both filename and line number are included', () => {
@@ -24,14 +29,14 @@ describe('addFileInfo', () => {
       const result = addFileInfo(fileName, lineNum, true, true, delimiter);
 
       expect(result).toEqual(['testFile.js:42', ' | ']);
-      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith('', delimiter);
+      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith(delimiter);
       expect(mockResolveDelimiterSpacing).toHaveBeenCalledTimes(1);
     });
 
-    it('should call resolveDelimiterSpacing with empty prefix and provided delimiter', () => {
+    it('should call resolveDelimiterSpacing with the provided delimiter', () => {
       addFileInfo(fileName, lineNum, true, true, delimiter);
 
-      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith('', delimiter);
+      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith(delimiter);
     });
   });
 
@@ -40,7 +45,7 @@ describe('addFileInfo', () => {
       const result = addFileInfo(fileName, lineNum, true, false, delimiter);
 
       expect(result).toEqual(['testFile.js', ' | ']);
-      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith('', delimiter);
+      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith(delimiter);
     });
 
     it('should not include colon when line number is excluded', () => {
@@ -56,7 +61,7 @@ describe('addFileInfo', () => {
       const result = addFileInfo(fileName, lineNum, false, true, delimiter);
 
       expect(result).toEqual([':42', ' | ']);
-      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith('', delimiter);
+      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith(delimiter);
     });
 
     it('should include colon prefix when only line number is shown', () => {
@@ -83,30 +88,17 @@ describe('addFileInfo', () => {
   });
 
   describe('delimiter handling', () => {
-    it('should use the resolved delimiter from resolveDelimiterSpacing', () => {
-      const customDelimiterResult = ' :: ';
-      mockResolveDelimiterSpacing.mockReturnValue(customDelimiterResult);
-
-      const result = addFileInfo(fileName, lineNum, true, true, ' -> ');
-
-      expect(result[1]).toBe(customDelimiterResult);
-      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith('', ' -> ');
-    });
-
-    it('should handle empty delimiter', () => {
-      mockResolveDelimiterSpacing.mockReturnValue('');
-
-      const result = addFileInfo(fileName, lineNum, true, false, '');
-
-      expect(result).toEqual(['testFile.js', '']);
-      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith('', '');
-    });
-
     it('should handle complex delimiters', () => {
       const complexDelimiter = ' [DEBUG] ';
       mockResolveDelimiterSpacing.mockReturnValue(complexDelimiter);
 
-      const result = addFileInfo('complex.ts', 777, false, true, complexDelimiter);
+      const result = addFileInfo(
+        'complex.ts',
+        777,
+        false,
+        true,
+        complexDelimiter,
+      );
 
       expect(result).toEqual([':777', complexDelimiter]);
     });
@@ -132,7 +124,8 @@ describe('addFileInfo', () => {
     });
 
     it('should handle very long filename', () => {
-      const longFileName = 'very-very-very-long-filename-that-exceeds-normal-length.js';
+      const longFileName =
+        'very-very-very-long-filename-that-exceeds-normal-length.js';
       const result = addFileInfo(longFileName, lineNum, true, true, delimiter);
 
       expect(result[0]).toBe(`${longFileName}:42`);
@@ -140,7 +133,13 @@ describe('addFileInfo', () => {
 
     it('should handle filename with special characters', () => {
       const specialFileName = 'file-with@special#chars$.ts';
-      const result = addFileInfo(specialFileName, lineNum, true, false, delimiter);
+      const result = addFileInfo(
+        specialFileName,
+        lineNum,
+        true,
+        false,
+        delimiter,
+      );
 
       expect(result[0]).toBe(specialFileName);
     });
@@ -173,12 +172,6 @@ describe('addFileInfo', () => {
   });
 
   describe('integration with resolveDelimiterSpacing', () => {
-    it('should pass empty prefix to resolveDelimiterSpacing', () => {
-      addFileInfo(fileName, lineNum, true, true, ' test ');
-
-      expect(mockResolveDelimiterSpacing).toHaveBeenCalledWith('', ' test ');
-    });
-
     it('should use resolveDelimiterSpacing result as second array element', () => {
       const expectedDelimiter = ' PROCESSED ';
       mockResolveDelimiterSpacing.mockReturnValue(expectedDelimiter);

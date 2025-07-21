@@ -25,7 +25,7 @@ export function addFileInfo(
     const filePart = includeFilename ? fileName : '';
     const linePart = includeLineNum ? `:${lineNum}` : '';
     parts.push(`${filePart}${linePart}`);
-    parts.push(resolveDelimiterSpacing('', delimiter));
+    parts.push(resolveDelimiterSpacing(delimiter));
   }
   return parts;
 }

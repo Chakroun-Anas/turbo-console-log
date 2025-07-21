@@ -19,11 +19,11 @@ export function addEnclosingContext(
   const parts: string[] = [];
   if (className.length > 0) {
     parts.push(className);
-    parts.push(resolveDelimiterSpacing('', delimiter, false));
+    parts.push(resolveDelimiterSpacing(delimiter));
   }
   if (functionName.length > 0) {
     parts.push(functionName);
-    parts.push(resolveDelimiterSpacing('', delimiter));
+    parts.push(resolveDelimiterSpacing(delimiter));
   }
   return parts;
 }

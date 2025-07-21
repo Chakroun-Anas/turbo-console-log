@@ -14,7 +14,7 @@ export function addPrefix(prefix: string, delimiter: string): string[] {
   const parts: string[] = [];
   if (prefix.length > 0) {
     parts.push(prefix);
-    parts.push(resolveDelimiterSpacing(prefix, delimiter));
+    parts.push(resolveDelimiterSpacing(delimiter));
   }
   return parts;
 }

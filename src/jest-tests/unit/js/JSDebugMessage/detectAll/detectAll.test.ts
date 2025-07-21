@@ -78,7 +78,7 @@ describe('detectAll', () => {
     it('should detect single-line log message with prefix and delimiter', () => {
       const document = makeTextDocument([
         'const x = 5;',
-        'console.log("🚀 x ~", x);',
+        'console.log("🚀 ~ x:", x);',
         'return x;',
       ]);
 
@@ -110,7 +110,7 @@ describe('detectAll', () => {
       const document = makeTextDocument([
         'const complexObj = { a: 1, b: 2 };',
         'console.log(',
-        '  "🚀 complexObj ~",',
+        '  "🚀 ~ complexObj:",',
         '  complexObj',
         ');',
         'return complexObj;',
@@ -133,7 +133,7 @@ describe('detectAll', () => {
       expect(result[0].spaces).toBe('');
       // Check that we're capturing the correct range of lines
       expect(result[0].lines[0].start.line).toBe(1); // console.log(
-      expect(result[0].lines[1].start.line).toBe(2); // "🚀 complexObj ~",
+      expect(result[0].lines[1].start.line).toBe(2); // "🚀 ~ complexObj:",
       expect(result[0].lines[2].start.line).toBe(3); // complexObj
       expect(result[0].lines[3].start.line).toBe(4); // );
       expect(mockClosingContextLine).toHaveBeenCalledWith(
@@ -187,7 +187,7 @@ describe('detectAll', () => {
 
     it('should include log message with both prefix and delimiter', () => {
       const document = makeTextDocument([
-        'console.log("🚀 variable ~ value", variable);',
+        'console.log("🚀 ~ variable:", variable);',
       ]);
 
       mockLogFunctionToUse.mockReturnValue('console.log');
@@ -213,7 +213,7 @@ describe('detectAll', () => {
   describe('Different log functions', () => {
     it('should detect console.warn messages', () => {
       const document = makeTextDocument([
-        'console.warn("🚀 warning ~", data);',
+        'console.warn("🚀 ~ warning:", data);',
       ]);
 
       mockLogFunctionToUse.mockReturnValue('console.warn');
@@ -241,7 +241,7 @@ describe('detectAll', () => {
 
     it('should detect console.error messages', () => {
       const document = makeTextDocument([
-        'console.error("🚀 error ~", error);',
+        'console.error("🚀 ~ error:", error);',
       ]);
 
       mockLogFunctionToUse.mockReturnValue('console.error');
@@ -264,7 +264,7 @@ describe('detectAll', () => {
 
     it('should handle custom log functions', () => {
       const document = makeTextDocument([
-        'logger.debug("🚀 debug ~", debugInfo);',
+        'logger.debug("🚀 ~ debug:", debugInfo);',
       ]);
 
       mockLogFunctionToUse.mockReturnValue('logger.debug');
@@ -288,7 +288,7 @@ describe('detectAll', () => {
 
   describe('Special characters handling', () => {
     it('should handle regex special characters in log function name', () => {
-      const document = makeTextDocument(['$log.info("🚀 info ~", info);']);
+      const document = makeTextDocument(['$log.info("🚀 ~ info:", info);']);
 
       mockLogFunctionToUse.mockReturnValue('$log.info');
       mockSpacesBeforeLogMsg.mockReturnValue('');
@@ -309,7 +309,9 @@ describe('detectAll', () => {
     });
 
     it('should handle regex special characters in prefix', () => {
-      const document = makeTextDocument(['console.log("[DEBUG] ~", value);']);
+      const document = makeTextDocument([
+        'console.log("[DEBUG] ~ value:", value);',
+      ]);
 
       mockLogFunctionToUse.mockReturnValue('console.log');
       mockSpacesBeforeLogMsg.mockReturnValue('');
@@ -330,9 +332,7 @@ describe('detectAll', () => {
     });
 
     it('should handle regex special characters in delimiter', () => {
-      const document = makeTextDocument([
-        'console.log("🚀 value | delimiter", value);',
-      ]);
+      const document = makeTextDocument(['console.log("🚀 | value:", value);']);
 
       mockLogFunctionToUse.mockReturnValue('console.log');
       mockSpacesBeforeLogMsg.mockReturnValue('');
@@ -357,11 +357,11 @@ describe('detectAll', () => {
     it('should detect multiple log messages in the same document', () => {
       const document = makeTextDocument([
         'const x = 5;',
-        'console.log("🚀 x ~", x);',
+        'console.log("🚀 ~ x:", x);',
         'const y = 10;',
-        'console.log("🚀 y ~", y);',
+        'console.log("🚀 ~ y:", y);',
         'const z = x + y;',
-        'console.log("🚀 z ~", z);',
+        'console.log("🚀 ~ z:", z);',
       ]);
 
       mockLogFunctionToUse.mockReturnValue('console.log');
@@ -399,10 +399,10 @@ describe('detectAll', () => {
 
     it('should detect some but not all log messages based on validation', () => {
       const document = makeTextDocument([
-        'console.log("🚀 valid ~", x);',
-        'console.log("missing prefix ~", y);',
-        'console.log("🚀 missing delimiter", z);',
-        'console.log("🚀 valid too ~", a);',
+        'console.log("🚀 ~ valid:", x);',
+        'console.log("missing prefix ~ y:", y);',
+        'console.log("🚀 z:", z);',
+        'console.log("🚀 ~ valid too:", a);',
       ]);
 
       mockLogFunctionToUse.mockReturnValue('console.log');
@@ -437,7 +437,7 @@ describe('detectAll', () => {
 
   describe('Arguments handling', () => {
     it('should pass args to logFunctionToUse', () => {
-      const document = makeTextDocument(['console.log("🚀 test ~", test);']);
+      const document = makeTextDocument(['console.log("🚀 ~ test:", test);']);
 
       const args = [{ logFunction: 'customLog' }];
       mockLogFunctionToUse.mockReturnValue('customLog');
@@ -461,7 +461,7 @@ describe('detectAll', () => {
     });
 
     it('should work without args parameter', () => {
-      const document = makeTextDocument(['console.log("🚀 test ~", test);']);
+      const document = makeTextDocument(['console.log("🚀 ~ test:", test);']);
 
       mockLogFunctionToUse.mockReturnValue('console.log');
       mockSpacesBeforeLogMsg.mockReturnValue('');
@@ -522,9 +522,9 @@ describe('detectAll', () => {
 
     it('should handle log messages at the beginning and end of document', () => {
       const document = makeTextDocument([
-        'console.log("🚀 start ~", start);',
+        'console.log("🚀 ~ start:", start);',
         'const middle = "code";',
-        'console.log("🚀 end ~", end);',
+        'console.log("🚀 ~ end:", end);',
       ]);
 
       mockLogFunctionToUse.mockReturnValue('console.log');
@@ -590,10 +590,10 @@ describe('detectAll', () => {
       const document = makeTextDocument([
         'function outer() {',
         '  const x = 5;',
-        '  console.log("🚀 x ~", x);',
+        '  console.log("🚀 ~ x:", x);',
         '  function inner() {',
         '    const y = 10;',
-        '    console.log("🚀 y ~", y);',
+        '    console.log("🚀 ~ y:", y);',
         '  }',
         '}',
       ]);
@@ -629,11 +629,11 @@ describe('detectAll', () => {
       const document = makeTextDocument([
         'class MyClass {',
         '  constructor() {',
-        '    console.log("🚀 constructor ~", this);',
+        '    console.log("🚀 ~ constructor:", this);',
         '  }',
         '  method() {',
         '    const result = this.compute();',
-        '    console.log("🚀 result ~", result);',
+        '    console.log("🚀 ~ result:", result);',
         '  }',
         '}',
       ]);
