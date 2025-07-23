@@ -8,10 +8,10 @@ export function getExtensionProperties(
     logMessagePrefix: workspaceConfig.logMessagePrefix || '🚀',
     logMessageSuffix: workspaceConfig.logMessageSuffix || ':',
     addSemicolonInTheEnd: workspaceConfig.addSemicolonInTheEnd || false,
-    insertEnclosingClass: workspaceConfig.insertEnclosingClass || true,
+    insertEnclosingClass: workspaceConfig.insertEnclosingClass ?? true,
     logCorrectionNotificationEnabled:
       workspaceConfig.logCorrectionNotificationEnabled || false,
-    insertEnclosingFunction: workspaceConfig.insertEnclosingFunction || true,
+    insertEnclosingFunction: workspaceConfig.insertEnclosingFunction ?? true,
     insertEmptyLineBeforeLogMessage:
       workspaceConfig.insertEmptyLineBeforeLogMessage || false,
     insertEmptyLineAfterLogMessage:

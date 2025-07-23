@@ -1,194 +1,34 @@
-import { TextEditorEdit, TextDocument, Position } from 'vscode';
+import { TextEditorEdit, TextDocument } from 'vscode';
 import {
   ExtensionProperties,
   LogMessage,
   LogContextMetadata,
-  LogMessageType,
-} from '../../../../entities';
-import { NamedFunctionMetadata } from '../../../../entities/extension/logMessage';
+} from '@/entities';
 import { logMessage } from '../logMessage';
-import { LineCodeProcessing } from '../../../../line-code-processing';
-import { DebugMessageLine } from '../../../DebugMessageLine';
-import { enclosingBlockName } from '../enclosingBlockName';
+import { spacesBeforeLogMsg } from '../helpers';
+import { line as logMessageLine } from '../logMessageLine';
 import {
-  spacesBeforeLogMsg,
-  isEmptyBlockContext,
-  emptyBlockDebuggingMsg,
-} from '../helpers';
-import { JSDebugMessageAnonymous } from '../../JSDebugMessageAnonymous';
+  applyTransformedCode,
+  needTransformation,
+  performTransformation,
+} from '../transformer';
+import { omit } from './helpers/omit';
+import { constructDebuggingMsg } from './constructDebuggingMsg';
+import { constructDebuggingMsgContent } from './constructDebuggingMsgContent';
+import { insertDebugMessage } from './insertDebugMessage';
 
-function omit<T extends object, K extends keyof T>(
-  obj: T,
-  keys: K[],
-): Omit<T, K> {
-  const clone = { ...obj };
-  keys.forEach((key) => delete clone[key]);
-  return clone;
-}
-
-function hasFunctionBody(
-  document: TextDocument,
-  functionStartLine: number,
-): boolean {
-  let currentLineNum = functionStartLine;
-  let totalOpenedBraces = 0;
-
-  while (currentLineNum < document.lineCount) {
-    const currentLineText = document.lineAt(currentLineNum).text.trim();
-
-    // ✅ Count `{` and `}`
-    totalOpenedBraces += (currentLineText.match(/(?<!\()\{/g) || []).length;
-
-    // ✅ If `{` exists → The function has a body
-    if (totalOpenedBraces > 0) {
-      return true;
-    }
-
-    currentLineNum++;
-
-    // ✅ Stop early if we reach a new statement without finding `{`
-    if (/^\S/.test(currentLineText) && totalOpenedBraces === 0) {
-      return false;
-    }
-  }
-
-  return false;
-}
-
-function constructDebuggingMsg(
-  extensionProperties: ExtensionProperties,
-  debuggingMsgContent: string,
-  spacesBeforeMsg: string,
-): string {
-  const logFunction =
-    extensionProperties.logFunction !== 'log'
-      ? extensionProperties.logFunction
-      : `console.${extensionProperties.logType}`;
-  const wrappingMsg = `${logFunction}(${extensionProperties.quote}${
-    extensionProperties.logMessagePrefix
-  } ${'-'.repeat(debuggingMsgContent.length - 16)}${
-    extensionProperties.logMessagePrefix
-  }${extensionProperties.quote})${
-    extensionProperties.addSemicolonInTheEnd ? ';' : ''
-  }`;
-  const debuggingMsg: string = extensionProperties.wrapLogMessage
-    ? `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsgContent}\n${spacesBeforeMsg}${wrappingMsg}`
-    : `${spacesBeforeMsg}${debuggingMsgContent}`;
-  return debuggingMsg;
-}
-
-function baseDebuggingMsg(
-  document: TextDocument,
-  textEditor: TextEditorEdit,
-  lineOfLogMsg: number,
-  debuggingMsg: string,
-  insertEmptyLineBeforeLogMessage: ExtensionProperties['insertEmptyLineBeforeLogMessage'],
-  insertEmptyLineAfterLogMessage: ExtensionProperties['insertEmptyLineAfterLogMessage'],
-): void {
-  textEditor.insert(
-    new Position(
-      lineOfLogMsg >= document.lineCount ? document.lineCount : lineOfLogMsg,
-      0,
-    ),
-    `${insertEmptyLineBeforeLogMessage ? '\n' : ''}${
-      lineOfLogMsg === document.lineCount ? '\n' : ''
-    }${debuggingMsg}\n${insertEmptyLineAfterLogMessage ? '\n' : ''}`,
-  );
-}
-
-function debuggingMsgQuote(settingQuote: string, selectedVar: string): string {
-  const trimmedVar = selectedVar.trim();
-  // If the variable starts with `{`, it's likely an object literal → use backticks
-  if (trimmedVar.startsWith('{')) {
-    return '`';
-  }
-  if (selectedVar.includes(`"`)) {
-    return '`';
-  }
-  if (selectedVar.includes(`'`)) {
-    return '"';
-  }
-  return settingQuote;
-}
-
-function constructDebuggingMsgContent(
-  document: TextDocument,
-  selectedVar: string,
-  lineOfSelectedVar: number,
-  lineOfLogMsg: number,
-  extensionProperties: Omit<
-    ExtensionProperties,
-    'wrapLogMessage' | 'insertEmptyLineAfterLogMessage'
-  >,
-  lineCodeProcessing: LineCodeProcessing,
-): string {
-  const {
-    includeFilename,
-    includeLineNum,
-    logFunction,
-    logType,
-    logMessagePrefix,
-    logMessageSuffix,
-    delimiterInsideMessage,
-    insertEmptyLineBeforeLogMessage,
-    quote,
-    insertEnclosingClass,
-    insertEnclosingFunction,
-  } = extensionProperties;
-  const fileName = document.fileName.includes('/')
-    ? document.fileName.split('/')[document.fileName.split('/').length - 1]
-    : document.fileName.split('\\')[document.fileName.split('\\').length - 1];
-  let classThatEncloseTheVar = '';
-  if (insertEnclosingClass) {
-    classThatEncloseTheVar = enclosingBlockName(
-      document,
-      lineOfSelectedVar,
-      'class',
-      lineCodeProcessing,
-    );
-  }
-  let funcThatEncloseTheVar = '';
-  if (insertEnclosingFunction) {
-    funcThatEncloseTheVar = enclosingBlockName(
-      document,
-      lineOfSelectedVar,
-      'function',
-      lineCodeProcessing,
-    );
-  }
-  const semicolon: string = extensionProperties.addSemicolonInTheEnd ? ';' : '';
-  const quoteToUse: string = debuggingMsgQuote(quote, selectedVar);
-  return `${
-    logFunction !== 'log' ? logFunction : `console.${logType}`
-  }(${quoteToUse}${logMessagePrefix}${
-    logMessagePrefix.length !== 0 &&
-    delimiterInsideMessage.length !== 0 &&
-    logMessagePrefix !== `${delimiterInsideMessage} `
-      ? ` ${delimiterInsideMessage} `
-      : ' '
-  }${
-    includeFilename || includeLineNum
-      ? `${includeFilename ? fileName : ''}${includeLineNum ? ':' : ''}${
-          includeLineNum
-            ? lineOfLogMsg + (insertEmptyLineBeforeLogMessage ? 2 : 1)
-            : ''
-        }${delimiterInsideMessage ? ` ${delimiterInsideMessage} ` : ' '}`
-      : ''
-  }${
-    classThatEncloseTheVar.length > 0
-      ? `${classThatEncloseTheVar}${
-          delimiterInsideMessage ? ` ${delimiterInsideMessage} ` : ''
-        }`
-      : ''
-  }${
-    funcThatEncloseTheVar.length > 0
-      ? `${funcThatEncloseTheVar}${
-          delimiterInsideMessage ? ` ${delimiterInsideMessage} ` : ' '
-        }`
-      : ''
-  }${selectedVar}${logMessageSuffix}${quoteToUse}, ${selectedVar})${semicolon}`;
-}
-
+/**
+ * Main function to generate and insert debugging messages into the document.
+ * This function orchestrates the entire process of creating a debug log message
+ * based on the selected variable and extension configuration.
+ *
+ * @param textEditor The text editor instance for making edits
+ * @param document The text document being edited
+ * @param selectedVar The selected variable name to debug
+ * @param lineOfSelectedVar The line number where the variable is located
+ * @param tabSize The tab size setting for proper indentation
+ * @param extensionProperties Configuration properties for the extension
+ */
 export function msg(
   textEditor: TextEditorEdit,
   document: TextDocument,
@@ -196,17 +36,13 @@ export function msg(
   lineOfSelectedVar: number,
   tabSize: number,
   extensionProperties: ExtensionProperties,
-  lineCodeProcessing: LineCodeProcessing,
-  debugMessageLine: DebugMessageLine,
-  jsDebugMessageAnonymous: JSDebugMessageAnonymous,
 ): void {
   const logMsg: LogMessage = logMessage(
     document,
     lineOfSelectedVar,
     selectedVar,
-    lineCodeProcessing,
   );
-  const lineOfLogMsg: number = debugMessageLine.line(
+  const lineOfLogMsg: number = logMessageLine(
     document,
     lineOfSelectedVar,
     selectedVar,
@@ -230,52 +66,31 @@ export function msg(
       'wrapLogMessage',
       'insertEmptyLineAfterLogMessage',
     ]),
-    lineCodeProcessing,
   );
   const debuggingMsg: string = constructDebuggingMsg(
     extensionProperties,
     debuggingMsgContent,
     spacesBeforeMsg,
   );
-  const selectedVarLine = document.lineAt(lineOfSelectedVar);
-  const selectedVarLineLoc = selectedVarLine.text;
-  if (isEmptyBlockContext(document, logMsg)) {
-    const emptyBlockLine =
-      logMsg.logMessageType === LogMessageType.MultilineParenthesis ||
-      logMsg.logMessageType === LogMessageType.FunctionParameter
-        ? document.lineAt(
-            (logMsg.metadata as LogContextMetadata).closingContextLine,
-          )
-        : document.lineAt((logMsg.metadata as NamedFunctionMetadata).line);
-    emptyBlockDebuggingMsg(
+
+  // Handle code transformation if needed
+  if (needTransformation(document, lineOfSelectedVar, selectedVar)) {
+    const transformedCode = performTransformation(
       document,
-      textEditor,
-      emptyBlockLine,
-      lineOfLogMsg,
-      debuggingMsgContent,
-      spacesBeforeMsg,
-      tabSize,
-    );
-    return;
-  }
-  if (
-    jsDebugMessageAnonymous.isAnonymousFunctionContext(
+      lineOfSelectedVar,
       selectedVar,
-      selectedVarLineLoc,
-    ) &&
-    !hasFunctionBody(document, lineOfSelectedVar)
-  ) {
-    jsDebugMessageAnonymous.anonymousPropDebuggingMsg(
-      document,
-      textEditor,
-      tabSize,
-      extensionProperties.addSemicolonInTheEnd,
-      selectedVarLine,
-      debuggingMsgContent,
+      debuggingMsg,
+      {
+        addSemicolonInTheEnd: extensionProperties.addSemicolonInTheEnd,
+        tabSize: tabSize,
+      },
     );
+    applyTransformedCode(document, transformedCode);
     return;
   }
-  baseDebuggingMsg(
+
+  // Insert the debugging message into the document
+  insertDebugMessage(
     document,
     textEditor,
     lineOfLogMsg,

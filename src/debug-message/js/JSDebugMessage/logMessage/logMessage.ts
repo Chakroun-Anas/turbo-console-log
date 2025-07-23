@@ -1,121 +1,77 @@
 import { TextDocument } from 'vscode';
-import { LogMessageType, LogMessage } from '../../../../entities';
-import { LineCodeProcessing } from '../../../../line-code-processing';
+import { LogMessageType, LogMessage, LogContextMetadata } from '@/entities';
 import {
   arrayAssignmentChecker,
-  decoratorChecker,
+  binaryExpressionChecker,
   functionCallAssignmentChecker,
   functionParameterChecker,
   logTypeOrder,
-  multiLineAnonymousFunctionChecker,
-  multilineBracesChecker,
-  multilineParenthesisChecker,
   namedFunctionAssignmentChecker,
-  nullishCoalescingChecker,
   objectFunctionCallAssignmentChecker,
   objectLiteralChecker,
   primitiveAssignmentChecker,
   propertyAccessAssignmentChecker,
   templateStringChecker,
   ternaryChecker,
-  typedFunctionCallAssignmentChecker,
+  rawPropertyAccessChecker,
+  propertyMethodCallChecker,
+  withinReturnStatementChecker,
+  withinConditionBlockChecker,
+  wanderingExpressionChecker,
 } from './helpers';
-
-function getFullRhs(document: TextDocument, startLine: number): string {
-  let rhs = document.lineAt(startLine).text.trim();
-  let line = startLine + 1;
-
-  while (line < document.lineCount) {
-    const nextLineText = document.lineAt(line).text.trim();
-    const shouldContinue =
-      // eslint-disable-next-line no-useless-escape
-      /[.\[]$/.test(rhs) || // RHS ends with . or [
-      /\?\.$/.test(rhs) || // RHS ends with ?.
-      // eslint-disable-next-line no-useless-escape
-      /^[.\[]/.test(nextLineText) || // next line starts with . or [
-      /^\?\./.test(nextLineText); // next line starts with ?.
-    if (!shouldContinue) break;
-
-    rhs += nextLineText;
-    line++;
-  }
-
-  return rhs;
-}
 
 export function logMessage(
   document: TextDocument,
   selectionLine: number,
   selectedVar: string,
-  lineCodeProcessing: LineCodeProcessing,
 ): LogMessage {
   const logMsgTypesChecks: {
     [key in LogMessageType]: () => {
       isChecked: boolean;
-      metadata?: Pick<LogMessage, 'metadata'>;
+      metadata?: Pick<LogMessage, 'metadata'> | LogContextMetadata;
     };
   } = {
+    [LogMessageType.WithinReturnStatement]: () =>
+      withinReturnStatementChecker(document, selectionLine, selectedVar),
+    [LogMessageType.WithinConditionBlock]: () =>
+      withinConditionBlockChecker(document, selectionLine, selectedVar),
     [LogMessageType.ObjectLiteral]: () =>
-      objectLiteralChecker(document, lineCodeProcessing, selectionLine),
-
-    [LogMessageType.Decorator]: () => decoratorChecker(document, selectionLine),
+      objectLiteralChecker(document, selectionLine, selectedVar),
     [LogMessageType.FunctionParameter]: () =>
       functionParameterChecker(document, selectionLine, selectedVar),
     [LogMessageType.ArrayAssignment]: () =>
-      arrayAssignmentChecker(document, lineCodeProcessing, selectionLine),
+      arrayAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.TemplateString]: () =>
-      templateStringChecker(document, selectionLine),
+      templateStringChecker(document, selectionLine, selectedVar),
     [LogMessageType.Ternary]: () =>
       ternaryChecker(document, selectionLine, selectedVar),
-    [LogMessageType.NullishCoalescing]: () =>
-      nullishCoalescingChecker(document, lineCodeProcessing, selectionLine),
-    [LogMessageType.MultilineBraces]: () =>
-      multilineBracesChecker(
-        document,
-        lineCodeProcessing,
-        selectedVar,
-        selectionLine,
-      ),
-    [LogMessageType.MultilineParenthesis]: () =>
-      multilineParenthesisChecker(document, lineCodeProcessing, selectionLine),
+    [LogMessageType.BinaryExpression]: () =>
+      binaryExpressionChecker(document, selectionLine, selectedVar),
+    [LogMessageType.RawPropertyAccess]: () =>
+      rawPropertyAccessChecker(document, selectionLine, selectedVar),
+    [LogMessageType.PropertyMethodCall]: () =>
+      propertyMethodCallChecker(document, selectionLine, selectedVar),
     [LogMessageType.ObjectFunctionCallAssignment]: () => {
-      const fullRhs = getFullRhs(document, selectionLine);
       return objectFunctionCallAssignmentChecker(
         document,
         selectionLine,
-        fullRhs,
-        lineCodeProcessing,
+        selectedVar,
       );
     },
     [LogMessageType.FunctionCallAssignment]: () =>
-      functionCallAssignmentChecker(
-        document,
-        lineCodeProcessing,
-        selectionLine,
-      ),
-    [LogMessageType.TypedFunctionCallAssignment]: () =>
-      typedFunctionCallAssignmentChecker(
-        document,
-        lineCodeProcessing,
-        selectionLine,
-      ),
+      functionCallAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.NamedFunctionAssignment]: () =>
-      namedFunctionAssignmentChecker(
-        document,
-        lineCodeProcessing,
-        selectionLine,
-      ),
-    [LogMessageType.MultiLineAnonymousFunction]: () =>
-      multiLineAnonymousFunctionChecker(
-        document,
-        lineCodeProcessing,
-        selectionLine,
-      ),
+      namedFunctionAssignmentChecker(document, selectionLine, selectedVar),
     [LogMessageType.PrimitiveAssignment]: () =>
-      primitiveAssignmentChecker(document, lineCodeProcessing, selectionLine),
+      primitiveAssignmentChecker(document, selectionLine, selectedVar),
+    [LogMessageType.WanderingExpression]: () =>
+      wanderingExpressionChecker(document, selectionLine, selectedVar),
     [LogMessageType.PropertyAccessAssignment]: () => {
-      const fullRhs = getFullRhs(document, selectionLine);
-      return propertyAccessAssignmentChecker(lineCodeProcessing, fullRhs);
+      return propertyAccessAssignmentChecker(
+        document,
+        selectionLine,
+        selectedVar,
+      );
     },
   };
 

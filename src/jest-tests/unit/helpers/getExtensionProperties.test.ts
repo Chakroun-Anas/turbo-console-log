@@ -36,4 +36,16 @@ describe('getExtensionProperties', () => {
     expect(props.logMessagePrefix).toBe('🔥');
     expect(props.logType).toBe('info');
   });
+
+  it('respects explicit false values for boolean properties', () => {
+    const config = createMockWorkspaceConfig({
+      insertEnclosingClass: false,
+      insertEnclosingFunction: false,
+    });
+
+    const props = getExtensionProperties(config);
+
+    expect(props.insertEnclosingClass).toBe(false);
+    expect(props.insertEnclosingFunction).toBe(false);
+  });
 });

@@ -2,6 +2,36 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.3.0] – 2025-07-23
+
+### Full AST Engine Revolution — Complete Rewrite
+
+- **Revolutionary AST Engine:** Complete rebuild from the ground up using TypeScript Compiler API
+- **Massive Quality Improvement:** Coverage increased from 45% to 86% average (statements, branches, functions, lines)
+- **2.6X More Comprehensive:** 4,423 lines of sophisticated AST code vs 1,688 in the old regex system
+- **750+ Tests:** Comprehensive unit and integration testing for bulletproof reliability
+- **16 Specialized AST Checkers:** Each code pattern handled with precision and semantic understanding
+
+### What's New:
+
+- **Bulletproof Accuracy:** AST understands code structure semantically, not just pattern matching
+- **Modern JavaScript Support:** Native handling of destructuring, async/await, optional chaining
+- **Complex Expression Support:** Perfect handling of ternary operators, binary expressions, template literals
+- **Edge Case Mastery:** Robust support for multi-line assignments, chained method calls, nested objects
+- **TypeScript Integration:** Seamless support for TypeScript-specific syntax and patterns
+- **Future-Proof Architecture:** Easy to extend for new JavaScript language features
+
+### Bug Fixes & Improvements:
+
+- **Core Engine:** insertEnclosingClass and insertEnclosingFunction can now be deactivated
+- **Pro - Tree Sync:** Fixed sync issues when deleting logs from the tree view
+- **Pro - Better UX:** Status bar activation message now has neutral background instead of warning style
+- **Pro - Accuracy:** Significantly reduced false positives in the tree view detection
+
+→ [Read the full v3.3.0 release article](https://www.turboconsolelog.io/articles/release-330)  
+→ [Understanding the Full AST Engine](https://www.turboconsolelog.io/articles/turbo-full-ast-engine)  
+→ [Advanced Debugging: Memory Patterns](https://www.turboconsolelog.io/articles/debugging-memory)
+
 ## [3.2.0] – 2025-07-10
 
 - 🧠 **AST Support:** Introduced AST parsing for ternary expressions and function parameters

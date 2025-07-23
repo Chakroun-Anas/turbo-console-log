@@ -1,13 +1,54 @@
-import { TextDocument } from 'vscode';
+import { TextDocument, Range, Position } from 'vscode';
 
-export const makeTextDocument = (lines: string[]): TextDocument =>
+export const makeTextDocument = (
+  lines: string[],
+  fileName: string = 'mockDocument.ts',
+): TextDocument =>
   ({
-    fileName: 'mockDocument.ts',
+    fileName,
     lineCount: lines.length,
-    getText: () => lines.join('\n'),
+    getText: (range?: Range) => {
+      if (!range) return lines.join('\n');
+
+      const { start, end } = range;
+
+      if (start.line === end.line) {
+        return lines[start.line].slice(start.character, end.character);
+      }
+
+      const resultLines = lines.slice(start.line, end.line + 1);
+      resultLines[0] = resultLines[0].slice(start.character);
+      resultLines[resultLines.length - 1] = resultLines[
+        resultLines.length - 1
+      ].slice(0, end.character);
+
+      return resultLines.join('\n');
+    },
+    getWordRangeAtPosition: (position: Position): Range | undefined => {
+      const lineText = lines[position.line];
+      const wordRegex = /\w+/g;
+
+      let match: RegExpExecArray | null;
+      while ((match = wordRegex.exec(lineText)) !== null) {
+        const start = match.index;
+        const end = start + match[0].length;
+        if (position.character >= start && position.character <= end) {
+          return new Range(
+            new Position(position.line, start),
+            new Position(position.line, end),
+          );
+        }
+      }
+
+      return undefined;
+    },
     lineAt: (i: number) => ({
       text: lines[i],
       firstNonWhitespaceCharacterIndex: lines[i].search(/\S|$/),
+      rangeIncludingLineBreak: new Range(
+        new Position(i, 0),
+        new Position(i, lines[i].length + 1), // +1 for line break
+      ),
     }),
     positionAt: (offset: number) => {
       let total = 0;

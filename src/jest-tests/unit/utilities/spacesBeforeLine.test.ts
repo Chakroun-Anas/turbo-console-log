@@ -1,4 +1,4 @@
-import { spacesBeforeLine } from '../../../utilities/spacesBeforeLine';
+import { spacesBeforeLine } from '@/utilities';
 import { makeTextDocument } from '../../mocks/helpers/';
 
 describe('spacesBeforeLine', () => {

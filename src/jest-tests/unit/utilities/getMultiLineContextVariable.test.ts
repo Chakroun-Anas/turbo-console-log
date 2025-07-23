@@ -1,5 +1,5 @@
-import { BracketType } from '../../../entities';
-import { getMultiLineContextVariable } from '../../../utilities/getMultiLineContextVariable';
+import { BracketType } from '@/entities';
+import { getMultiLineContextVariable } from '@/utilities';
 import { makeTextDocument } from '../../mocks/helpers';
 
 const locMock = jest.fn();

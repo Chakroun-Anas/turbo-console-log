@@ -10,15 +10,6 @@ import { logMessage } from './logMessage';
 import { enclosingBlockName } from './enclosingBlockName';
 import { detectAll } from './detectAll';
 import { msg } from './msg';
-import { JSLineCodeProcessing } from '../../../line-code-processing/js';
-import { LineCodeProcessing } from '../../../line-code-processing';
-import { JSDebugMessageAnonymous } from '../JSDebugMessageAnonymous';
-import { jsDebugMessageLine } from '../JSDebugMessageLine/';
-
-const jsLineCodeProcessing: LineCodeProcessing = new JSLineCodeProcessing();
-const jsDebugMessageAnonymous = new JSDebugMessageAnonymous(
-  jsLineCodeProcessing,
-);
 
 export const jsDebugMessage: DebugMessage = {
   msg(
@@ -36,9 +27,6 @@ export const jsDebugMessage: DebugMessage = {
       lineOfSelectedVar,
       tabSize,
       extensionProperties,
-      jsLineCodeProcessing,
-      jsDebugMessageLine,
-      jsDebugMessageAnonymous,
     );
   },
   logMessage(
@@ -46,24 +34,14 @@ export const jsDebugMessage: DebugMessage = {
     selectionLine: number,
     selectedVar: string,
   ): LogMessage {
-    return logMessage(
-      document,
-      selectionLine,
-      selectedVar,
-      jsLineCodeProcessing,
-    );
+    return logMessage(document, selectionLine, selectedVar);
   },
   enclosingBlockName(
     document: TextDocument,
     lineOfSelectedVar: number,
     blockType: BlockType,
   ): string {
-    return enclosingBlockName(
-      document,
-      lineOfSelectedVar,
-      blockType,
-      jsLineCodeProcessing,
-    );
+    return enclosingBlockName(document, lineOfSelectedVar, blockType);
   },
   detectAll(
     document: TextDocument,
@@ -80,19 +58,6 @@ export const jsDebugMessage: DebugMessage = {
       logMessagePrefix,
       delimiterInsideMessage,
       args,
-    );
-  },
-  line(
-    document: TextDocument,
-    selectionLine: number,
-    selectedVar: string,
-    logMsg: LogMessage,
-  ): number {
-    return jsDebugMessageLine.line(
-      document,
-      selectionLine,
-      selectedVar,
-      logMsg,
     );
   },
 };

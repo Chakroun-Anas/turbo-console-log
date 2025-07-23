@@ -1,5 +1,6 @@
 import { TextDocument } from 'vscode';
 
+// FIXME: Should be improved
 export function spacesBeforeLogMsg(
   document: TextDocument,
   selectedVarLine: number,

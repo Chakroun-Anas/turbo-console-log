@@ -1,0 +1,1 @@
+export { resolveDelimiterSpacing } from './resolveDelimiterSpacing';

@@ -5,6 +5,7 @@ import {
   openDocument,
   expectActiveTextEditorWithFile,
   documentLinesChanged,
+  NaturalEditorPosition,
 } from '../../../helpers';
 import { ProgrammingLanguage } from '../../../../../entities';
 
@@ -32,8 +33,8 @@ export default (): void => {
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new vscode.Position(13, 5),
-            new vscode.Position(13, 13),
+            new NaturalEditorPosition(14, 5),
+            new NaturalEditorPosition(14, 13),
           ),
         ];
         await vscode.commands.executeCommand(

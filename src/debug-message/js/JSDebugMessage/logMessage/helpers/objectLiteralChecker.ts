@@ -1,32 +1,43 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
-import { LineCodeProcessing } from '../../../../../line-code-processing';
 
 export function objectLiteralChecker(
   document: TextDocument,
-  lineCodeProcessing: LineCodeProcessing,
   selectionLine: number,
+  variableName: string,
 ) {
-  let lineIdx = selectionLine;
-  let combined = '';
+  const code = document.getText();
+  const sourceFile = ts.createSourceFile(
+    'temp.ts',
+    code,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
 
-  while (lineIdx < document.lineCount) {
-    const txt = document.lineAt(lineIdx).text;
+  let isChecked = false;
 
-    // skip full-line comments
-    const stripped = txt.trim();
-    if (stripped.startsWith('//') || stripped.startsWith('/*')) {
-      lineIdx++;
-      continue;
+  function visit(node: ts.Node) {
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.name.text === variableName &&
+      node.initializer &&
+      ts.isObjectLiteralExpression(node.initializer)
+    ) {
+      const declLine = sourceFile.getLineAndCharacterOfPosition(
+        node.getStart(),
+      ).line;
+      if (declLine === selectionLine) {
+        isChecked = true;
+        return;
+      }
     }
 
-    combined += txt.replace(/\s+/g, ' ');
-    // once we reach “= {” (with only spaces between) we have enough
-    if (/=\s*\{/.test(combined)) break;
-
-    lineIdx++;
+    ts.forEachChild(node, visit);
   }
 
-  return {
-    isChecked: lineCodeProcessing.isObjectLiteralAssignedToVariable(combined),
-  };
+  visit(sourceFile);
+
+  return { isChecked };
 }

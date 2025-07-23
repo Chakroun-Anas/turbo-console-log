@@ -4,7 +4,7 @@ import {
   ExtensionProperties,
   LogMessage,
   Message,
-} from '../entities';
+} from '@/entities';
 
 export interface DebugMessage {
   logMessage(
@@ -33,10 +33,4 @@ export interface DebugMessage {
     lineOfSelectedVar: number,
     blockType: BlockType,
   ): string;
-  line(
-    document: TextDocument,
-    selectionLine: number,
-    selectedVar: string,
-    logMsg: LogMessage,
-  ): number;
 }

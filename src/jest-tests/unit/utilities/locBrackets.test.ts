@@ -1,5 +1,5 @@
-import { locBrackets } from '../../../utilities/locBrackets';
-import { BracketType } from '../../../entities';
+import { BracketType } from '@/entities';
+import { locBrackets } from '@/utilities';
 
 describe('locBrackets', () => {
   it('counts curly braces in a line correctly', () => {
