@@ -7,9 +7,11 @@
 
 ## 🌟 Why Turbo Console Log?
 
-Turbo Console Log is a **developer’s best friend** when it comes to debugging.
+Turbo Console Log is a **developer's best friend** when it comes to debugging.
 
 Trusted by **nearly 2 million developers**, it simplifies inserting meaningful log messages and makes debugging **faster and more efficient**.
+
+**Now powered by a revolutionary Full AST Engine** for bulletproof accuracy and enterprise-grade code analysis!
 
 ---
 
@@ -30,32 +32,62 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ✅ Prefixes & Suffixes  
 ✅ Log Function (`console.log`, `console.warn`, `console.error`, etc.)  
-✅ Quote Type (`'`, `"`, or \``)  
+✅ Quote Type (`'`, `"`, or ``)  
 ✅ Filename & Line Number Inclusion
 
 📖 **Explore Settings**: [Settings Documentation](https://www.turboconsolelog.io/documentation/settings)
 
 ---
 
-## 🚀 What’s New in v3.2.0? – AST Introduction & Core Detection Fixes
+## 🚀 What's New in v3.3.0? – Full AST Engine Revolution
 
-This release introduces AST parsing for specific cases, increasing log placement accuracy without affecting performance.
+**Complete rebuild from the ground up!** This release introduces a revolutionary **Full AST (Abstract Syntax Tree) Engine** powered by the TypeScript Compiler API.
 
-### 🧠 AST-Based Enhancements
+### Revolutionary Transformation
 
-- 📐 **AST Support:** Introduced AST parsing for ternary expressions and function parameters
-- 🧠 **More reliable Log Placement:** Improved accuracy for ternary expressions and function parameters
-- 🧪 **Test Coverage:** New test cases added to validate AST logic and key edge scenarios
+- **Full AST Engine:** Complete semantic understanding of your code, not just pattern matching
+- **86% Average Coverage:** Massive quality improvement from 45% to 86% across all metrics
+- **2.6X More Comprehensive:** 4,423 lines of sophisticated code vs 1,688 in the old regex system
+- **750+ Tests:** Enterprise-grade testing with unit and integration coverage
+- **16 Specialized AST Checkers:** Each code pattern handled with precision
 
-### 🔧 Core Fixes
+### What This Means for You
 
-- 🐛 **Object Literal Detection:** Fixed handling of assignments with complex type annotations
-- 🛠️ **Default Config Values:** Now correctly respects default values, reducing false positives
+- **Bulletproof Accuracy:** AST understands code structure semantically
+- **Modern JavaScript Support:** Native handling of destructuring, async/await, optional chaining
+- **Complex Expression Support:** Perfect handling of ternary operators, binary expressions, template literals
+- **Edge Case Mastery:** Robust support for multi-line assignments, chained method calls, nested objects
+- **TypeScript Integration:** Seamless support for TypeScript-specific syntax and patterns
+- **Future-Proof Architecture:** Easy to extend for new JavaScript language features
+
+### Bug Fixes & Improvements
+
+- **Core:** insertEnclosingClass and insertEnclosingFunction can now be deactivated
+- **Pro:** Fixed tree sync issues when deleting logs
+- **Pro:** Status bar activation message has neutral background (better UX)
+- **Pro:** Significantly reduced false positives in tree view detection
+
+👉 [Read the full v3.3.0 release article](https://www.turboconsolelog.io/articles/release-330)  
+👉 [Understanding the Full AST Engine](https://www.turboconsolelog.io/articles/turbo-full-ast-engine)  
+👉 [Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)
 
 ---
 
-👉 [Read the full v3.2.0 release article](https://www.turboconsolelog.io/articles/release-320)  
-👉 [Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)
+## 💼 Upgrade to Turbo Pro — One-Time Payment, Lifetime Access
+
+Want more power, more control, and a smoother workflow?
+
+**Turbo Pro** gives you a native side panel, real-time log synchronization, and smart log actions — all built on top of the new AST engine.
+
+### 🔥 Pro Features at a Glance
+
+- 🧭 **Native Log Panel:** Explore all logs in your current folder/workspace via VSCode Tree View
+- 🔁 **Real-Time Sync:** Log updates appear instantly in the panel
+- 🧠 **Contextual File Actions:** Right-click to comment, delete, or correct logs directly from the tree
+- 🧹 **Auto-Correction:** Automatically fix line numbers and file names after log movements
+- 🚀 **Fast & Lightweight:** Fully native to VS Code, no external dependencies
+
+👉 [Get Turbo Pro — Lifetime License](https://www.turboconsolelog.io/pro)
 
 ---
 
@@ -79,13 +111,6 @@ If you’ve found value in it, you can help keep it growing:
 Your support fuels **bug fixes, improvements, and new features**, ensuring Turbo Console Log continues evolving for **millions of developers—including YOU!**
 
 Whether you contribute or not, we’re happy to have you as part of this journey. 🚀
-
----
-
-## 📢 Stay Updated
-
-🔗 **[Follow Turbo Console Log Updates](https://www.turboconsolelog.io/articles)**  
-💬 **Join the Discussion** → [GitHub Discussions](https://github.com/Chakroun-Anas/turbo-console-log/discussions)
 
 ---
 

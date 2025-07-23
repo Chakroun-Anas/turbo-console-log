@@ -71,7 +71,7 @@ export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
             <a href="https://turboconsolelog.io/pro" target="_blank" style="text-decoration: none; outline: none; margin-top: 0rem;">
                 <div style="display: flex; justify-content: center;">
                     <button class="button" onclick="openTurboProPage()">
-                        GET LIFETIME LICENCE FOR 14.99€
+                        GET LIFETIME LICENCE FOR 29.99€
                     </button>
                 </div>
             </a>
