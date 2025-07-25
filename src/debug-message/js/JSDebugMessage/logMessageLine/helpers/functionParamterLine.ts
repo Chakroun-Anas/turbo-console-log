@@ -6,20 +6,14 @@ import { TextDocument } from 'vscode';
  * for a function parameter.
  */
 export function functionParameterLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const source = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   // Find the parameter node that matches our variable name and is on the selection line
   const parameterNode = findParameterNodeOnLine(
-    source,
+    sourceFile,
     selectionLine,
     variableName,
     document,

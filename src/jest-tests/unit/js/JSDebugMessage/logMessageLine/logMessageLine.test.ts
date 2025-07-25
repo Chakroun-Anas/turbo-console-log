@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { line } from '@/debug-message/js/JSDebugMessage/logMessageLine';
 import { LogMessage, LogMessageType } from '@/entities';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/makeTextDocument';
@@ -24,6 +25,13 @@ jest.mock('@/debug-message/js/JSDebugMessage/logMessageLine/helpers');
 
 describe('logMessageLine', () => {
   const mockDocument = makeTextDocument(['const value = 42;']);
+  const sourceFile = ts.createSourceFile(
+    mockDocument.fileName,
+    mockDocument.getText(),
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
   const selectionLine = 0;
   const selectedVar = 'value';
 
@@ -52,7 +60,13 @@ describe('logMessageLine', () => {
       logMessageType: 'UnknownType' as LogMessageType,
     };
 
-    const result = line(mockDocument, selectionLine, selectedVar, logMsg);
+    const result = line(
+      sourceFile,
+      mockDocument,
+      selectionLine,
+      selectedVar,
+      logMsg,
+    );
 
     expect(result).toBe(selectionLine + 1);
 
@@ -141,9 +155,16 @@ describe('logMessageLine', () => {
       const expectedLine = 42;
       (helper as jest.Mock).mockReturnValue(expectedLine);
 
-      const result = line(mockDocument, selectionLine, selectedVar, logMsg);
+      const result = line(
+        sourceFile,
+        mockDocument,
+        selectionLine,
+        selectedVar,
+        logMsg,
+      );
 
       expect(helper).toHaveBeenCalledWith(
+        sourceFile,
         mockDocument,
         selectionLine,
         selectedVar,

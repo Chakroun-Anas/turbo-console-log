@@ -3,18 +3,11 @@ import { Position, TextDocument } from 'vscode';
 import { LogContextMetadata } from '@/entities';
 
 export function rawPropertyAccessChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   selectedText: string,
 ) {
-  const text = document.getText();
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    text,
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   // Find the selection in the line
   const lineText = document.lineAt(selectionLine).text;
   const charIndex = lineText.indexOf(selectedText);

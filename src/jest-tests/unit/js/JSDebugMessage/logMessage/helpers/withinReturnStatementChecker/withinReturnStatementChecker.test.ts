@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { withinReturnStatementChecker } from '@/debug-message/js/JSDebugMessage/logMessage/helpers/withinReturnStatementChecker';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 import passingCases from './passingCases';
@@ -7,7 +8,15 @@ describe('withinReturnStatementChecker', () => {
   for (const testCase of passingCases) {
     it(`should detect: ${testCase.name}`, () => {
       const doc = makeTextDocument(testCase.lines);
+      const sourceFile = ts.createSourceFile(
+        doc.fileName,
+        doc.getText(),
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS,
+      );
       const result = withinReturnStatementChecker(
+        sourceFile,
         doc,
         testCase.selectionLine,
         testCase.variableName,
@@ -19,7 +28,15 @@ describe('withinReturnStatementChecker', () => {
   for (const testCase of failingCases) {
     it(`should reject: ${testCase.name}`, () => {
       const doc = makeTextDocument(testCase.lines);
+      const sourceFile = ts.createSourceFile(
+        doc.fileName,
+        doc.getText(),
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS,
+      );
       const result = withinReturnStatementChecker(
+        sourceFile,
         doc,
         testCase.selectionLine,
         testCase.variableName,

@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
 import { LogMessageType, LogMessage, LogContextMetadata } from '@/entities';
 import {
@@ -21,6 +22,7 @@ import {
 } from './helpers';
 
 export function logMessage(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   selectedVar: string,
@@ -32,42 +34,89 @@ export function logMessage(
     };
   } = {
     [LogMessageType.WithinReturnStatement]: () =>
-      withinReturnStatementChecker(document, selectionLine, selectedVar),
+      withinReturnStatementChecker(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      ),
     [LogMessageType.WithinConditionBlock]: () =>
-      withinConditionBlockChecker(document, selectionLine, selectedVar),
+      withinConditionBlockChecker(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      ),
     [LogMessageType.ObjectLiteral]: () =>
-      objectLiteralChecker(document, selectionLine, selectedVar),
+      objectLiteralChecker(sourceFile, document, selectionLine, selectedVar),
     [LogMessageType.FunctionParameter]: () =>
-      functionParameterChecker(document, selectionLine, selectedVar),
+      functionParameterChecker(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      ),
     [LogMessageType.ArrayAssignment]: () =>
-      arrayAssignmentChecker(document, selectionLine, selectedVar),
+      arrayAssignmentChecker(sourceFile, document, selectionLine, selectedVar),
     [LogMessageType.TemplateString]: () =>
-      templateStringChecker(document, selectionLine, selectedVar),
+      templateStringChecker(sourceFile, document, selectionLine, selectedVar),
     [LogMessageType.Ternary]: () =>
-      ternaryChecker(document, selectionLine, selectedVar),
+      ternaryChecker(sourceFile, document, selectionLine, selectedVar),
     [LogMessageType.BinaryExpression]: () =>
-      binaryExpressionChecker(document, selectionLine, selectedVar),
+      binaryExpressionChecker(sourceFile, document, selectionLine, selectedVar),
     [LogMessageType.RawPropertyAccess]: () =>
-      rawPropertyAccessChecker(document, selectionLine, selectedVar),
+      rawPropertyAccessChecker(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      ),
     [LogMessageType.PropertyMethodCall]: () =>
-      propertyMethodCallChecker(document, selectionLine, selectedVar),
+      propertyMethodCallChecker(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      ),
     [LogMessageType.ObjectFunctionCallAssignment]: () => {
       return objectFunctionCallAssignmentChecker(
+        sourceFile,
         document,
         selectionLine,
         selectedVar,
       );
     },
     [LogMessageType.FunctionCallAssignment]: () =>
-      functionCallAssignmentChecker(document, selectionLine, selectedVar),
+      functionCallAssignmentChecker(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      ),
     [LogMessageType.NamedFunctionAssignment]: () =>
-      namedFunctionAssignmentChecker(document, selectionLine, selectedVar),
+      namedFunctionAssignmentChecker(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      ),
     [LogMessageType.PrimitiveAssignment]: () =>
-      primitiveAssignmentChecker(document, selectionLine, selectedVar),
+      primitiveAssignmentChecker(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      ),
     [LogMessageType.WanderingExpression]: () =>
-      wanderingExpressionChecker(document, selectionLine, selectedVar),
+      wanderingExpressionChecker(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      ),
     [LogMessageType.PropertyAccessAssignment]: () => {
       return propertyAccessAssignmentChecker(
+        sourceFile,
         document,
         selectionLine,
         selectedVar,

@@ -20,18 +20,11 @@ function getFullExpressionEnd(initializer: ts.Expression): number {
 }
 
 export function functionCallLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const sourceFile = ts.createSourceFile(
-    'file.ts',
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
-
   let targetEnd = -1;
 
   ts.forEachChild(sourceFile, function visit(node: ts.Node): void {

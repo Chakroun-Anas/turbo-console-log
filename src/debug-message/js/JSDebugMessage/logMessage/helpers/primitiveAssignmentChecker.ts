@@ -29,17 +29,11 @@ function isPrimitiveRHS(expr: ts.Expression): boolean {
 }
 
 export function primitiveAssignmentChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): { isChecked: boolean } {
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   let isChecked = false;
 
   ts.forEachChild(sourceFile, function visit(node: ts.Node): void {

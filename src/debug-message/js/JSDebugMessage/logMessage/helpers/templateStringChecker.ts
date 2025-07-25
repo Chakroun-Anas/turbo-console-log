@@ -2,19 +2,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function templateStringChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ) {
-  const sourceText = document.getText();
-  const sourceFile = ts.createSourceFile(
-    'temp.ts',
-    sourceText,
-    ts.ScriptTarget.Latest,
-    /* setParentNodes */ true,
-    ts.ScriptKind.TS,
-  );
-
   let isChecked = false;
 
   function visit(node: ts.Node) {

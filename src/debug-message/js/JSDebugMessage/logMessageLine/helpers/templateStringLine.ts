@@ -2,19 +2,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function templateStringLine(
-  document: TextDocument,
+  sourceFile: ts.SourceFile,
+  _document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const sourceText = document.getText();
-  const sourceFile = ts.createSourceFile(
-    'temp.ts',
-    sourceText,
-    ts.ScriptTarget.Latest,
-    /* setParentNodes */ true,
-    ts.ScriptKind.TS,
-  );
-
   // Default insertion: one line below selection
   let insertionLine = selectionLine + 1;
 

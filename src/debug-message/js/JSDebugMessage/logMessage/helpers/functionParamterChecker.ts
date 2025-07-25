@@ -2,6 +2,7 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function functionParameterChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
@@ -9,16 +10,9 @@ export function functionParameterChecker(
   const wanted = variableName.trim();
   if (!wanted) return { isChecked: false };
 
-  const source = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    /* setParentNodes */ true,
-  );
-
   let match = false;
 
-  ts.forEachChild(source, function visit(node) {
+  ts.forEachChild(sourceFile, function visit(node) {
     if (match) return;
 
     if (ts.isParameter(node)) {

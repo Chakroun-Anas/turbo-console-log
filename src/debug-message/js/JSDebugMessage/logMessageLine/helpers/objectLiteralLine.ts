@@ -2,19 +2,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function objectLiteralLine(
-  document: TextDocument,
+  sourceFile: ts.SourceFile,
+  _document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const code = document.getText();
-  const sourceFile = ts.createSourceFile(
-    'temp.ts',
-    code,
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
-
   let insertionLine = selectionLine + 1;
   let found = false;
 

@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { functionParameterChecker } from '@/debug-message/js/JSDebugMessage/logMessage/helpers/';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 import passingCases from './passingCases';
@@ -7,7 +8,15 @@ describe('functionParameterChecker', () => {
   for (const doc of passingCases) {
     it(`should detect function parameter – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
+      const sourceFile = ts.createSourceFile(
+        document.fileName,
+        document.getText(),
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS,
+      );
       const result = functionParameterChecker(
+        sourceFile,
         document,
         doc.selectionLine,
         doc.variableName,
@@ -19,7 +28,15 @@ describe('functionParameterChecker', () => {
   for (const doc of failingCases) {
     it(`should not detect function parameter – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
+      const sourceFile = ts.createSourceFile(
+        document.fileName,
+        document.getText(),
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS,
+      );
       const result = functionParameterChecker(
+        sourceFile,
         document,
         doc.selectionLine,
         doc.variableName,

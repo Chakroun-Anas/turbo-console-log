@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { logMessage } from '@/debug-message/js/JSDebugMessage/logMessage/logMessage';
 import { LogMessageType } from '@/entities';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/makeTextDocument';
@@ -25,6 +26,13 @@ jest.mock('@/debug-message/js/JSDebugMessage/logMessage/helpers');
 
 describe('logMessage', () => {
   const mockDocument = makeTextDocument(['const value = 42;']);
+  const sourceFile = ts.createSourceFile(
+    mockDocument.fileName,
+    mockDocument.getText(),
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
   const selectionLine = 0;
   const selectedVar = 'value';
 
@@ -94,10 +102,16 @@ describe('logMessage', () => {
     (arrayAssignmentChecker as jest.Mock).mockReturnValue({ isChecked: true });
     (binaryExpressionChecker as jest.Mock).mockReturnValue({ isChecked: true });
 
-    const result = logMessage(mockDocument, selectionLine, selectedVar);
+    const result = logMessage(
+      sourceFile,
+      mockDocument,
+      selectionLine,
+      selectedVar,
+    );
 
     expect(result.logMessageType).toBe(LogMessageType.ArrayAssignment);
     expect(arrayAssignmentChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
@@ -109,10 +123,16 @@ describe('logMessage', () => {
   it('should return the correct type for binary expression', () => {
     (binaryExpressionChecker as jest.Mock).mockReturnValue({ isChecked: true });
 
-    const result = logMessage(mockDocument, selectionLine, selectedVar);
+    const result = logMessage(
+      sourceFile,
+      mockDocument,
+      selectionLine,
+      selectedVar,
+    );
 
     expect(result.logMessageType).toBe(LogMessageType.BinaryExpression);
     expect(binaryExpressionChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
@@ -124,10 +144,16 @@ describe('logMessage', () => {
       isChecked: true,
     });
 
-    const result = logMessage(mockDocument, selectionLine, selectedVar);
+    const result = logMessage(
+      sourceFile,
+      mockDocument,
+      selectionLine,
+      selectedVar,
+    );
 
     expect(result.logMessageType).toBe(LogMessageType.FunctionCallAssignment);
     expect(functionCallAssignmentChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
@@ -139,10 +165,16 @@ describe('logMessage', () => {
       isChecked: true,
     });
 
-    const result = logMessage(mockDocument, selectionLine, selectedVar);
+    const result = logMessage(
+      sourceFile,
+      mockDocument,
+      selectionLine,
+      selectedVar,
+    );
 
     expect(result.logMessageType).toBe(LogMessageType.PrimitiveAssignment);
     expect(primitiveAssignmentChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
@@ -152,10 +184,16 @@ describe('logMessage', () => {
   it('should return the correct type for ternary expression', () => {
     (ternaryChecker as jest.Mock).mockReturnValue({ isChecked: true });
 
-    const result = logMessage(mockDocument, selectionLine, selectedVar);
+    const result = logMessage(
+      sourceFile,
+      mockDocument,
+      selectionLine,
+      selectedVar,
+    );
 
     expect(result.logMessageType).toBe(LogMessageType.Ternary);
     expect(ternaryChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
@@ -165,7 +203,12 @@ describe('logMessage', () => {
   it('should default to PrimitiveAssignment if no checker matches', () => {
     // All checkers return false by default from beforeEach
 
-    const result = logMessage(mockDocument, selectionLine, selectedVar);
+    const result = logMessage(
+      sourceFile,
+      mockDocument,
+      selectionLine,
+      selectedVar,
+    );
 
     expect(result.logMessageType).toBe(LogMessageType.PrimitiveAssignment);
   });
@@ -176,7 +219,12 @@ describe('logMessage', () => {
       isChecked: true,
     });
 
-    const result = logMessage(mockDocument, selectionLine, selectedVar);
+    const result = logMessage(
+      sourceFile,
+      mockDocument,
+      selectionLine,
+      selectedVar,
+    );
 
     expect(result.logMessageType).toBe(
       LogMessageType.ObjectFunctionCallAssignment,
@@ -184,31 +232,37 @@ describe('logMessage', () => {
 
     // Should call checkers in order until match
     expect(arrayAssignmentChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
     );
     expect(binaryExpressionChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
     );
     expect(functionCallAssignmentChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
     );
     expect(functionParameterChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
     );
     expect(namedFunctionAssignmentChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
     );
     expect(objectFunctionCallAssignmentChecker).toHaveBeenCalledWith(
+      sourceFile,
       mockDocument,
       selectionLine,
       selectedVar,
@@ -280,10 +334,16 @@ describe('logMessage', () => {
         // Make the specific checker return true
         (checker as jest.Mock).mockReturnValue({ isChecked: true });
 
-        const result = logMessage(mockDocument, selectionLine, selectedVar);
+        const result = logMessage(
+          sourceFile,
+          mockDocument,
+          selectionLine,
+          selectedVar,
+        );
 
         expect(result.logMessageType).toBe(type);
         expect(checker).toHaveBeenCalledWith(
+          sourceFile,
           mockDocument,
           selectionLine,
           selectedVar,

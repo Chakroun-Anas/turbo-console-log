@@ -2,18 +2,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function objectFunctionCallAssignmentChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ) {
-  const sourceFile = ts.createSourceFile(
-    'file.ts',
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
-
   let isChecked = false;
 
   ts.forEachChild(sourceFile, function visit(node) {

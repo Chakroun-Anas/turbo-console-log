@@ -2,18 +2,11 @@ import ts from 'typescript';
 import { TextDocument, Position } from 'vscode';
 
 export function propertyMethodCallChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   selectedText: string,
 ) {
-  const sourceText = document.getText();
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    sourceText,
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   // locate the selection in the source
   const lineText = document.lineAt(selectionLine).text;
   const charIndex = lineText.indexOf(selectedText);

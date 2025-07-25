@@ -2,17 +2,12 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function withinConditionBlockChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): { isChecked: boolean } {
   const wanted = variableName.trim();
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    /* setParentNodes */ true,
-  );
 
   let isChecked = false;
 

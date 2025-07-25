@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { TextDocument } from 'vscode';
 import { LogMessage, LogMessageType } from '@/entities';
 import {
@@ -19,6 +20,7 @@ import {
 } from './helpers';
 
 export function line(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   selectedVar: string,
@@ -26,39 +28,104 @@ export function line(
 ): number {
   switch (logMsg.logMessageType) {
     case LogMessageType.WithinReturnStatement: {
-      return withinReturnStatementLine(document, selectionLine, selectedVar);
+      return withinReturnStatementLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     }
     case LogMessageType.WithinConditionBlock: {
-      return withinConditionBlockLine(document, selectionLine, selectedVar);
+      return withinConditionBlockLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     }
     case LogMessageType.PrimitiveAssignment:
-      return primitiveAssignmentLine(document, selectionLine, selectedVar);
+      return primitiveAssignmentLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.PropertyAccessAssignment:
-      return propertyAccessAssignmentLine(document, selectionLine, selectedVar);
+      return propertyAccessAssignmentLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.FunctionParameter:
-      return functionParameterLine(document, selectionLine, selectedVar);
+      return functionParameterLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.ObjectLiteral:
-      return objectLiteralLine(document, selectionLine, selectedVar);
+      return objectLiteralLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.NamedFunctionAssignment:
-      return functionAssignmentLine(document, selectionLine, selectedVar);
+      return functionAssignmentLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.ObjectFunctionCallAssignment:
-      return functionCallLine(document, selectionLine, selectedVar);
+      return functionCallLine(sourceFile, document, selectionLine, selectedVar);
     case LogMessageType.FunctionCallAssignment:
-      return functionCallLine(document, selectionLine, selectedVar);
+      return functionCallLine(sourceFile, document, selectionLine, selectedVar);
     case LogMessageType.ArrayAssignment:
-      return arrayLine(document, selectionLine, selectedVar);
+      return arrayLine(sourceFile, document, selectionLine, selectedVar);
     case LogMessageType.RawPropertyAccess:
-      return rawPropertyAccessLine(document, selectionLine, selectedVar);
+      return rawPropertyAccessLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.PropertyMethodCall:
-      return propertyMethodCallLine(document, selectionLine, selectedVar);
+      return propertyMethodCallLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.TemplateString:
-      return templateStringLine(document, selectionLine, selectedVar);
+      return templateStringLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.BinaryExpression:
-      return binaryExpressionLine(document, selectionLine, selectedVar);
+      return binaryExpressionLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.Ternary:
-      return ternaryExpressionLine(document, selectionLine, selectedVar);
+      return ternaryExpressionLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     case LogMessageType.WanderingExpression:
-      return wanderingExpressionLine(document, selectionLine, selectedVar);
+      return wanderingExpressionLine(
+        sourceFile,
+        document,
+        selectionLine,
+        selectedVar,
+      );
     default:
       return selectionLine + 1;
   }

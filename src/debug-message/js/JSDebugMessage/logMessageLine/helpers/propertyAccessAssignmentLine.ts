@@ -2,18 +2,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function propertyAccessAssignmentLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const text = document.getText();
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    text,
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   let insertionLine = selectionLine + 1;
 
   ts.forEachChild(sourceFile, function visit(node) {

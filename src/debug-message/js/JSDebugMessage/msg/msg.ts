@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { TextEditorEdit, TextDocument } from 'vscode';
 import {
   ExtensionProperties,
@@ -37,12 +38,21 @@ export function msg(
   tabSize: number,
   extensionProperties: ExtensionProperties,
 ): void {
+  const sourceFile = ts.createSourceFile(
+    document.fileName,
+    document.getText(),
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
   const logMsg: LogMessage = logMessage(
+    sourceFile,
     document,
     lineOfSelectedVar,
     selectedVar,
   );
   const lineOfLogMsg: number = logMessageLine(
+    sourceFile,
     document,
     lineOfSelectedVar,
     selectedVar,

@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { wanderingExpressionChecker } from '@/debug-message/js/JSDebugMessage/logMessage/helpers/wanderingExpressionChecker';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers';
 import passingCases from './passingCases';
@@ -7,7 +8,15 @@ describe('wanderingExpressionChecker', () => {
   passingCases.forEach(({ name, lines, selectionLine, variableName }) => {
     it(`passes: ${name}`, () => {
       const document = makeTextDocument(lines);
+      const sourceFile = ts.createSourceFile(
+        document.fileName,
+        document.getText(),
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS,
+      );
       const result = wanderingExpressionChecker(
+        sourceFile,
         document,
         selectionLine,
         variableName,
@@ -19,7 +28,15 @@ describe('wanderingExpressionChecker', () => {
   failingCases.forEach(({ name, lines, selectionLine, variableName }) => {
     it(`fails: ${name}`, () => {
       const document = makeTextDocument(lines);
+      const sourceFile = ts.createSourceFile(
+        document.fileName,
+        document.getText(),
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS,
+      );
       const result = wanderingExpressionChecker(
+        sourceFile,
         document,
         selectionLine,
         variableName,

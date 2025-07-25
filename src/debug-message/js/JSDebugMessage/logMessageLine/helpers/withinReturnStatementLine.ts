@@ -284,19 +284,13 @@ function getPropertyAccessPath(node: ts.PropertyAccessExpression): string {
  * @returns The line number where the log message should be placed
  */
 export function withinReturnStatementLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   selectedVar: string,
 ): number {
   const wanted = selectedVar.trim();
   if (!wanted) return selectionLine + 1;
-
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    /* setParentNodes */ true,
-  );
 
   let returnStatementLine = -1;
 

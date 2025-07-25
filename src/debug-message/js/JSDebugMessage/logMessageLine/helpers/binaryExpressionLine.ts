@@ -2,17 +2,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function binaryExpressionLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   // Try to locate the VariableDeclaration first
   const decl = findVariableDeclaration(sourceFile, variableName);
   if (decl && decl.initializer) {

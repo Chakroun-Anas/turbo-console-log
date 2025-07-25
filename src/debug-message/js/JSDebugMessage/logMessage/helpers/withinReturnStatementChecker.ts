@@ -286,19 +286,13 @@ function getPropertyAccessPath(node: ts.PropertyAccessExpression): string {
  * @returns Object indicating if the check passed
  */
 export function withinReturnStatementChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): { isChecked: boolean } {
   const wanted = variableName.trim();
   if (!wanted) return { isChecked: false };
-
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    /* setParentNodes */ true,
-  );
 
   let isChecked = false;
 

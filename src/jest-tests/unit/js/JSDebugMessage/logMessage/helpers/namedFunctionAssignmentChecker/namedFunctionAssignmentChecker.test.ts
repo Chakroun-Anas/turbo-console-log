@@ -1,3 +1,4 @@
+import ts from 'typescript';
 import { namedFunctionAssignmentChecker } from '@/debug-message/js/JSDebugMessage/logMessage/helpers/namedFunctionAssignmentChecker';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 import passingCases from './passingCases';
@@ -7,7 +8,15 @@ describe('namedFunctionAssignmentChecker', () => {
   for (const test of passingCases) {
     it(`should detect named function assignment – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
+      const sourceFile = ts.createSourceFile(
+        doc.fileName,
+        doc.getText(),
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS,
+      );
       const result = namedFunctionAssignmentChecker(
+        sourceFile,
         doc,
         test.selectionLine,
         test.variableName,
@@ -19,7 +28,15 @@ describe('namedFunctionAssignmentChecker', () => {
   for (const test of failingCases) {
     it(`should NOT detect named function assignment – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
+      const sourceFile = ts.createSourceFile(
+        doc.fileName,
+        doc.getText(),
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS,
+      );
       const result = namedFunctionAssignmentChecker(
+        sourceFile,
         doc,
         test.selectionLine,
         test.variableName,

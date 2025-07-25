@@ -2,21 +2,14 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function ternaryExpressionLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const text = document.getText();
-  const sf = ts.createSourceFile(
-    document.fileName,
-    text,
-    ts.ScriptTarget.Latest,
-    /* setParentNodes */ true,
-  );
-
   // ─── 1) Scope to the variable declarator if possible ─────────────────────
   let condNode: ts.ConditionalExpression | undefined;
-  const decl = findVariableDeclaration(sf, variableName);
+  const decl = findVariableDeclaration(sourceFile, variableName);
   if (decl && decl.initializer) {
     if (ts.isConditionalExpression(decl.initializer)) {
       condNode = decl.initializer;
@@ -36,7 +29,7 @@ export function ternaryExpressionLine(
         candidates.push(n);
       }
       ts.forEachChild(n, collect);
-    })(sf);
+    })(sourceFile);
 
     if (candidates.length) {
       // prefer those covering your cursor line

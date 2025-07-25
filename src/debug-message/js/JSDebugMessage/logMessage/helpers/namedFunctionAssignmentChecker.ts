@@ -3,17 +3,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function namedFunctionAssignmentChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ) {
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   let isChecked = false;
 
   ts.forEachChild(sourceFile, function visit(node): void {

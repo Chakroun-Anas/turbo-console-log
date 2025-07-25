@@ -2,18 +2,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function wanderingExpressionLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const sourceFile = ts.createSourceFile(
-    'file.ts',
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
-
   let bestEndOffset = -1;
 
   function isDeclaration(node: ts.Node): boolean {

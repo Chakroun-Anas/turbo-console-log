@@ -2,18 +2,11 @@ import ts from 'typescript';
 import { TextDocument, Position } from 'vscode';
 
 export function rawPropertyAccessLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const sourceText = document.getText();
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    sourceText,
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   const lineText = document.lineAt(selectionLine).text;
   const charIndex = lineText.indexOf(variableName);
   if (charIndex === -1) return selectionLine + 1;

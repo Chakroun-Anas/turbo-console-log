@@ -2,17 +2,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function primitiveAssignmentLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   let line = selectionLine + 1;
 
   ts.forEachChild(sourceFile, function visit(node) {

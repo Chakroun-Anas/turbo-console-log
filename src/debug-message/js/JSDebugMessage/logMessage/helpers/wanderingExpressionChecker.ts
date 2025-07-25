@@ -2,18 +2,11 @@ import ts from 'typescript';
 import { TextDocument, Position } from 'vscode';
 
 export function wanderingExpressionChecker(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   selectedText: string,
 ): { isChecked: boolean } {
-  const code = document.getText();
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    code,
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   // Hard search: get all positions of selectedText on the line
   const lineText = document.lineAt(selectionLine).text;
   const trimmedText = selectedText.trim();

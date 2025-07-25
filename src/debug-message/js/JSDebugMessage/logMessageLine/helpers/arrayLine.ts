@@ -2,17 +2,11 @@ import ts from 'typescript';
 import { TextDocument } from 'vscode';
 
 export function arrayLine(
+  sourceFile: ts.SourceFile,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
-  const sourceFile = ts.createSourceFile(
-    'file.ts',
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-  );
-
   let targetEnd = -1;
 
   ts.forEachChild(sourceFile, function visit(node) {
