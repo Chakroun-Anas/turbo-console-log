@@ -5,14 +5,14 @@ import {
   LogMessage,
   LogContextMetadata,
 } from '@/entities';
-import { logMessage } from '../logMessage';
-import { spacesBeforeLogMsg } from '../helpers';
-import { line as logMessageLine } from '../logMessageLine';
+import { logMessage } from './logMessage';
+import { spacesBeforeLogMsg } from './spacesBeforeLogMsg';
+import { line as logMessageLine } from './logMessageLine';
 import {
   applyTransformedCode,
   needTransformation,
   performTransformation,
-} from '../transformer';
+} from './transformer';
 import { omit } from './helpers/omit';
 import { constructDebuggingMsg } from './constructDebuggingMsg';
 import { constructDebuggingMsgContent } from './constructDebuggingMsgContent';

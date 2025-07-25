@@ -1,8 +1,8 @@
 import ts from 'typescript';
 import { msg } from '@/debug-message/js/JSDebugMessage/msg';
-import { logMessage } from '@/debug-message/js/JSDebugMessage/logMessage';
-import { line as logMessageLine } from '@/debug-message/js/JSDebugMessage/logMessageLine';
-import { spacesBeforeLogMsg } from '@/debug-message/js/JSDebugMessage/helpers';
+import { logMessage } from '@/debug-message/js/JSDebugMessage/msg/logMessage';
+import { line as logMessageLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine';
+import { spacesBeforeLogMsg } from '@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg';
 import { constructDebuggingMsgContent } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent';
 import { constructDebuggingMsg } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsg';
 import { insertDebugMessage } from '@/debug-message/js/JSDebugMessage/msg/insertDebugMessage';
@@ -10,20 +10,20 @@ import {
   needTransformation,
   performTransformation,
   applyTransformedCode,
-} from '@/debug-message/js/JSDebugMessage/transformer';
+} from '@/debug-message/js/JSDebugMessage/msg/transformer';
 import { omit } from '@/debug-message/js/JSDebugMessage/msg/helpers/omit';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/makeTextDocument';
 import { createMockTextEditorEdit } from '@/jest-tests/mocks/helpers/createMockTextEditorEdit';
 import { ExtensionProperties, LogMessage, LogMessageType } from '@/entities';
 
 // Mock all dependencies
-jest.mock('@/debug-message/js/JSDebugMessage/logMessage');
-jest.mock('@/debug-message/js/JSDebugMessage/logMessageLine');
-jest.mock('@/debug-message/js/JSDebugMessage/helpers');
+jest.mock('@/debug-message/js/JSDebugMessage/msg/logMessage');
+jest.mock('@/debug-message/js/JSDebugMessage/msg/logMessageLine');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsg');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/insertDebugMessage');
-jest.mock('@/debug-message/js/JSDebugMessage/transformer');
+jest.mock('@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg');
+jest.mock('@/debug-message/js/JSDebugMessage/msg/transformer');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/helpers/omit');
 
 describe('msg', () => {

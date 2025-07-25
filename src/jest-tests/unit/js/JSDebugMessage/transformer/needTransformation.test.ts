@@ -1,4 +1,4 @@
-import { needTransformation } from '@/debug-message/js/JSDebugMessage/transformer/needTransformation';
+import { needTransformation } from '@/debug-message/js/JSDebugMessage/msg/transformer/needTransformation';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
 const passingCases = [

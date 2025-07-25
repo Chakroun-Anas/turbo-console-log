@@ -1,6 +1,6 @@
 import { jsDebugMessage } from '@/debug-message/js/JSDebugMessage/JSDebugMessage';
 import { msg } from '@/debug-message/js/JSDebugMessage/msg';
-import { logMessage } from '@/debug-message/js/JSDebugMessage/logMessage';
+import { logMessage } from '@/debug-message/js/JSDebugMessage/msg/logMessage';
 import { enclosingBlockName } from '@/debug-message/js/JSDebugMessage/enclosingBlockName';
 import { detectAll } from '@/debug-message/js/JSDebugMessage/detectAll';
 import {
@@ -19,7 +19,7 @@ import { Range } from 'vscode';
 
 // Mock all imported functions
 jest.mock('@/debug-message/js/JSDebugMessage/msg');
-jest.mock('@/debug-message/js/JSDebugMessage/logMessage');
+jest.mock('@/debug-message/js/JSDebugMessage/msg/logMessage');
 jest.mock('@/debug-message/js/JSDebugMessage/enclosingBlockName');
 jest.mock('@/debug-message/js/JSDebugMessage/detectAll');
 

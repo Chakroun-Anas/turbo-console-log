@@ -1,7 +1,7 @@
 import type { TextDocument } from 'vscode';
 import { Message, BracketType, ExtensionProperties } from '@/entities';
 import { closingContextLine } from '@/utilities';
-import { spacesBeforeLogMsg } from '../helpers';
+import { spacesBeforeLogMsg } from '../msg/spacesBeforeLogMsg';
 import { logFunctionToUse } from './helpers';
 
 export function detectAll(
