@@ -1,12 +1,6 @@
 import { TextDocument, TextEditorEdit } from 'vscode';
-import {
-  BlockType,
-  ExtensionProperties,
-  Message,
-  LogMessage,
-} from '../../../entities';
+import { BlockType, ExtensionProperties, Message } from '../../../entities';
 import { DebugMessage } from '../../DebugMessage';
-import { logMessage } from './logMessage';
 import { enclosingBlockName } from './enclosingBlockName';
 import { detectAll } from './detectAll';
 import { msg } from './msg';
@@ -28,13 +22,6 @@ export const jsDebugMessage: DebugMessage = {
       tabSize,
       extensionProperties,
     );
-  },
-  logMessage(
-    document: TextDocument,
-    selectionLine: number,
-    selectedVar: string,
-  ): LogMessage {
-    return logMessage(document, selectionLine, selectedVar);
   },
   enclosingBlockName(
     document: TextDocument,

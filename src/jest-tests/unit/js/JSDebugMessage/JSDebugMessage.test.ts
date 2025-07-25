@@ -3,8 +3,17 @@ import { msg } from '@/debug-message/js/JSDebugMessage/msg';
 import { logMessage } from '@/debug-message/js/JSDebugMessage/logMessage';
 import { enclosingBlockName } from '@/debug-message/js/JSDebugMessage/enclosingBlockName';
 import { detectAll } from '@/debug-message/js/JSDebugMessage/detectAll';
-import { makeTextDocument, createMockTextEditorEdit } from '@/jest-tests/mocks/helpers';
-import { ExtensionProperties, LogMessage, LogMessageType, BlockType, Message } from '@/entities';
+import {
+  makeTextDocument,
+  createMockTextEditorEdit,
+} from '@/jest-tests/mocks/helpers';
+import {
+  ExtensionProperties,
+  LogMessage,
+  LogMessageType,
+  BlockType,
+  Message,
+} from '@/entities';
 import { LogType } from '@/entities/extension/extensionProperties';
 import { Range } from 'vscode';
 
@@ -18,7 +27,9 @@ describe('JSDebugMessage', () => {
   // Mock functions
   const mockMsg = msg as jest.MockedFunction<typeof msg>;
   const mockLogMessage = logMessage as jest.MockedFunction<typeof logMessage>;
-  const mockEnclosingBlockName = enclosingBlockName as jest.MockedFunction<typeof enclosingBlockName>;
+  const mockEnclosingBlockName = enclosingBlockName as jest.MockedFunction<
+    typeof enclosingBlockName
+  >;
   const mockDetectAll = detectAll as jest.MockedFunction<typeof detectAll>;
 
   // Test data
@@ -43,12 +54,12 @@ describe('JSDebugMessage', () => {
   };
 
   const mockMessages: Message[] = [
-    { spaces: '  ', lines: [new Range(0, 0, 1, 0)] }
+    { spaces: '  ', lines: [new Range(0, 0, 1, 0)] },
   ];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Set up default mock return values
     mockLogMessage.mockReturnValue(mockLogMsg);
     mockEnclosingBlockName.mockReturnValue('functionName');
@@ -63,7 +74,7 @@ describe('JSDebugMessage', () => {
         selectedVar,
         lineOfSelectedVar,
         tabSize,
-        extensionProperties
+        extensionProperties,
       );
 
       expect(mockMsg).toHaveBeenCalledTimes(1);
@@ -73,7 +84,7 @@ describe('JSDebugMessage', () => {
         selectedVar,
         lineOfSelectedVar,
         tabSize,
-        extensionProperties
+        extensionProperties,
       );
     });
 
@@ -84,64 +95,28 @@ describe('JSDebugMessage', () => {
         selectedVar,
         lineOfSelectedVar,
         tabSize,
-        extensionProperties
+        extensionProperties,
       );
 
       expect(result).toBeUndefined();
     });
   });
 
-  describe('logMessage', () => {
-    it('should delegate to the imported logMessage function with correct parameters', () => {
-      const selectionLine = 5;
-      
-      const result = jsDebugMessage.logMessage(
-        mockDocument,
-        selectionLine,
-        selectedVar
-      );
-
-      expect(mockLogMessage).toHaveBeenCalledTimes(1);
-      expect(mockLogMessage).toHaveBeenCalledWith(
-        mockDocument,
-        selectionLine,
-        selectedVar
-      );
-      expect(result).toBe(mockLogMsg);
-    });
-
-    it('should return the result from the imported logMessage function', () => {
-      const customLogMsg: LogMessage = {
-        logMessageType: LogMessageType.FunctionCallAssignment,
-        metadata: { functionName: 'test' }
-      };
-      mockLogMessage.mockReturnValue(customLogMsg);
-
-      const result = jsDebugMessage.logMessage(mockDocument, 0, selectedVar);
-
-      expect(result).toBe(customLogMsg);
-      expect(result).toEqual({
-        logMessageType: LogMessageType.FunctionCallAssignment,
-        metadata: { functionName: 'test' }
-      });
-    });
-  });
-
   describe('enclosingBlockName', () => {
     it('should delegate to the imported enclosingBlockName function with correct parameters', () => {
       const blockType: BlockType = 'function';
-      
+
       const result = jsDebugMessage.enclosingBlockName(
         mockDocument,
         lineOfSelectedVar,
-        blockType
+        blockType,
       );
 
       expect(mockEnclosingBlockName).toHaveBeenCalledTimes(1);
       expect(mockEnclosingBlockName).toHaveBeenCalledWith(
         mockDocument,
         lineOfSelectedVar,
-        blockType
+        blockType,
       );
       expect(result).toBe('functionName');
     });
@@ -153,7 +128,7 @@ describe('JSDebugMessage', () => {
       const result = jsDebugMessage.enclosingBlockName(
         mockDocument,
         lineOfSelectedVar,
-        'class'
+        'class',
       );
 
       expect(result).toBe(customBlockName);
@@ -163,14 +138,14 @@ describe('JSDebugMessage', () => {
   describe('detectAll', () => {
     it('should delegate to the imported detectAll function with all parameters', () => {
       const args = ['arg1', 'arg2'];
-      
+
       const result = jsDebugMessage.detectAll(
         mockDocument,
         extensionProperties.logFunction,
         extensionProperties.logType,
         extensionProperties.logMessagePrefix,
         extensionProperties.delimiterInsideMessage,
-        args
+        args,
       );
 
       expect(mockDetectAll).toHaveBeenCalledTimes(1);
@@ -180,7 +155,7 @@ describe('JSDebugMessage', () => {
         extensionProperties.logType,
         extensionProperties.logMessagePrefix,
         extensionProperties.delimiterInsideMessage,
-        args
+        args,
       );
       expect(result).toBe(mockMessages);
     });
@@ -191,7 +166,7 @@ describe('JSDebugMessage', () => {
         'console.log',
         LogType.log,
         'DEBUG:',
-        ' | '
+        ' | ',
       );
 
       expect(mockDetectAll).toHaveBeenCalledTimes(1);
@@ -201,7 +176,7 @@ describe('JSDebugMessage', () => {
         LogType.log,
         'DEBUG:',
         ' | ',
-        undefined
+        undefined,
       );
       expect(result).toBe(mockMessages);
     });
@@ -209,7 +184,7 @@ describe('JSDebugMessage', () => {
     it('should return the result from the imported detectAll function', () => {
       const customMessages: Message[] = [
         { spaces: '    ', lines: [new Range(2, 0, 3, 0)] },
-        { spaces: '  ', lines: [new Range(5, 0, 6, 0)] }
+        { spaces: '  ', lines: [new Range(5, 0, 6, 0)] },
       ];
       mockDetectAll.mockReturnValue(customMessages);
 
@@ -218,7 +193,7 @@ describe('JSDebugMessage', () => {
         'console.debug',
         LogType.debug,
         'TEST:',
-        ' - '
+        ' - ',
       );
 
       expect(result).toBe(customMessages);
@@ -229,7 +204,6 @@ describe('JSDebugMessage', () => {
   describe('interface compliance', () => {
     it('should implement all required DebugMessage interface methods', () => {
       expect(typeof jsDebugMessage.msg).toBe('function');
-      expect(typeof jsDebugMessage.logMessage).toBe('function');
       expect(typeof jsDebugMessage.enclosingBlockName).toBe('function');
       expect(typeof jsDebugMessage.detectAll).toBe('function');
     });
@@ -238,7 +212,6 @@ describe('JSDebugMessage', () => {
       // Test that methods exist and can be called (already tested above)
       // This test serves as documentation of the interface
       expect(jsDebugMessage.msg).toBeDefined();
-      expect(jsDebugMessage.logMessage).toBeDefined();
       expect(jsDebugMessage.enclosingBlockName).toBeDefined();
       expect(jsDebugMessage.detectAll).toBeDefined();
     });

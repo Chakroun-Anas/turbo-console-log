@@ -1,17 +1,7 @@
 import { TextDocument, TextEditorEdit } from 'vscode';
-import {
-  BlockType,
-  ExtensionProperties,
-  LogMessage,
-  Message,
-} from '@/entities';
+import { BlockType, ExtensionProperties, Message } from '@/entities';
 
 export interface DebugMessage {
-  logMessage(
-    document: TextDocument,
-    selectionLine: number,
-    selectedVar: string,
-  ): LogMessage;
   msg(
     textEditor: TextEditorEdit,
     document: TextDocument,
