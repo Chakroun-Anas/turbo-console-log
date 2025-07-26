@@ -2,6 +2,17 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.3.1] - 2025-07-26
+
+### 🔧 Core Improvements
+
+- Optimized AST engine by generating and reusing a single `SourceFile` instance across all checkers and line helpers — improving performance and consistency.
+
+### 💎 UI Enhancements
+
+- Updated Turbo Pro showcase panel with a visual overlay and demo preview.
+- Clicking the overlay now opens the [Turbo Pro page](https://www.turboconsolelog.io/pro) with the Pro Bundle 25s demo video.
+
 ## [3.3.0] – 2025-07-23
 
 ### Full AST Engine Revolution — Complete Rewrite
