@@ -1,4 +1,4 @@
-import { performTransformation } from '@/debug-message/js/JSDebugMessage/transformer/performTransformation';
+import { performTransformation } from '@/debug-message/js/JSDebugMessage/msg/transformer/performTransformation';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers';
 
 const options = {

@@ -1,4 +1,4 @@
-import { applyTransformedCode } from '@/debug-message/js/JSDebugMessage/transformer/applyTransformedCode';
+import { applyTransformedCode } from '@/debug-message/js/JSDebugMessage/msg/transformer/applyTransformedCode';
 import {
   makeTextDocument,
   makeTextEditor,

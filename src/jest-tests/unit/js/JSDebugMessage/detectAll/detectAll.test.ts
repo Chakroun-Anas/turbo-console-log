@@ -2,23 +2,22 @@ import { detectAll } from '@/debug-message/js/JSDebugMessage/detectAll/detectAll
 import { makeTextDocument } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
 import { LogType } from '@/entities/extension/extensionProperties';
+import { logFunctionToUse } from '@/debug-message/js/JSDebugMessage/detectAll/helpers';
+import { spacesBeforeLogMsg } from '@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg';
+import { closingContextLine } from '@/utilities';
 
 // Mock the dependencies
 jest.mock('@/debug-message/js/JSDebugMessage/detectAll/helpers', () => ({
   logFunctionToUse: jest.fn(),
 }));
 
-jest.mock('@/debug-message/js/JSDebugMessage/helpers', () => ({
+jest.mock('@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg', () => ({
   spacesBeforeLogMsg: jest.fn(),
 }));
 
 jest.mock('@/utilities', () => ({
   closingContextLine: jest.fn(),
 }));
-
-import { logFunctionToUse } from '@/debug-message/js/JSDebugMessage/detectAll/helpers';
-import { spacesBeforeLogMsg } from '@/debug-message/js/JSDebugMessage/helpers';
-import { closingContextLine } from '@/utilities';
 
 const mockLogFunctionToUse = logFunctionToUse as jest.MockedFunction<
   typeof logFunctionToUse

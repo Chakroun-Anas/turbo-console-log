@@ -1,17 +1,18 @@
+import ts from 'typescript';
 import { TextEditorEdit, TextDocument } from 'vscode';
 import {
   ExtensionProperties,
   LogMessage,
   LogContextMetadata,
 } from '@/entities';
-import { logMessage } from '../logMessage';
-import { spacesBeforeLogMsg } from '../helpers';
-import { line as logMessageLine } from '../logMessageLine';
+import { logMessage } from './logMessage';
+import { spacesBeforeLogMsg } from './spacesBeforeLogMsg';
+import { line as logMessageLine } from './logMessageLine';
 import {
   applyTransformedCode,
   needTransformation,
   performTransformation,
-} from '../transformer';
+} from './transformer';
 import { omit } from './helpers/omit';
 import { constructDebuggingMsg } from './constructDebuggingMsg';
 import { constructDebuggingMsgContent } from './constructDebuggingMsgContent';
@@ -37,12 +38,21 @@ export function msg(
   tabSize: number,
   extensionProperties: ExtensionProperties,
 ): void {
+  const sourceFile = ts.createSourceFile(
+    document.fileName,
+    document.getText(),
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  );
   const logMsg: LogMessage = logMessage(
+    sourceFile,
     document,
     lineOfSelectedVar,
     selectedVar,
   );
   const lineOfLogMsg: number = logMessageLine(
+    sourceFile,
     document,
     lineOfSelectedVar,
     selectedVar,
