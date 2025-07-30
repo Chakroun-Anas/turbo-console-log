@@ -1,0 +1,58 @@
+Turbo Unicorn Custom License  
+(Open-Source Core + Proprietary Asset Protection)
+
+Copyright (c) 2018–2025 Turbo Unicorn
+
+---
+## 1. Open Source Core
+
+The source code located in the `src/` directory of this repository is provided under the following conditions:
+
+- You are permitted to use, copy, modify, and distribute the core source code solely for personal or non-commercial purposes.
+- Commercial use — including resale, monetized forks, SaaS integration, paid add-ons, or inclusion in commercial tools — 
+ is strictly prohibited unless explicitly licensed through Turbo Console Log and the Turbo Pro Bundle.
+- You may NOT redistribute it under the name “Turbo Console Log” or with any branding elements associated with Turbo Unicorn.
+- You must preserve the original copyright notice.
+- There is no warranty or guarantee of support.
+
+All commercial rights are exclusively reserved by **Turbo Unicorn**.
+
+This code is provided “as is”, without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, or noninfringement.
+
+---
+
+## 2. Proprietary Components & Brand Protection
+
+The following components are NOT open source and are explicitly excluded from the open license:
+
+- The name “Turbo Console Log"
+- The brand identity and visual design of Turbo Console Log
+- The domain name turboconsolelog.io
+- All illustrations, visual assets, and UI/UX design related to Turbo Console Log and Turbo Unicorn
+- The compiled and/or obfuscated Turbo Pro Bundle
+- All backend services and commercial activation logic for Turbo Console Log Pro
+
+These are the exclusive property of Turbo Unicorn.  
+They may not be used, copied, modified, redistributed, rebranded, resold, or embedded in any project — open or commercial — without explicit written permission.
+
+Forked projects must not:
+- Use the name “Turbo Console Log” or any confusingly similar name
+- Use the official logo, colors, or illustrations
+- Link to or reference the turboconsolelog.io website or Pro features
+
+---
+
+## 3. Turbo Console Log Pro License
+
+The Turbo Pro Bundle is a proprietary product sold separately.  
+Purchasing a license gives you the right to use the Pro features within your VS Code environment for personal or commercial development.  
+You are not allowed to redistribute, modify, reverse-engineer, or re-sell the Pro Bundle under any circumstance.
+
+---
+
+## 4. Final Notes
+
+Use of this repository or any part of its tooling indicates your agreement with the terms above.
+
+For licensing questions or commercial requests, contact:  
+📧 support@turboconsolelog.io

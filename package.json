@@ -1,15 +1,38 @@
 {
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
-  "description": "Automating the process of writing meaningful log messages.",
-  "version": "3.3.1",
+  "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console.log or custom log functions.",
+  "version": "3.3.2",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
   },
   "icon": "images/icon.png",
   "categories": [
-    "Other"
+    "Debuggers",
+    "Programming Languages",
+    "Snippets",
+    "Visualization"
+  ],
+  "keywords": [
+    "console log",
+    "insert log",
+    "remove log",
+    "remove logs",
+    "comment log",
+    "uncomment log",
+    "delete log",
+    "correct log",
+    "debug",
+    "debug javascript",
+    "debug typescript",
+    "javascript logs",
+    "typescript logs",
+    "log cleanup",
+    "log snippet",
+    "productivity",
+    "developer tools",
+    "log panel"
   ],
   "activationEvents": [
     "onStartupFinished",

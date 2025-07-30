@@ -2,6 +2,28 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.3.2] - 2025-07-30
+
+### 📈 Marketplace Visibility & SEO
+
+- Updated extension `categories` to improve discovery across **Debuggers**, **Snippets**, **Visualizations**, and **Programming Languages**
+- Refined `keywords` to appear in searches like `debug javascript`, `remove logs`, `log panel`, and `insert log`
+
+### 📜 License & Legal Structure
+
+- Introduced a new **Turbo Unicorn Custom License** to protect the brand, logo, domain, and Turbo Pro bundle
+- The core of the extension remains **free and open source** for personal and non-commercial use
+- Commercial use of the source code is now **prohibited** unless licensed through Turbo Pro
+- All proprietary assets are now explicitly excluded from the open license
+- Updated `package.json` license field and added a full [LICENSE](./LICENSE) file
+
+### 📝 README Improvements
+
+- Rewrote intro to define Turbo Console Log as the **standard for automated logging in JavaScript and TypeScript**
+- Highlighted support for **custom log functions**, not just console.log
+- Updated license section to reflect new legal terms
+- Improved configuration section to clarify flexibility with custom log methods
+
 ## [3.3.1] - 2025-07-26
 
 ### 🔧 Core Improvements

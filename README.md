@@ -5,13 +5,15 @@
 
 ---
 
-## 🌟 Why Turbo Console Log?
+## 💡 What is Turbo Console Log?
 
-Turbo Console Log is a **developer's best friend** when it comes to debugging.
+**Turbo Console Log is the standard tool for automated logging in JavaScript and TypeScript.**
 
-Trusted by **nearly 2 million developers**, it simplifies inserting meaningful log messages and makes debugging **faster and more efficient**.
+It helps you insert, manage, and clean log statements across your code — whether you're using `console.log`, `debug`, `warn`, `table`, or even a fully custom logging function.
 
-**Now powered by a revolutionary Full AST Engine** for bulletproof accuracy and enterprise-grade code analysis!
+Powered by a full **AST engine**, Turbo understands your code structure and adds logs precisely where they belong — making debugging faster, smarter, and less repetitive.
+
+Used by nearly **2 million developers**, Turbo removes friction from your dev flow and keeps your codebase clean.
 
 ---
 
@@ -133,4 +135,9 @@ Want to improve it? Report issues, suggest features, or submit pull requests:
 
 ## 📜 License
 
-MIT License &copy; Turbo Console Log
+The Turbo Console Log repository is released under the **Turbo Unicorn Custom License**.  
+It allows free personal and non-commercial use of the open-source core.
+
+Commercial use, redistribution, and use of the brand, logo, or Turbo Pro features are strictly protected.
+
+See the full [LICENSE](./LICENSE) for details.
