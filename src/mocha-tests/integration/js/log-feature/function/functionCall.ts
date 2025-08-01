@@ -36,7 +36,7 @@ export default (): void => {
           ),
         ];
         await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
+          'turboConsoleLog.insertConsoleLog',
           [],
         );
         await Promise.all(
@@ -60,7 +60,7 @@ export default (): void => {
           ),
         ];
         await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
+          'turboConsoleLog.insertConsoleLog',
           [],
         );
         await Promise.all(
@@ -84,7 +84,7 @@ export default (): void => {
           ),
         ];
         await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
+          'turboConsoleLog.insertConsoleLog',
           [],
         );
         await Promise.all(
@@ -108,7 +108,7 @@ export default (): void => {
           ),
         ];
         await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
+          'turboConsoleLog.insertConsoleLog',
           [],
         );
         await Promise.all(

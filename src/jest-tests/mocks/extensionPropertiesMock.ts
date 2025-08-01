@@ -1,5 +1,4 @@
 import { ExtensionProperties } from '../../entities';
-import { LogType } from '../../entities/extension/extensionProperties';
 
 export const extensionPropertiesMock: ExtensionProperties = {
   wrapLogMessage: false,
@@ -15,6 +14,5 @@ export const extensionPropertiesMock: ExtensionProperties = {
   delimiterInsideMessage: '~',
   includeLineNum: false,
   includeFilename: false,
-  logType: 'log' as LogType,
   logFunction: 'log',
 };

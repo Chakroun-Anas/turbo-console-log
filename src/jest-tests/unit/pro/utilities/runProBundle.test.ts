@@ -5,7 +5,8 @@ describe('runProBundle', () => {
     jest.resetModules();
     jest.clearAllMocks();
   });
-  it('should call turboConsoleLogPro with extensionProperties', () => {
+
+  it('should call turboConsoleLogPro with extensionProperties', async () => {
     const mockFn = jest.fn();
     const activateProModeMock = jest.fn();
     const deactivateRepairModeMock = jest.fn();
@@ -27,7 +28,7 @@ describe('runProBundle', () => {
     const { runProBundle } = require('../../../../pro/utilities');
 
     // Act
-    runProBundle(extensionPropertiesMock, fakeBundle);
+    await runProBundle(extensionPropertiesMock, fakeBundle);
 
     // Assert
     expect(mockFn).toHaveBeenCalledWith(extensionPropertiesMock);
@@ -35,7 +36,7 @@ describe('runProBundle', () => {
     expect(deactivateRepairModeMock).toHaveBeenCalled();
   });
 
-  it('should throw an error if the bundle throws internally', () => {
+  it('should throw an error if the bundle throws internally', async () => {
     const brokenBundle = `
       exports.turboConsoleLogPro = function() {
         throw new Error('Internal error');
@@ -47,12 +48,14 @@ describe('runProBundle', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { runProBundle } = require('../../../../pro/utilities');
 
-    expect(() => runProBundle(extensionPropertiesMock, brokenBundle)).toThrow(
+    await expect(
+      runProBundle(extensionPropertiesMock, brokenBundle),
+    ).rejects.toThrow(
       'Failed to load Turbo Console Log Pro — the bundle may be corrupted!',
     );
   });
 
-  it("should throw if the bundle doesn't export turboConsoleLogPro", () => {
+  it("should throw if the bundle doesn't export turboConsoleLogPro", async () => {
     const noExportBundle = `
     // No turboConsoleLogPro defined
   `;
@@ -60,7 +63,9 @@ describe('runProBundle', () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { runProBundle } = require('../../../../pro/utilities');
 
-    expect(() => runProBundle(extensionPropertiesMock, noExportBundle)).toThrow(
+    await expect(
+      runProBundle(extensionPropertiesMock, noExportBundle),
+    ).rejects.toThrow(
       'Pro bundle does not export turboConsoleLogPro. Activation failed!',
     );
   });

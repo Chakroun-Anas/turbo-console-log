@@ -13,6 +13,7 @@ export const jsDebugMessage: DebugMessage = {
     lineOfSelectedVar: number,
     tabSize: number,
     extensionProperties: ExtensionProperties,
+    logFunction: string,
   ): void {
     msg(
       textEditor,
@@ -21,6 +22,7 @@ export const jsDebugMessage: DebugMessage = {
       lineOfSelectedVar,
       tabSize,
       extensionProperties,
+      logFunction,
     );
   },
   enclosingBlockName(
@@ -33,18 +35,14 @@ export const jsDebugMessage: DebugMessage = {
   detectAll(
     document: TextDocument,
     logFunction: ExtensionProperties['logFunction'],
-    logType: ExtensionProperties['logType'],
     logMessagePrefix: ExtensionProperties['logMessagePrefix'],
     delimiterInsideMessage: ExtensionProperties['delimiterInsideMessage'],
-    args?: unknown[],
   ): Message[] {
     return detectAll(
       document,
       logFunction,
-      logType,
       logMessagePrefix,
       delimiterInsideMessage,
-      args,
     );
   },
 };

@@ -35,7 +35,7 @@ export default (): void => {
           ),
         ];
         await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
+          'turboConsoleLog.insertConsoleLog',
           [],
         );
         // Console log message is appended to the last line of the file starting with /n character

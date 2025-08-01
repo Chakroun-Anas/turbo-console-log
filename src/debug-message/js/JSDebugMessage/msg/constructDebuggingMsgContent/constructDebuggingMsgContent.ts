@@ -32,12 +32,11 @@ export function constructDebuggingMsgContent(
     ExtensionProperties,
     'wrapLogMessage' | 'insertEmptyLineAfterLogMessage'
   >,
+  logFunction: string,
 ): string {
   const {
     includeFilename,
     includeLineNum,
-    logFunction,
-    logType,
     logMessagePrefix,
     logMessageSuffix,
     delimiterInsideMessage,
@@ -87,7 +86,6 @@ export function constructDebuggingMsgContent(
   return buildLogMessage(
     parts,
     logFunction,
-    logType,
     quote,
     selectedVar,
     extensionProperties.addSemicolonInTheEnd,

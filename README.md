@@ -41,37 +41,45 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ---
 
-## 🚀 What's New in v3.3.0? – Full AST Engine Revolution
+## 🚀 What's New in v3.4.0? – More Complete Console Control
 
-**Complete rebuild from the ground up!** This release introduces a revolutionary **Full AST (Abstract Syntax Tree) Engine** powered by the TypeScript Compiler API.
+**Granular console method control is here!** This release introduces **7 dedicated console commands** with individual keyboard shortcuts, building on our revolutionary AST engine from v3.3.0.
 
-### Revolutionary Transformation
+### Complete Console Method Coverage
 
-- **Full AST Engine:** Complete semantic understanding of your code, not just pattern matching
-- **86% Average Coverage:** Massive quality improvement from 45% to 86% across all metrics
-- **2.6X More Comprehensive:** 4,423 lines of sophisticated code vs 1,688 in the old regex system
-- **750+ Tests:** Enterprise-grade testing with unit and integration coverage
-- **16 Specialized AST Checkers:** Each code pattern handled with precision
+- **7 New Console Commands:** Dedicated commands for every console method (log, info, debug, warn, error, table, custom)
+- **Individual Keyboard Shortcuts:** Each console method has its own ⌘K combination shortcut
+- **Granular Control:** No more switching settings — choose the exact console method instantly
+- **Enhanced AST Detection:** Continuing our AST revolution with even fewer false positives
 
-### What This Means for You
+### New Keyboard Shortcuts
 
-- **Bulletproof Accuracy:** AST understands code structure semantically
-- **Modern JavaScript Support:** Native handling of destructuring, async/await, optional chaining
-- **Complex Expression Support:** Perfect handling of ternary operators, binary expressions, template literals
-- **Edge Case Mastery:** Robust support for multi-line assignments, chained method calls, nested objects
-- **TypeScript Integration:** Seamless support for TypeScript-specific syntax and patterns
-- **Future-Proof Architecture:** Easy to extend for new JavaScript language features
+- **Console Log:** `⌘K ⌘L` (macOS) / `Ctrl+K Ctrl+L` (Windows/Linux)
+- **Console Info:** `⌘K ⌘I` (macOS) / `Ctrl+K Ctrl+I` (Windows/Linux)
+- **Console Debug:** `⌘K ⌘D` (macOS) / `Ctrl+K Ctrl+D` (Windows/Linux)
+- **Console Warn:** `⌘K ⌘W` (macOS) / `Ctrl+K Ctrl+W` (Windows/Linux)
+- **Console Error:** `⌘K ⌘E` (macOS) / `Ctrl+K Ctrl+E` (Windows/Linux)
+- **Console Table:** `⌘K ⌘T` (macOS) / `Ctrl+K Ctrl+T` (Windows/Linux)
+- **Custom Log:** `⌘K ⌘C` (macOS) / `Ctrl+K Ctrl+C` (Windows/Linux)
 
-### Bug Fixes & Improvements
+### Enhanced Features & Pro Improvements
 
-- **Core:** insertEnclosingClass and insertEnclosingFunction can now be deactivated
-- **Pro:** Fixed tree sync issues when deleting logs
-- **Pro:** Status bar activation message has neutral background (better UX)
-- **Pro:** Significantly reduced false positives in tree view detection
+- **Auto-Save Integration:** Turbo commands now auto-save documents after execution
+- **Instant Tree Sync:** Pro tree updates immediately after file changes thanks to auto-save
+- **Color-Coded Console Methods:** Each console type displays in unique colors (🟦 log, 🟩 info, 🟪 debug, 🟨 warn, 🟥 error, 📊 table)
+- **Enhanced Expand All:** Pro "Expand All" now properly expands final log leaves
+- **Smart Shortcut Integration:** All 7 new shortcuts work seamlessly with Pro tree view
 
-👉 [Read the full v3.3.0 release article](https://www.turboconsolelog.io/articles/release-330)  
-👉 [Understanding the Full AST Engine](https://www.turboconsolelog.io/articles/turbo-full-ast-engine)  
-👉 [Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)
+### Quality & Testing
+
+- **1,400+ Lines of New Tests:** Comprehensive Jest unit tests for all console commands
+- **Test Suite Consolidation:** Reduced 36+ test files into 4 unified, maintainable suites
+- **Enhanced Coverage:** Improved edge case handling across all console scenarios
+- **Unified Architecture:** All commands follow identical patterns for consistency
+
+👉 [Read the Full v3.4.0 Release Article](https://www.turboconsolelog.io/articles/release-340)  
+👉 [Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)  
+👉 [Subscribe to Newsletter (30% Pro Discount)](https://www.turboconsolelog.io/join)
 
 ---
 

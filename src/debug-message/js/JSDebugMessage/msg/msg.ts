@@ -37,6 +37,7 @@ export function msg(
   lineOfSelectedVar: number,
   tabSize: number,
   extensionProperties: ExtensionProperties,
+  logFunction: string,
 ): void {
   const sourceFile = ts.createSourceFile(
     document.fileName,
@@ -76,11 +77,13 @@ export function msg(
       'wrapLogMessage',
       'insertEmptyLineAfterLogMessage',
     ]),
+    logFunction,
   );
   const debuggingMsg: string = constructDebuggingMsg(
     extensionProperties,
     debuggingMsgContent,
     spacesBeforeMsg,
+    logFunction,
   );
 
   // Handle code transformation if needed

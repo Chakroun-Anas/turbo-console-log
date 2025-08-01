@@ -9,14 +9,13 @@ export interface DebugMessage {
     lineOfSelectedVar: number,
     tabSize: number,
     extensionProperties: ExtensionProperties,
+    logFunction: string,
   ): void;
   detectAll(
     document: TextDocument,
     logFunction: ExtensionProperties['logFunction'],
-    logType: ExtensionProperties['logType'],
     logMessagePrefix: ExtensionProperties['logMessagePrefix'],
     delimiterInsideMessage: ExtensionProperties['delimiterInsideMessage'],
-    args?: unknown[],
   ): Message[];
   enclosingBlockName(
     document: TextDocument,

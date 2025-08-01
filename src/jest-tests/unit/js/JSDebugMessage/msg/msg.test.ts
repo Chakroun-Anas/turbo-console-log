@@ -101,6 +101,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       // Verify the orchestration flow
@@ -147,6 +148,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(mockOmit).toHaveBeenCalledWith(extensionProperties, [
@@ -165,6 +167,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(mockPerformTransformation).not.toHaveBeenCalled();
@@ -186,6 +189,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(mockNeedTransformation).toHaveBeenCalledWith(
@@ -220,6 +224,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(mockApplyTransformedCode).toHaveBeenCalled();
@@ -245,6 +250,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(mockSpacesBeforeLogMsg).toHaveBeenCalledWith(mockDocument, 5, 1);
@@ -254,6 +260,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         1,
         {},
+        'log',
       );
     });
 
@@ -270,6 +277,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(mockSpacesBeforeLogMsg).toHaveBeenCalledWith(
@@ -283,6 +291,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         1,
         {},
+        'log',
       );
     });
   });
@@ -301,12 +310,14 @@ describe('msg', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(mockConstructDebuggingMsg).toHaveBeenCalledWith(
         extensionProperties,
         mockContent,
         mockSpaces,
+        'log',
       );
     });
 
@@ -321,6 +332,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(mockSpacesBeforeLogMsg).toHaveBeenCalledWith(
@@ -334,6 +346,7 @@ describe('msg', () => {
         lineOfSelectedVar,
         mockLineOfLogMsg,
         {},
+        'log',
       );
     });
   });

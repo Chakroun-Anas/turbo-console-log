@@ -20,7 +20,6 @@ export function getExtensionProperties(
     delimiterInsideMessage: workspaceConfig.delimiterInsideMessage || '~',
     includeLineNum: workspaceConfig.includeLineNum || false,
     includeFilename: workspaceConfig.includeFilename || false,
-    logType: workspaceConfig.logType || 'log',
     logFunction: workspaceConfig.logFunction || 'log',
   };
 }

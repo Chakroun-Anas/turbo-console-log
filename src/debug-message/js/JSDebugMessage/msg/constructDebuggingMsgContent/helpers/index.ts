@@ -9,6 +9,5 @@ export * from './addVariable';
 export * from './buildLogMessage';
 export * from './getFileName';
 export * from './getEnclosingContext';
-export * from './getLogFunction';
 export * from './selectQuote';
 export * from './resolveDelimiterSpacing';

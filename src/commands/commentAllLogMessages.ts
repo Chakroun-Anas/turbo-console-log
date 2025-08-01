@@ -4,8 +4,8 @@ import { Command, Message } from '../entities';
 export function commentAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.commentAllLogMessages',
-    handler: async ({ extensionProperties, debugMessage, args }) => {
-      const { logFunction, logType, logMessagePrefix, delimiterInsideMessage } =
+    handler: async ({ extensionProperties, debugMessage }) => {
+      const { logFunction, logMessagePrefix, delimiterInsideMessage } =
         extensionProperties;
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
@@ -16,22 +16,29 @@ export function commentAllLogMessagesCommand(): Command {
       const logMessages: Message[] = debugMessage.detectAll(
         document,
         logFunction,
-        logType,
         logMessagePrefix,
         delimiterInsideMessage,
-        args,
       );
-      editor.edit((editBuilder) => {
-        logMessages.forEach(({ spaces, lines }) => {
-          lines.forEach((line: vscode.Range) => {
-            editBuilder.delete(line);
-            editBuilder.insert(
-              new vscode.Position(line.start.line, 0),
-              `${spaces}// ${document.getText(line).trim()}\n`,
-            );
+      editor
+        .edit((editBuilder) => {
+          logMessages.forEach(({ spaces, lines, isCommented }) => {
+            if (isCommented) {
+              return; // Skip commenting if the message is already commented
+            }
+            lines.forEach((line: vscode.Range) => {
+              editBuilder.delete(line);
+              editBuilder.insert(
+                new vscode.Position(line.start.line, 0),
+                `${spaces}// ${document.getText(line).trim()}\n`,
+              );
+            });
           });
+        })
+        .then(async (applied) => {
+          if (applied) {
+            await document.save();
+          }
         });
-      });
     },
   };
 }

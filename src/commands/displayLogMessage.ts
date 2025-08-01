@@ -34,6 +34,7 @@ export function displayLogMessageCommand(): Command {
               lineOfSelectedVar,
               tabSize,
               extensionProperties,
+              'log',
             );
           });
         }

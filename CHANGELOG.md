@@ -2,6 +2,52 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.4.0] - 2025-08-05
+
+### 🎯 Complete Console Method Coverage
+
+- **7 New Console Commands:** Dedicated commands for `console.log`, `console.info`, `console.debug`, `console.warn`, `console.error`, `console.table`, and custom log functions
+- **Individual Keyboard Shortcuts:** Each console method now has its own keyboard shortcut (⌘K combinations)
+- **Granular Control:** No more switching settings — choose the exact console method you need instantly
+
+### ⌨️ New Keyboard Shortcuts
+
+- **Console Log:** `⌘K ⌘L` (macOS) / `Ctrl+K Ctrl+L` (Windows/Linux)
+- **Console Info:** `⌘K ⌘I` (macOS) / `Ctrl+K Ctrl+I` (Windows/Linux)
+- **Console Debug:** `⌘K ⌘D` (macOS) / `Ctrl+K Ctrl+D` (Windows/Linux)
+- **Console Warn:** `⌘K ⌘W` (macOS) / `Ctrl+K Ctrl+W` (Windows/Linux)
+- **Console Error:** `⌘K ⌘E` (macOS) / `Ctrl+K Ctrl+E` (Windows/Linux)
+- **Console Table:** `⌘K ⌘T` (macOS) / `Ctrl+K Ctrl+T` (Windows/Linux)
+- **Custom Log:** `⌘K ⌘C` (macOS) / `Ctrl+K Ctrl+C` (Windows/Linux)
+
+### 🚀 Enhanced Core Features
+
+- **Auto-Save Integration:** Turbo commands (comment, uncomment, correct, delete) now auto-save documents after execution
+- **Enhanced AST Detection:** Continuing our AST revolution with even fewer false positives and improved accuracy
+- **Unified Command Structure:** All new commands follow identical patterns for consistency and reliability
+- **Improved Error Recovery:** Enhanced Pro bundle repair system with better recovery mechanisms
+
+### ✨ Turbo Pro Enhancements
+
+- **Color-Coded Console Methods:** Each console type displays in unique colors (🟦 log, 🟩 info, 🟪 debug, 🟨 warn, 🟥 error, 📊 table)
+- **Instant Auto-Sync:** Tree updates immediately after any Turbo command thanks to auto-save integration
+- **Smart Shortcut Integration:** All 7 new keyboard shortcuts work seamlessly with the Pro tree view
+- **Enhanced Expand All:** Now properly expands final log leaves in the tree structure
+- **Real-Time Synchronization:** Tree syncs immediately after file changes with improved reliability
+
+### 🧪 Testing & Quality Improvements
+
+- **1,400+ Lines of New Tests:** Comprehensive Jest unit tests for all new console commands
+- **Test Suite Consolidation:** Reduced 36+ individual test files into 4 unified, maintainable suites
+- **Enhanced Coverage:** Improved edge case handling across all console method scenarios
+- **Repair Mode Testing:** 414 lines of comprehensive repair system tests
+
+→ **Legacy Support:** Original `displayLogMessage` command remains available as "Insert console log message (Legacy)"
+
+👉 [Read the Full v3.4.0 Release Article](https://www.turboconsolelog.io/articles/release-340)  
+👉 [Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)  
+👉 [Subscribe to Newsletter (30% Pro Discount)](https://www.turboconsolelog.io/join)
+
 ## [3.3.2] - 2025-07-30
 
 ### 📈 Marketplace Visibility & SEO
