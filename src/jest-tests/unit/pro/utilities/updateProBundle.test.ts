@@ -53,7 +53,9 @@ describe('updateProBundle', () => {
       mockBundle,
     );
     expect(showNotification).toHaveBeenCalledWith(
-      expect.stringContaining('Pro Bundle Updated Successfully'),
+      expect.stringContaining(
+        "Pro Bundle Updated v3.0.0, don't forget to reload your window!",
+      ),
       10000,
     );
   });

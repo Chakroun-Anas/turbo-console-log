@@ -27,14 +27,12 @@ describe('getExtensionProperties', () => {
     const config = createMockWorkspaceConfig({
       wrapLogMessage: true,
       logMessagePrefix: '🔥',
-      logType: 'info',
     });
 
     const props = getExtensionProperties(config);
 
     expect(props.wrapLogMessage).toBe(true);
     expect(props.logMessagePrefix).toBe('🔥');
-    expect(props.logType).toBe('info');
   });
 
   it('respects explicit false values for boolean properties', () => {

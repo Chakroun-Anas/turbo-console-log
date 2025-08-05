@@ -12,14 +12,5 @@ export type ExtensionProperties = {
   includeFilename: boolean;
   includeLineNum: boolean;
   quote: string;
-  logType: LogType;
   logFunction: string;
 };
-
-export enum LogType {
-  log = 'log',
-  warn = 'warn',
-  error = 'error',
-  debug = 'debug',
-  table = 'table',
-}

@@ -8,7 +8,6 @@ import {
   makeDebugMessage,
 } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
-import { LogType } from '@/entities/extension/extensionProperties';
 import { DebugMessage } from '@/debug-message';
 
 describe('uncommentAllLogMessagesCommand', () => {
@@ -21,7 +20,6 @@ describe('uncommentAllLogMessagesCommand', () => {
 
     mockExtensionProperties = {
       logFunction: 'log',
-      logType: 'log',
       logMessagePrefix: 'Debug',
       delimiterInsideMessage: '~',
       includeFilename: true,
@@ -82,6 +80,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange],
+            isCommented: true,
           },
         ]);
 
@@ -135,10 +134,12 @@ describe('uncommentAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange1],
+            isCommented: true,
           },
           {
             spaces: '    ',
             lines: [mockRange2],
+            isCommented: true,
           },
         ]);
 
@@ -208,6 +209,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange1, mockRange2, mockRange3, mockRange4],
+            isCommented: true,
           },
         ]);
 
@@ -248,149 +250,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         );
         expect(mockEditBuilder.delete).toHaveBeenCalledTimes(4);
         expect(mockEditBuilder.insert).toHaveBeenCalledTimes(4);
-      });
-    });
-
-    describe('comment removal variations', () => {
-      it('should remove single forward slash from commented log', async () => {
-        const mockLines = [
-          'const myVar = 123;',
-          '    / console.log("Debug ~ file.js:2 ~ myVar:", myVar);',
-          'return myVar;',
-        ];
-        mockDocument = makeTextDocument(mockLines, 'file.js');
-
-        const mockRange = new vscode.Range(
-          new vscode.Position(1, 0),
-          new vscode.Position(1, mockLines[1].length),
-        );
-
-        mockEditor = makeTextEditor({
-          document: mockDocument,
-          selections: [],
-        });
-
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
-          {
-            spaces: '    ',
-            lines: [mockRange],
-          },
-        ]);
-
-        vscode.window.activeTextEditor = mockEditor;
-
-        mockEditor.edit = jest.fn().mockImplementation((cb) => {
-          cb(mockEditBuilder);
-          return Promise.resolve(true);
-        });
-
-        const command = uncommentAllLogMessagesCommand();
-
-        await command.handler({
-          context: mockContext,
-          extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
-        });
-
-        expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
-        expect(mockEditBuilder.insert).toHaveBeenCalledWith(
-          new vscode.Position(1, 0),
-          '    console.log("Debug ~ file.js:2 ~ myVar:", myVar);\n',
-        );
-      });
-
-      it('should remove multiple forward slashes from commented log', async () => {
-        const mockLines = [
-          'const myVar = 123;',
-          '    //// console.log("Debug ~ file.js:2 ~ myVar:", myVar);',
-          'return myVar;',
-        ];
-        mockDocument = makeTextDocument(mockLines, 'file.js');
-
-        const mockRange = new vscode.Range(
-          new vscode.Position(1, 0),
-          new vscode.Position(1, mockLines[1].length),
-        );
-
-        mockEditor = makeTextEditor({
-          document: mockDocument,
-          selections: [],
-        });
-
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
-          {
-            spaces: '    ',
-            lines: [mockRange],
-          },
-        ]);
-
-        vscode.window.activeTextEditor = mockEditor;
-
-        mockEditor.edit = jest.fn().mockImplementation((cb) => {
-          cb(mockEditBuilder);
-          return Promise.resolve(true);
-        });
-
-        const command = uncommentAllLogMessagesCommand();
-
-        await command.handler({
-          context: mockContext,
-          extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
-        });
-
-        expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
-        expect(mockEditBuilder.insert).toHaveBeenCalledWith(
-          new vscode.Position(1, 0),
-          '    console.log("Debug ~ file.js:2 ~ myVar:", myVar);\n',
-        );
-      });
-
-      it('should handle comments with extra whitespace', async () => {
-        const mockLines = [
-          'const myVar = 123;',
-          '    //   console.log("Debug ~ file.js:2 ~ myVar:", myVar);   ',
-          'return myVar;',
-        ];
-        mockDocument = makeTextDocument(mockLines, 'file.js');
-
-        const mockRange = new vscode.Range(
-          new vscode.Position(1, 0),
-          new vscode.Position(1, mockLines[1].length),
-        );
-
-        mockEditor = makeTextEditor({
-          document: mockDocument,
-          selections: [],
-        });
-
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
-          {
-            spaces: '    ',
-            lines: [mockRange],
-          },
-        ]);
-
-        vscode.window.activeTextEditor = mockEditor;
-
-        mockEditor.edit = jest.fn().mockImplementation((cb) => {
-          cb(mockEditBuilder);
-          return Promise.resolve(true);
-        });
-
-        const command = uncommentAllLogMessagesCommand();
-
-        await command.handler({
-          context: mockContext,
-          extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
-        });
-
-        expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
-        expect(mockEditBuilder.insert).toHaveBeenCalledWith(
-          new vscode.Position(1, 0),
-          '    console.log("Debug ~ file.js:2 ~ myVar:", myVar);\n',
-        );
       });
     });
 
@@ -446,6 +305,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           {
             spaces: '',
             lines: [mockRange],
+            isCommented: true,
           },
         ]);
 
@@ -492,6 +352,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           {
             spaces: '',
             lines: [mockRange],
+            isCommented: true,
           },
         ]);
 
@@ -538,6 +399,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           {
             spaces: '',
             lines: [mockRange],
+            isCommented: true,
           },
         ]);
 
@@ -549,7 +411,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         });
 
         mockExtensionProperties.logFunction = 'error';
-        mockExtensionProperties.logType = LogType.error;
 
         const command = uncommentAllLogMessagesCommand();
 
@@ -562,10 +423,8 @@ describe('uncommentAllLogMessagesCommand', () => {
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
           mockDocument,
           'error',
-          'error',
           'Debug',
           '~',
-          undefined,
         );
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
         expect(mockEditBuilder.insert).toHaveBeenCalledWith(
@@ -637,14 +496,17 @@ describe('uncommentAllLogMessagesCommand', () => {
           {
             spaces: '      ',
             lines: [mockRange1],
+            isCommented: true,
           },
           {
             spaces: '      ',
             lines: [mockRange2],
+            isCommented: true,
           },
           {
             spaces: '    ',
             lines: [mockRange3],
+            isCommented: true,
           },
         ]);
 
@@ -718,10 +580,8 @@ describe('uncommentAllLogMessagesCommand', () => {
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
           mockDocument,
           'log',
-          'log',
           'Debug',
           '~',
-          undefined,
         );
       });
 
@@ -744,22 +604,18 @@ describe('uncommentAllLogMessagesCommand', () => {
         });
 
         const command = uncommentAllLogMessagesCommand();
-        const mockArgs: unknown[] = ['someArg', 'value'];
 
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
           debugMessage: mockDebugMessage,
-          args: mockArgs,
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
           mockDocument,
           'log',
-          'log',
           'Debug',
           '~',
-          mockArgs,
         );
       });
     });

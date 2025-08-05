@@ -8,7 +8,6 @@ import {
   makeDebugMessage,
 } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
-import { LogType } from '@/entities/extension/extensionProperties';
 import { DebugMessage } from '@/debug-message';
 
 describe('deleteAllLogMessagesCommand', () => {
@@ -21,7 +20,6 @@ describe('deleteAllLogMessagesCommand', () => {
 
     mockExtensionProperties = {
       logFunction: 'log',
-      logType: 'log',
       logMessagePrefix: 'Debug',
       delimiterInsideMessage: '~',
       includeFilename: true,
@@ -732,7 +730,6 @@ describe('deleteAllLogMessagesCommand', () => {
         });
 
         mockExtensionProperties.logFunction = 'error';
-        mockExtensionProperties.logType = LogType.error;
 
         const command = deleteAllLogMessagesCommand();
 
@@ -745,10 +742,8 @@ describe('deleteAllLogMessagesCommand', () => {
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
           mockDocument,
           'error',
-          'error',
           'Debug',
           '~',
-          undefined,
         );
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
       });
@@ -784,48 +779,8 @@ describe('deleteAllLogMessagesCommand', () => {
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
           mockDocument,
           'log',
-          'log',
           'Debug',
           '~',
-          undefined,
-        );
-      });
-
-      it('should call debugMessage.detectAll with args when provided', async () => {
-        const mockLines = ['const myVar = 123;'];
-        mockDocument = makeTextDocument(mockLines, 'file.js');
-
-        mockEditor = makeTextEditor({
-          document: mockDocument,
-          selections: [],
-        });
-
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([]);
-
-        vscode.window.activeTextEditor = mockEditor;
-
-        mockEditor.edit = jest.fn().mockImplementation((cb) => {
-          cb(mockEditBuilder);
-          return Promise.resolve(true);
-        });
-
-        const command = deleteAllLogMessagesCommand();
-        const mockArgs: unknown[] = ['someArg', 'value'];
-
-        await command.handler({
-          context: mockContext,
-          extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
-          args: mockArgs,
-        });
-
-        expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
-          mockDocument,
-          'log',
-          'log',
-          'Debug',
-          '~',
-          mockArgs,
         );
       });
     });

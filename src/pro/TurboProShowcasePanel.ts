@@ -87,6 +87,47 @@ export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
         text-align: center;
         cursor: pointer;
         max-width: 320px;
+        margin-bottom: 12px;
+      }
+
+      .newsletter-button {
+        display: inline-block;
+        padding: 14px 22px;
+        width: 80%;
+        background-color: #FFC947;
+        color: black;
+        border-radius: 6px;
+        font-weight: bold;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+        max-width: 320px;
+        margin-bottom: 24px;
+      }
+
+      .discount-illustration {
+        max-width: 250px;
+        width: 100%;
+        border-radius: 8px;
+        margin-bottom: 16px;
+      }
+
+      .discount-text {
+        background: linear-gradient(135deg, #FF6B6B, #FFC947);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: bold;
+        font-size: 1.1rem;
+        text-align: center;
+        margin: 12px 0;
+      }
+
+      .small-text {
+        font-size: 0.8rem;
+        color: #CCCCCC;
+        text-align: center;
+        margin-top: 8px;
       }
 
       .list {
@@ -121,23 +162,36 @@ export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
           <div class="play-icon"></div>
         </a>
       </div>
-
-      <p class="caption">Click to watch a 25s demo 🎥</p>
-
       <ul class="list">
         <h2 class="primary-color">Features</h2>
         <li>Native dedicated VSCode panel for the extension 🚀</li>
         <li>Current folder/workspace logs listing via VSCode Tree View API 🌲</li>
+        <li>Color-coded console methods for instant visual recognition 🎨</li>
         <li>Real time synchronisation of the current folder/workspace logs in the tree ⚡️</li>
         <li>Contextual menu to execute turbo command actions on the file level 🚦</li>
         <li>Auto correct turbo log messages line numbers and file names when the tree is synchronised 🖊️</li>
         <li>Blazing fast and 100% native to VSCode 💨</li>
       </ul>
 
-      <a href="https://turboconsolelog.io/pro" target="_blank" style="text-decoration: none; outline: none; margin-top: 0.75rem;">
+      <div style="background: rgba(255,107,107,0.1); border: 2px solid #FF6B6B; border-radius: 8px; padding: 16px; margin: 16px 8px; text-align: center;">
+        <h3 style="color: #FF6B6B; margin: 0 0 8px 0; font-size: 16px;">🎉 Celebrate v3.4.0 Release!</h3>
+        <p style="margin: 0; font-size: 13px; color: #CCCCCC;">
+          New keyboard shortcuts for all console methods
+        </p>
+      </div>
+
+      <div style="display: flex; justify-content: center; margin-top: 0.75rem;">
+        <img
+          src="https://www.turboconsolelog.io/assets/subscribe-30-off.png"
+          alt="Subscribe for 30% Off"
+          class="discount-illustration"
+        />
+      </div>
+
+      <a href="https://turboconsolelog.io/join" target="_blank" style="text-decoration: none; outline: none;">
         <div style="display: flex; justify-content: center;">
-          <button class="button">
-            GET LIFETIME LICENCE FOR 29.99€
+          <button class="newsletter-button">
+            📬 JOIN NEWSLETTER & GET 30% OFF NOW
           </button>
         </div>
       </a>

@@ -39,7 +39,7 @@ export default (): void => {
           new NaturalEditorPosition(3, 20),
         );
         await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
+          'turboConsoleLog.insertConsoleLog',
           [],
         );
         await Promise.all(
@@ -68,7 +68,7 @@ export default (): void => {
           new NaturalEditorPosition(7, 24),
         );
         await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
+          'turboConsoleLog.insertConsoleLog',
           [],
         );
         await Promise.all(
@@ -97,7 +97,7 @@ export default (): void => {
           new NaturalEditorPosition(11, 34),
         );
         await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
+          'turboConsoleLog.insertConsoleLog',
           [],
         );
         await Promise.all(
@@ -126,7 +126,7 @@ export default (): void => {
           new NaturalEditorPosition(18, 27),
         );
         await vscode.commands.executeCommand(
-          'turboConsoleLog.displayLogMessage',
+          'turboConsoleLog.insertConsoleLog',
           [],
         );
         await Promise.all(

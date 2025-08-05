@@ -173,7 +173,7 @@ describe('activateTurboProBundleCommand', () => {
         '3.3.0',
       );
       expect(showNotification).toHaveBeenCalledWith(
-        'Turbo Console Log Pro Activated Successfully 🚀 🎉',
+        "🚀 Turbo Console Log Pro Activated, don't forget to reload your window!",
         10000,
       );
     });

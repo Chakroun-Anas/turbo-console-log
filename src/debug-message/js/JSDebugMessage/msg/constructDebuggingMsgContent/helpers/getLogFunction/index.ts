@@ -1,1 +1,0 @@
-export { getLogFunction } from './getLogFunction';

@@ -71,4 +71,5 @@ export const makeTextDocument = (
       }
       return offset + position.character;
     },
+    save: jest.fn().mockResolvedValue(true),
   }) as unknown as TextDocument;

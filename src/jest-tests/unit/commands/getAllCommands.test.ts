@@ -1,43 +1,85 @@
-import { getAllCommands } from '../../../commands';
-import type { Command } from '../../../entities';
+import { getAllCommands } from '@/commands';
+import type { Command } from '@/entities';
 
 // Mock each command function
-jest.mock('../../../commands/displayLogMessage', () => ({
-  displayLogMessageCommand: () => ({
-    name: 'turboConsoleLog.displayLogMessage',
+jest.mock('@/commands/insertConsoleLog', () => ({
+  insertConsoleLogCommand: () => ({
+    name: 'turboConsoleLog.insertConsoleLog',
     handler: jest.fn(),
   }),
 }));
 
-jest.mock('../../../commands/commentAllLogMessages', () => ({
+jest.mock('@/commands/insertConsoleDebug', () => ({
+  insertConsoleDebugCommand: () => ({
+    name: 'turboConsoleLog.insertConsoleDebug',
+    handler: jest.fn(),
+  }),
+}));
+
+jest.mock('@/commands/insertConsoleTable', () => ({
+  insertConsoleTableCommand: () => ({
+    name: 'turboConsoleLog.insertConsoleTable',
+    handler: jest.fn(),
+  }),
+}));
+
+jest.mock('@/commands/insertConsoleInfo', () => ({
+  insertConsoleInfoCommand: () => ({
+    name: 'turboConsoleLog.insertConsoleInfo',
+    handler: jest.fn(),
+  }),
+}));
+
+jest.mock('@/commands/insertConsoleWarn', () => ({
+  insertConsoleWarnCommand: () => ({
+    name: 'turboConsoleLog.insertConsoleWarn',
+    handler: jest.fn(),
+  }),
+}));
+
+jest.mock('@/commands/insertConsoleError', () => ({
+  insertConsoleErrorCommand: () => ({
+    name: 'turboConsoleLog.insertConsoleError',
+    handler: jest.fn(),
+  }),
+}));
+
+jest.mock('@/commands/insertCustomLog', () => ({
+  insertCustomLogCommand: () => ({
+    name: 'turboConsoleLog.insertCustomLog',
+    handler: jest.fn(),
+  }),
+}));
+
+jest.mock('@/commands/commentAllLogMessages', () => ({
   commentAllLogMessagesCommand: () => ({
     name: 'turboConsoleLog.commentAllLogMessages',
     handler: jest.fn(),
   }),
 }));
 
-jest.mock('../../../commands/uncommentAllLogMessages', () => ({
+jest.mock('@/commands/uncommentAllLogMessages', () => ({
   uncommentAllLogMessagesCommand: () => ({
     name: 'turboConsoleLog.uncommentAllLogMessages',
     handler: jest.fn(),
   }),
 }));
 
-jest.mock('../../../commands/deleteAllLogMessages', () => ({
+jest.mock('@/commands/deleteAllLogMessages', () => ({
   deleteAllLogMessagesCommand: () => ({
     name: 'turboConsoleLog.deleteAllLogMessages',
     handler: jest.fn(),
   }),
 }));
 
-jest.mock('../../../commands/correctAllLogMessages', () => ({
+jest.mock('@/commands/correctAllLogMessages', () => ({
   correctAllLogMessagesCommand: () => ({
     name: 'turboConsoleLog.correctAllLogMessages',
     handler: jest.fn(),
   }),
 }));
 
-jest.mock('../../../commands/activateTurboProBundle', () => ({
+jest.mock('@/commands/activateTurboProBundle', () => ({
   activateTurboProBundleCommand: () => ({
     name: 'turboConsoleLog.activatePro',
     handler: jest.fn(),
@@ -49,7 +91,14 @@ describe('getAllCommands', () => {
     const commands = getAllCommands();
 
     const expectedNames = [
+      'turboConsoleLog.insertConsoleLog',
+      'turboConsoleLog.insertConsoleDebug',
+      'turboConsoleLog.insertConsoleTable',
+      'turboConsoleLog.insertConsoleInfo',
+      'turboConsoleLog.insertConsoleWarn',
       'turboConsoleLog.displayLogMessage',
+      'turboConsoleLog.insertConsoleError',
+      'turboConsoleLog.insertCustomLog',
       'turboConsoleLog.commentAllLogMessages',
       'turboConsoleLog.uncommentAllLogMessages',
       'turboConsoleLog.deleteAllLogMessages',

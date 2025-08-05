@@ -24,7 +24,6 @@ describe('correctAllLogMessagesCommand', () => {
 
     mockExtensionProperties = {
       logFunction: 'log',
-      logType: 'log',
       logMessagePrefix: 'Debug',
       delimiterInsideMessage: '~',
       includeFilename: true,

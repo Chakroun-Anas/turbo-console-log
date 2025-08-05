@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console.log or custom log functions.",
-  "version": "3.3.2",
+  "version": "3.4.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -17,22 +17,17 @@
   "keywords": [
     "console log",
     "insert log",
-    "remove log",
-    "remove logs",
-    "comment log",
-    "uncomment log",
-    "delete log",
-    "correct log",
     "debug",
-    "debug javascript",
-    "debug typescript",
-    "javascript logs",
-    "typescript logs",
-    "log cleanup",
+    "javascript",
+    "typescript",
+    "debugging",
     "log snippet",
     "productivity",
+    "log panel",
     "developer tools",
-    "log panel"
+    "tool",
+    "log management",
+    "log manager"
   ],
   "activationEvents": [
     "onStartupFinished",
@@ -117,29 +112,45 @@
           "default": "\"",
           "description": "Double quotes, single quotes or backtick"
         },
-        "turboConsoleLog.logType": {
-          "type": "string",
-          "enum": [
-            "log",
-            "warn",
-            "error",
-            "debug",
-            "table"
-          ],
-          "default": "log",
-          "description": "Select the log type"
-        },
         "turboConsoleLog.logFunction": {
           "type": "string",
           "default": "log",
-          "description": "Specify a log function (when specified logType will be ignored)"
+          "description": "Specify the log function to use with 'displayCustomLogMessage' command. "
         }
       }
     },
     "commands": [
       {
         "command": "turboConsoleLog.displayLogMessage",
-        "title": "Turbo Console Log: Display Turbo Log Message"
+        "title": "Turbo Console Log: Insert console log message (Legacy)"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleLog",
+        "title": "Turbo Console Log: Insert console log message"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleInfo",
+        "title": "Turbo Console Log: Insert console info message"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleDebug",
+        "title": "Turbo Console Log: Insert console debug message"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleTable",
+        "title": "Turbo Console Log: Insert console table message"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleWarn",
+        "title": "Turbo Console Log: Insert console warn message"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleError",
+        "title": "Turbo Console Log: Insert console error message"
+      },
+      {
+        "command": "turboConsoleLog.insertCustomLog",
+        "title": "Turbo Console Log: Insert custom log message"
       },
       {
         "command": "turboConsoleLog.commentAllLogMessages",
@@ -167,6 +178,41 @@
         "command": "turboConsoleLog.displayLogMessage",
         "key": "ctrl+alt+l",
         "mac": "ctrl+alt+l"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleLog",
+        "key": "ctrl+k ctrl+l",
+        "mac": "cmd+k cmd+l"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleInfo",
+        "key": "ctrl+k ctrl+i",
+        "mac": "cmd+k cmd+i"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleDebug",
+        "key": "ctrl+k ctrl+d",
+        "mac": "cmd+k cmd+d"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleTable",
+        "key": "ctrl+k ctrl+t",
+        "mac": "cmd+k cmd+t"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleWarn",
+        "key": "ctrl+k ctrl+w",
+        "mac": "cmd+k cmd+w"
+      },
+      {
+        "command": "turboConsoleLog.insertConsoleError",
+        "key": "ctrl+k ctrl+e",
+        "mac": "cmd+k cmd+e"
+      },
+      {
+        "command": "turboConsoleLog.insertCustomLog",
+        "key": "ctrl+k ctrl+c",
+        "mac": "cmd+k cmd+c"
       },
       {
         "command": "turboConsoleLog.commentAllLogMessages",

@@ -79,6 +79,7 @@ describe('displayLogMessageCommand', () => {
       0,
       2,
       {},
+      'log',
     );
   });
   it('should not call debugMessage.msg when nothing is selected and no word under cursor', async () => {

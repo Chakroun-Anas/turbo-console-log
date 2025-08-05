@@ -4,8 +4,8 @@ import { Command, Message } from '../entities';
 export function uncommentAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.uncommentAllLogMessages',
-    handler: async ({ extensionProperties, debugMessage, args }) => {
-      const { logFunction, logType, logMessagePrefix, delimiterInsideMessage } =
+    handler: async ({ extensionProperties, debugMessage }) => {
+      const { logFunction, logMessagePrefix, delimiterInsideMessage } =
         extensionProperties;
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
@@ -13,26 +13,32 @@ export function uncommentAllLogMessagesCommand(): Command {
         return;
       }
       const document: vscode.TextDocument = editor.document;
-
       const logMessages: Message[] = debugMessage.detectAll(
         document,
         logFunction,
-        logType,
         logMessagePrefix,
         delimiterInsideMessage,
-        args,
       );
-      editor.edit((editBuilder) => {
-        logMessages.forEach(({ spaces, lines }) => {
-          lines.forEach((line: vscode.Range) => {
-            editBuilder.delete(line);
-            editBuilder.insert(
-              new vscode.Position(line.start.line, 0),
-              `${spaces}${document.getText(line).replace(/\//g, '').trim()}\n`,
-            );
+      editor
+        .edit((editBuilder) => {
+          logMessages.forEach(({ spaces, lines, isCommented }) => {
+            if (!isCommented) {
+              return; // Skip uncommenting if the message is not commented
+            }
+            lines.forEach((line: vscode.Range) => {
+              editBuilder.delete(line);
+              editBuilder.insert(
+                new vscode.Position(line.start.line, 0),
+                `${spaces}${document.getText(line).replace(/\/\//, '').trim()}\n`,
+              );
+            });
           });
+        })
+        .then(async (applied) => {
+          if (applied) {
+            await document.save();
+          }
         });
-      });
     },
   };
 }

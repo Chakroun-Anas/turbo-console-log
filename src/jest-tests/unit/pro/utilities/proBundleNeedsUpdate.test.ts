@@ -7,6 +7,7 @@ describe('proBundleNeedsUpdate', () => {
     expect(proBundleNeedsUpdate('2.0.0', '1.5.0')).toBe(true);
     expect(proBundleNeedsUpdate('1.2.0', '1.1.9')).toBe(true);
     expect(proBundleNeedsUpdate('1.2.0', '1.1')).toBe(true);
+    expect(proBundleNeedsUpdate('3.4.0', '3.3.0')).toBe(true);
   });
 
   it('should return false if versions are equal', () => {

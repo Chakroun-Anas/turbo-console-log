@@ -54,7 +54,7 @@ export function activateTurboProBundleCommand(): Command {
         runProBundle(extensionProperties, proBundle);
         writeProBundleToCache(context, licenseKey, proBundle, version);
         showNotification(
-          'Turbo Console Log Pro Activated Successfully 🚀 🎉',
+          "🚀 Turbo Console Log Pro Activated, don't forget to reload your window!",
           10000,
         );
       } catch (error) {

@@ -8,6 +8,7 @@ import { getHtmlWebView as release300HtmlWebView } from './300';
 import { getHtmlWebView as release301HtmlWebView } from './310';
 import { getHtmlWebView as release302HtmlWebView } from './320';
 import { getHtmlWebView as release330HtmlWebView } from './330';
+import { getHtmlWebView as release340HtmlWebView } from './340';
 
 export const releaseNotes: Record<
   string,
@@ -64,5 +65,9 @@ export const releaseNotes: Record<
   '3.3.2': {
     webViewHtml: release330HtmlWebView(),
     isPro: false,
+  },
+  '3.4.0': {
+    webViewHtml: release340HtmlWebView(),
+    isPro: true,
   },
 };

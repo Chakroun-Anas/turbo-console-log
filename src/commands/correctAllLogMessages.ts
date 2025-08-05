@@ -16,7 +16,7 @@ function getFilenameFromLogMessage(
 export function correctAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.correctAllLogMessages',
-    handler: async ({ extensionProperties, debugMessage, args }) => {
+    handler: async ({ extensionProperties, debugMessage }) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
@@ -31,16 +31,14 @@ export function correctAllLogMessagesCommand(): Command {
       const logMessages: Message[] = debugMessage.detectAll(
         document,
         extensionProperties.logFunction,
-        extensionProperties.logType,
         extensionProperties.logMessagePrefix,
         extensionProperties.delimiterInsideMessage,
-        args,
       );
 
       const edits: { range: vscode.Range; newText: string }[] = [];
       let updatedCount = 0;
 
-      editor
+      return editor
         .edit((editBuilder) => {
           logMessages.forEach(({ lines }) => {
             lines.forEach((line: vscode.Range) => {
@@ -95,7 +93,10 @@ export function correctAllLogMessagesCommand(): Command {
             editBuilder.replace(range, newText),
           );
         })
-        .then(() => {
+        .then(async (applied) => {
+          if (applied && edits.length > 0) {
+            await document.save();
+          }
           if (extensionProperties.logCorrectionNotificationEnabled) {
             const editCount = edits.length;
             if (editCount !== 0) {

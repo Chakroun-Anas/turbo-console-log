@@ -7,12 +7,11 @@ import pLimit from 'p-limit';
 import { ExtensionProperties } from '../../entities';
 import { activateProMode, deactivateRepairMode } from '../../helpers';
 import { detectAll } from '../../debug-message/js/JSDebugMessage/detectAll';
-import { logFunctionToUse } from '../../debug-message/js/JSDebugMessage/detectAll/helpers';
 
-export function runProBundle(
+export async function runProBundle(
   extensionProperties: ExtensionProperties,
   proBundle: string,
-): void {
+): Promise<void> {
   const exports: Record<string, unknown> = {};
   const module = { exports };
 
@@ -26,7 +25,6 @@ export function runProBundle(
     'os',
     'pLimit',
     'detectAll',
-    'logFunctionToUse',
     proBundle,
   );
 
@@ -40,14 +38,13 @@ export function runProBundle(
     os,
     pLimit,
     detectAll,
-    logFunctionToUse,
   );
 
   const turboConsoleLogPro =
     exports.turboConsoleLogPro || module.exports?.turboConsoleLogPro;
   if (typeof turboConsoleLogPro === 'function') {
     try {
-      turboConsoleLogPro(extensionProperties);
+      await turboConsoleLogPro(extensionProperties);
       deactivateRepairMode();
       activateProMode();
     } catch (error) {

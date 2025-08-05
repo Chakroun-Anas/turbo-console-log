@@ -1,18 +1,77 @@
-import { describe } from 'mocha';
-import uncommentLogMessagesTests from './uncommentLogMessages';
-import uncommentDebugMessagesTests from './uncommentDebugMessages';
-import uncommentErrorMessagesTests from './uncommentErrorMessages';
-import uncommentWarnMessagesTests from './uncommentWarnMessages';
-import uncommentTableMessages from './uncommentTableMessages';
-import uncommentCustomMessages from './uncommentCustomMessages';
+import * as vscode from 'vscode';
+import Mocha, { it, describe } from 'mocha';
+import { expect } from 'chai';
+import {
+  openDocument,
+  expectActiveTextEditorWithFile,
+  documentLinesChanged,
+  naturalEditorLine,
+} from '../../helpers';
+import { ProgrammingLanguage } from '../../../../entities';
 
 export default (): void => {
-  describe('Uncomment log messages inserted by the extension feature', () => {
-    uncommentLogMessagesTests();
-    uncommentDebugMessagesTests();
-    uncommentErrorMessagesTests();
-    uncommentWarnMessagesTests();
-    uncommentTableMessages();
-    uncommentCustomMessages();
+  describe('Uncomment all log types (console.log, console.warn, console.error, console.debug, console.info, console.table, myLogger)', () => {
+    Mocha.before(async () => {
+      await openDocument(
+        ProgrammingLanguage.JAVASCRIPT,
+        'uncomment-feature',
+        'allLogTypes.ts',
+      );
+    });
+
+    Mocha.after(async () => {
+      await vscode.commands.executeCommand(
+        'workbench.action.closeActiveEditor',
+        [],
+      );
+    });
+
+    it('Should uncomment all Turbo-generated log messages regardless of log type', async () => {
+      const { activeTextEditor } = vscode.window;
+      expectActiveTextEditorWithFile(activeTextEditor, 'allLogTypes.ts');
+
+      if (activeTextEditor) {
+        // Execute uncomment all log messages command
+        await vscode.commands.executeCommand(
+          'turboConsoleLog.uncommentAllLogMessages',
+          [],
+        );
+
+        // Wait for document changes on all log message lines
+        const logMessageLines = [
+          naturalEditorLine(9), // console.log("🚀 ~ userData:", userData);
+          naturalEditorLine(12), // console.warn("🚀 ~ processUser ~ user:", user);
+          naturalEditorLine(15), // console.error("🚀 ~ processUser ~ missing email:", user);
+          naturalEditorLine(19), // console.info("🚀 ~ processUser ~ processing user:", user);
+          naturalEditorLine(26), // console.debug("🚀 ~ processUser ~ result:", result);
+          naturalEditorLine(27), // console.table("🚀 ~ processUser ~ table data:", result);
+          naturalEditorLine(28), // myLogger("🚀 ~ processUser ~ custom log:", result);
+          naturalEditorLine(34), // console.log("🚀 ~ processedUser:", processedUser);
+          naturalEditorLine(37), // Multi-line console.log
+          naturalEditorLine(38), // Multi-line console.log
+          naturalEditorLine(39), // Multi-line console.log
+          naturalEditorLine(40), // Multi-line console.log
+          naturalEditorLine(41), // Multi-line console.log
+          naturalEditorLine(42), // Multi-line console.log
+          naturalEditorLine(43), // Multi-line myLogger
+          naturalEditorLine(45), // Multi-line myLogger
+          naturalEditorLine(46), // Multi-line myLogger
+          naturalEditorLine(47), // Multi-line myLogger
+          naturalEditorLine(48), // Multi-line myLogger
+        ];
+
+        await Promise.all(
+          documentLinesChanged(activeTextEditor.document, logMessageLines),
+        );
+
+        const textDocument = activeTextEditor.document;
+
+        // Verify all log messages are uncommented
+        for (const logMessageLine of logMessageLines) {
+          const lineText = textDocument.lineAt(logMessageLine).text.trim();
+          expect(!lineText.startsWith('//')).to.equal(true);
+        }
+      }
+    });
   });
 };

@@ -14,7 +14,6 @@ import {
   BlockType,
   Message,
 } from '@/entities';
-import { LogType } from '@/entities/extension/extensionProperties';
 import { Range } from 'vscode';
 
 // Mock all imported functions
@@ -44,7 +43,6 @@ describe('JSDebugMessage', () => {
     insertEmptyLineBeforeLogMessage: false,
     addSemicolonInTheEnd: true,
     logFunction: 'console.log',
-    logType: LogType.log,
     logMessagePrefix: '',
     delimiterInsideMessage: ' ',
   } as ExtensionProperties;
@@ -75,6 +73,7 @@ describe('JSDebugMessage', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(mockMsg).toHaveBeenCalledTimes(1);
@@ -85,6 +84,7 @@ describe('JSDebugMessage', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
     });
 
@@ -96,6 +96,7 @@ describe('JSDebugMessage', () => {
         lineOfSelectedVar,
         tabSize,
         extensionProperties,
+        'log',
       );
 
       expect(result).toBeUndefined();
@@ -137,46 +138,19 @@ describe('JSDebugMessage', () => {
 
   describe('detectAll', () => {
     it('should delegate to the imported detectAll function with all parameters', () => {
-      const args = ['arg1', 'arg2'];
-
       const result = jsDebugMessage.detectAll(
         mockDocument,
         extensionProperties.logFunction,
-        extensionProperties.logType,
         extensionProperties.logMessagePrefix,
         extensionProperties.delimiterInsideMessage,
-        args,
       );
 
       expect(mockDetectAll).toHaveBeenCalledTimes(1);
       expect(mockDetectAll).toHaveBeenCalledWith(
         mockDocument,
         extensionProperties.logFunction,
-        extensionProperties.logType,
         extensionProperties.logMessagePrefix,
         extensionProperties.delimiterInsideMessage,
-        args,
-      );
-      expect(result).toBe(mockMessages);
-    });
-
-    it('should handle optional args parameter', () => {
-      const result = jsDebugMessage.detectAll(
-        mockDocument,
-        'console.log',
-        LogType.log,
-        'DEBUG:',
-        ' | ',
-      );
-
-      expect(mockDetectAll).toHaveBeenCalledTimes(1);
-      expect(mockDetectAll).toHaveBeenCalledWith(
-        mockDocument,
-        'console.log',
-        LogType.log,
-        'DEBUG:',
-        ' | ',
-        undefined,
       );
       expect(result).toBe(mockMessages);
     });
@@ -191,7 +165,6 @@ describe('JSDebugMessage', () => {
       const result = jsDebugMessage.detectAll(
         mockDocument,
         'console.debug',
-        LogType.debug,
         'TEST:',
         ' - ',
       );
