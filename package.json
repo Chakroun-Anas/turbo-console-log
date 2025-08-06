@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console.log or custom log functions.",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -186,13 +186,13 @@
       },
       {
         "command": "turboConsoleLog.insertConsoleInfo",
-        "key": "ctrl+k ctrl+i",
-        "mac": "cmd+k cmd+i"
+        "key": "ctrl+k ctrl+n",
+        "mac": "cmd+k cmd+n"
       },
       {
         "command": "turboConsoleLog.insertConsoleDebug",
-        "key": "ctrl+k ctrl+d",
-        "mac": "cmd+k cmd+d"
+        "key": "ctrl+k ctrl+b",
+        "mac": "cmd+k cmd+b"
       },
       {
         "command": "turboConsoleLog.insertConsoleTable",
@@ -201,8 +201,8 @@
       },
       {
         "command": "turboConsoleLog.insertConsoleWarn",
-        "key": "ctrl+k ctrl+w",
-        "mac": "cmd+k cmd+w"
+        "key": "ctrl+k ctrl+r",
+        "mac": "cmd+k cmd+r"
       },
       {
         "command": "turboConsoleLog.insertConsoleError",
@@ -211,8 +211,8 @@
       },
       {
         "command": "turboConsoleLog.insertCustomLog",
-        "key": "ctrl+k ctrl+c",
-        "mac": "cmd+k cmd+c"
+        "key": "ctrl+k ctrl+k",
+        "mac": "cmd+k cmd+k"
       },
       {
         "command": "turboConsoleLog.commentAllLogMessages",

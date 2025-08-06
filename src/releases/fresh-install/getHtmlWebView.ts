@@ -126,24 +126,24 @@ export function getHtmlWebView(): string {
               <div class="command-title"><span class="console-info">🟩 Console Info</span></div>
               <div class="command-desc">Informational messages and status updates</div>
               <div class="command-shortcut">
-                <div><strong>Apple:</strong> ⌘K ⌘I</div>
-                <div><strong>Windows/Linux:</strong> Ctrl+K Ctrl+I</div>
+                <div><strong>Apple:</strong> ⌘K ⌘N</div>
+                <div><strong>Windows/Linux:</strong> Ctrl+K Ctrl+N</div>
               </div>
             </div>
             <div class="command-card">
               <div class="command-title"><span class="console-debug">🟪 Console Debug</span></div>
               <div class="command-desc">Debug-level messages for development</div>
               <div class="command-shortcut">
-                <div><strong>Apple:</strong> ⌘K ⌘D</div>
-                <div><strong>Windows/Linux:</strong> Ctrl+K Ctrl+D</div>
+                <div><strong>Apple:</strong> ⌘K ⌘B</div>
+                <div><strong>Windows/Linux:</strong> Ctrl+K Ctrl+B</div>
               </div>
             </div>
             <div class="command-card">
               <div class="command-title"><span class="console-warn">🟨 Console Warn</span></div>
               <div class="command-desc">Warning messages for potential issues</div>
               <div class="command-shortcut">
-                <div><strong>Apple:</strong> ⌘K ⌘W</div>
-                <div><strong>Windows/Linux:</strong> Ctrl+K Ctrl+W</div>
+                <div><strong>Apple:</strong> ⌘K ⌘R</div>
+                <div><strong>Windows/Linux:</strong> Ctrl+K Ctrl+R</div>
               </div>
             </div>
             <div class="command-card">
@@ -166,8 +166,8 @@ export function getHtmlWebView(): string {
               <div class="command-title"><span class="console-custom">🔍 Custom Log</span></div>
               <div class="command-desc">Your custom log function from settings</div>
               <div class="command-shortcut">
-                <div><strong>Apple:</strong> ⌘K ⌘C</div>
-                <div><strong>Windows/Linux:</strong> Ctrl+K Ctrl+C</div>
+                <div><strong>Apple:</strong> ⌘K ⌘K</div>
+                <div><strong>Windows/Linux:</strong> Ctrl+K Ctrl+K</div>
               </div>
             </div>
           </div>

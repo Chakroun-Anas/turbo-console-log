@@ -2,6 +2,29 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.4.1] - 2025-08-06
+
+### 🔧 Fixing shortcut conflicts and refining mental model
+
+After the v3.4.0 release introduced new console log shortcuts, we received helpful community feedback about conflicts with native VSCode keybindings. This patch resolves those issues and improves the logic behind our shortcut assignments to better match intuitive developer mental models:
+
+- 🛠️ Replaced the conflicting `Ctrl+K Ctrl+C` shortcut for **Insert Custom Log** with `Ctrl+K Ctrl+K`, avoiding override of VSCode’s native **Add Line Comment** command  
+  ([#284](https://github.com/Chakroun-Anas/turbo-console-log/issues/284))
+
+- 🔁 Changed **Insert Console Info** from `Ctrl+K Ctrl+I` to `Ctrl+K Ctrl+N` → _N = Note_, avoiding conflict with **Show Hover**
+
+- 🔁 Changed **Insert Console Debug** from `Ctrl+K Ctrl+D` to `Ctrl+K Ctrl+B` → _B = Breakpoint_, avoiding conflict with **Move last selection to next match**
+
+- 🔁 Changed **Insert Console Warn** from `Ctrl+K Ctrl+W` to `Ctrl+K Ctrl+R` → _R = Risk_, avoiding conflict with **Close All Editors**
+
+This update ensures all Turbo Console Log shortcuts are now:
+
+- Conflict-free across macOS and Windows
+- Easy to remember
+- Consistent with VSCode's native behaviors
+
+Thanks again to the community for the quick and constructive feedback!
+
 ## [3.4.0] - 2025-08-05
 
 ### 🎯 Complete Console Method Coverage
