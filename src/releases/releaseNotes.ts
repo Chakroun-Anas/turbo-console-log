@@ -74,4 +74,8 @@ export const releaseNotes: Record<
     webViewHtml: release340HtmlWebView(),
     isPro: false,
   },
+  '3.4.2': {
+    webViewHtml: release340HtmlWebView(),
+    isPro: false,
+  },
 };

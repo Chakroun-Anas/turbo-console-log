@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console.log or custom log functions.",
-  "version": "3.4.1",
+  "version": "3.4.2",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -177,67 +177,80 @@
       {
         "command": "turboConsoleLog.displayLogMessage",
         "key": "ctrl+alt+l",
-        "mac": "ctrl+alt+l"
+        "mac": "ctrl+alt+l",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.insertConsoleLog",
         "key": "ctrl+k ctrl+l",
-        "mac": "cmd+k cmd+l"
+        "mac": "cmd+k cmd+l",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.insertConsoleInfo",
         "key": "ctrl+k ctrl+n",
-        "mac": "cmd+k cmd+n"
+        "mac": "cmd+k cmd+n",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.insertConsoleDebug",
         "key": "ctrl+k ctrl+b",
-        "mac": "cmd+k cmd+b"
+        "mac": "cmd+k cmd+b",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.insertConsoleTable",
         "key": "ctrl+k ctrl+t",
-        "mac": "cmd+k cmd+t"
+        "mac": "cmd+k cmd+t",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.insertConsoleWarn",
         "key": "ctrl+k ctrl+r",
-        "mac": "cmd+k cmd+r"
+        "mac": "cmd+k cmd+r",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.insertConsoleError",
         "key": "ctrl+k ctrl+e",
-        "mac": "cmd+k cmd+e"
+        "mac": "cmd+k cmd+e",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.insertCustomLog",
         "key": "ctrl+k ctrl+k",
-        "mac": "cmd+k cmd+k"
+        "mac": "cmd+k cmd+k",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.commentAllLogMessages",
         "key": "alt+shift+c",
-        "mac": "alt+shift+c"
+        "mac": "alt+shift+c",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.uncommentAllLogMessages",
         "key": "alt+shift+u",
-        "mac": "alt+shift+u"
+        "mac": "alt+shift+u",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.deleteAllLogMessages",
         "key": "alt+shift+d",
-        "mac": "alt+shift+d"
+        "mac": "alt+shift+d",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.correctAllLogMessages",
         "key": "alt+shift+x",
-        "mac": "alt+shift+x"
+        "mac": "alt+shift+x",
+        "when": "editorTextFocus"
       },
       {
         "command": "turboConsoleLog.activateTurboProBundle",
         "key": "alt+shift+p",
-        "mac": "alt+shift+p"
+        "mac": "alt+shift+p",
+        "when": "editorTextFocus"
       }
     ],
     "viewsContainers": {

@@ -2,6 +2,37 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.4.2] - 2025-08-06
+
+### 🎯 Scoped shortcuts, reduced conflicts, and reinforced control
+
+This patch addresses an important usability issue:  
+Some Turbo commands were triggering inside the terminal and other non-editor views — which was never intended.
+
+To resolve this:
+
+- 🧠 All Turbo Console Log keyboard shortcuts are now scoped with `"when": "editorTextFocus"`, meaning they will only trigger inside active editors.
+- ✅ This completely eliminates unintended behaviors in terminal, sidebar, search, and other UI panels.
+- 🔒 Terminal actions like `Ctrl+K` to clear output are now fully respected.
+
+We also want to take a moment to highlight that **Turbo now supports 6 brand-new log insertion shortcuts** — one for each log method, with intuitive and conflict-free bindings:
+
+- `Ctrl+K Ctrl+L` → `console.log`
+- `Ctrl+K Ctrl+N` → `console.info` (N = Note)
+- `Ctrl+K Ctrl+R` → `console.warn` (R = Risk)
+- `Ctrl+K Ctrl+E` → `console.error`
+- `Ctrl+K Ctrl+B` → `console.debug` (B = Breakpoint)
+- `Ctrl+K Ctrl+T` → `console.table`
+- `Ctrl+K Ctrl+K` → Custom log
+
+These shortcuts are fast, native, and designed to feel second-nature in your workflow.
+
+We recognize that v3.4.0 introduced a few unintended side effects, and we reacted as quickly as possible to fix them while also addressing the root causes.
+
+We’ll also be increasing integration test coverage around keyboard shortcuts and context detection to avoid this in future releases.
+
+Thanks to everyone who flagged this early and respectfully — you're helping make Turbo even sharper.
+
 ## [3.4.1] - 2025-08-06
 
 ### 🔧 Fixing shortcut conflicts and refining mental model
