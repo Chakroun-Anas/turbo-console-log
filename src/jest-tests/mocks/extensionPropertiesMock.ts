@@ -15,4 +15,5 @@ export const extensionPropertiesMock: ExtensionProperties = {
   includeLineNum: false,
   includeFilename: false,
   logFunction: 'log',
+  releaseReviewTargetWindow: 'Night',
 };

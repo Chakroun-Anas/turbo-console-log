@@ -12,7 +12,12 @@ import { getHtmlWebView as release340HtmlWebView } from './340';
 
 export const releaseNotes: Record<
   string,
-  { webViewHtml: string; isPro: boolean }
+  {
+    webViewHtml?: string; // Optional: Only needed for legacy webview fallback
+    isPro: boolean;
+    date?: Date;
+    releaseArticleUrl?: string; // Optional: URL to external release article (preferred for new releases)
+  }
 > = {
   '2.11.0': {
     webViewHtml: release2110HtmlWebView(),
@@ -69,6 +74,7 @@ export const releaseNotes: Record<
   '3.4.0': {
     webViewHtml: release340HtmlWebView(),
     isPro: true,
+    date: new Date('2025-08-05'),
   },
   '3.4.1': {
     webViewHtml: release340HtmlWebView(),
@@ -77,5 +83,10 @@ export const releaseNotes: Record<
   '3.4.2': {
     webViewHtml: release340HtmlWebView(),
     isPro: false,
+  },
+  '3.5.0': {
+    isPro: true,
+    releaseArticleUrl: 'https://www.turboconsolelog.io/articles/release-350',
+    date: new Date('2025-08-19'),
   },
 };

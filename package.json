@@ -1,8 +1,8 @@
 {
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
-  "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console.log or custom log functions.",
-  "version": "3.4.2",
+  "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console log or custom log functions.",
+  "version": "3.5.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -116,6 +116,26 @@
           "type": "string",
           "default": "log",
           "description": "Specify the log function to use with 'displayCustomLogMessage' command. "
+        },
+        "turboConsoleLog.releaseReviewTargetWindow": {
+          "type": "string",
+          "enum": [
+            "Morning",
+            "Afternoon",
+            "Evening",
+            "Night"
+          ],
+          "default": "Night",
+          "description": "Choose your preferred time window for receiving release notifications. Options: Morning (7-13), Afternoon (13-17), Evening (17-23), or Night (23-7)."
+        },
+        "turboConsoleLog.isTurboTelemetryEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable anonymous telemetry for Turbo Console Log analytics (respects VS Code's global telemetry settings). This helps improve the extension but never collects personal information.",
+          "tags": [
+            "telemetry",
+            "usesOnlineServices"
+          ]
         }
       }
     },

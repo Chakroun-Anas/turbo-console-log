@@ -2,6 +2,37 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.5.0] - 2025-08-18
+
+### 🎯 Smarter release notifications and enhanced user control
+
+This release introduces significant improvements to how Turbo Console Log handles release announcements and gives users more control over their experience:
+
+#### ✨ New Features
+
+- **🕒 Release Review Target Window Setting**: New configurable setting `turboConsoleLog.releaseReviewTargetWindow` allows users to control when they receive release notifications. Choose from `Morning`, `Afternoon`, `Evening`, or `Night` (default) time windows to align with your preferred review schedule.
+
+- **🚀 Non-intrusive Release Notifications**: Release announcements now appear as respectful VS Code notifications instead of automatically opening web views. Users can choose to view release notes or dismiss the notification gracefully.
+
+- **🌐 External Article Integration**: New releases now link to comprehensive articles on [turboconsolelog.io](https://www.turboconsolelog.io) instead of embedded web views, providing richer content and better accessibility.
+
+#### 🔧 System Improvements
+
+- **📊 Enhanced Reporting Service**: Reporting integration that fully respects VS Code's global telemetry settings and user privacy preferences.
+
+- **⚡ Smarter Timing Logic**: Intelligent release notification scheduling based on user's target window preference, ensuring announcements appear at convenient times.
+
+- **🔧 Turbo Pro Vue/Svelte/Astro Support**: Fixed an issue where Vue, Svelte, and Astro files were not appearing in the Turbo Pro TreeView panel. These file types now display correctly in the Pro panel alongside JavaScript and TypeScript files.
+
+#### 🎪 Behind the Scenes
+
+- Removed forced web view updates that could interrupt workflows
+- Improved global state management for notification tracking
+- Enhanced error handling for release content delivery
+- Better integration with VS Code's native notification system
+
+This release represents our commitment to user agency and non-disruptive feature discovery. Release notifications are now more respectful of your workflow while still keeping you informed about exciting new capabilities.
+
 ## [3.4.2] - 2025-08-06
 
 ### 🎯 Scoped shortcuts, reduced conflicts, and reinforced control

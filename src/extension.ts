@@ -9,11 +9,11 @@ import {
   activateFreemiumMode,
 } from './helpers';
 import { TurboProBundleRepairPanel, TurboProShowcasePanel } from './pro';
-import { showReleaseHtmlWebViewAndNotification } from './ui/helpers';
 import {
   releaseNotes,
   getLatestWebViewReleaseVersion,
   getPreviousWebViewReleaseVersion,
+  showReleaseHtmlWebView,
 } from './releases';
 import {
   proBundleNeedsUpdate,
@@ -61,10 +61,13 @@ export async function activate(
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');
   const proBundle = readFromGlobalState<string>(context, 'pro-bundle');
   const proBundleVersion = readFromGlobalState<string>(context, 'version');
-  showReleaseHtmlWebViewAndNotification(
+  showReleaseHtmlWebView(
     context,
     previousWebViewReleaseVersion,
     latestWebViewReleaseVersion,
+    extensionProperties.releaseReviewTargetWindow,
+    new Date(),
+    releaseNotes[latestWebViewReleaseVersion]?.date ?? new Date(),
   );
   const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
   if (isProUser) {

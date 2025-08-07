@@ -16,189 +16,225 @@ export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
   private getHtml(): string {
     return `
   <html>
-    <style>
-      body {
-        padding: 0;
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        background-color: #1e1e1e;
-        color: #ffffff;
-      }
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body {
+          padding: 0;
+          margin: 0;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+          background-color: #1e1e1e;
+          color: #ffffff;
+          line-height: 1.6;
+        }
 
-      .primary-color {
-        color: #FF6B6B;
-      }
+        h1, h2, h3 { font-weight: bold; margin: 0; }
+        a { color: #48BFE3; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .primary-color { color: #FF6B6B; }
+        .secondary-color { color: #FFC947; }
+        .info-color { color: #48BFE3; font-weight: bold; }
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
 
-      .illustration-wrapper {
-        position: relative;
-        display: flex;
-        justify-content: center;
-        margin-bottom: 6px;
-      }
+        /* Hero Section */
+        .hero-section {
+          text-align: center;
+          padding: 24px 16px;
+          background: linear-gradient(135deg, rgba(255,107,107,0.08), rgba(255,201,71,0.08));
+          border-radius: 12px;
+          margin-bottom: 24px;
+          border: 1px solid rgba(255, 201, 71, 0.3);
+        }
+        .hero-title {
+          font-size: 22px;
+          color: #FF6B6B;
+          margin-bottom: 8px;
+        }
+        .hero-subtitle {
+          font-size: 16px;
+          color: #FFC947;
+          margin-bottom: 8px;
+          font-weight: 500;
+        }
+        .hero-description {
+          font-size: 14px;
+          color: #CCCCCC;
+          margin: 0 auto;
+        }
 
-      .illustration {
-        max-width: 300px;
-        width: 100%;
-        border-radius: 8px;
-        cursor: pointer;
-      }
+        /* Newsletter Section */
+        .newsletter-hero {
+          background: linear-gradient(135deg, rgba(72, 191, 227, 0.12), rgba(255, 107, 107, 0.12));
+          border: 2px solid #48BFE3;
+          border-radius: 12px;
+          padding: 20px 16px;
+          margin: 20px 0;
+          text-align: center;
+        }
+        .newsletter-hero h2 {
+          color: #48BFE3;
+          font-size: 18px;
+          margin-bottom: 12px;
+        }
+        .newsletter-hero p {
+          font-size: 13px;
+          color: #FFFFFF;
+          margin-bottom: 16px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .newsletter-illustration {
+          margin: 0 auto 16px auto;
+          max-width: 240px;
+        }
+        .newsletter-illustration img {
+          width: 100%;
+          height: auto;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(72, 191, 227, 0.25);
+        }
+        .newsletter-cta {
+          display: inline-block;
+          padding: 12px 20px;
+          background: linear-gradient(135deg, #48BFE3, #9CE3F0);
+          color: #1E1E1E;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: bold;
+          font-size: 14px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(72, 191, 227, 0.3);
+        }
+        .newsletter-cta:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(72, 191, 227, 0.4);
+        }
+        .micro-reassure {
+          margin-top: 6px;
+          font-size: 11px;
+          color: #B8E8F6;
+        }
+        .bonus-highlight {
+          background: rgba(255, 201, 71, 0.2);
+          border: 1px solid #FFC947;
+          border-radius: 6px;
+          padding: 8px;
+          margin-top: 12px;
+          font-size: 12px;
+          color: #FFC947;
+        }
 
-      .play-icon {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 64px;
-        height: 64px;
-        background-color: rgba(0, 0, 0, 0.5);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
+        /* Features Section */
+        .features-simple {
+          background: rgba(255,255,255,0.05);
+          border-radius: 8px;
+          padding: 16px;
+          margin: 20px 0;
+          border: 1px solid rgba(72, 191, 227, 0.2);
+        }
+        .features-simple h3 {
+          color: #FFC947;
+          font-size: 16px;
+          margin-bottom: 12px;
+          text-align: center;
+        }
+        .feature-list {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+        }
+        .feature-list li {
+          padding: 4px 0;
+          color: #CCCCCC;
+          display: flex;
+          align-items: baseline;
+          font-size: 12px;
+        }
+        .feature-list li::before {
+          content: "⚡";
+          margin-right: 8px;
+          font-size: 14px;
+        }
+        .bullet-label {
+          display: inline-block;
+          margin-right: 4px;
+          color: #FFFFFF;
+        }
 
-      .play-icon::before {
-        content: '';
-        display: block;
-        width: 0;
-        height: 0;
-        border-left: 18px solid white;
-        border-top: 10px solid transparent;
-        border-bottom: 10px solid transparent;
-        margin-left: 4px;
-      }
+        .footer {
+          text-align: center;
+          margin-top: 20px;
+          padding: 12px;
+          border-top: 1px solid rgba(255,255,255,0.1);
+          font-size: 10px;
+          color: #CCCCCC;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <!-- Hero -->
+        <section class="hero-section">
+          <h1 class="hero-title">📬 Be Part of Turbo's Future</h1>
+          <p class="hero-description">
+            Get early updates, exclusive debugging tips, and help shape what we build next.
+          </p>
+        </section>
 
-      .caption {
-        text-align: center;
-        margin-top: 4px;
-        font-size: 0.9rem;
-        color: #FFC947;
-      }
+        <!-- Newsletter -->
+        <section class="newsletter-hero">
+          <h2>Join Our Inner Circle</h2>
+          <p>
+            Be the first to know about new features, get exclusive strategies, and receive your instant Turbo Pro discount.
+          </p>
 
-      .button {
-        display: inline-block;
-        padding: 14px 22px;
-        width: 80%;
-        background-color: #FF6B6B;
-        color: white;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        text-align: center;
-        cursor: pointer;
-        max-width: 320px;
-        margin-bottom: 12px;
-      }
+          <div class="newsletter-illustration">
+            <img src="https://www.turboconsolelog.io/assets/turbo-pro-tree.png" alt="Turbo Pro Tree preview" />
+          </div>
 
-      .newsletter-button {
-        display: inline-block;
-        padding: 14px 22px;
-        width: 80%;
-        background-color: #FFC947;
-        color: black;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        text-align: center;
-        cursor: pointer;
-        max-width: 320px;
-        margin-bottom: 24px;
-      }
+          <a
+            href="https://www.turboconsolelog.io/join?utm_source=webview_showcasepanel&utm_medium=app&utm_campaign=newsletter_innercircle&utm_content=main_cta"
+            class="newsletter-cta"
+            target="_blank"
+            rel="noopener"
+          >
+            🎯 Join & Get Your Pro Discount
+          </a>
+          <div class="micro-reassure">No spam. Unsubscribe anytime.</div>
 
-      .discount-illustration {
-        max-width: 250px;
-        width: 100%;
-        border-radius: 8px;
-        margin-bottom: 16px;
-      }
+          <div class="bonus-highlight">
+            🎁 Instant bonus: 30% off Turbo Pro + exclusive debugging strategies
+          </div>
+        </section>
 
-      .discount-text {
-        background: linear-gradient(135deg, #FF6B6B, #FFC947);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-weight: bold;
-        font-size: 1.1rem;
-        text-align: center;
-        margin: 12px 0;
-      }
+        <!-- Features -->
+        <section class="features-simple">
+          <h3>⚡ What You'll Get with Turbo Pro</h3>
+          <ul class="feature-list">
+            <li>
+              <strong class="bullet-label">Native TreeView Panel:</strong>
+              color-coded logs with instant actions
+            </li>
+            <li>
+              <strong class="bullet-label">Real-time Sync:</strong>
+              workspace logs updated automatically
+            </li>
+            <li>
+              <strong class="bullet-label">Smart Auto-correct:</strong>
+              line numbers and file names stay accurate
+            </li>
+            <li>
+              <strong class="bullet-label">Contextual Actions:</strong>
+              file-level commands via right-click menu
+            </li>
+          </ul>
+        </section>
 
-      .small-text {
-        font-size: 0.8rem;
-        color: #CCCCCC;
-        text-align: center;
-        margin-top: 8px;
-      }
-
-      .list {
-        padding-left: 20px;
-      }
-
-      .list li {
-        margin-bottom: 8px;
-        list-style-type: none;
-      }
-
-      .list li::before {
-        content: "✅";
-        margin-right: 10px;
-      }
-
-      .footer {
-        margin-top: 1rem;
-        text-align: center;
-      }
-    </style>
-    <body style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; overflow-x: hidden;">
-      <h1 class="primary-color" style="text-align: center;">Unlock Turbo Pro Bundle 🚀</h1>
-
-      <div class="illustration-wrapper">
-        <a href="https://www.turboconsolelog.io/pro" target="_blank" style="display: inline-block;">
-          <img
-            src="https://www.turboconsolelog.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fturbo-pro-illustration.4cf37990.png&amp;w=640&amp;q=75"
-            alt="Turbo Pro Illustration"
-            class="illustration"
-          />
-          <div class="play-icon"></div>
-        </a>
+        <!-- Footer -->
+        <footer class="footer">
+          © 2025 Turbo Console Log • Built with ❤️ by Turbo Unicorn 🦄
+        </footer>
       </div>
-      <ul class="list">
-        <h2 class="primary-color">Features</h2>
-        <li>Native dedicated VSCode panel for the extension 🚀</li>
-        <li>Current folder/workspace logs listing via VSCode Tree View API 🌲</li>
-        <li>Color-coded console methods for instant visual recognition 🎨</li>
-        <li>Real time synchronisation of the current folder/workspace logs in the tree ⚡️</li>
-        <li>Contextual menu to execute turbo command actions on the file level 🚦</li>
-        <li>Auto correct turbo log messages line numbers and file names when the tree is synchronised 🖊️</li>
-        <li>Blazing fast and 100% native to VSCode 💨</li>
-      </ul>
-
-      <div style="background: rgba(255,107,107,0.1); border: 2px solid #FF6B6B; border-radius: 8px; padding: 16px; margin: 16px 8px; text-align: center;">
-        <h3 style="color: #FF6B6B; margin: 0 0 8px 0; font-size: 16px;">🎉 Celebrate v3.4.0 Release!</h3>
-        <p style="margin: 0; font-size: 13px; color: #CCCCCC;">
-          New keyboard shortcuts for all console methods
-        </p>
-      </div>
-
-      <div style="display: flex; justify-content: center; margin-top: 0.75rem;">
-        <img
-          src="https://www.turboconsolelog.io/assets/subscribe-30-off.png"
-          alt="Subscribe for 30% Off"
-          class="discount-illustration"
-        />
-      </div>
-
-      <a href="https://turboconsolelog.io/join" target="_blank" style="text-decoration: none; outline: none;">
-        <div style="display: flex; justify-content: center;">
-          <button class="newsletter-button">
-            📬 JOIN NEWSLETTER & GET 30% OFF NOW
-          </button>
-        </div>
-      </a>
-
-      <p class="footer">
-        Copyright &copy; 2025 Turbo Unicorn 🦄 – All Rights Reserved.
-      </p>
     </body>
   </html>
   `;
