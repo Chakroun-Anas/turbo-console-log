@@ -3,13 +3,11 @@ import { activate } from '../../extension';
 import * as commandsModule from '../../commands';
 import * as helpers from '../../helpers';
 import * as releases from '../../releases';
-import * as uiHelpers from '../../ui/helpers';
 import * as proUtilities from '../../pro/utilities';
 import { ExtensionProperties } from '../../entities';
 
 jest.mock('../../helpers');
 jest.mock('../../releases');
-jest.mock('../../ui/helpers');
 
 const updateViewMock = jest.fn();
 jest.mock('../../pro', () => {
@@ -39,9 +37,9 @@ describe('activate - command registration', () => {
     jest.clearAllMocks();
 
     // Mock extension properties
-    jest
-      .spyOn(helpers, 'getExtensionProperties')
-      .mockReturnValue({} as ExtensionProperties);
+    jest.spyOn(helpers, 'getExtensionProperties').mockReturnValue({
+      releaseReviewTargetWindow: 'Night',
+    } as ExtensionProperties);
 
     // Mock commands
     jest.spyOn(commandsModule, 'getAllCommands').mockReturnValue([
@@ -96,9 +94,7 @@ describe('activate - command registration', () => {
     (releases.getLatestWebViewReleaseVersion as jest.Mock).mockReturnValue(
       '3.0.0',
     );
-    (
-      uiHelpers.showReleaseHtmlWebViewAndNotification as jest.Mock
-    ).mockImplementation(() => {});
+    (releases.showReleaseHtmlWebView as jest.Mock).mockImplementation(() => {});
     (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
 
     // Reset pro utilities mocks specifically
@@ -131,9 +127,14 @@ describe('activate - command registration', () => {
 
     activate(fakeContext);
 
-    expect(
-      uiHelpers.showReleaseHtmlWebViewAndNotification,
-    ).toHaveBeenCalledWith(fakeContext, '2.16.0', '3.0.0');
+    expect(releases.showReleaseHtmlWebView).toHaveBeenCalledWith(
+      fakeContext,
+      '2.16.0',
+      '3.0.0',
+      'Night',
+      expect.any(Date), // currentDate parameter
+      expect.any(Date), // releaseDate parameter
+    );
   });
   it('calls updateProBundle if pro is active and update is needed', () => {
     const fakeContext = {

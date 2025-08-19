@@ -27,6 +27,7 @@ describe('detectAll', () => {
     includeLineNum: false,
     includeFilename: false,
     logFunction: 'myLogger',
+    releaseReviewTargetWindow: 'Night',
   };
 
   beforeEach(() => {

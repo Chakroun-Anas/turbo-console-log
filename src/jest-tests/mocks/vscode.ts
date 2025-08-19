@@ -17,11 +17,25 @@ export const commands = {
 };
 
 export const workspace = {
-  getConfiguration: jest.fn(() => ({})),
+  getConfiguration: jest.fn(() => ({
+    get: jest.fn(() => true), // Default to telemetry enabled for tests
+  })),
+  onDidChangeConfiguration: jest.fn(),
 };
 
 export const extensions = {
   getExtension: jest.fn(() => ({ packageJSON: { version: '3.0.0' } })),
+};
+
+export const env = {
+  isTelemetryEnabled: true,
+  machineId: 'test-machine-id',
+  language: 'en',
+  openExternal: jest.fn(),
+};
+
+export const Uri = {
+  parse: jest.fn(),
 };
 
 export class Position {
@@ -76,3 +90,5 @@ export class Selection extends Range {
     this.active = active;
   }
 }
+
+export const version = '1.85.0';

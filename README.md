@@ -22,9 +22,20 @@ Used by nearly **2 million developers**, Turbo removes friction from your dev fl
 ✔️ **Insert Meaningful Log Messages** – Quickly generate console logs with helpful context  
 ✔️ **Comment, Uncomment, or Delete Logs** – Manage logs with a simple shortcut  
 ✔️ **Multi-Cursor Support** – Debug multiple variables simultaneously  
-✔️ **Customizable Log Format** – Personalize how logs appear in your code
+✔️ **Customizable Log Format** – Personalize how logs appear in your code  
+✔️ **7 Console Methods** – Dedicated commands for log, info, debug, warn, error, table, and custom  
+✔️ **Individual Keyboard Shortcuts** – Each console method has its own ⌘K combination
 
-📖 **Full Documentation**: [Turbo Console Log Docs](https://www.turboconsolelog.io/documentation/features)
+### 🔥 Pro Features
+
+✔️ **Native TreeView Panel** – Visual log panel integrated into VS Code  
+✔️ **Real-Time Sync** – Workspace logs updated automatically  
+✔️ **Color-Coded Console Methods** – Instant visual recognition (🟦 log, 🟩 info, 🟪 debug, 🟨 warn, 🟥 error, 📊 table)  
+✔️ **Contextual Actions** – Right-click to comment, delete, or correct logs from the tree  
+✔️ **Smart Auto-Correction** – Line numbers and file names stay accurate after refactoring  
+✔️ **Vue/Svelte/Astro Support** – Full support for modern frontend frameworks
+
+📖 **Full Documentation**: [Turbo Console Log Docs](https://www.turboconsolelog.io/documentation)
 
 ---
 
@@ -33,51 +44,40 @@ Used by nearly **2 million developers**, Turbo removes friction from your dev fl
 Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ✅ Prefixes & Suffixes  
-✅ Log Function (`console.log`, `console.warn`, `console.error`, etc.)  
+✅ Release Notification Timing (Morning, Afternoon, Evening, Night)  
 ✅ Quote Type (`'`, `"`, or ``)  
 ✅ Filename & Line Number Inclusion
 
-📖 **Explore Settings**: [Settings Documentation](https://www.turboconsolelog.io/documentation/settings)
+📖 **Explore Settings**: [Settings Documentation](https://www.turboconsolelog.io/documentation/settings/custom-prefix)
 
 ---
 
-## 🚀 What's New in v3.4.0? – More Complete Console Control
+## 🚀 What's New in v3.5.0? – Smarter Notifications & Enhanced User Control
 
-**Granular console method control is here!** This release introduces **7 dedicated console commands** with individual keyboard shortcuts, building on our revolutionary AST engine from v3.3.0.
+**Non-intrusive release management is here!** This release introduces **intelligent notification scheduling** and **enhanced user control**, building on our revolutionary AST engine and console method coverage.
 
-### Complete Console Method Coverage
+### 🎯 Smarter Release Notifications
 
-- **7 New Console Commands:** Dedicated commands for every console method (log, info, debug, warn, error, table, custom)
-- **Individual Keyboard Shortcuts:** Each console method has its own ⌘K combination shortcut
-- **Granular Control:** No more switching settings — choose the exact console method instantly
-- **Enhanced AST Detection:** Continuing our AST revolution with even fewer false positives
+- **🕒 Release Review Target Window Setting:** New configurable setting allows you to control when you receive release notifications (Morning, Afternoon, Evening, or Night)
+- **🚀 Non-intrusive Release Notifications:** Release announcements now appear as respectful VS Code notifications instead of automatically opening web views
+- **🌐 External Article Integration:** New releases link to comprehensive articles on [turboconsolelog.io](https://www.turboconsolelog.io) for richer content
 
-### New Keyboard Shortcuts
+### 🔧 System Improvements
 
-- **Console Log:** `⌘K ⌘L` (macOS) / `Ctrl+K Ctrl+L` (Windows/Linux)
-- **Console Info:** `⌘K ⌘I` (macOS) / `Ctrl+K Ctrl+I` (Windows/Linux)
-- **Console Debug:** `⌘K ⌘D` (macOS) / `Ctrl+K Ctrl+D` (Windows/Linux)
-- **Console Warn:** `⌘K ⌘W` (macOS) / `Ctrl+K Ctrl+W` (Windows/Linux)
-- **Console Error:** `⌘K ⌘E` (macOS) / `Ctrl+K Ctrl+E` (Windows/Linux)
-- **Console Table:** `⌘K ⌘T` (macOS) / `Ctrl+K Ctrl+T` (Windows/Linux)
-- **Custom Log:** `⌘K ⌘C` (macOS) / `Ctrl+K Ctrl+C` (Windows/Linux)
+- **📊 Enhanced Reporting Service:** Reporting integration that fully respects VS Code's global telemetry settings and user privacy preferences
+- **⚡ Smarter Timing Logic:** Intelligent release notification scheduling based on your preferred time window
+- **🔧 Turbo Pro Vue/Svelte/Astro Support:** Fixed issue where Vue, Svelte, and Astro files weren't appearing in the Pro TreeView panel
 
-### Enhanced Features & Pro Improvements
+### 🎪 Behind the Scenes
 
-- **Auto-Save Integration:** Turbo commands now auto-save documents after execution
-- **Instant Tree Sync:** Pro tree updates immediately after file changes thanks to auto-save
-- **Color-Coded Console Methods:** Each console type displays in unique colors (🟦 log, 🟩 info, 🟪 debug, 🟨 warn, 🟥 error, 📊 table)
-- **Enhanced Expand All:** Pro "Expand All" now properly expands final log leaves
-- **Smart Shortcut Integration:** All 7 new shortcuts work seamlessly with Pro tree view
+- Removed forced web view updates that could interrupt workflows
+- Improved global state management for notification tracking
+- Enhanced error handling for release content delivery
+- Better integration with VS Code's native notification system
 
-### Quality & Testing
+**This release represents our commitment to user agency and non-disruptive feature discovery.** Release notifications are now more respectful of your workflow while keeping you informed about exciting new capabilities.
 
-- **1,400+ Lines of New Tests:** Comprehensive Jest unit tests for all console commands
-- **Test Suite Consolidation:** Reduced 36+ test files into 4 unified, maintainable suites
-- **Enhanced Coverage:** Improved edge case handling across all console scenarios
-- **Unified Architecture:** All commands follow identical patterns for consistency
-
-👉 [Read the Full v3.4.0 Release Article](https://www.turboconsolelog.io/articles/release-340)  
+👉 [Read the Full v3.5.0 Release Article](https://www.turboconsolelog.io/articles/release-350)  
 👉 [Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)  
 👉 [Subscribe to Newsletter (30% Pro Discount)](https://www.turboconsolelog.io/join)
 
@@ -148,4 +148,4 @@ It allows free personal and non-commercial use of the open-source core.
 
 Commercial use, redistribution, and use of the brand, logo, or Turbo Pro features are strictly protected.
 
-See the full [LICENSE](./LICENSE) for details.
+See the full [LICENSE](./LICENSE.txt) for details.
