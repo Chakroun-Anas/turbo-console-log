@@ -18,6 +18,15 @@ export interface TurboAnalyticsProvider {
   reportUpdate(context: ExtensionContext): Promise<void>;
 
   /**
+   * Reports when a new user has inserted 10 commands
+   * Only sends data if both VS Code telemetry and custom telemetry are enabled
+   */
+  reportCommandsInserted(
+    context: ExtensionContext,
+    count: number,
+  ): Promise<void>;
+
+  /**
    * Dispose of any resources and event listeners
    * Should be called when the extension is deactivated
    */
@@ -47,4 +56,18 @@ export interface UpdateAnalyticsData {
   timezoneOffset?: number;
   vscodeVersion?: string;
   platform?: string;
+}
+
+/**
+ * Data structure for commands inserted analytics
+ */
+export interface CommandsInsertedAnalyticsData {
+  developerId: string;
+  count: number;
+  isPro: boolean;
+  timezoneOffset?: number;
+  extensionVersion?: string;
+  vscodeVersion?: string;
+  platform?: string;
+  updatedAt: Date;
 }

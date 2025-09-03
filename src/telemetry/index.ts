@@ -3,4 +3,5 @@ export type {
   TurboAnalyticsProvider,
   FreshInstallAnalyticsData,
   UpdateAnalyticsData,
+  CommandsInsertedAnalyticsData,
 } from './TurboAnalyticsProvider';

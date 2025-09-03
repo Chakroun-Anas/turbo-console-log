@@ -422,6 +422,247 @@ describe('TelemetryService', () => {
     });
   });
 
+  describe('reportCommandsInserted', () => {
+    beforeEach(() => {
+      // Mock successful axios response
+      mockedAxios.post.mockResolvedValue({ status: 200 });
+    });
+
+    it('should send commands inserted analytics when telemetry is enabled and extension is in free mode', async () => {
+      const mockDate = new Date('2025-08-18T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const mockGlobalState =
+        mockContext.globalState as jest.Mocked<vscode.Memento>;
+      mockGlobalState.get.mockReturnValue(undefined); // No pro license
+
+      await telemetryService.reportCommandsInserted(mockContext, 10);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportInsertionsCommandsCount',
+        expect.objectContaining({
+          developerId: expect.stringMatching(/^dev_/),
+          count: 10,
+          isPro: false,
+          timezoneOffset: mockDate.getTimezoneOffset(),
+          extensionVersion: '3.5.0',
+          vscodeVersion: '1.85.0',
+          platform: 'darwin',
+          updatedAt: mockDate,
+        }),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/3.5.0',
+          },
+        }),
+      );
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Sending commands inserted analytics data:',
+        expect.any(Object),
+      );
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Commands inserted analytics sent successfully',
+      );
+    });
+
+    it('should detect pro mode correctly', async () => {
+      const mockGlobalState =
+        mockContext.globalState as jest.Mocked<vscode.Memento>;
+      mockGlobalState.get.mockImplementation((key: string) => {
+        if (key === 'license-key') return 'valid-license-key';
+        if (key === 'pro-bundle') return 'valid-pro-bundle';
+        return undefined;
+      });
+
+      await telemetryService.reportCommandsInserted(mockContext, 5);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportInsertionsCommandsCount',
+        expect.objectContaining({
+          isPro: true,
+          count: 5,
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should not detect pro mode when license key is missing', async () => {
+      const mockGlobalState =
+        mockContext.globalState as jest.Mocked<vscode.Memento>;
+      mockGlobalState.get.mockImplementation((key: string) => {
+        if (key === 'license-key') return undefined;
+        if (key === 'pro-bundle') return 'valid-pro-bundle';
+        return undefined;
+      });
+
+      await telemetryService.reportCommandsInserted(mockContext, 3);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportInsertionsCommandsCount',
+        expect.objectContaining({
+          isPro: false,
+          count: 3,
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should not detect pro mode when pro bundle is missing', async () => {
+      const mockGlobalState =
+        mockContext.globalState as jest.Mocked<vscode.Memento>;
+      mockGlobalState.get.mockImplementation((key: string) => {
+        if (key === 'license-key') return 'valid-license-key';
+        if (key === 'pro-bundle') return undefined;
+        return undefined;
+      });
+
+      await telemetryService.reportCommandsInserted(mockContext, 7);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportInsertionsCommandsCount',
+        expect.objectContaining({
+          isPro: false,
+          count: 7,
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should handle different count values correctly', async () => {
+      const mockGlobalState =
+        mockContext.globalState as jest.Mocked<vscode.Memento>;
+      mockGlobalState.get.mockReturnValue(undefined);
+
+      // Test with count = 1
+      await telemetryService.reportCommandsInserted(mockContext, 1);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportInsertionsCommandsCount',
+        expect.objectContaining({
+          count: 1,
+        }),
+        expect.any(Object),
+      );
+
+      // Test with count = 15
+      await telemetryService.reportCommandsInserted(mockContext, 15);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportInsertionsCommandsCount',
+        expect.objectContaining({
+          count: 15,
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should handle globalState errors gracefully', async () => {
+      const mockGlobalState =
+        mockContext.globalState as jest.Mocked<vscode.Memento>;
+      mockGlobalState.get.mockImplementation(() => {
+        throw new Error('GlobalState error');
+      });
+
+      await telemetryService.reportCommandsInserted(mockContext, 10);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportInsertionsCommandsCount',
+        expect.objectContaining({
+          isPro: false,
+          count: 10,
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should not send analytics when telemetry is disabled', async () => {
+      // Reset singleton to ensure new instance with disabled telemetry
+      resetTelemetryService();
+      mockVscodeEnv.isTelemetryEnabled = false;
+
+      const disabledService = createTelemetryService();
+      await disabledService.reportCommandsInserted(mockContext, 10);
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Telemetry is disabled, skipping commands inserted reporting',
+      );
+    });
+
+    it('should not send analytics when custom telemetry is disabled', async () => {
+      // Reset singleton to ensure new instance with disabled custom telemetry
+      resetTelemetryService();
+      const mockWorkspace = vscode.workspace as jest.Mocked<
+        typeof vscode.workspace
+      >;
+      mockWorkspace.getConfiguration.mockReturnValue({
+        get: jest.fn().mockReturnValue(false), // Custom telemetry disabled
+      } as unknown as vscode.WorkspaceConfiguration);
+
+      const disabledService = createTelemetryService();
+      await disabledService.reportCommandsInserted(mockContext, 10);
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Telemetry is disabled, skipping commands inserted reporting',
+      );
+    });
+
+    it('should handle axios errors gracefully', async () => {
+      const error = new Error('Network error');
+      mockedAxios.post.mockRejectedValue(error);
+
+      await telemetryService.reportCommandsInserted(mockContext, 10);
+
+      expect(mockConsoleWarn).toHaveBeenCalledWith(
+        '[Turbo Console Log] Failed to send commands inserted analytics:',
+        error,
+      );
+    });
+
+    it('should handle missing extension version gracefully', async () => {
+      const mockExtensions = vscode.extensions as jest.Mocked<
+        typeof vscode.extensions
+      >;
+      mockExtensions.getExtension.mockReturnValue(undefined);
+
+      await telemetryService.reportCommandsInserted(mockContext, 10);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportInsertionsCommandsCount',
+        expect.objectContaining({
+          extensionVersion: undefined,
+        }),
+        expect.objectContaining({
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/undefined',
+          },
+        }),
+      );
+    });
+
+    it('should handle missing extension packageJSON gracefully', async () => {
+      const mockExtensions = vscode.extensions as jest.Mocked<
+        typeof vscode.extensions
+      >;
+      mockExtensions.getExtension.mockReturnValue({
+        packageJSON: { version: undefined },
+      } as vscode.Extension<unknown>);
+
+      await telemetryService.reportCommandsInserted(mockContext, 10);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportInsertionsCommandsCount',
+        expect.objectContaining({
+          extensionVersion: undefined,
+        }),
+        expect.any(Object),
+      );
+    });
+  });
+
   describe('generateDeveloperId', () => {
     it('should generate consistent developer ID with crypto available', async () => {
       // Test indirectly through reportFreshInstall
@@ -515,6 +756,7 @@ describe('TelemetryService', () => {
       expect(service).toBeDefined();
       expect(typeof service.reportFreshInstall).toBe('function');
       expect(typeof service.reportUpdate).toBe('function');
+      expect(typeof service.reportCommandsInserted).toBe('function');
       expect(typeof service.dispose).toBe('function');
     });
 

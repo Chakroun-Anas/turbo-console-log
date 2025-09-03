@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
+import { trackNewUserJourney } from '../helpers';
 
 export function displayLogMessageCommand(): Command {
   return {
     name: 'turboConsoleLog.displayLogMessage',
-    handler: async ({ extensionProperties, debugMessage }) => {
+    handler: async ({ extensionProperties, debugMessage, context }) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
@@ -13,6 +14,7 @@ export function displayLogMessageCommand(): Command {
       }
       const tabSize: number | string = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
+
       for (let index = 0; index < editor.selections.length; index++) {
         const selection: vscode.Selection = editor.selections[index];
         let wordUnderCursor = '';
@@ -39,6 +41,9 @@ export function displayLogMessageCommand(): Command {
           });
         }
       }
+
+      // Track new user journey after successful log insertion
+      trackNewUserJourney(context);
     },
   };
 }

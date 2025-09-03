@@ -5,12 +5,16 @@ import {
   TurboAnalyticsProvider,
   FreshInstallAnalyticsData,
   UpdateAnalyticsData,
+  CommandsInsertedAnalyticsData,
 } from './TurboAnalyticsProvider';
 
 // Type extension for VS Code env API compatibility
 interface ExtendedEnv {
   isTelemetryEnabled?: boolean;
 }
+
+const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
+// const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
 
 /**
  * Telemetry service implementation that respects VS Code and user privacy settings
@@ -146,7 +150,7 @@ class TelemetryService implements TurboAnalyticsProvider {
 
       // Send the analytics data to the endpoint
       await axios.post(
-        'https://www.turboconsolelog.io/api/reportFreshInstall',
+        `${TURBO_WEBSITE_BASE_URL}/api/reportFreshInstall`,
         analyticsData,
         {
           timeout: 5000, // 5 second timeout to avoid blocking the extension
@@ -212,7 +216,7 @@ class TelemetryService implements TurboAnalyticsProvider {
 
       // Send the analytics data to the endpoint
       await axios.post(
-        'https://www.turboconsolelog.io/api/reportUpdate',
+        `${TURBO_WEBSITE_BASE_URL}/api/reportUpdate`,
         analyticsData,
         {
           timeout: 5000, // 5 second timeout to avoid blocking the extension
@@ -229,6 +233,82 @@ class TelemetryService implements TurboAnalyticsProvider {
       // Only log to console for debugging purposes
       console.warn(
         '[Turbo Console Log] Failed to send update analytics:',
+        error,
+      );
+    }
+  }
+
+  public async reportCommandsInserted(
+    context: vscode.ExtensionContext,
+    count: number,
+  ): Promise<void> {
+    try {
+      // Check if telemetry is enabled before proceeding
+      if (!this.canSendTelemetry()) {
+        console.log(
+          '[Turbo Console Log] Telemetry is disabled, skipping commands inserted reporting',
+        );
+        return;
+      }
+
+      const developerId = this.generateDeveloperId();
+      const extensionVersion = vscode.extensions.getExtension(
+        'ChakrounAnas.turbo-console-log',
+      )?.packageJSON.version;
+      const vscodeVersion = vscode.version;
+      const platform = process.platform;
+      const isPro = this.checkProStatus(context);
+
+      // Get current time and timezone information
+      const now = new Date();
+      const timezoneOffset = now.getTimezoneOffset();
+
+      const analyticsData: CommandsInsertedAnalyticsData = {
+        developerId,
+        count,
+        isPro,
+        timezoneOffset,
+        extensionVersion,
+        vscodeVersion,
+        platform,
+        updatedAt: now,
+      };
+
+      console.log(
+        '[Turbo Console Log] Sending commands inserted analytics data:',
+        {
+          developerId,
+          count,
+          isPro,
+          extensionVersion,
+          vscodeVersion,
+          platform,
+          updatedAt: analyticsData.updatedAt.toISOString(),
+          timezoneOffset: timezoneOffset,
+        },
+      );
+
+      // Send the analytics data to the endpoint
+      await axios.post(
+        `${TURBO_WEBSITE_BASE_URL}/api/reportInsertionsCommandsCount`,
+        analyticsData,
+        {
+          timeout: 5000, // 5 second timeout to avoid blocking the extension
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': `turbo-console-log-extension/${extensionVersion}`,
+          },
+        },
+      );
+
+      console.log(
+        '[Turbo Console Log] Commands inserted analytics sent successfully',
+      );
+    } catch (error) {
+      // Silently fail to ensure extension functionality is not affected
+      // Only log to console for debugging purposes
+      console.warn(
+        '[Turbo Console Log] Failed to send commands inserted analytics:',
         error,
       );
     }
