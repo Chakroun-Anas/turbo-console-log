@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console log or custom log functions.",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.50.0"
@@ -126,7 +126,7 @@
             "Night"
           ],
           "default": "Night",
-          "description": "Choose your preferred time window for receiving release notifications. Options: Morning (7-13), Afternoon (13-17), Evening (17-23), or Night (23-7)."
+          "description": "Choose your preferred time window for receiving release notifications. Options: Morning (7-12), Afternoon (13-17), Evening (17-21), or Night (21-2)."
         },
         "turboConsoleLog.isTurboTelemetryEnabled": {
           "type": "boolean",

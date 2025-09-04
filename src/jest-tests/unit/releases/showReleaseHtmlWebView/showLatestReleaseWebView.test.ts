@@ -1,222 +1,210 @@
 import { showLatestReleaseWebView } from '@/releases/showReleaseHtmlWebView/showLatestReleaseWebView';
-import { readFromGlobalState, writeToGlobalState } from '@/helpers';
-import { openWebView } from '@/ui';
-import { releaseNotes } from '@/releases/releaseNotes';
+import { isProUser } from '@/helpers';
+import { fetchCustomReleaseMessage } from '@/utilities/fetchCustomReleaseMessage';
 import {
-  createTelemetryService,
-  type TurboAnalyticsProvider,
-} from '@/telemetry';
-import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
+  readFromGlobalState,
+  writeToGlobalState,
+  showReleaseStatusBar,
+} from '@/helpers';
+import { openWebView } from '@/ui/helpers/openWebView';
+import { createTelemetryService } from '@/telemetry';
 import * as vscode from 'vscode';
+import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
+import type { ExtensionContext } from 'vscode';
 
-jest.mock('@/helpers');
-jest.mock('@/ui');
-jest.mock('@/releases/releaseNotes');
+// Mock dependencies
+jest.mock('@/helpers/isProUser');
+jest.mock('@/utilities/fetchCustomReleaseMessage');
+jest.mock('@/helpers/readFromGlobalState');
+jest.mock('@/helpers/writeToGlobalState');
+jest.mock('@/helpers/showReleaseStatusBar');
+jest.mock('@/ui/helpers/openWebView');
 jest.mock('@/telemetry');
-jest.mock('vscode');
+
+const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
+const mockFetchCustomReleaseMessage =
+  fetchCustomReleaseMessage as jest.MockedFunction<
+    typeof fetchCustomReleaseMessage
+  >;
+const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
+  typeof readFromGlobalState
+>;
+const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
+  typeof writeToGlobalState
+>;
+const mockShowReleaseStatusBar = showReleaseStatusBar as jest.MockedFunction<
+  typeof showReleaseStatusBar
+>;
+const mockOpenWebView = openWebView as jest.MockedFunction<typeof openWebView>;
+const mockCreateTelemetryService =
+  createTelemetryService as jest.MockedFunction<typeof createTelemetryService>;
 
 describe('showLatestReleaseWebView', () => {
-  const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
-    typeof readFromGlobalState
-  >;
-  const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
-    typeof writeToGlobalState
-  >;
-  const mockOpenWebView = openWebView as jest.MockedFunction<
-    typeof openWebView
-  >;
-  const mockReleaseNotes = releaseNotes as jest.Mocked<typeof releaseNotes>;
-  const mockCreateTelemetryService =
-    createTelemetryService as jest.MockedFunction<
-      typeof createTelemetryService
-    >;
-  const mockShowInformationMessage = vscode.window
-    .showInformationMessage as jest.MockedFunction<
-    typeof vscode.window.showInformationMessage
-  >;
-  const mockShowErrorMessage = vscode.window
-    .showErrorMessage as jest.MockedFunction<
-    typeof vscode.window.showErrorMessage
-  >;
-  const mockOpenExternal = vscode.env.openExternal as jest.MockedFunction<
-    typeof vscode.env.openExternal
-  >;
-  const mockUriParse = vscode.Uri.parse as jest.MockedFunction<
-    typeof vscode.Uri.parse
-  >;
-
-  let mockTelemetryService: jest.Mocked<TurboAnalyticsProvider>;
+  let mockContext: ExtensionContext;
+  let mockShowInformationMessage: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(console, 'warn').mockImplementation(() => {}); // ⛔ Silence console.warn
 
-    // Create mock telemetry service
-    mockTelemetryService = {
-      reportFreshInstall: jest.fn(),
+    mockContext = makeExtensionContext();
+
+    // Mock VS Code API
+    mockShowInformationMessage = jest
+      .spyOn(vscode.window, 'showInformationMessage')
+      .mockResolvedValue(undefined);
+
+    // Mock helper functions to return false for already shown notification
+    mockReadFromGlobalState.mockReturnValue(false);
+    mockWriteToGlobalState.mockReturnValue(undefined);
+    mockShowReleaseStatusBar.mockReturnValue(undefined);
+    mockOpenWebView.mockReturnValue(undefined);
+    mockCreateTelemetryService.mockReturnValue({
       reportUpdate: jest.fn(),
+      reportFreshInstall: jest.fn(),
+      reportCommandsInserted: jest.fn(),
       dispose: jest.fn(),
-    };
-    mockCreateTelemetryService.mockReturnValue(mockTelemetryService);
-
-    // Mock showInformationMessage to return a resolved promise
-    (mockShowInformationMessage as jest.Mock).mockResolvedValue(undefined);
-
-    mockReleaseNotes['3.5.0'] = {
-      webViewHtml: '<html>Release 3.5.0 content</html>',
-      isPro: false,
-    };
+    });
   });
 
-  it('should not show notification if already shown', () => {
-    const context = makeExtensionContext();
-    const latestWebViewReleaseVersion = '3.5.0';
-    mockReadFromGlobalState.mockReturnValue(true); // Already shown
-
-    showLatestReleaseWebView(context, latestWebViewReleaseVersion);
-
-    expect(mockReadFromGlobalState).toHaveBeenCalledWith(
-      context,
-      'IS_NOTIFICATION_SHOWN_3.5.0',
-    );
-    expect(mockShowInformationMessage).not.toHaveBeenCalled();
-    expect(mockOpenWebView).not.toHaveBeenCalled();
-    expect(mockWriteToGlobalState).not.toHaveBeenCalled();
+  afterEach(() => {
+    jest.restoreAllMocks(); // Restore console.warn and other mocks
   });
 
-  it('should show notification when not previously shown', () => {
-    const context = makeExtensionContext();
-    const latestWebViewReleaseVersion = '3.5.0';
-    mockReadFromGlobalState.mockReturnValue(false); // Not shown yet
+  describe('for pro users', () => {
+    beforeEach(() => {
+      mockIsProUser.mockReturnValue(true);
+    });
 
-    showLatestReleaseWebView(context, latestWebViewReleaseVersion);
+    it('should show pro-specific message without CTA', async () => {
+      await showLatestReleaseWebView(mockContext, '3.6.0');
 
-    expect(mockShowInformationMessage).toHaveBeenCalledWith(
-      `🚀 Your time matters! We've adapted our release communication so we can get the most out of each other.`,
-      'View Release Notes',
-      'Later',
-    );
-    expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-      context,
-      'IS_NOTIFICATION_SHOWN_3.5.0',
-      true,
-    );
+      expect(mockShowInformationMessage).toHaveBeenCalledWith(
+        expect.stringContaining("Hope you're enjoying your Turbo Pro bundle"),
+      );
+      expect(mockFetchCustomReleaseMessage).not.toHaveBeenCalled();
+    });
   });
 
-  it('should open webview when user clicks "View Release Notes"', async () => {
-    const context = makeExtensionContext();
-    const latestWebViewReleaseVersion = '3.5.0';
-    mockReadFromGlobalState.mockReturnValue(false);
-    (mockShowInformationMessage as jest.Mock).mockResolvedValue(
-      'View Release Notes',
-    );
+  describe('for non-pro users', () => {
+    beforeEach(() => {
+      mockIsProUser.mockReturnValue(false);
+    });
 
-    showLatestReleaseWebView(context, latestWebViewReleaseVersion);
+    it('should fetch and display custom message with dynamic CTA for v3.6.0', async () => {
+      const mockCustomMessage = {
+        message:
+          '🚀 Turbo Console Log introduces regional pricing! 🇺🇸 Turbo Pro is now adapted for your region.',
+        ctaText: 'Check Pro',
+        ctaUrl: 'https://www.turboconsolelog.io/pro',
+        countryFlag: '🇺🇸',
+        countryCode: 'US',
+      };
 
-    // Wait for the promise to resolve
-    await new Promise(process.nextTick);
+      mockFetchCustomReleaseMessage.mockResolvedValue(mockCustomMessage);
 
-    expect(mockOpenWebView).toHaveBeenCalledWith(
-      '🚀 Turbo Console Log - Release 3.5.0 Notes',
-      '<html>Release 3.5.0 content</html>',
-    );
+      await showLatestReleaseWebView(mockContext, '3.6.0');
+
+      expect(mockFetchCustomReleaseMessage).toHaveBeenCalledWith('v3.6.0');
+      expect(mockShowInformationMessage).toHaveBeenCalledWith(
+        mockCustomMessage.message,
+        'Check Pro',
+        'Maybe Later',
+      );
+    });
+
+    it('should show fallback message when API call fails', async () => {
+      mockFetchCustomReleaseMessage.mockRejectedValue(new Error('API failed'));
+
+      await showLatestReleaseWebView(mockContext, '3.6.0');
+
+      expect(mockShowInformationMessage).toHaveBeenCalledWith(
+        expect.stringMatching(/Turbo Console Log.*introduces regional pricing/),
+        'Check Pro',
+        'Maybe Later',
+      );
+    });
+
+    it('should show fallback message when API returns null', async () => {
+      mockFetchCustomReleaseMessage.mockResolvedValue(null);
+
+      await showLatestReleaseWebView(mockContext, '3.6.0');
+
+      expect(mockShowInformationMessage).toHaveBeenCalledWith(
+        expect.stringMatching(/Turbo Console Log.*introduces regional pricing/),
+        'Check Pro',
+        'Maybe Later',
+      );
+    });
+
+    it('should not include View Release Notes button for v3.6.0 (no release notes)', async () => {
+      const mockCustomMessage = {
+        message: '🚀 Turbo Console Log introduces regional pricing!',
+        ctaText: 'Check Pro',
+        ctaUrl: 'https://www.turboconsolelog.io/pro',
+        countryFlag: '🇺🇸',
+        countryCode: 'US',
+      };
+
+      mockFetchCustomReleaseMessage.mockResolvedValue(mockCustomMessage);
+
+      await showLatestReleaseWebView(mockContext, '3.6.0');
+
+      expect(mockShowInformationMessage).toHaveBeenCalledWith(
+        mockCustomMessage.message,
+        'Check Pro',
+        'Maybe Later',
+      );
+    });
   });
 
-  it('should open external URL when release has releaseArticleUrl', async () => {
-    const context = makeExtensionContext();
-    const latestWebViewReleaseVersion = '3.5.0';
-    mockReadFromGlobalState.mockReturnValue(false);
-    (mockShowInformationMessage as jest.Mock).mockResolvedValue(
-      'View Release Notes',
-    );
+  describe('button handling', () => {
+    beforeEach(() => {
+      mockIsProUser.mockReturnValue(false);
+    });
 
-    // Mock release with external URL
-    mockReleaseNotes['3.5.0'] = {
-      webViewHtml: '<html>Release 3.5.0 content</html>',
-      isPro: false,
-      releaseArticleUrl: 'https://www.turboconsolelog.io/articles/release-350',
-    };
+    it('should open CTA URL when dynamic CTA button is clicked', async () => {
+      const mockCustomMessage = {
+        message: '🚀 Turbo Console Log introduces regional pricing!',
+        ctaText: 'Check Pro',
+        ctaUrl: 'https://www.turboconsolelog.io/pro',
+        countryFlag: '🇺🇸',
+        countryCode: 'US',
+      };
 
-    const mockUri = {
-      toString: () => 'https://www.turboconsolelog.io/articles/release-350',
-    } as vscode.Uri;
-    mockUriParse.mockReturnValue(mockUri);
+      mockFetchCustomReleaseMessage.mockResolvedValue(mockCustomMessage);
+      mockShowInformationMessage.mockResolvedValue('Check Pro');
 
-    showLatestReleaseWebView(context, latestWebViewReleaseVersion);
+      const mockOpenExternal = jest
+        .spyOn(vscode.env, 'openExternal')
+        .mockResolvedValue(true);
 
-    // Wait for the promise to resolve
-    await new Promise(process.nextTick);
+      await showLatestReleaseWebView(mockContext, '3.6.0');
 
-    expect(mockUriParse).toHaveBeenCalledWith(
-      'https://www.turboconsolelog.io/articles/release-350',
-    );
-    expect(mockOpenExternal).toHaveBeenCalledWith(mockUri);
-    expect(mockOpenWebView).not.toHaveBeenCalled();
-  });
+      // Wait for the async button handler
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
-  it('should not open webview when user clicks "Later"', async () => {
-    const context = makeExtensionContext();
-    const latestWebViewReleaseVersion = '3.5.0';
-    mockReadFromGlobalState.mockReturnValue(false);
-    (mockShowInformationMessage as jest.Mock).mockResolvedValue('Later');
+      expect(mockOpenExternal).toHaveBeenCalledWith(
+        vscode.Uri.parse('https://www.turboconsolelog.io/pro'),
+      );
+    });
 
-    showLatestReleaseWebView(context, latestWebViewReleaseVersion);
+    it('should handle fallback CTA button when API fails', async () => {
+      mockFetchCustomReleaseMessage.mockRejectedValue(new Error('API failed'));
+      mockShowInformationMessage.mockResolvedValue('Check Pro');
 
-    // Wait for the promise to resolve
-    await new Promise(process.nextTick);
+      const mockOpenExternal = jest
+        .spyOn(vscode.env, 'openExternal')
+        .mockResolvedValue(true);
 
-    expect(mockOpenWebView).not.toHaveBeenCalled();
-  });
+      await showLatestReleaseWebView(mockContext, '3.6.0');
 
-  it('should handle different version numbers correctly', () => {
-    const context = makeExtensionContext();
-    const latestWebViewReleaseVersion = '4.0.1';
-    mockReleaseNotes['4.0.1'] = {
-      webViewHtml: '<html>Release 4.0.1 content</html>',
-      isPro: false,
-    };
-    mockReadFromGlobalState.mockReturnValue(false);
+      // Wait for the async button handler
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
-    showLatestReleaseWebView(context, latestWebViewReleaseVersion);
-
-    expect(mockReadFromGlobalState).toHaveBeenCalledWith(
-      context,
-      'IS_NOTIFICATION_SHOWN_4.0.1',
-    );
-    expect(mockShowInformationMessage).toHaveBeenCalledWith(
-      `🚀 Your time matters! We've adapted our release communication so we can get the most out of each other.`,
-      'View Release Notes',
-      'Later',
-    );
-    expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-      context,
-      'IS_NOTIFICATION_SHOWN_4.0.1',
-      true,
-    );
-  });
-
-  it('should show error when neither releaseArticleUrl nor webViewHtml is available', async () => {
-    const context = makeExtensionContext();
-    const latestWebViewReleaseVersion = '3.5.0';
-    mockReadFromGlobalState.mockReturnValue(false);
-    (mockShowInformationMessage as jest.Mock).mockResolvedValue(
-      'View Release Notes',
-    );
-
-    // Mock release with neither URL nor HTML
-    mockReleaseNotes['3.5.0'] = {
-      isPro: false,
-      // No webViewHtml and no releaseArticleUrl
-    };
-
-    showLatestReleaseWebView(context, latestWebViewReleaseVersion);
-
-    // Wait for the promise to resolve
-    await new Promise(process.nextTick);
-
-    expect(mockShowErrorMessage).toHaveBeenCalledWith(
-      'Release notes for version 3.5.0 are not available.',
-    );
-    expect(mockOpenWebView).not.toHaveBeenCalled();
-    expect(mockOpenExternal).not.toHaveBeenCalled();
+      expect(mockOpenExternal).toHaveBeenCalledWith(
+        vscode.Uri.parse('https://www.turboconsolelog.io/pro'),
+      );
+    });
   });
 });

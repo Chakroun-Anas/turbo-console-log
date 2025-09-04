@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
+import { trackNewUserJourney } from '../helpers';
 
 export function insertConsoleWarnCommand(): Command {
   return {
     name: 'turboConsoleLog.insertConsoleWarn',
-    handler: async ({ extensionProperties, debugMessage }) => {
+    handler: async ({ extensionProperties, debugMessage, context }) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
@@ -39,6 +40,9 @@ export function insertConsoleWarnCommand(): Command {
           });
         }
       }
+
+      // Track new user journey after successful log insertion
+      trackNewUserJourney(context);
     },
   };
 }

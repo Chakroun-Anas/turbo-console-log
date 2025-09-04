@@ -89,4 +89,8 @@ export const releaseNotes: Record<
     releaseArticleUrl: 'https://www.turboconsolelog.io/articles/release-350',
     date: new Date('2025-08-19'),
   },
+  '3.6.0': {
+    isPro: false,
+    date: new Date('2025-09-05'),
+  },
 };

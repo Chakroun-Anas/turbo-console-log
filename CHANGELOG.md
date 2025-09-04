@@ -2,6 +2,25 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.6.0] - 2025-09-05
+
+### 🌍 Regional Pricing for Turbo Pro
+
+This release introduces regional pricing for Turbo Pro, making the premium features more accessible worldwide:
+
+#### ✨ New Features
+
+- **🌎 Regional Pricing**: Turbo Pro is now available with regional pricing tailored to different countries and economies, ensuring fair access to premium features regardless of your location.
+
+- **💰 Automatic Price Adjustment**: The pricing automatically adjusts based on your region when visiting the purchase page, providing the most appropriate pricing for your area.
+
+#### 🔧 System Improvements
+
+- Enhanced purchase flow to support multiple regional pricing tiers
+- Improved user experience for international customers
+
+This update reflects our commitment to making Turbo Pro accessible to developers worldwide, regardless of their geographic location.
+
 ## [3.5.0] - 2025-08-18
 
 ### 🎯 Smarter release notifications and enhanced user control

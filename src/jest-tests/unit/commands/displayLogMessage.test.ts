@@ -8,12 +8,21 @@ import {
   makeDebugMessage,
   makeExtensionContext,
 } from '@/jest-tests/mocks/helpers';
+import { trackNewUserJourney } from '@/helpers/trackNewUserJourney';
 
 jest.mock('@/utilities', () => ({
   getTabSize: () => 2,
 }));
 
+jest.mock('@/helpers/trackNewUserJourney', () => ({
+  trackNewUserJourney: jest.fn(),
+}));
+
 describe('displayLogMessageCommand', () => {
+  const mockTrackNewUserJourney = trackNewUserJourney as jest.MockedFunction<
+    typeof trackNewUserJourney
+  >;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -115,5 +124,58 @@ describe('displayLogMessageCommand', () => {
     });
 
     expect(debugMessage.msg).not.toHaveBeenCalled(); // no selected var to log
+  });
+
+  it('should call trackNewUserJourney after successful log insertion', async () => {
+    const mockDocument = makeTextDocument(['const myVar = 42;']);
+
+    const mockSelection = new vscode.Selection(
+      new vscode.Position(0, 6),
+      new vscode.Position(0, 11),
+    );
+
+    const mockEditBuilder = createMockTextEditorEdit();
+
+    const mockEditor = makeTextEditor({
+      document: mockDocument,
+      selections: [mockSelection],
+    });
+
+    mockEditor.edit = jest.fn().mockImplementation((cb) => {
+      cb(mockEditBuilder);
+      return Promise.resolve(true);
+    });
+
+    vscode.window.activeTextEditor = mockEditor;
+
+    const debugMessage = makeDebugMessage();
+    const context = makeExtensionContext();
+
+    const command = displayLogMessageCommand();
+
+    await command.handler({
+      context,
+      extensionProperties: {} as ExtensionProperties,
+      debugMessage,
+    });
+
+    expect(mockTrackNewUserJourney).toHaveBeenCalledWith(context);
+  });
+
+  it('should not call trackNewUserJourney when no editor is active', async () => {
+    vscode.window.activeTextEditor = undefined;
+
+    const debugMessage = makeDebugMessage();
+    const context = makeExtensionContext();
+
+    const command = displayLogMessageCommand();
+
+    await command.handler({
+      context,
+      extensionProperties: {} as ExtensionProperties,
+      debugMessage,
+    });
+
+    expect(mockTrackNewUserJourney).not.toHaveBeenCalled();
   });
 });

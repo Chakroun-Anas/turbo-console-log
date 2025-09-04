@@ -1,5 +1,9 @@
 import { showReleaseHtmlWebView } from '@/releases/showReleaseHtmlWebView/showReleaseHtmlWebView';
-import { readFromGlobalState } from '@/helpers';
+import {
+  readFromGlobalState,
+  showNewsletterStatusBar,
+  showReleaseStatusBar,
+} from '@/helpers';
 import { showFreshInstallWebView } from '@/releases/showReleaseHtmlWebView/showFreshInstallWebView';
 import { showLatestReleaseWebView } from '@/releases/showReleaseHtmlWebView/showLatestReleaseWebView';
 import { isCurrentTimeWithinReleaseReviewWindow } from '@/releases/showReleaseHtmlWebView/isCurrentTimeWithinReleaseReviewWindow';
@@ -43,6 +47,13 @@ describe('showReleaseHtmlWebView', () => {
     createTelemetryService as jest.MockedFunction<
       typeof createTelemetryService
     >;
+  const mockShowNewsletterStatusBar =
+    showNewsletterStatusBar as jest.MockedFunction<
+      typeof showNewsletterStatusBar
+    >;
+  const mockShowReleaseStatusBar = showReleaseStatusBar as jest.MockedFunction<
+    typeof showReleaseStatusBar
+  >;
 
   let context: ReturnType<typeof makeExtensionContext>;
   let mockTelemetryService: jest.Mocked<TurboAnalyticsProvider>;
@@ -60,9 +71,13 @@ describe('showReleaseHtmlWebView', () => {
     mockTelemetryService = {
       reportFreshInstall: jest.fn(),
       reportUpdate: jest.fn(),
+      reportCommandsInserted: jest.fn(),
       dispose: jest.fn(),
     };
     mockCreateTelemetryService.mockReturnValue(mockTelemetryService);
+
+    // Mock showLatestReleaseWebView to return a resolved promise
+    mockShowLatestReleaseWebView.mockResolvedValue(undefined);
 
     context = makeExtensionContext();
   });
@@ -645,6 +660,178 @@ describe('showReleaseHtmlWebView', () => {
 
       // Should return the clearTimeout result (typically undefined)
       expect(result).toBeUndefined();
+    });
+  });
+
+  describe('Newsletter status bar display', () => {
+    it('should show newsletter status bar when SHOULD_SHOW_NEWSLETTER_STATUS_BAR is true', () => {
+      mockReadFromGlobalState
+        .mockReturnValueOnce(true) // Previous shown
+        .mockReturnValueOnce(true) // Latest also shown (so no webview logic runs)
+        .mockReturnValueOnce(true); // Newsletter status bar should be shown
+
+      showReleaseHtmlWebView(
+        context,
+        previousWebViewReleaseVersion,
+        latestWebViewReleaseVersion,
+        releaseReviewTargetWindow,
+        new Date(),
+      );
+
+      expect(mockReadFromGlobalState).toHaveBeenNthCalledWith(
+        3,
+        context,
+        'SHOULD_SHOW_NEWSLETTER_STATUS_BAR',
+      );
+      expect(mockShowNewsletterStatusBar).toHaveBeenCalledWith(context);
+    });
+
+    it('should not show newsletter status bar when SHOULD_SHOW_NEWSLETTER_STATUS_BAR is false', () => {
+      mockReadFromGlobalState
+        .mockReturnValueOnce(true) // Previous shown
+        .mockReturnValueOnce(true) // Latest also shown (so no webview logic runs)
+        .mockReturnValueOnce(false); // Newsletter status bar should not be shown
+
+      showReleaseHtmlWebView(
+        context,
+        previousWebViewReleaseVersion,
+        latestWebViewReleaseVersion,
+        releaseReviewTargetWindow,
+        new Date(),
+      );
+
+      expect(mockReadFromGlobalState).toHaveBeenNthCalledWith(
+        3,
+        context,
+        'SHOULD_SHOW_NEWSLETTER_STATUS_BAR',
+      );
+      expect(mockShowNewsletterStatusBar).not.toHaveBeenCalled();
+    });
+
+    it('should not show newsletter status bar when SHOULD_SHOW_NEWSLETTER_STATUS_BAR is undefined', () => {
+      mockReadFromGlobalState
+        .mockReturnValueOnce(true) // Previous shown
+        .mockReturnValueOnce(true) // Latest also shown (so no webview logic runs)
+        .mockReturnValueOnce(undefined); // Newsletter status bar flag is undefined
+
+      showReleaseHtmlWebView(
+        context,
+        previousWebViewReleaseVersion,
+        latestWebViewReleaseVersion,
+        releaseReviewTargetWindow,
+        new Date(),
+      );
+
+      expect(mockReadFromGlobalState).toHaveBeenNthCalledWith(
+        3,
+        context,
+        'SHOULD_SHOW_NEWSLETTER_STATUS_BAR',
+      );
+      expect(mockShowNewsletterStatusBar).not.toHaveBeenCalled();
+    });
+
+    it('should check newsletter status bar when no early returns occur', () => {
+      mockReadFromGlobalState
+        .mockReturnValueOnce(true) // Previous shown
+        .mockReturnValueOnce(true) // Latest also shown (no early returns)
+        .mockReturnValueOnce(true); // Newsletter status bar should be shown
+
+      showReleaseHtmlWebView(
+        context,
+        previousWebViewReleaseVersion,
+        latestWebViewReleaseVersion,
+        releaseReviewTargetWindow,
+        new Date(),
+      );
+
+      // Should not call any webview functions since both are already shown
+      expect(mockShowFreshInstallWebView).not.toHaveBeenCalled();
+      expect(mockShowLatestReleaseWebView).not.toHaveBeenCalled();
+
+      // But should check newsletter status bar
+      expect(mockReadFromGlobalState).toHaveBeenNthCalledWith(
+        3,
+        context,
+        'SHOULD_SHOW_NEWSLETTER_STATUS_BAR',
+      );
+      expect(mockShowNewsletterStatusBar).toHaveBeenCalledWith(context);
+    });
+  });
+
+  describe('Release status bar display', () => {
+    it('should show release status bar when SHOULD_SHOW_RELEASE_STATUS_BAR is true', () => {
+      mockReadFromGlobalState
+        .mockReturnValueOnce(true) // Previous shown
+        .mockReturnValueOnce(true) // Latest also shown (so no webview logic runs)
+        .mockReturnValueOnce(false) // Newsletter status bar not shown
+        .mockReturnValueOnce(true); // Release status bar should be shown
+
+      showReleaseHtmlWebView(
+        context,
+        previousWebViewReleaseVersion,
+        latestWebViewReleaseVersion,
+        releaseReviewTargetWindow,
+        new Date(),
+      );
+
+      expect(mockReadFromGlobalState).toHaveBeenNthCalledWith(
+        4,
+        context,
+        'SHOULD_SHOW_RELEASE_STATUS_BAR',
+      );
+      expect(mockShowReleaseStatusBar).toHaveBeenCalledWith(
+        context,
+        latestWebViewReleaseVersion,
+        '🌎',
+        undefined,
+        undefined,
+      );
+    });
+
+    it('should not show release status bar when SHOULD_SHOW_RELEASE_STATUS_BAR is false', () => {
+      mockReadFromGlobalState
+        .mockReturnValueOnce(true) // Previous shown
+        .mockReturnValueOnce(true) // Latest also shown (so no webview logic runs)
+        .mockReturnValueOnce(false) // Newsletter status bar not shown
+        .mockReturnValueOnce(false); // Release status bar should not be shown
+
+      showReleaseHtmlWebView(
+        context,
+        previousWebViewReleaseVersion,
+        latestWebViewReleaseVersion,
+        releaseReviewTargetWindow,
+        new Date(),
+      );
+
+      expect(mockReadFromGlobalState).toHaveBeenNthCalledWith(
+        4,
+        context,
+        'SHOULD_SHOW_RELEASE_STATUS_BAR',
+      );
+      expect(mockShowReleaseStatusBar).not.toHaveBeenCalled();
+    });
+
+    it('should not show release status bar when SHOULD_SHOW_RELEASE_STATUS_BAR is undefined', () => {
+      mockReadFromGlobalState
+        .mockReturnValueOnce(true) // Previous shown
+        .mockReturnValueOnce(true) // Latest also shown (so no webview logic runs)
+        .mockReturnValueOnce(false) // Newsletter status bar not shown
+        .mockReturnValueOnce(undefined); // Release status bar flag is undefined
+
+      showReleaseHtmlWebView(
+        context,
+        previousWebViewReleaseVersion,
+        latestWebViewReleaseVersion,
+        releaseReviewTargetWindow,
+        new Date(),
+      );
+
+      expect(mockReadFromGlobalState).toHaveBeenNthCalledWith(
+        4,
+        context,
+        'SHOULD_SHOW_RELEASE_STATUS_BAR',
+      );
+      expect(mockShowReleaseStatusBar).not.toHaveBeenCalled();
     });
   });
 });
