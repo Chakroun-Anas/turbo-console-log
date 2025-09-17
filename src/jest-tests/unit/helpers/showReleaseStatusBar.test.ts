@@ -23,18 +23,6 @@ jest.mock('vscode', () => ({
   },
 }));
 
-jest.mock('@/releases/releaseNotes', () => ({
-  releaseNotes: {
-    '3.5.0': {
-      releaseArticleUrl: 'https://example.com/release',
-      webViewHtml: '<html>Release notes</html>',
-    },
-    '3.4.0': {
-      webViewHtml: '<html>Old release notes</html>',
-    },
-  },
-}));
-
 // Mock UI module with proper structure
 jest.mock('@/ui', () => ({
   openWebView: jest.fn(),
@@ -91,21 +79,23 @@ describe('showReleaseStatusBar', () => {
   });
 
   it('should create and show status bar item with correct properties', () => {
-    showReleaseStatusBar(context, '3.5.0', '🚀');
+    showReleaseStatusBar(context, '3.5.0');
 
     expect(mockCreateStatusBarItem).toHaveBeenCalledWith(
       vscode.StatusBarAlignment.Left,
       100,
     );
-    expect(mockStatusBarItem.text).toBe('🚀 v3.5.0 → Regional pricing! 🚀 ');
+    expect(mockStatusBarItem.text).toBe(
+      '🚀 v3.5.0 → Decide what is next for Turbo!',
+    );
     expect(mockStatusBarItem.tooltip).toBe(
-      'Turbo Console Log introduces regional pricing!',
+      'Take a one minute survey shaping the future of Turbo',
     );
     expect(mockStatusBarItem.show).toHaveBeenCalled();
   });
 
   it('should register command with unique ID and set it on status bar', () => {
-    showReleaseStatusBar(context, '3.5.0', '🚀');
+    showReleaseStatusBar(context, '3.5.0');
 
     expect(mockRegisterCommand).toHaveBeenCalled();
     const commandId = (mockRegisterCommand as jest.Mock).mock.calls[0][0];
@@ -114,7 +104,7 @@ describe('showReleaseStatusBar', () => {
   });
 
   it('should add disposables to context subscriptions', () => {
-    showReleaseStatusBar(context, '3.5.0', '🚀');
+    showReleaseStatusBar(context, '3.5.0');
 
     expect(context.subscriptions).toContain(mockStatusBarItem);
     expect(context.subscriptions).toContain(mockDisposable);
@@ -124,7 +114,7 @@ describe('showReleaseStatusBar', () => {
     let commandHandler: () => Promise<void>;
 
     beforeEach(() => {
-      showReleaseStatusBar(context, '3.5.0', '🚀');
+      showReleaseStatusBar(context, '3.5.0');
       commandHandler = (mockRegisterCommand as jest.Mock).mock.calls[0][1];
     });
 
@@ -134,7 +124,8 @@ describe('showReleaseStatusBar', () => {
       await commandHandler();
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        `🚀 Turbo Console Log v3.5.0 introduces regional pricing!`,
+        `Decide what is next for Turbo by taking a one minute survey 🚀`,
+        'Take Survey',
         'Maybe Later',
         'Dismiss',
       );

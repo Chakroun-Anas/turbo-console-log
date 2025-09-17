@@ -4,15 +4,16 @@ import {
   readFromGlobalState,
   writeToGlobalState,
   showReleaseStatusBar,
-  isProUser,
 } from '@/helpers';
 import { createTelemetryService } from '@/telemetry';
-import { fetchCustomReleaseMessage } from '@/utilities/fetchCustomReleaseMessage';
 
-export async function showLatestReleaseWebView(
+const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
+// const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
+
+export function showLatestReleaseWebView(
   context: ExtensionContext,
   latestWebViewReleaseVersion: string,
-): Promise<void> {
+): void {
   const wasLatestReleaseWebviewShown = readFromGlobalState(
     context,
     `IS_NOTIFICATION_SHOWN_${latestWebViewReleaseVersion}`,
@@ -24,56 +25,14 @@ export async function showLatestReleaseWebView(
   // Set IS_NEW_USER to false since an existing user receiving an update is no longer a new user
   writeToGlobalState(context, 'IS_NEW_USER', false);
 
-  // Determine message based on user type and fetch custom message if needed
-  const userIsPro = isProUser(context);
-  let notificationMessage: string;
-  let ctaUrl: string | undefined;
-  let ctaText: string | undefined;
-  let countryFlag: string | undefined;
-
-  if (userIsPro) {
-    // Pro users get a static message about enjoying their pro bundle
-    notificationMessage = `Hope you're enjoying your Turbo Pro bundle! v${latestWebViewReleaseVersion} 🚀`;
-    ctaUrl = undefined; // No CTA for pro users
-    ctaText = undefined;
-  } else {
-    // Non-pro users get dynamic message from API
-    try {
-      const customMessage = await fetchCustomReleaseMessage(
-        `v${latestWebViewReleaseVersion}`,
-      );
-      if (customMessage) {
-        notificationMessage = customMessage.message;
-        ctaUrl = customMessage.ctaUrl;
-        ctaText = customMessage.ctaText;
-        countryFlag = customMessage.countryFlag;
-      } else {
-        // Fallback message when API fails
-        notificationMessage = `🌎 Turbo Console Log ${latestWebViewReleaseVersion} introduces regional pricing!`;
-        ctaUrl = 'https://www.turboconsolelog.io/pro';
-        ctaText = 'Check Pro';
-        countryFlag = '🌎';
-      }
-    } catch (error) {
-      // Fallback message when API call fails
-      console.warn(
-        '[Turbo Console Log] Failed to get custom release message:',
-        error,
-      );
-      notificationMessage = `🌎 Turbo Console Log ${latestWebViewReleaseVersion} introduces regional pricing!`;
-      ctaUrl = 'https://www.turboconsolelog.io/pro';
-      ctaText = 'Check Pro';
-      countryFlag = '🌎';
-    }
-  }
+  const notificationMessage: string =
+    'Decide what is next for Turbo by taking a one minute survey 🚀';
+  const ctaUrl: string = `${TURBO_WEBSITE_BASE_URL}/community-survey`;
+  const ctaText: string = 'Take Survey';
+  const ctaLaterText: string = 'Maybe Later';
 
   // Show notification first (non-blocking)
-  const buttons = [];
-  if (!userIsPro && ctaUrl) {
-    buttons.push(ctaText || 'Check Pro');
-    buttons.push('Maybe Later');
-  }
-
+  const buttons = [ctaText, ctaLaterText];
   const notificationPromise = vscode.window.showInformationMessage(
     notificationMessage,
     ...buttons,
@@ -81,31 +40,17 @@ export async function showLatestReleaseWebView(
 
   // Handle notification result asynchronously (don't block)
   notificationPromise.then((selection) => {
-    // Check if selection matches the dynamic CTA text
-    const expectedCtaText = ctaText || 'Check Pro';
-    if (selection === expectedCtaText && ctaUrl) {
+    // Check if selection matches the CTA text
+    if (selection === ctaText) {
       vscode.env.openExternal(vscode.Uri.parse(ctaUrl));
     }
   });
 
-  if (!userIsPro) {
-    // Persist the release data for status bar reuse
-    writeToGlobalState(context, 'RELEASE_COUNTRY_FLAG', countryFlag ?? '🌎');
-    writeToGlobalState(context, 'RELEASE_CTA_URL', ctaUrl);
-    writeToGlobalState(context, 'RELEASE_CTA_TEXT', ctaText);
+  // Show persistent release status bar that survives VS Code reloads
+  showReleaseStatusBar(context, latestWebViewReleaseVersion);
 
-    // Show persistent release status bar that survives VS Code reloads
-    showReleaseStatusBar(
-      context,
-      latestWebViewReleaseVersion,
-      countryFlag ?? '🌎',
-      ctaUrl,
-      ctaText,
-    );
-
-    // Set flag to indicate that status bar should be shown on future activations
-    writeToGlobalState(context, 'SHOULD_SHOW_RELEASE_STATUS_BAR', true);
-  }
+  // Set flag to indicate that status bar should be shown on future activations
+  writeToGlobalState(context, 'SHOULD_SHOW_RELEASE_STATUS_BAR', true);
 
   // Mark notification as shown (immediately)
   writeToGlobalState(

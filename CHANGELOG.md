@@ -2,6 +2,23 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.7.0] - 2025-09-18
+
+### 🎯 Community Engagement & Enhanced Freemium Panel Experience
+
+This release focuses on strengthening the connection between Turbo Console Log and its community while providing a richer experience for all users:
+
+#### Release Features:
+
+- **Community Survey Integration**: Release notification now invite users to participate in community surveys to help shape Turbo's future development roadmap.
+
+- **Enhanced Freemium Panel**: The freemium panel has been completely revamped with:
+  - **Complete Commands Reference**: Interactive table showing all Turbo Console Log commands with keyboard shortcuts
+  - **Featured Turbo Articles**: Direct access to educational content including "Debugging: Between Science & Art" and "Understanding the Full AST Engine"
+  - **Community Survey Integration**: Easy access to provide feedback and influence future features
+
+This update reflects our commitment to building Turbo Console Log together with the community, ensuring that user feedback directly influences future development priorities.
+
 ## [3.6.0] - 2025-09-05
 
 ### 🌍 Regional Pricing for Turbo Pro

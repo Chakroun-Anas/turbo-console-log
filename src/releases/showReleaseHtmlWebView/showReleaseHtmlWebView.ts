@@ -37,14 +37,7 @@ export function showReleaseHtmlWebView(
   if (!wasLatestReleaseWebviewShown) {
     if (isCurrentTimeWithinReleaseReviewWindow(releaseReviewTargetWindow)) {
       // Async call wrapped to be non-blocking
-      showLatestReleaseWebView(context, latestWebViewReleaseVersion).catch(
-        (error) => {
-          console.warn(
-            '[Turbo Console Log] Failed to show latest release web view:',
-            error,
-          );
-        },
-      );
+      showLatestReleaseWebView(context, latestWebViewReleaseVersion);
       return;
     }
     const pastSevenDaysOfRelease = isReleasePastSevenDays(
@@ -62,14 +55,7 @@ export function showReleaseHtmlWebView(
       if (
         isCurrentTimeWithinReleaseReviewWindow(nextTargetWindow, currentDate)
       ) {
-        showLatestReleaseWebView(context, latestWebViewReleaseVersion).catch(
-          (error) => {
-            console.warn(
-              '[Turbo Console Log] Failed to show latest release web view:',
-              error,
-            );
-          },
-        );
+        showLatestReleaseWebView(context, latestWebViewReleaseVersion);
         return;
       }
 
@@ -94,14 +80,7 @@ export function showReleaseHtmlWebView(
 
       if (webViewDeltaTime > 0) {
         const timeoutId = setTimeout(() => {
-          showLatestReleaseWebView(context, latestWebViewReleaseVersion).catch(
-            (error) => {
-              console.warn(
-                '[Turbo Console Log] Failed to show latest release web view:',
-                error,
-              );
-            },
-          );
+          showLatestReleaseWebView(context, latestWebViewReleaseVersion);
         }, webViewDeltaTime);
 
         context.subscriptions.push({
@@ -116,14 +95,7 @@ export function showReleaseHtmlWebView(
     const webViewDeltaTime = targetDate.getTime() - currentDate.getTime();
     if (webViewDeltaTime > 0) {
       const timeoutId = setTimeout(() => {
-        showLatestReleaseWebView(context, latestWebViewReleaseVersion).catch(
-          (error) => {
-            console.warn(
-              '[Turbo Console Log] Failed to show latest release web view:',
-              error,
-            );
-          },
-        );
+        showLatestReleaseWebView(context, latestWebViewReleaseVersion);
       }, targetDate.getTime() - currentDate.getTime());
       context.subscriptions.push({
         dispose: () => {
@@ -150,18 +122,6 @@ export function showReleaseHtmlWebView(
   );
 
   if (shouldShowReleaseStatusBar) {
-    // Retrieve persisted release data for status bar
-    const countryFlag =
-      readFromGlobalState<string>(context, 'RELEASE_COUNTRY_FLAG') ?? '🌎';
-    const ctaUrl = readFromGlobalState<string>(context, 'RELEASE_CTA_URL');
-    const ctaText = readFromGlobalState<string>(context, 'RELEASE_CTA_TEXT');
-
-    showReleaseStatusBar(
-      context,
-      latestWebViewReleaseVersion,
-      countryFlag,
-      ctaUrl,
-      ctaText,
-    );
+    showReleaseStatusBar(context, latestWebViewReleaseVersion);
   }
 }
