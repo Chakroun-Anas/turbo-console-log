@@ -1,49 +1,46 @@
 import * as vscode from 'vscode';
 import { writeToGlobalState } from './index';
 
+const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
+// const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
+
 /**
  * Creates and shows a persistent release notification status bar item
  * This status bar will persist across VS Code sessions until the user interacts with it
  * @param context VS Code extension context
  * @param latestWebViewReleaseVersion The latest release version to show
- * @param countryFlag The country flag to display
  * @param ctaUrl The CTA URL to open when user wants to check Pro
  * @param ctaText The CTA text to display
  */
 export function showReleaseStatusBar(
   context: vscode.ExtensionContext,
   latestWebViewReleaseVersion: string,
-  countryFlag: string,
-  ctaUrl?: string,
-  ctaText?: string,
 ): void {
   const statusBarItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left,
     100,
   );
-  statusBarItem.text = `🚀 v${latestWebViewReleaseVersion} → Regional pricing! ${countryFlag} `;
-  statusBarItem.tooltip = 'Turbo Console Log introduces regional pricing!';
+  statusBarItem.text = `🚀 v${latestWebViewReleaseVersion} → Decide what is next for Turbo!`;
+  statusBarItem.tooltip =
+    'Take a one minute survey shaping the future of Turbo';
 
   // Create command for status bar click
   const commandId = `turbo.releaseCta.${Date.now()}`;
   const disposable = vscode.commands.registerCommand(commandId, async () => {
     // Build buttons array based on available actions
-    const buttons = [];
-    if (ctaUrl) {
-      buttons.push(ctaText || 'Check Pro');
-    }
-    buttons.push('Maybe Later', 'Dismiss');
+    const buttons = ['Take Survey', 'Maybe Later', 'Dismiss'];
 
     // Show toast with appropriate buttons
     const toastResult = await vscode.window.showInformationMessage(
-      `${countryFlag} Turbo Console Log v${latestWebViewReleaseVersion} introduces regional pricing!`,
+      'Decide what is next for Turbo by taking a one minute survey 🚀',
       ...buttons,
     );
 
-    // Handle CTA action (Check Pro / Get Turbo Pro)
-    const expectedCtaText = ctaText || 'Check Pro';
-    if (toastResult === expectedCtaText && ctaUrl) {
-      vscode.env.openExternal(vscode.Uri.parse(ctaUrl));
+    // Handle CTA actions
+    if (toastResult === 'Take Survey') {
+      vscode.env.openExternal(
+        vscode.Uri.parse(TURBO_WEBSITE_BASE_URL + '/community-survey'),
+      );
       // Remove status bar and mark as dismissed
       statusBarItem.dispose();
       disposable.dispose();

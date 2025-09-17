@@ -1,6 +1,4 @@
 import { showLatestReleaseWebView } from '@/releases/showReleaseHtmlWebView/showLatestReleaseWebView';
-import { isProUser } from '@/helpers';
-import { fetchCustomReleaseMessage } from '@/utilities/fetchCustomReleaseMessage';
 import {
   readFromGlobalState,
   writeToGlobalState,
@@ -13,19 +11,12 @@ import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
 import type { ExtensionContext } from 'vscode';
 
 // Mock dependencies
-jest.mock('@/helpers/isProUser');
-jest.mock('@/utilities/fetchCustomReleaseMessage');
 jest.mock('@/helpers/readFromGlobalState');
 jest.mock('@/helpers/writeToGlobalState');
 jest.mock('@/helpers/showReleaseStatusBar');
 jest.mock('@/ui/helpers/openWebView');
 jest.mock('@/telemetry');
 
-const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
-const mockFetchCustomReleaseMessage =
-  fetchCustomReleaseMessage as jest.MockedFunction<
-    typeof fetchCustomReleaseMessage
-  >;
 const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
   typeof readFromGlobalState
 >;
@@ -71,140 +62,30 @@ describe('showLatestReleaseWebView', () => {
     jest.restoreAllMocks(); // Restore console.warn and other mocks
   });
 
-  describe('for pro users', () => {
-    beforeEach(() => {
-      mockIsProUser.mockReturnValue(true);
-    });
+  it('should display releasse message with CTA for v3.7.0', async () => {
+    showLatestReleaseWebView(mockContext, '3.7.0');
 
-    it('should show pro-specific message without CTA', async () => {
-      await showLatestReleaseWebView(mockContext, '3.6.0');
-
-      expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        expect.stringContaining("Hope you're enjoying your Turbo Pro bundle"),
-      );
-      expect(mockFetchCustomReleaseMessage).not.toHaveBeenCalled();
-    });
+    expect(mockShowInformationMessage).toHaveBeenCalledWith(
+      'Decide what is next for Turbo by taking a one minute survey 🚀',
+      'Take Survey',
+      'Maybe Later',
+    );
   });
 
-  describe('for non-pro users', () => {
-    beforeEach(() => {
-      mockIsProUser.mockReturnValue(false);
-    });
+  it('should open CTA URL when dynamic CTA button is clicked', async () => {
+    mockShowInformationMessage.mockResolvedValue('Take Survey');
 
-    it('should fetch and display custom message with dynamic CTA for v3.6.0', async () => {
-      const mockCustomMessage = {
-        message:
-          '🚀 Turbo Console Log introduces regional pricing! 🇺🇸 Turbo Pro is now adapted for your region.',
-        ctaText: 'Check Pro',
-        ctaUrl: 'https://www.turboconsolelog.io/pro',
-        countryFlag: '🇺🇸',
-        countryCode: 'US',
-      };
+    const mockOpenExternal = jest
+      .spyOn(vscode.env, 'openExternal')
+      .mockResolvedValue(true);
 
-      mockFetchCustomReleaseMessage.mockResolvedValue(mockCustomMessage);
+    showLatestReleaseWebView(mockContext, '3.7.0');
 
-      await showLatestReleaseWebView(mockContext, '3.6.0');
+    // Wait for the async button handler
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
-      expect(mockFetchCustomReleaseMessage).toHaveBeenCalledWith('v3.6.0');
-      expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        mockCustomMessage.message,
-        'Check Pro',
-        'Maybe Later',
-      );
-    });
-
-    it('should show fallback message when API call fails', async () => {
-      mockFetchCustomReleaseMessage.mockRejectedValue(new Error('API failed'));
-
-      await showLatestReleaseWebView(mockContext, '3.6.0');
-
-      expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        expect.stringMatching(/Turbo Console Log.*introduces regional pricing/),
-        'Check Pro',
-        'Maybe Later',
-      );
-    });
-
-    it('should show fallback message when API returns null', async () => {
-      mockFetchCustomReleaseMessage.mockResolvedValue(null);
-
-      await showLatestReleaseWebView(mockContext, '3.6.0');
-
-      expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        expect.stringMatching(/Turbo Console Log.*introduces regional pricing/),
-        'Check Pro',
-        'Maybe Later',
-      );
-    });
-
-    it('should not include View Release Notes button for v3.6.0 (no release notes)', async () => {
-      const mockCustomMessage = {
-        message: '🚀 Turbo Console Log introduces regional pricing!',
-        ctaText: 'Check Pro',
-        ctaUrl: 'https://www.turboconsolelog.io/pro',
-        countryFlag: '🇺🇸',
-        countryCode: 'US',
-      };
-
-      mockFetchCustomReleaseMessage.mockResolvedValue(mockCustomMessage);
-
-      await showLatestReleaseWebView(mockContext, '3.6.0');
-
-      expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        mockCustomMessage.message,
-        'Check Pro',
-        'Maybe Later',
-      );
-    });
-  });
-
-  describe('button handling', () => {
-    beforeEach(() => {
-      mockIsProUser.mockReturnValue(false);
-    });
-
-    it('should open CTA URL when dynamic CTA button is clicked', async () => {
-      const mockCustomMessage = {
-        message: '🚀 Turbo Console Log introduces regional pricing!',
-        ctaText: 'Check Pro',
-        ctaUrl: 'https://www.turboconsolelog.io/pro',
-        countryFlag: '🇺🇸',
-        countryCode: 'US',
-      };
-
-      mockFetchCustomReleaseMessage.mockResolvedValue(mockCustomMessage);
-      mockShowInformationMessage.mockResolvedValue('Check Pro');
-
-      const mockOpenExternal = jest
-        .spyOn(vscode.env, 'openExternal')
-        .mockResolvedValue(true);
-
-      await showLatestReleaseWebView(mockContext, '3.6.0');
-
-      // Wait for the async button handler
-      await new Promise((resolve) => setTimeout(resolve, 0));
-
-      expect(mockOpenExternal).toHaveBeenCalledWith(
-        vscode.Uri.parse('https://www.turboconsolelog.io/pro'),
-      );
-    });
-
-    it('should handle fallback CTA button when API fails', async () => {
-      mockFetchCustomReleaseMessage.mockRejectedValue(new Error('API failed'));
-      mockShowInformationMessage.mockResolvedValue('Check Pro');
-
-      const mockOpenExternal = jest
-        .spyOn(vscode.env, 'openExternal')
-        .mockResolvedValue(true);
-
-      await showLatestReleaseWebView(mockContext, '3.6.0');
-
-      // Wait for the async button handler
-      await new Promise((resolve) => setTimeout(resolve, 0));
-
-      expect(mockOpenExternal).toHaveBeenCalledWith(
-        vscode.Uri.parse('https://www.turboconsolelog.io/pro'),
-      );
-    });
+    expect(mockOpenExternal).toHaveBeenCalledWith(
+      vscode.Uri.parse('https://www.turboconsolelog.io/community-survey'),
+    );
   });
 });

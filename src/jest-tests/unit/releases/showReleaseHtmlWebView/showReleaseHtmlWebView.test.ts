@@ -75,10 +75,6 @@ describe('showReleaseHtmlWebView', () => {
       dispose: jest.fn(),
     };
     mockCreateTelemetryService.mockReturnValue(mockTelemetryService);
-
-    // Mock showLatestReleaseWebView to return a resolved promise
-    mockShowLatestReleaseWebView.mockResolvedValue(undefined);
-
     context = makeExtensionContext();
   });
 
@@ -782,9 +778,6 @@ describe('showReleaseHtmlWebView', () => {
       expect(mockShowReleaseStatusBar).toHaveBeenCalledWith(
         context,
         latestWebViewReleaseVersion,
-        '🌎',
-        undefined,
-        undefined,
       );
     });
 
