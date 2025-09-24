@@ -6,9 +6,13 @@ import {
   readFromGlobalState,
   getExtensionProperties,
   activateRepairMode,
-  activateFreemiumMode,
+  activateFreemiumLauncherMode,
 } from './helpers';
-import { TurboProBundleRepairPanel, TurboProShowcasePanel } from './pro';
+import {
+  TurboFreemiumLauncherPanel,
+  TurboProBundleRepairPanel,
+  TurboProShowcasePanel,
+} from './pro';
 import {
   releaseNotes,
   getLatestWebViewReleaseVersion,
@@ -39,8 +43,9 @@ export async function activate(
       });
     });
   }
-  const turboProShowCasePanel = new TurboProShowcasePanel();
+  const turboProShowCasePanel = new TurboProShowcasePanel(context);
   const turboProBundleRepairPanel = new TurboProBundleRepairPanel('', 'run');
+  const freemiumLauncherProvider = new TurboFreemiumLauncherPanel();
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       TurboProShowcasePanel.viewType,
@@ -51,6 +56,12 @@ export async function activate(
     vscode.window.registerWebviewViewProvider(
       TurboProBundleRepairPanel.viewType,
       turboProBundleRepairPanel,
+    ),
+  );
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider(
+      TurboFreemiumLauncherPanel.viewType,
+      freemiumLauncherProvider,
     ),
   );
   const version = vscode.extensions.getExtension(
@@ -114,5 +125,6 @@ export async function activate(
     }
     return;
   }
-  activateFreemiumMode();
+
+  activateFreemiumLauncherMode(context, freemiumLauncherProvider);
 }

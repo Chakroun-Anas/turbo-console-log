@@ -2,6 +2,30 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.7.1] - 2025-09-28
+
+### 🎉 Dynamic Freemium Panel & v3.8.0 Preview
+
+This release introduces a dynamic content system for the freemium panel and provides an exciting preview of the upcoming v3.8.0 hide logs feature:
+
+#### ✨ New Features
+
+- **Dynamic Freemium Panel**: Panel content now updates automatically with latest news, feature previews, and community updates
+- **v3.8.0 Teaser Integration**: Preview of the most requested hide logs feature coming October 6th, 2025
+- **Real-time Countdown**: Live countdown to v3.8.0 release with teaser article links
+- **Enhanced Community Engagement**: Direct links to surveys, articles, and feature previews
+
+#### 🔧 Improvements
+
+- Updated panel content structure for better user engagement
+- Improved freemium user experience with dynamic, relevant content
+- Better integration between extension panel and website features
+
+#### 📝 Documentation
+
+- Added comprehensive teaser article for v3.8.0 hide logs feature
+- Updated website with countdown and feature preview
+
 ## [3.7.0] - 2025-09-18
 
 ### 🎯 Community Engagement & Enhanced Freemium Panel Experience

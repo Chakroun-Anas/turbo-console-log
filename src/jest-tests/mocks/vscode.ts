@@ -1,6 +1,8 @@
 export const window = {
   showInformationMessage: jest.fn(),
   registerWebviewViewProvider: jest.fn(),
+  registerTreeDataProvider: jest.fn(),
+  createTreeView: jest.fn(),
   showErrorMessage: jest.fn(),
   showInputBox: jest.fn(),
   showWarningMessage: jest.fn(),
@@ -92,3 +94,37 @@ export class Selection extends Range {
 }
 
 export const version = '1.85.0';
+
+export class EventEmitter<T> {
+  event: jest.Mock;
+
+  constructor() {
+    this.event = jest.fn();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  fire(_data?: T): void {
+    // Mock implementation
+  }
+
+  dispose(): void {
+    // Mock implementation
+  }
+}
+
+export class ThemeIcon {
+  id: string;
+
+  constructor(id: string) {
+    this.id = id;
+  }
+}
+
+export class TreeItem {
+  label: string;
+  iconPath?: ThemeIcon | string;
+
+  constructor(label: string) {
+    this.label = label;
+  }
+}

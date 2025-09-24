@@ -27,6 +27,22 @@ export interface TurboAnalyticsProvider {
   ): Promise<void>;
 
   /**
+   * Reports freemium panel opening events
+   * Only sends data if both VS Code telemetry and custom telemetry are enabled
+   */
+  reportFreemiumPanelOpening(): Promise<void>;
+
+  /**
+   * Reports freemium panel CTA button clicks
+   * Only sends data if both VS Code telemetry and custom telemetry are enabled
+   */
+  reportFreemiumPanelCtaClick(
+    ctaType: string,
+    ctaText: string,
+    ctaUrl: string,
+  ): Promise<void>;
+
+  /**
    * Dispose of any resources and event listeners
    * Should be called when the extension is deactivated
    */
@@ -70,4 +86,31 @@ export interface CommandsInsertedAnalyticsData {
   vscodeVersion?: string;
   platform?: string;
   updatedAt: Date;
+}
+
+/**
+ * Data structure for freemium panel opening analytics
+ */
+export interface FreemiumPanelOpeningAnalyticsData {
+  developerId: string;
+  openedAt: Date;
+  timezoneOffset?: number;
+  extensionVersion?: string;
+  vscodeVersion?: string;
+  platform?: string;
+}
+
+/**
+ * Data structure for freemium panel CTA click analytics
+ */
+export interface FreemiumPanelCtaClickAnalyticsData {
+  developerId: string;
+  clickedAt: Date;
+  ctaType: string;
+  ctaText: string;
+  ctaUrl: string;
+  timezoneOffset?: number;
+  extensionVersion?: string;
+  vscodeVersion?: string;
+  platform?: string;
 }

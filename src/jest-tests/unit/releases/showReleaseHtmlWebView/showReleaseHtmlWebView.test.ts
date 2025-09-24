@@ -72,6 +72,8 @@ describe('showReleaseHtmlWebView', () => {
       reportFreshInstall: jest.fn(),
       reportUpdate: jest.fn(),
       reportCommandsInserted: jest.fn(),
+      reportFreemiumPanelOpening: jest.fn(),
+      reportFreemiumPanelCtaClick: jest.fn(),
       dispose: jest.fn(),
     };
     mockCreateTelemetryService.mockReturnValue(mockTelemetryService);

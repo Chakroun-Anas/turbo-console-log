@@ -56,6 +56,8 @@ describe('showReleaseStatusBar', () => {
 
     // Create mock status bar item
     mockStatusBarItem = {
+      id: 'test-status-bar',
+      name: 'Test Status Bar',
       text: '',
       tooltip: '',
       command: undefined,
@@ -66,6 +68,7 @@ describe('showReleaseStatusBar', () => {
       priority: 100,
       accessibilityInformation: undefined,
       color: undefined,
+      backgroundColor: undefined,
     };
 
     // Create mock disposable
