@@ -9,6 +9,11 @@ export function activateFreemiumMode(): void {
   );
   vscode.commands.executeCommand(
     'setContext',
+    'turboConsoleLog:isLauncherMode',
+    false,
+  );
+  vscode.commands.executeCommand(
+    'setContext',
     'turboConsoleLog:isInitialized',
     true,
   );

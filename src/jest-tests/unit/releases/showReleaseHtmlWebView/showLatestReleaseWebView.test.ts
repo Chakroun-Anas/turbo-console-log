@@ -54,6 +54,8 @@ describe('showLatestReleaseWebView', () => {
       reportUpdate: jest.fn(),
       reportFreshInstall: jest.fn(),
       reportCommandsInserted: jest.fn(),
+      reportFreemiumPanelOpening: jest.fn(),
+      reportFreemiumPanelCtaClick: jest.fn(),
       dispose: jest.fn(),
     });
   });

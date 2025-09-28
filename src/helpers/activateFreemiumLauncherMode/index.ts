@@ -1,0 +1,1 @@
+export { activateFreemiumLauncherMode } from './activateFreemiumLauncherMode';

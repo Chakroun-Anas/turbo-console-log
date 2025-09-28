@@ -2,10 +2,10 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console log or custom log functions.",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "publisher": "ChakrounAnas",
   "engines": {
-    "vscode": "^1.50.0"
+    "vscode": "^1.94.0"
   },
   "icon": "images/icon.png",
   "categories": [
@@ -136,6 +136,11 @@
             "telemetry",
             "usesOnlineServices"
           ]
+        },
+        "turboConsoleLog.dynamicFreemiumPanel": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable dynamic content fetching for the freemium panel. Recommended to keep enabled for the latest features and updates."
         }
       }
     },
@@ -291,11 +296,17 @@
           "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro"
         },
         {
-          "id": "turboConsoleLogFreemiumPanel",
+          "id": "turboConsoleLogFreemiumLauncher",
           "name": "Become Pro",
           "icon": "images/icon.png",
+          "when": "turboConsoleLog:isInitialized && !turboConsoleLog:isPro && !turboConsoleLog:isRepairMode && turboConsoleLog:isLauncherMode"
+        },
+        {
+          "id": "turboConsoleLogFreemiumPanel",
+          "name": "Turbo Console Log",
+          "icon": "images/icon.png",
           "type": "webview",
-          "when": "turboConsoleLog:isInitialized && !turboConsoleLog:isPro && !turboConsoleLog:isRepairMode"
+          "when": "turboConsoleLog:isInitialized && !turboConsoleLog:isPro && !turboConsoleLog:isRepairMode && !turboConsoleLog:isLauncherMode"
         },
         {
           "id": "turboConsoleLogBundleRepairPanel",
@@ -351,7 +362,7 @@
     "@types/jest": "^30.0.0",
     "@types/mocha": "^8.0.0",
     "@types/node": "^24.0.3",
-    "@types/vscode": "^1.50.0",
+    "@types/vscode": "^1.94.0",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "@vscode/test-electron": "^2.4.1",

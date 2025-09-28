@@ -19,6 +19,9 @@ jest.mock('../../pro', () => {
       static viewType = 'mocked.panel.proBundleRepairPanel';
       updateView = updateViewMock;
     },
+    TurboFreemiumLauncherPanel: class {
+      static viewType = 'mocked.panel.freemiumLauncherPanel';
+    },
   };
 });
 
@@ -465,7 +468,7 @@ describe('activate - command registration', () => {
 
     await activate(fakeContext);
 
-    expect(helpers.activateFreemiumMode).toHaveBeenCalledTimes(1);
+    expect(helpers.activateFreemiumLauncherMode).toHaveBeenCalledTimes(1);
     expect(proUtilities.runProBundle).not.toHaveBeenCalled();
     expect(proUtilities.updateProBundle).not.toHaveBeenCalled();
   });
