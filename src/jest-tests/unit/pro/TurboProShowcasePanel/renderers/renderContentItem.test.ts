@@ -95,6 +95,7 @@ describe('renderContentItem', () => {
       title: 'Test Article',
       description: 'Article description',
       illustrationSrc: 'https://example.com/image.jpg',
+      url: 'https://example.com/test-article',
     };
     const content: DynamicFreemiumPanelContent = { type: 'article', component };
 

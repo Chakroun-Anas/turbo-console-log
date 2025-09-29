@@ -72,27 +72,29 @@ describe('getStaticHtml', () => {
   it('should contain static dynamic panel content', () => {
     const result = getStaticHtml();
 
-    expect(result).toContain('🎉 New Dynamic Panel!');
-    expect(result).toContain('This panel now updates automatically with the latest Turbo Console Log news');
+    expect(result).toContain('🚀 Stay Ahead with Turbo!');
+    expect(result).toContain(
+      'The latest feature previews, Pro upgrade events, and key news, delivered automatically',
+    );
     expect(result).toContain('class="dynamic-content"');
   });
 
-  it('should contain static survey section', () => {
+  it('should contain countdown section', () => {
     const result = getStaticHtml();
 
-    expect(result).toContain('🚀 Shape Turbo&#x27;s Future');
-    expect(result).toContain('Help us decide what&#x27;s next');
-    expect(result).toContain('class="survey-section"');
-    expect(result).toContain('class="survey-cta"');
+    expect(result).toContain('Coming in v3.8.0: Hide Logs in the Pro Panel');
+    expect(result).toContain('Sneak peek at v3.8.0');
+    expect(result).toContain('class="countdown-widget"');
+    expect(result).toContain('class="countdown-cta"');
   });
 
-  it('should include survey onclick handler with correct URL', () => {
+  it('should include countdown onclick handler with correct URL', () => {
     const result = getStaticHtml();
 
     expect(result).toContain(
-      "onclick=\"openUrlWithTracking('https://www.turboconsolelog.io/community-survey', 'survey', '📝 Take Survey'); return false;\"",
+      "onclick=\"openUrlWithTracking('https://www.turboconsolelog.io/articles/v380-hide-logs-teaser', 'countdown', 'Sneak peek at v3.8.0'); return false;\"",
     );
-    expect(result).toContain('📝 Take Survey');
+    expect(result).toContain('Sneak peek at v3.8.0');
     expect(result).toContain('style="cursor: pointer;"');
   });
 
@@ -100,7 +102,10 @@ describe('getStaticHtml', () => {
     const result = getStaticHtml();
 
     expect(result).toContain('📚 Featured Turbo Articles');
-    expect(result).toContain('Deep dive into how Turbo&#x27;s AST engine');
+    expect(result).toContain(
+      'Debugging with Memory: Why Turbo PRO Panel Matters!',
+    );
+    expect(result).toContain('Turbo PRO v2 Benchmark: Real-World Performance');
     expect(result).toContain('class="articles-grid"');
   });
 
@@ -108,9 +113,11 @@ describe('getStaticHtml', () => {
     const result = getStaticHtml();
 
     expect(result).toContain(
-      "onclick=\"openUrlWithTracking('https://www.turboconsolelog.io/articles/turbo-full-ast-engine', 'article', 'Understanding the Full AST Engine')\"",
+      "onclick=\"openUrlWithTracking('https://www.turboconsolelog.io/articles/debugging-memory', 'article', 'Debugging with Memory: Why Turbo PRO Panel Matters!')\"",
     );
-    expect(result).toContain('Understanding the Full AST Engine');
+    expect(result).toContain(
+      'Debugging with Memory: Why Turbo PRO Panel Matters!',
+    );
   });
 
   it('should maintain proper HTML structure', () => {
@@ -130,14 +137,13 @@ describe('getStaticHtml', () => {
     const result = getStaticHtml();
 
     const dynamicContentIndex = result.indexOf('class="dynamic-content"');
-    const surveyIndex = result.indexOf('class="survey-section"');
-    const commandsIndex = result.indexOf('class="commands-table"');
+    const countdownIndex = result.indexOf('class="countdown-widget"');
     const articlesIndex = result.indexOf('class="articles-grid"');
 
-    // Verify order: dynamic content, then survey, then commands table, then articles
-    expect(dynamicContentIndex).toBeLessThan(surveyIndex);
-    expect(surveyIndex).toBeLessThan(commandsIndex);
-    expect(commandsIndex).toBeLessThan(articlesIndex);
+    // Verify order: dynamic content, then countdown, then articles
+    expect(dynamicContentIndex).toBeLessThan(countdownIndex);
+    expect(countdownIndex).toBeLessThan(articlesIndex);
+    expect(articlesIndex).toBeGreaterThan(-1);
   });
 
   it('should handle different style configurations', () => {

@@ -250,7 +250,7 @@ describe('manageDynamicFreemiumPanel', () => {
         expect.anything(),
       );
       expect(consoleInfoSpy).toHaveBeenCalledWith(
-        'Dynamic freemium content unchanged, skipping update',
+        'Dynamic freemium content unchanged, badge state preserved from previous cycles',
       );
     });
   });
@@ -277,12 +277,18 @@ describe('manageDynamicFreemiumPanel', () => {
       });
     });
 
-    it('should not show badge when shouldShowBadge returns false', async () => {
-      mockReadFromGlobalState.mockReturnValue(undefined);
+    it('should not show badge when content unchanged and shouldShowBadge returns false', async () => {
+      // Mock existing content with same date
+      mockReadFromGlobalState.mockImplementation((context, key) => {
+        if (key === GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_CONTENT) {
+          return { date: '2025-09-27', tooltip: 'Existing content' };
+        }
+        return undefined;
+      });
 
       const mockResponse = {
         data: {
-          date: '2025-09-27',
+          date: '2025-09-27', // Same date as existing
           tooltip: 'Already seen content',
           content: [],
         },
@@ -292,6 +298,7 @@ describe('manageDynamicFreemiumPanel', () => {
 
       await manageDynamicFreemiumPanel(mockContext, mockTreeView);
 
+      // Badge should not be set when content is unchanged
       expect(mockTreeView.badge).toBeUndefined();
     });
 

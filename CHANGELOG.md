@@ -2,6 +2,26 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.7.2] - 2025-09-29
+
+### 🔧 Bug Fixes & Improvements
+
+#### ⚠️ Known Issue (Harmless)
+
+**VS Code Error Notification**: When upgrading from v3.7.0 to v3.7.1 or v3.7.2, some users may briefly see an error:  
+`"No view is registered with id: turboConsoleLogFreemiumLauncher"`.
+
+- **Harmless**: This does not affect the extension’s functionality
+- **One-time only**: Appears during the upgrade from v3.7.0 and will not return
+- **Why it happens**: Due to how VS Code loads new views before the extension activates
+- **No action needed**: You can safely dismiss the message
+
+#### 🛠️ Technical Improvements
+
+- Improved reliability of the dynamic panel content system
+- Fixed article URL handling for dynamic panel content
+- Strengthened type safety for panel component interfaces
+
 ## [3.7.1] - 2025-09-28
 
 ### 🎉 Dynamic Freemium Panel & v3.8.0 Preview

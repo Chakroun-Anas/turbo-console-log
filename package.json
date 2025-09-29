@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console log or custom log functions.",
-  "version": "3.7.1",
+  "version": "3.7.2",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.94.0"
