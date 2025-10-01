@@ -45,12 +45,13 @@ export function getCommonStyles(): string {
         /* Countdown Widget Styles */
         .countdown-widget {
           margin-bottom: 24px;
-          padding: 20px;
+          padding: 28px 20px;
           background: rgba(30, 30, 30, 0.8);
           border-radius: 12px;
           border: 2px solid #FFC947;
           position: relative;
           overflow: hidden;
+          min-height: 180px;
         }
         
         .countdown-widget::before {
@@ -75,9 +76,9 @@ export function getCommonStyles(): string {
         
         .countdown-title {
           color: #FF6B6B;
-          font-size: 16px;
+          font-size: 18px;
           font-weight: bold;
-          margin-bottom: 12px;
+          margin-bottom: 16px;
           text-align: center;
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
         }
@@ -184,8 +185,9 @@ export function getCommonStyles(): string {
         }
         .article-image {
           width: 100%;
-          height: 80px;
+          height: 110px;
           object-fit: cover;
+          object-position: center 10%;
           border-radius: 6px;
           margin-bottom: 8px;
         }

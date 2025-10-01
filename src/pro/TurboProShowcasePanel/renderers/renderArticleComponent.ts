@@ -10,7 +10,7 @@ export function renderArticleComponent(
   component: ArticlePanelComponent,
 ): string {
   return `
-      <div class="article-card" onclick="openUrlWithTracking('https://www.turboconsolelog.io/articles/turbo-full-ast-engine', 'article', '${escapeHtml(component.title)}')">
+      <div class="article-card" onclick="openUrlWithTracking('${escapeHtml(component.url)}', 'article', '${escapeHtml(component.title)}')">
         <img src="${escapeHtml(component.illustrationSrc)}" alt="${escapeHtml(component.title)}" class="article-image" />
         <div class="article-title">${escapeHtml(component.title)}</div>
         <div class="article-desc">${escapeHtml(component.description)}</div>

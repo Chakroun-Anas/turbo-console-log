@@ -58,9 +58,12 @@ export async function manageDynamicFreemiumPanel(
         const lastPanelAccess = readFromGlobalState(
           context,
           GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_LAST_ACCESS,
-        ) as string | undefined; // Only show badge if content exists and user hasn't seen it yet
+        ) as string | undefined;
+
+        // Only show badge if content exists with valid date and user hasn't seen it yet
         if (
           existingContent &&
+          existingContent.date &&
           launcherView &&
           shouldShowBadge(existingContent.date, lastPanelAccess)
         ) {
@@ -95,7 +98,7 @@ export async function manageDynamicFreemiumPanel(
         ? new Date(previousContent.date).getTime()
         : 0;
 
-      // Only update storage and badge if content has actually changed
+      // Only update storage if content has actually changed
       if (newContentDate !== previousContentDate) {
         // Store the API response in global storage for TurboProShowcasePanel to use
         writeToGlobalState(
@@ -108,22 +111,16 @@ export async function manageDynamicFreemiumPanel(
           'Dynamic freemium content updated with new date:',
           new Date(newContentDate),
         );
-      } else {
-        console.info('Dynamic freemium content unchanged, skipping update');
-      }
 
-      // Check if we should show badge for current content (new or existing)
-      const lastPanelAccess = readFromGlobalState(
-        context,
-        GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_LAST_ACCESS,
-      ) as string | undefined;
-
-      if (shouldShowBadge(response.data.date, lastPanelAccess)) {
-        // Update badge value from 0 to 1 when content is newer than last access
+        // For genuinely new content, always show badge regardless of last access
         launcherView.badge = {
           value: 1,
           tooltip: response.data.tooltip || 'New content in Turbo panel',
         };
+      } else {
+        console.info(
+          'Dynamic freemium content unchanged, badge state preserved from previous cycles',
+        );
       }
 
       // Always update the last fetch date after successful API call

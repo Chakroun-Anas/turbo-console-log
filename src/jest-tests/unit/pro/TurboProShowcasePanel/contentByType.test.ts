@@ -100,6 +100,7 @@ describe('contentByType', () => {
       title: 'Test Article',
       description: 'Article description',
       illustrationSrc: 'https://example.com/image.jpg',
+      url: 'https://example.com/test-article',
     };
     const content: DynamicFreemiumPanelContent[] = [
       { type: 'article', component: articleComponent },
@@ -213,6 +214,7 @@ describe('contentByType', () => {
       title: 'Article Title',
       description: 'Article description',
       illustrationSrc: 'https://example.com/image.jpg',
+      url: 'https://example.com/article',
     };
     const surveyComponent: SurveyPanelComponent = {
       title: 'Survey Title',
@@ -260,11 +262,13 @@ describe('contentByType', () => {
       title: 'Article 1',
       description: 'First article',
       illustrationSrc: 'https://example.com/1.jpg',
+      url: 'https://example.com/article1',
     };
     const article2: ArticlePanelComponent = {
       title: 'Article 2',
       description: 'Second article',
       illustrationSrc: 'https://example.com/2.jpg',
+      url: 'https://example.com/article2',
     };
 
     const content: DynamicFreemiumPanelContent[] = [

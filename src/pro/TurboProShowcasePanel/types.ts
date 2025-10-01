@@ -8,6 +8,7 @@ export interface ArticlePanelComponent {
   title: string;
   description: string;
   illustrationSrc: string;
+  url: string;
 }
 
 export interface CountDownPanelComponent {
