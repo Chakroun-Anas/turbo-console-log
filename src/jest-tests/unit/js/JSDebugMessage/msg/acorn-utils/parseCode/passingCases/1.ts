@@ -1,0 +1,22 @@
+export default {
+  name: 'simple Node.js script',
+  sourceCode: [
+    "const fs = require('fs');",
+    '',
+    'function readFile(path) {',
+    '  try {',
+    "    const data = fs.readFileSync(path, 'utf8');",
+    "    console.log('File content:', data);",
+    '    return data;',
+    '  } catch (error) {',
+    "    console.error('Error reading file:', error.message);",
+    '    return null;',
+    '  }',
+    '}',
+    '',
+    "const result = readFile('./package.json');",
+    'if (result) {',
+    "  console.log('Successfully read file');",
+    '}',
+  ],
+};

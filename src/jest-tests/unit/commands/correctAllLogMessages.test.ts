@@ -79,7 +79,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -123,7 +123,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -166,7 +166,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -208,7 +208,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -253,7 +253,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -302,7 +302,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange1],
@@ -356,7 +356,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -405,7 +405,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange1],
@@ -453,7 +453,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -494,7 +494,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -537,7 +537,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -574,7 +574,7 @@ describe('correctAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([]);
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([]);
 
         vscode.window.activeTextEditor = mockEditor;
 

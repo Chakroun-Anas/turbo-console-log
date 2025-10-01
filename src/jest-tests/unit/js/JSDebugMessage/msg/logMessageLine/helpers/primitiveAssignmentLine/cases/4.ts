@@ -1,7 +1,7 @@
 export default {
   name: 'identifier assignment',
-  lines: ['const copy = other;', 'return copy;'],
-  selectionLine: 0,
+  lines: ['function test() {', '  const copy = other;', '  return copy;', '}'],
+  selectionLine: 1,
   variableName: 'copy',
-  expectedLine: 1,
+  expectedLine: 2,
 };

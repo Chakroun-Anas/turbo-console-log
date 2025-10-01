@@ -1,6 +1,6 @@
-import ts from 'typescript';
 import { rawPropertyAccessChecker } from '@/debug-message/js/JSDebugMessage/msg/logMessage/helpers/rawPropertyAccessChecker';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import passingCases from './passingCases';
 import failingCases from './failingCases';
 
@@ -8,15 +8,9 @@ describe('rawPropertyAccessChecker', () => {
   for (const test of passingCases) {
     it(`should detect property access – ${test.name}`, () => {
       const document = makeTextDocument(test.lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = rawPropertyAccessChecker(
-        sourceFile,
+        ast,
         document,
         test.selectionLine,
         test.selectedText,
@@ -29,15 +23,9 @@ describe('rawPropertyAccessChecker', () => {
   for (const test of failingCases) {
     it(`should not detect property access – ${test.name}`, () => {
       const document = makeTextDocument(test.lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = rawPropertyAccessChecker(
-        sourceFile,
+        ast,
         document,
         test.selectionLine,
         test.selectedText,

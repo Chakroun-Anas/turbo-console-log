@@ -1,26 +1,20 @@
-import ts from 'typescript';
 import { rawPropertyAccessLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import testCases from './cases';
 
 describe('rawPropertyAccessLine', () => {
-  for (const test of testCases) {
-    it(`should return correct insertion line – ${test.name}`, () => {
-      const doc = makeTextDocument(test.lines);
-      const sourceFile = ts.createSourceFile(
-        doc.fileName,
-        doc.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+  for (const testCase of testCases) {
+    it(testCase.name, () => {
+      const document = makeTextDocument(testCase.lines);
+      const ast = parseCode(document.getText())!;
       const result = rawPropertyAccessLine(
-        sourceFile,
-        doc,
-        test.selectionLine,
-        test.variableName,
+        ast,
+        document,
+        testCase.selectionLine,
+        testCase.variableName,
       );
-      expect(result).toBe(test.expectedLine);
+      expect(result).toBe(testCase.expectedLine);
     });
   }
 });

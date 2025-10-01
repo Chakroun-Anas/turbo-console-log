@@ -1,55 +1,74 @@
 import { LogMessage } from '@/entities';
-import ts from 'typescript';
-import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  isVariableDeclaration,
+  isIdentifier,
+  isFunctionExpression,
+  isArrowFunctionExpression,
+  isExpressionStatement,
+  isAssignmentExpression,
+  isMemberExpression,
+  walk,
+} from '../../acorn-utils';
 
 export function namedFunctionAssignmentChecker(
-  sourceFile: ts.SourceFile,
-  document: TextDocument,
+  ast: AcornNode,
   selectionLine: number,
   variableName: string,
 ) {
   let isChecked = false;
 
-  ts.forEachChild(sourceFile, function visit(node): void {
-    if (isChecked) return;
+  if (!ast) {
+    return {
+      isChecked: false,
+      metadata: { line: selectionLine } as Pick<LogMessage, 'metadata'>,
+    };
+  }
+
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (isChecked) return true;
 
     // Handle: const myFn = function() {} or const myFn = () => {}
-    if (ts.isVariableStatement(node)) {
-      for (const decl of node.declarationList.declarations) {
+    if (isVariableDeclaration(node)) {
+      for (const decl of node.declarations) {
+        if (!decl.loc) continue;
+
+        const line = decl.loc.start.line - 1; // Acorn uses 1-based lines
+        if (line !== selectionLine) continue;
+
+        const { id, init } = decl;
         if (
-          ts.isIdentifier(decl.name) &&
-          decl.name.text === variableName &&
-          decl.initializer &&
-          (ts.isFunctionExpression(decl.initializer) ||
-            ts.isArrowFunction(decl.initializer))
+          isIdentifier(id) &&
+          id.name === variableName &&
+          init &&
+          (isFunctionExpression(init) || isArrowFunctionExpression(init))
         ) {
-          const line = document.positionAt(decl.getStart()).line;
-          if (line === selectionLine) {
-            isChecked = true;
-            return;
-          }
+          isChecked = true;
+          return true;
         }
       }
     }
 
     // Handle: obj.myFn = function() {} or obj.myFn = () => {}
-    if (
-      ts.isExpressionStatement(node) &&
-      ts.isBinaryExpression(node.expression) &&
-      ts.isPropertyAccessExpression(node.expression.left) &&
-      ts.isIdentifier(node.expression.left.name) &&
-      node.expression.left.name.text === variableName &&
-      (ts.isFunctionExpression(node.expression.right) ||
-        ts.isArrowFunction(node.expression.right))
-    ) {
-      const line = document.positionAt(node.getStart()).line;
-      if (line === selectionLine) {
+    if (isExpressionStatement(node)) {
+      const expr = node.expression;
+      if (!expr.loc) return;
+
+      const line = expr.loc.start.line - 1;
+      if (line !== selectionLine) return;
+
+      if (
+        isAssignmentExpression(expr) &&
+        isMemberExpression(expr.left) &&
+        isIdentifier(expr.left.property) &&
+        expr.left.property.name === variableName &&
+        (isFunctionExpression(expr.right) ||
+          isArrowFunctionExpression(expr.right))
+      ) {
         isChecked = true;
-        return;
+        return true;
       }
     }
-
-    ts.forEachChild(node, visit);
   });
 
   return {

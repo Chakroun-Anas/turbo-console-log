@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 import { Command, Message } from '../entities';
 
 export function uncommentAllLogMessagesCommand(): Command {
@@ -13,8 +14,10 @@ export function uncommentAllLogMessagesCommand(): Command {
         return;
       }
       const document: vscode.TextDocument = editor.document;
-      const logMessages: Message[] = debugMessage.detectAll(
-        document,
+      const logMessages: Message[] = await debugMessage.detectAll(
+        fs,
+        vscode,
+        document.uri.fsPath,
         logFunction,
         logMessagePrefix,
         delimiterInsideMessage,

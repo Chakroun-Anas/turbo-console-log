@@ -1,35 +1,59 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  isIdentifier,
+  isMemberExpression,
+  walk,
+} from '../../acorn-utils';
 
 /**
  * Comprehensive helper function to check if a node contains the target variable reference
  * Handles both variable name matching and position-based matching for complex expressions
  */
 function containsVariable(
-  node: ts.Node,
+  node: AcornNode,
   variableName: string,
+  code: string,
   document?: TextDocument,
   selectionLine?: number,
+  visited = new Set<AcornNode>(),
+  depth = 0,
 ): boolean {
   if (!node) return false;
+
+  // Safeguards against infinite recursion
+  const MAX_DEPTH = 1000;
+
+  if (depth >= MAX_DEPTH) {
+    console.warn(
+      `containsVariable: Hit max depth limit (${MAX_DEPTH}) - preventing infinite recursion`,
+    );
+    return false;
+  }
+
+  if (visited.has(node)) {
+    return false;
+  }
+
+  visited.add(node);
 
   // If we have document and selectionLine, also check for position-based matching
   // This handles cases where the entire expression/object is selected
   if (document && selectionLine !== undefined) {
-    const start = document.positionAt(node.getStart()).line;
-    const end = document.positionAt(node.getEnd()).line;
+    const start = document.positionAt(node.start).line;
+    const end = document.positionAt(node.end).line;
 
     // If the selection line is within this node's range, it could be the target
     if (selectionLine >= start && selectionLine <= end) {
       // For complex expressions like object literals, array literals, etc.
       // we consider them a match if the selection is within their bounds
       if (
-        ts.isObjectLiteralExpression(node) ||
-        ts.isArrayLiteralExpression(node) ||
-        ts.isCallExpression(node) ||
-        ts.isBinaryExpression(node) ||
-        ts.isConditionalExpression(node) ||
-        ts.isTemplateExpression(node)
+        node.type === 'ObjectExpression' ||
+        node.type === 'ArrayExpression' ||
+        node.type === 'CallExpression' ||
+        node.type === 'BinaryExpression' ||
+        node.type === 'ConditionalExpression' ||
+        node.type === 'TemplateLiteral'
       ) {
         // Check if this node spans exactly the selection or if it's a reasonable match
         // We'll be permissive here since the user explicitly selected this content
@@ -39,116 +63,201 @@ function containsVariable(
   }
 
   // 1. Simple identifier: variableName
-  if (ts.isIdentifier(node)) {
-    return node.text === variableName;
+  if (isIdentifier(node)) {
+    return (node as unknown as { name: string }).name === variableName;
   }
 
   // 2. Property access: object.property, person.name, etc.
-  if (ts.isPropertyAccessExpression(node)) {
+  if (isMemberExpression(node)) {
     const fullPath = getPropertyAccessPath(node);
-    return (
-      fullPath === variableName ||
-      containsVariable(node.expression, variableName, document, selectionLine)
+    if (fullPath === variableName) return true;
+
+    const memberNode = node as unknown as {
+      object: AcornNode;
+      property: AcornNode;
+    };
+    return containsVariable(
+      memberNode.object,
+      variableName,
+      code,
+      document,
+      selectionLine,
     );
   }
 
   // 3. Element access: object['key'], array[index], etc.
-  if (ts.isElementAccessExpression(node)) {
+  if (node.type === 'MemberExpression') {
+    const memberNode = node as unknown as {
+      object: AcornNode;
+      property: AcornNode;
+      computed: boolean;
+    };
+    if (memberNode.computed) {
+      return (
+        containsVariable(
+          memberNode.object,
+          variableName,
+          code,
+          document,
+          selectionLine,
+        ) ||
+        containsVariable(
+          memberNode.property,
+          variableName,
+          code,
+          document,
+          selectionLine,
+        )
+      );
+    }
+  }
+
+  // 4. Call expressions: func(), object.method(), etc.
+  if (node.type === 'CallExpression') {
+    const callNode = node as unknown as {
+      callee: AcornNode;
+      arguments: AcornNode[];
+    };
+    if (
+      containsVariable(
+        callNode.callee,
+        variableName,
+        code,
+        document,
+        selectionLine,
+      )
+    ) {
+      return true;
+    }
+    return callNode.arguments.some((arg) =>
+      containsVariable(
+        arg,
+        variableName,
+        code,
+        document,
+        selectionLine,
+        visited,
+        depth + 1,
+      ),
+    );
+  }
+
+  // 5. Binary expressions: a + b, x === y, etc.
+  if (node.type === 'BinaryExpression' || node.type === 'LogicalExpression') {
+    const binaryNode = node as unknown as { left: AcornNode; right: AcornNode };
     return (
       containsVariable(
-        node.expression,
+        binaryNode.left,
         variableName,
+        code,
         document,
         selectionLine,
       ) ||
       containsVariable(
-        node.argumentExpression,
+        binaryNode.right,
         variableName,
+        code,
         document,
         selectionLine,
       )
     );
   }
 
-  // 4. Call expressions: func(), object.method(), etc.
-  if (ts.isCallExpression(node)) {
-    if (
-      containsVariable(node.expression, variableName, document, selectionLine)
-    )
-      return true;
-    return node.arguments.some((arg) =>
-      containsVariable(arg, variableName, document, selectionLine),
-    );
-  }
-
-  // 5. Binary expressions: a + b, x === y, etc.
-  if (ts.isBinaryExpression(node)) {
-    return (
-      containsVariable(node.left, variableName, document, selectionLine) ||
-      containsVariable(node.right, variableName, document, selectionLine)
-    );
-  }
-
-  // 6. Prefix/Postfix unary expressions: !flag, ++counter, typeof x, etc.
-  if (ts.isPrefixUnaryExpression(node)) {
+  // 6. Unary expressions: !flag, ++counter, typeof x, etc.
+  if (node.type === 'UnaryExpression' || node.type === 'UpdateExpression') {
+    const unaryNode = node as unknown as { argument: AcornNode };
     return containsVariable(
-      node.operand,
+      unaryNode.argument,
       variableName,
-      document,
-      selectionLine,
-    );
-  }
-  if (ts.isPostfixUnaryExpression(node)) {
-    return containsVariable(
-      node.operand,
-      variableName,
+      code,
       document,
       selectionLine,
     );
   }
 
   // 7. Conditional (ternary) expressions: condition ? a : b
-  if (ts.isConditionalExpression(node)) {
+  if (node.type === 'ConditionalExpression') {
+    const ternaryNode = node as unknown as {
+      test: AcornNode;
+      consequent: AcornNode;
+      alternate: AcornNode;
+    };
     return (
-      containsVariable(node.condition, variableName, document, selectionLine) ||
-      containsVariable(node.whenTrue, variableName, document, selectionLine) ||
-      containsVariable(node.whenFalse, variableName, document, selectionLine)
+      containsVariable(
+        ternaryNode.test,
+        variableName,
+        code,
+        document,
+        selectionLine,
+      ) ||
+      containsVariable(
+        ternaryNode.consequent,
+        variableName,
+        code,
+        document,
+        selectionLine,
+      ) ||
+      containsVariable(
+        ternaryNode.alternate,
+        variableName,
+        code,
+        document,
+        selectionLine,
+      )
     );
   }
 
   // 8. Array literals: [a, b, c]
-  if (ts.isArrayLiteralExpression(node)) {
-    return node.elements.some((element) =>
-      containsVariable(element, variableName, document, selectionLine),
+  if (node.type === 'ArrayExpression') {
+    const arrayNode = node as unknown as { elements: AcornNode[] };
+    return arrayNode.elements.some((element) =>
+      element
+        ? containsVariable(
+            element,
+            variableName,
+            code,
+            document,
+            selectionLine,
+            visited,
+            depth + 1,
+          )
+        : false,
     );
   }
 
   // 9. Object literals: { key: value }
-  if (ts.isObjectLiteralExpression(node)) {
-    return node.properties.some((prop) => {
-      if (ts.isPropertyAssignment(prop)) {
+  if (node.type === 'ObjectExpression') {
+    const objectNode = node as unknown as { properties: AcornNode[] };
+    return objectNode.properties.some((prop) => {
+      if (prop.type === 'Property') {
+        const propNode = prop as unknown as {
+          key: AcornNode;
+          value: AcornNode;
+          shorthand: boolean;
+        };
         return (
-          containsVariable(prop.name, variableName, document, selectionLine) ||
           containsVariable(
-            prop.initializer,
+            propNode.key,
             variableName,
+            code,
+            document,
+            selectionLine,
+          ) ||
+          containsVariable(
+            propNode.value,
+            variableName,
+            code,
             document,
             selectionLine,
           )
         );
       }
-      if (ts.isShorthandPropertyAssignment(prop)) {
+      if (prop.type === 'SpreadElement') {
+        const spreadNode = prop as unknown as { argument: AcornNode };
         return containsVariable(
-          prop.name,
+          spreadNode.argument,
           variableName,
-          document,
-          selectionLine,
-        );
-      }
-      if (ts.isSpreadAssignment(prop)) {
-        return containsVariable(
-          prop.expression,
-          variableName,
+          code,
           document,
           selectionLine,
         );
@@ -158,98 +267,219 @@ function containsVariable(
   }
 
   // 10. Template literals: `Hello ${name}`
-  if (ts.isTemplateExpression(node)) {
-    return node.templateSpans.some((span) =>
-      containsVariable(span.expression, variableName, document, selectionLine),
+  if (node.type === 'TemplateLiteral') {
+    const templateNode = node as unknown as { expressions: AcornNode[] };
+    return templateNode.expressions.some((expr) =>
+      containsVariable(
+        expr,
+        variableName,
+        code,
+        document,
+        selectionLine,
+        visited,
+        depth + 1,
+      ),
     );
   }
 
-  // 11. Parenthesized expressions: (expression)
-  if (ts.isParenthesizedExpression(node)) {
+  // 11. Tagged template literals: tag`template`
+  if (node.type === 'TaggedTemplateExpression') {
+    const taggedNode = node as unknown as { tag: AcornNode; quasi: AcornNode };
+    return (
+      containsVariable(
+        taggedNode.tag,
+        variableName,
+        code,
+        document,
+        selectionLine,
+      ) ||
+      containsVariable(
+        taggedNode.quasi,
+        variableName,
+        code,
+        document,
+        selectionLine,
+      )
+    );
+  }
+
+  // 12. Spread elements: ...array
+  if (node.type === 'SpreadElement') {
+    const spreadNode = node as unknown as { argument: AcornNode };
     return containsVariable(
-      node.expression,
+      spreadNode.argument,
       variableName,
+      code,
       document,
       selectionLine,
     );
   }
 
-  // 12. Type assertions: expr as Type, <Type>expr
-  if (ts.isAsExpression(node) || ts.isTypeAssertionExpression(node)) {
+  // 13. Await expressions: await promise
+  if (node.type === 'AwaitExpression') {
+    const awaitNode = node as unknown as { argument: AcornNode };
     return containsVariable(
-      node.expression,
+      awaitNode.argument,
       variableName,
+      code,
       document,
       selectionLine,
     );
   }
 
-  // 13. Spread elements: ...array
-  if (ts.isSpreadElement(node)) {
-    return containsVariable(
-      node.expression,
-      variableName,
-      document,
-      selectionLine,
-    );
-  }
-
-  // 14. Await expressions: await promise
-  if (ts.isAwaitExpression(node)) {
-    return containsVariable(
-      node.expression,
-      variableName,
-      document,
-      selectionLine,
-    );
-  }
-
-  // 15. Arrow functions: (param) => expr
-  if (ts.isArrowFunction(node)) {
+  // 14. Arrow functions: (param) => expr
+  if (node.type === 'ArrowFunctionExpression') {
+    const arrowNode = node as unknown as {
+      params: AcornNode[];
+      body: AcornNode;
+    };
     // Check if variable is used in the function body (but not as a parameter)
-    const paramNames = node.parameters.map((p) =>
-      ts.isIdentifier(p.name) ? p.name.text : '',
-    );
+    const paramNames = arrowNode.params
+      .filter((p) => isIdentifier(p))
+      .map((p) => (p as { name: string }).name);
     if (paramNames.includes(variableName)) return false; // It's a parameter, not external variable
 
-    return containsVariable(node.body, variableName, document, selectionLine);
-  }
-
-  // 16. Function expressions: function() { ... }
-  if (ts.isFunctionExpression(node)) {
-    const paramNames = node.parameters.map((p) =>
-      ts.isIdentifier(p.name) ? p.name.text : '',
-    );
-    if (paramNames.includes(variableName)) return false;
-
-    return containsVariable(node.body, variableName, document, selectionLine);
-  }
-
-  // 17. Block statements: { ... }
-  if (ts.isBlock(node)) {
-    return node.statements.some((stmt) =>
-      containsVariable(stmt, variableName, document, selectionLine),
-    );
-  }
-
-  // 18. Expression statements
-  if (ts.isExpressionStatement(node)) {
     return containsVariable(
-      node.expression,
+      arrowNode.body,
       variableName,
+      code,
       document,
       selectionLine,
     );
   }
 
-  // 19. Recursively check all child nodes for any other cases
-  let found = false;
-  ts.forEachChild(node, (child) => {
+  // 15. Function expressions: function() { ... }
+  if (node.type === 'FunctionExpression') {
+    const funcNode = node as unknown as {
+      params: AcornNode[];
+      body: AcornNode;
+    };
+    const paramNames = funcNode.params
+      .filter((p) => isIdentifier(p))
+      .map((p) => (p as { name: string }).name);
+    if (paramNames.includes(variableName)) return false;
+
+    return containsVariable(
+      funcNode.body,
+      variableName,
+      code,
+      document,
+      selectionLine,
+    );
+  }
+
+  // 16. Block statements: { ... }
+  if (node.type === 'BlockStatement') {
+    const blockNode = node as unknown as { body: AcornNode[] };
+    return blockNode.body.some((stmt) =>
+      containsVariable(
+        stmt,
+        variableName,
+        code,
+        document,
+        selectionLine,
+        visited,
+        depth + 1,
+      ),
+    );
+  }
+
+  // 17. Expression statements
+  if (node.type === 'ExpressionStatement') {
+    const exprNode = node as unknown as { expression: AcornNode };
+    return containsVariable(
+      exprNode.expression,
+      variableName,
+      code,
+      document,
+      selectionLine,
+    );
+  }
+
+  // 18. Sequence expressions: a, b, c
+  if (node.type === 'SequenceExpression') {
+    const seqNode = node as unknown as { expressions: AcornNode[] };
+    return seqNode.expressions.some((expr) =>
+      containsVariable(
+        expr,
+        variableName,
+        code,
+        document,
+        selectionLine,
+        visited,
+        depth + 1,
+      ),
+    );
+  }
+
+  // 19. Assignment expressions: x = y
+  if (node.type === 'AssignmentExpression') {
+    const assignNode = node as unknown as { left: AcornNode; right: AcornNode };
+    return (
+      containsVariable(
+        assignNode.left,
+        variableName,
+        code,
+        document,
+        selectionLine,
+      ) ||
+      containsVariable(
+        assignNode.right,
+        variableName,
+        code,
+        document,
+        selectionLine,
+      )
+    );
+  }
+
+  // 20. New expressions: new Constructor()
+  if (node.type === 'NewExpression') {
+    const newNode = node as unknown as {
+      callee: AcornNode;
+      arguments: AcornNode[];
+    };
     if (
-      !found &&
-      containsVariable(child, variableName, document, selectionLine)
+      containsVariable(
+        newNode.callee,
+        variableName,
+        code,
+        document,
+        selectionLine,
+      )
+    ) {
+      return true;
+    }
+    return newNode.arguments.some((arg) =>
+      containsVariable(
+        arg,
+        variableName,
+        code,
+        document,
+        selectionLine,
+        visited,
+        depth + 1,
+      ),
+    );
+  }
+
+  // 21. Recursively check all child nodes for any other cases
+  let found = false;
+  walk(node, (child: AcornNode): boolean | void => {
+    if (
+      child !== node &&
+      containsVariable(
+        child,
+        variableName,
+        code,
+        document,
+        selectionLine,
+        visited,
+        depth + 1,
+      )
     ) {
       found = true;
+      return true; // Stop early
     }
   });
 
@@ -259,21 +489,55 @@ function containsVariable(
 /**
  * Helper function to get the full property access path
  * e.g., person.profile.name -> "person.profile.name"
+ * e.g., user.meta?.city -> "user.meta?.city"
  */
-function getPropertyAccessPath(node: ts.PropertyAccessExpression): string {
+function getPropertyAccessPath(node: AcornNode): string {
   const parts: string[] = [];
 
-  let current: ts.Node = node;
-  while (ts.isPropertyAccessExpression(current)) {
-    parts.unshift(current.name.text);
-    current = current.expression;
+  let current: AcornNode = node;
+  while (isMemberExpression(current)) {
+    const memberNode = current as {
+      object: AcornNode;
+      property: AcornNode;
+      computed: boolean;
+      optional?: boolean;
+    };
+
+    if (memberNode.computed) {
+      // For computed access like obj[key], we can't build a simple path
+      break;
+    }
+
+    if (isIdentifier(memberNode.property)) {
+      const propName = (memberNode.property as { name: string }).name;
+      // Include the optional chaining operator if present
+      if (memberNode.optional) {
+        parts.unshift(`?.${propName}`);
+      } else {
+        parts.unshift(propName);
+      }
+    }
+    current = memberNode.object;
   }
 
-  if (ts.isIdentifier(current)) {
-    parts.unshift(current.text);
+  if (isIdentifier(current)) {
+    const baseName = (current as { name: string }).name;
+    parts.unshift(baseName);
   }
 
-  return parts.join('.');
+  // Join parts, handling optional chaining properly
+  let result = '';
+  for (let i = 0; i < parts.length; i++) {
+    if (i === 0) {
+      result = parts[i];
+    } else if (parts[i].startsWith('?.')) {
+      result += parts[i];
+    } else {
+      result += '.' + parts[i];
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -284,39 +548,42 @@ function getPropertyAccessPath(node: ts.PropertyAccessExpression): string {
  * @returns The line number where the log message should be placed
  */
 export function withinReturnStatementLine(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
-  selectedVar: string,
+  variableName: string,
 ): number {
-  const wanted = selectedVar.trim();
+  const wanted = variableName.trim();
   if (!wanted) return selectionLine + 1;
+
+  const code = document.getText();
 
   let returnStatementLine = -1;
 
-  ts.forEachChild(sourceFile, function visit(node): void {
-    if (returnStatementLine !== -1) return;
-
+  walk(ast, (node: AcornNode): boolean | void => {
     // Look for return statements
-    if (ts.isReturnStatement(node)) {
-      const start = document.positionAt(node.getStart()).line;
-      const end = document.positionAt(node.getEnd()).line;
-
+    if (node.type === 'ReturnStatement') {
+      const start = document.positionAt(node.start).line;
+      const end = document.positionAt(node.end).line;
       // Check if the selection line is within the return statement
       if (selectionLine >= start && selectionLine <= end) {
+        const returnNode = node as unknown as { argument?: AcornNode };
         // Check if the return statement contains the target variable
-        if (
-          node.expression &&
-          containsVariable(node.expression, wanted, document, selectionLine)
-        ) {
-          returnStatementLine = start;
-          return;
+        if (returnNode.argument) {
+          const contains = containsVariable(
+            returnNode.argument,
+            wanted,
+            code,
+            document,
+            selectionLine,
+          );
+          if (contains) {
+            returnStatementLine = start;
+            return true; // Stop early
+          }
         }
       }
     }
-
-    // Continue traversing child nodes
-    ts.forEachChild(node, visit);
   });
 
   // Return the line before the return statement, or fallback to next line

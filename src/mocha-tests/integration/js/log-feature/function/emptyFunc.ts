@@ -41,14 +41,14 @@ export default (): void => {
         );
         await Promise.all(
           documentLinesChanged(activeTextEditor.document, [
-            naturalEditorLine(4),
+            naturalEditorLine(7),
           ]),
         );
         const textDocument = activeTextEditor.document;
         expect(
-          /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(4)).text),
+          /\{\s*$/.test(textDocument.lineAt(naturalEditorLine(7)).text),
         ).to.equal(true);
-        const logMessage = textDocument.lineAt(naturalEditorLine(5)).text;
+        const logMessage = textDocument.lineAt(naturalEditorLine(8)).text;
         expect(/console\.log\(.*/.test(logMessage)).to.equal(true);
       }
     });

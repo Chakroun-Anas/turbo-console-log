@@ -196,6 +196,7 @@ describe('activate - command registration', () => {
     expect(proUtilities.runProBundle).toHaveBeenCalledWith(
       expect.any(Object), // extensionProperties
       'PRO_BUNDLE_CODE',
+      fakeContext,
     );
 
     expect(proUtilities.updateProBundle).not.toHaveBeenCalled();
@@ -373,6 +374,7 @@ describe('activate - command registration', () => {
     expect(proUtilities.runProBundle).toHaveBeenCalledWith(
       expect.anything(), // extensionProperties
       'PRO_BUNDLE_CODE',
+      fakeContext,
     );
 
     // Verify activateRepairMode was called with run mode

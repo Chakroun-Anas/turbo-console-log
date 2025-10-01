@@ -160,7 +160,9 @@ export default (): void => {
             [],
           );
           await Promise.all(
-            documentLinesChanged(activeTextEditor.document, [11]),
+            documentLinesChanged(activeTextEditor.document, [
+              naturalEditorLine(12),
+            ]),
           );
           const textDocument = activeTextEditor.document;
           expect(
@@ -199,7 +201,9 @@ export default (): void => {
             [],
           );
           await Promise.all(
-            documentLinesChanged(activeTextEditor.document, [18]),
+            documentLinesChanged(activeTextEditor.document, [
+              naturalEditorLine(19),
+            ]),
           );
           const textDocument = activeTextEditor.document;
           expect(
@@ -238,7 +242,9 @@ export default (): void => {
             [],
           );
           await Promise.all(
-            documentLinesChanged(activeTextEditor.document, [26]),
+            documentLinesChanged(activeTextEditor.document, [
+              naturalEditorLine(27),
+            ]),
           );
           const textDocument = activeTextEditor.document;
           expect(
@@ -277,7 +283,9 @@ export default (): void => {
             [],
           );
           await Promise.all(
-            documentLinesChanged(activeTextEditor.document, [34]),
+            documentLinesChanged(activeTextEditor.document, [
+              naturalEditorLine(35),
+            ]),
           );
           const textDocument = activeTextEditor.document;
           expect(
@@ -358,9 +366,7 @@ export default (): void => {
             ),
           ).to.equal(true);
           expect(
-            /return {...raw/.test(
-              textDocument.lineAt(naturalEditorLine(79)).text,
-            ),
+            /return {/.test(textDocument.lineAt(naturalEditorLine(79)).text),
           );
           expect(/}/.test(textDocument.lineAt(naturalEditorLine(82)).text));
         }

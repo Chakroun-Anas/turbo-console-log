@@ -1,6 +1,6 @@
-import ts from 'typescript';
 import { wanderingExpressionChecker } from '@/debug-message/js/JSDebugMessage/msg/logMessage/helpers/wanderingExpressionChecker';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import passingCases from './passingCases';
 import failingCases from './failingCases';
 
@@ -8,15 +8,9 @@ describe('wanderingExpressionChecker', () => {
   passingCases.forEach(({ name, lines, selectionLine, variableName }) => {
     it(`passes: ${name}`, () => {
       const document = makeTextDocument(lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = wanderingExpressionChecker(
-        sourceFile,
+        ast,
         document,
         selectionLine,
         variableName,
@@ -28,15 +22,9 @@ describe('wanderingExpressionChecker', () => {
   failingCases.forEach(({ name, lines, selectionLine, variableName }) => {
     it(`fails: ${name}`, () => {
       const document = makeTextDocument(lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = wanderingExpressionChecker(
-        sourceFile,
+        ast,
         document,
         selectionLine,
         variableName,

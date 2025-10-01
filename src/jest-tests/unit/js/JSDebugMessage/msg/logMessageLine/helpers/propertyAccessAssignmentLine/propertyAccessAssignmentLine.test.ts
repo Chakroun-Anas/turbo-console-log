@@ -1,21 +1,15 @@
-import ts from 'typescript';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 import { propertyAccessAssignmentLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import testCases from './cases';
 
 describe('propertyAccessAssignmentLine – insert after property access assignment', () => {
   for (const test of testCases) {
     it(`should return correct insertion line – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
-      const sourceFile = ts.createSourceFile(
-        doc.fileName,
-        doc.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(doc.getText())!;
       const result = propertyAccessAssignmentLine(
-        sourceFile,
+        ast,
         doc,
         test.selectionLine,
         test.variableName,

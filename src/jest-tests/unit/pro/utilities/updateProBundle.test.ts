@@ -3,6 +3,7 @@ import * as proUtilities from '../../../../pro/utilities';
 import * as vscode from 'vscode';
 import { ExtensionProperties } from '../../../../entities';
 import { showNotification } from '../../../../ui';
+import { makeExtensionContext } from '../../../mocks/helpers/makeExtensionContext';
 
 jest.mock('../../../../pro/utilities/isOnline');
 jest.mock('../../../../pro/utilities/fetchProBundle');
@@ -11,7 +12,7 @@ jest.mock('../../../../pro/utilities/runProBundle');
 jest.mock('../../../../ui');
 
 describe('updateProBundle', () => {
-  const fakeContext = {} as vscode.ExtensionContext;
+  const fakeContext = makeExtensionContext();
   const fakeProps = {} as ExtensionProperties;
 
   beforeEach(() => {
@@ -51,10 +52,11 @@ describe('updateProBundle', () => {
     expect(proUtilities.runProBundle).toHaveBeenCalledWith(
       fakeProps,
       mockBundle,
+      fakeContext,
     );
     expect(showNotification).toHaveBeenCalledWith(
       expect.stringContaining(
-        "Pro Bundle Updated v3.0.0, don't forget to reload your window!",
+        "Pro Bundle Updated v3.0.0, don't forget to reload your window please!",
       ),
       10000,
     );

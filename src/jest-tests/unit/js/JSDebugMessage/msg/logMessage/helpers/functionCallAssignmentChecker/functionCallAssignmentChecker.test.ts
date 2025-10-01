@@ -1,6 +1,6 @@
-import ts from 'typescript';
 import { functionCallAssignmentChecker } from '@/debug-message/js/JSDebugMessage/msg/logMessage/helpers/functionCallAssignmentChecker';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import passingCases from './passingCases';
 import failingCases from './failingCases';
 
@@ -8,16 +8,9 @@ describe('functionCallAssignmentChecker', () => {
   for (const doc of passingCases) {
     it(`✓ should detect function call – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = functionCallAssignmentChecker(
-        sourceFile,
-        document,
+        ast,
         doc.selectionLine,
         doc.variableName,
       );
@@ -28,16 +21,9 @@ describe('functionCallAssignmentChecker', () => {
   for (const doc of failingCases) {
     it(`✗ should not detect function call – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = functionCallAssignmentChecker(
-        sourceFile,
-        document,
+        ast,
         doc.selectionLine,
         doc.variableName,
       );

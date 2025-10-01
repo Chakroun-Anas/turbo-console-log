@@ -1,7 +1,7 @@
 export default {
   name: 'arithmetic assignment, single line',
-  lines: ['const sum = a + b;', 'return sum;'],
-  selectionLine: 0,
+  lines: ['function test() {', '  const sum = a + b;', '  return sum;', '}'],
+  selectionLine: 1,
   variableName: 'sum',
-  expectedLine: 1,
+  expectedLine: 2,
 };

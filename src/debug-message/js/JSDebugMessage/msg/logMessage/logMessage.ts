@@ -1,6 +1,6 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
 import { LogMessageType, LogMessage, LogContextMetadata } from '@/entities';
+import { type AcornNode } from '../acorn-utils';
 import {
   arrayAssignmentChecker,
   binaryExpressionChecker,
@@ -22,7 +22,7 @@ import {
 } from './helpers';
 
 export function logMessage(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   selectedVar: string,
@@ -34,94 +34,42 @@ export function logMessage(
     };
   } = {
     [LogMessageType.WithinReturnStatement]: () =>
-      withinReturnStatementChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      ),
+      withinReturnStatementChecker(ast, document, selectionLine, selectedVar),
     [LogMessageType.WithinConditionBlock]: () =>
-      withinConditionBlockChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      ),
+      withinConditionBlockChecker(ast, document, selectionLine, selectedVar),
     [LogMessageType.ObjectLiteral]: () =>
-      objectLiteralChecker(sourceFile, document, selectionLine, selectedVar),
+      objectLiteralChecker(ast, selectionLine, selectedVar),
     [LogMessageType.FunctionParameter]: () =>
-      functionParameterChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      ),
+      functionParameterChecker(ast, document, selectionLine, selectedVar),
     [LogMessageType.ArrayAssignment]: () =>
-      arrayAssignmentChecker(sourceFile, document, selectionLine, selectedVar),
+      arrayAssignmentChecker(ast, selectionLine, selectedVar),
     [LogMessageType.TemplateString]: () =>
-      templateStringChecker(sourceFile, document, selectionLine, selectedVar),
+      templateStringChecker(ast, document, selectionLine, selectedVar),
     [LogMessageType.Ternary]: () =>
-      ternaryChecker(sourceFile, document, selectionLine, selectedVar),
+      ternaryChecker(ast, document, selectionLine, selectedVar),
     [LogMessageType.BinaryExpression]: () =>
-      binaryExpressionChecker(sourceFile, document, selectionLine, selectedVar),
+      binaryExpressionChecker(ast, selectionLine, selectedVar),
     [LogMessageType.RawPropertyAccess]: () =>
-      rawPropertyAccessChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      ),
+      rawPropertyAccessChecker(ast, document, selectionLine, selectedVar),
     [LogMessageType.PropertyMethodCall]: () =>
-      propertyMethodCallChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      ),
-    [LogMessageType.ObjectFunctionCallAssignment]: () => {
-      return objectFunctionCallAssignmentChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      );
-    },
+      propertyMethodCallChecker(ast, document, selectionLine, selectedVar),
+    [LogMessageType.ObjectFunctionCallAssignment]: () =>
+      objectFunctionCallAssignmentChecker(ast, selectionLine, selectedVar),
     [LogMessageType.FunctionCallAssignment]: () =>
-      functionCallAssignmentChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      ),
+      functionCallAssignmentChecker(ast, selectionLine, selectedVar),
     [LogMessageType.NamedFunctionAssignment]: () =>
-      namedFunctionAssignmentChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      ),
+      namedFunctionAssignmentChecker(ast, selectionLine, selectedVar),
     [LogMessageType.PrimitiveAssignment]: () =>
-      primitiveAssignmentChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      ),
+      primitiveAssignmentChecker(ast, selectionLine, selectedVar),
     [LogMessageType.WanderingExpression]: () =>
-      wanderingExpressionChecker(
-        sourceFile,
+      wanderingExpressionChecker(ast, document, selectionLine, selectedVar),
+    [LogMessageType.PropertyAccessAssignment]: () =>
+      propertyAccessAssignmentChecker(
+        ast,
         document,
         selectionLine,
         selectedVar,
       ),
-    [LogMessageType.PropertyAccessAssignment]: () => {
-      return propertyAccessAssignmentChecker(
-        sourceFile,
-        document,
-        selectionLine,
-        selectedVar,
-      );
-    },
   };
 
   for (const { logMessageType } of logTypeOrder) {

@@ -9,50 +9,53 @@ export function getStaticContent(): DynamicFreemiumPanel {
     {
       type: 'paragraph',
       component: {
-        title: '🚀 Stay Ahead with Turbo!',
+        title: 'Turbo v3.8.0 is Live ⚡️ 🌳',
         content:
-          'The latest feature previews, Pro upgrade events, and key news, delivered automatically right inside your favorite extension panel.',
+          'Hide Logs (Pro) is here — plus a new Acorn AST engine that makes Turbo 96% smaller, 89% faster, and far smarter at handling complex cases (return variables, JSX, decorators, destructuring, and more).',
       },
     },
     {
-      type: 'countdown',
+      type: 'media-showcase-cta',
       component: {
-        eventName: 'Coming in v3.8.0: Hide Logs in the Pro Panel 🎭',
-        targetDateUTC: new Date('2025-10-06T00:00:00.000Z'),
-        illustrationSrc: 'turbo-pro-tree.png',
-        CTA: {
-          text: 'Sneak peek at v3.8.0',
-          url: 'https://www.turboconsolelog.io/articles/v380-hide-logs-teaser',
+        illustrationSrcs: [
+          'https://www.turboconsolelog.io/assets/turbo-perf-boost.png',
+          'https://www.turboconsolelog.io/assets/turbo-pro-hide-logs.png',
+        ],
+        cta: {
+          text: 'Read the full release article',
+          url: 'https://www.turboconsolelog.io/articles/release-380?utm_source=panel&utm_campaign=release_380&utm_medium=panel_cta_media',
         },
       },
     },
     {
       type: 'article',
       component: {
-        title: 'Debugging with Memory: Why Turbo PRO Panel Matters!',
+        title:
+          'Turbo Sundays #1: As a developer, always have your own side project ✨',
         description:
-          'Discover how Turbo PRO’s tree panel acts as a debugging memory, helping you stay in flow and regain lost context.',
+          "In today's world, having a regular job with a stable paycheck is the natural path. But every developer should have at least one side project - something that exists outside company walls.",
         illustrationSrc:
-          'https://www.turboconsolelog.io/assets/turbo-pro-illustration.png',
-        url: 'https://www.turboconsolelog.io/articles/debugging-memory',
+          'https://www.turboconsolelog.io/assets/turbo-sunday-side-project.png',
+        illustrationFocus: 'center',
+        url: 'https://www.turboconsolelog.io/articles/turbo-sundays-001?utm_source=panel&utm_campaign=release_380&utm_medium=panel_cta_article',
       },
     },
     {
       type: 'article',
       component: {
-        title: 'Turbo PRO v2 Benchmark: Real-World Performance',
+        title: 'The Story Behind Turbo Console Log',
         description:
-          'We stress-tested Turbo PRO v2 on React, Storybook, and Vite. See how it blitzes through large codebases with rapid tree construction and instant log syncs.',
+          'Why we built Turbo Console Log — from simple idea to a tool trusted by 2M+ developers.',
         illustrationSrc:
-          'https://www.turboconsolelog.io/assets/benchmark-pro-v2.png',
-        url: 'https://www.turboconsolelog.io/articles/benchmark-pro-v2',
+          'https://www.turboconsolelog.io/assets/arc-de-triomphe-picture.webp',
+        url: 'https://www.turboconsolelog.io/articles/motivation-behind-tcl?utm_source=panel&utm_campaign=release_380&utm_medium=panel_cta_story',
       },
     },
   ];
 
   return {
-    tooltip: 'v3.8.0 Hide Logs Preview 🎭',
-    date: new Date('2025-09-29T12:00:00.000Z'),
+    tooltip: 'Turbo v3.8.0 — Pro Hide Logs & Acorn Engine ⚡',
+    date: new Date('2025-10-14T14:00:00.000Z'),
     content,
   };
 }

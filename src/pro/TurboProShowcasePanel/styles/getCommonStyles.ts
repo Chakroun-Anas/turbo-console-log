@@ -239,6 +239,70 @@ export function getCommonStyles(): string {
           box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
         }
 
+        .media-showcase-cta {
+          margin: 16px 0;
+          padding: 16px;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+        }
+        
+        .media-showcase-images {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+          width: 100%;
+        }
+        
+        @media (min-width: 800px) {
+          .media-showcase-images {
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+          }
+          
+          .media-showcase-cta-button {
+            margin-top: 8px;
+          }
+        }
+        
+        .media-showcase-image {
+          width: auto;
+          max-width: 360px;
+          max-height: 400px;
+          margin: 0 auto;
+          display: block;
+          border-radius: 8px;
+        }
+        
+        .media-showcase-images img {
+          border-radius: 8px;
+        }
+
+        .media-showcase-cta-button {
+          display: inline-block;
+          padding: 10px 20px;
+          background: linear-gradient(135deg, #667EEA, #764BA2);
+          color: #FFFFFF;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: bold;
+          font-size: 13px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .media-showcase-cta-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
         .footer {
           text-align: center;
           margin-top: 16px;

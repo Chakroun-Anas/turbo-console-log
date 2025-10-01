@@ -1,6 +1,6 @@
-import ts from 'typescript';
 import { functionParameterChecker } from '@/debug-message/js/JSDebugMessage/msg/logMessage/helpers/';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import passingCases from './passingCases';
 import failingCases from './failingCases';
 
@@ -8,15 +8,9 @@ describe('functionParameterChecker', () => {
   for (const doc of passingCases) {
     it(`should detect function parameter – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = functionParameterChecker(
-        sourceFile,
+        ast,
         document,
         doc.selectionLine,
         doc.variableName,
@@ -28,15 +22,9 @@ describe('functionParameterChecker', () => {
   for (const doc of failingCases) {
     it(`should not detect function parameter – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = functionParameterChecker(
-        sourceFile,
+        ast,
         document,
         doc.selectionLine,
         doc.variableName,

@@ -4,9 +4,13 @@
 
 import { TextDocument } from 'vscode';
 import { enclosingBlockName } from '../../../../enclosingBlockName';
+import { findEnclosingBlocks } from '../../../../enclosingBlockName/findEnclosingBlocks';
+import type { AcornNode } from '../../../acorn-utils';
 
 /**
  * Gets the enclosing class and function names for the selected variable.
+ * Optimized to find both class and function in a single AST traversal.
+ * @param ast The pre-parsed AST (pass from msg.ts to avoid re-parsing)
  * @param document The text document
  * @param lineOfSelectedVar The line number of the selected variable
  * @param insertEnclosingClass Whether to include the enclosing class name
@@ -14,21 +18,37 @@ import { enclosingBlockName } from '../../../../enclosingBlockName';
  * @returns Object containing className and functionName
  */
 export function getEnclosingContext(
+  ast: AcornNode,
   document: TextDocument,
   lineOfSelectedVar: number,
   insertEnclosingClass: boolean,
   insertEnclosingFunction: boolean,
 ): { className: string; functionName: string } {
-  let className = '';
-  let functionName = '';
-
-  if (insertEnclosingClass) {
-    className = enclosingBlockName(document, lineOfSelectedVar, 'class');
+  // Early exit if neither is needed
+  if (!insertEnclosingClass && !insertEnclosingFunction) {
+    return { className: '', functionName: '' };
   }
 
-  if (insertEnclosingFunction) {
-    functionName = enclosingBlockName(document, lineOfSelectedVar, 'function');
+  // If only one is needed, use the optimized single-block function
+  if (!insertEnclosingClass) {
+    return {
+      className: '',
+      functionName: enclosingBlockName(
+        ast,
+        document,
+        lineOfSelectedVar,
+        'function',
+      ),
+    };
   }
 
-  return { className, functionName };
+  if (!insertEnclosingFunction) {
+    return {
+      className: enclosingBlockName(ast, document, lineOfSelectedVar, 'class'),
+      functionName: '',
+    };
+  }
+
+  // If both are needed, find them in a SINGLE traversal (most efficient!)
+  return findEnclosingBlocks(ast, document, lineOfSelectedVar);
 }

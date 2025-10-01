@@ -1,7 +1,7 @@
 export default {
   name: 'number literal',
-  lines: ['const count = 10;', 'return count;'],
-  selectionLine: 0,
+  lines: ['function test() {', '  const count = 10;', '  return count;', '}'],
+  selectionLine: 1,
   variableName: 'count',
-  expectedLine: 1,
+  expectedLine: 2,
 };

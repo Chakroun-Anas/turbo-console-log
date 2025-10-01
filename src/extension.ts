@@ -109,7 +109,7 @@ export async function activate(
       return;
     }
     try {
-      await runProBundle(extensionProperties, proBundle);
+      await runProBundle(extensionProperties, proBundle, context);
     } catch (error) {
       activateRepairMode({
         context,

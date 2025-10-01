@@ -1,6 +1,6 @@
-import ts from 'typescript';
 import { wanderingExpressionLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers/wanderingExpressionLine';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import cases from './cases';
 
 describe('wanderingExpressionLine', () => {
@@ -8,15 +8,9 @@ describe('wanderingExpressionLine', () => {
     ({ name, lines, selectionLine, variableName, expectedLine }) => {
       it(name, () => {
         const document = makeTextDocument(lines);
-        const sourceFile = ts.createSourceFile(
-          document.fileName,
-          document.getText(),
-          ts.ScriptTarget.Latest,
-          true,
-          ts.ScriptKind.TS,
-        );
+        const ast = parseCode(document.getText())!;
         const resultLine = wanderingExpressionLine(
-          sourceFile,
+          ast,
           document,
           selectionLine,
           variableName,

@@ -1,5 +1,4 @@
-import ts from 'typescript';
-import { TextEditorEdit, TextDocument } from 'vscode';
+import { TextEditorEdit, TextDocument, window } from 'vscode';
 import {
   ExtensionProperties,
   LogMessage,
@@ -17,6 +16,7 @@ import { omit } from './helpers/omit';
 import { constructDebuggingMsg } from './constructDebuggingMsg';
 import { constructDebuggingMsgContent } from './constructDebuggingMsgContent';
 import { insertDebugMessage } from './insertDebugMessage';
+import { parseCode } from './acorn-utils';
 
 /**
  * Main function to generate and insert debugging messages into the document.
@@ -39,21 +39,35 @@ export function msg(
   extensionProperties: ExtensionProperties,
   logFunction: string,
 ): void {
-  const sourceFile = ts.createSourceFile(
-    document.fileName,
-    document.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
+  // Parse the code once and reuse the AST throughout the process
+  const code = document.getText();
+
+  // Get file extension from document URI
+  const filePath = document.uri?.path || document.fileName || '';
+  const fileExtension = filePath.split('.').pop();
+  const extension = fileExtension ? `.${fileExtension}` : undefined;
+
+  let ast;
+
+  try {
+    ast = parseCode(code, extension);
+  } catch (error) {
+    // Show error notification to the user
+    window.showErrorMessage(
+      `Turbo AST: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
+    return;
+  }
+
   const logMsg: LogMessage = logMessage(
-    sourceFile,
+    ast,
     document,
     lineOfSelectedVar,
     selectedVar,
   );
+
   const lineOfLogMsg: number = logMessageLine(
-    sourceFile,
+    ast,
     document,
     lineOfSelectedVar,
     selectedVar,
@@ -67,6 +81,7 @@ export function msg(
     lineOfLogMsg,
   );
   const debuggingMsgContent: string = constructDebuggingMsgContent(
+    ast,
     document,
     (logMsg.metadata as LogContextMetadata)?.deepObjectPath
       ? (logMsg.metadata as LogContextMetadata)?.deepObjectPath
@@ -87,8 +102,9 @@ export function msg(
   );
 
   // Handle code transformation if needed
-  if (needTransformation(document, lineOfSelectedVar, selectedVar)) {
+  if (needTransformation(ast, document, lineOfSelectedVar, selectedVar)) {
     const transformedCode = performTransformation(
+      ast,
       document,
       lineOfSelectedVar,
       selectedVar,

@@ -52,34 +52,56 @@ Want to customize your logs? Turbo Console Log allows you to adjust:
 
 ---
 
-## 🚀 What's New in v3.5.0? – Smarter Notifications & Enhanced User Control
+## 🚀 What's New in v3.8.0? – Hide Logs + Major Performance Boost
 
-**Non-intrusive release management is here!** This release introduces **intelligent notification scheduling** and **enhanced user control**, building on our revolutionary AST engine and console method coverage.
+**The most requested feature has arrived!** This release introduces **Hide Logs** for Pro users and a complete engine upgrade that makes Turbo **96% lighter and 89% faster**.
 
-### 🎯 Smarter Release Notifications
+### 🎭 New Pro Feature: Hide Logs
 
-- **🕒 Release Review Target Window Setting:** New configurable setting allows you to control when you receive release notifications (Morning, Afternoon, Evening, or Night)
-- **🚀 Non-intrusive Release Notifications:** Release announcements now appear as respectful VS Code notifications instead of automatically opening web views
-- **🌐 External Article Integration:** New releases link to comprehensive articles on [turboconsolelog.io](https://www.turboconsolelog.io) for richer content
+Managing dozens of log statements becomes overwhelming fast. The new **Hide Logs** feature lets you temporarily mute specific entries—by pattern, file, or one-click—without deleting them:
 
-### 🔧 System Improvements
+- **Hide file logs**: Hide all logs in specific files
+- **Hide folder logs**: Hide all logs in a specific folder
+- **Toggle visibility**: Reveal all hidden logs with a single action
 
-- **📊 Enhanced Reporting Service:** Reporting integration that fully respects VS Code's global telemetry settings and user privacy preferences
-- **⚡ Smarter Timing Logic:** Intelligent release notification scheduling based on your preferred time window
-- **🔧 Turbo Pro Vue/Svelte/Astro Support:** Fixed issue where Vue, Svelte, and Astro files weren't appearing in the Pro TreeView panel
+Hide everything that's not relevant to your current task, then reveal it all with a single toggle. Your debugging panel stays clean; your workflow stays focused.
 
-### 🎪 Behind the Scenes
+### 🧠 Major Engine Upgrade: TypeScript AST → Acorn AST
 
-- Removed forced web view updates that could interrupt workflows
-- Improved global state management for notification tracking
-- Enhanced error handling for release content delivery
-- Better integration with VS Code's native notification system
+We've completely rebuilt the parsing engine, swapping the heavy TypeScript compiler layer for the lightweight Acorn parser. You get the same AST-powered precision with a leaner, faster engine:
 
-**This release represents our commitment to user agency and non-disruptive feature discovery.** Release notifications are now more respectful of your workflow while keeping you informed about exciting new capabilities.
+#### � Performance Improvements
 
-👉 [Read the Full v3.5.0 Release Article](https://www.turboconsolelog.io/articles/release-350)  
+- **96% Smaller Package:** 2.6MB → ~108KB
+- **~85% Smaller Bundle:** 3.7MB → ~560KB
+- **~89% Faster Activation:** 860ms → ~96ms
+
+Your extension now loads almost instantly with a dramatically smaller footprint.
+
+#### 🛠️ Enhanced Parsing Patterns
+
+The migration to Acorn fixed several edge-case parsing patterns. Log insertion now works correctly in complex real-world code:
+
+✅ **Variables within return statements** – Correct placement for callback parameters and inline expressions  
+✅ **JSX and React patterns** – Full support for hooks, fragments, and conditional rendering  
+✅ **Computed property destructuring** – Dynamic `[id]` syntax handling  
+✅ **Multi-line object literals** – Complex objects with type annotations and deep nesting  
+✅ **Binary expressions with optional chaining** – Proper `!==` with `?.` operator parsing  
+✅ **Async destructuring assignments** – Multi-line destructuring from async calls  
+✅ **Nested default parameters** – Arrow functions with complex parameter lists  
+✅ **Class method decorators** – NestJS and Angular pattern support
+
+### 📌 Temporary Limitation
+
+Vue 3 Composition API in separate `.js`/`.ts` files is fully supported. However, Single-File Components (`.vue` with `<script>` blocks) aren't parsed yet. Workaround: isolate your `<script>` logic in a standalone file while we add first-class SFC support. [Track progress here](https://github.com/Chakroun-Anas/turbo-console-log/issues/292).
+
+### 🔮 What's Next: v3.9.0
+
+The next iteration focuses on broader AST engine strengthening—refining edge-case handling, improving parsing resilience, and expanding framework coverage. Vue Single-File Component support is part of this roadmap.
+
+👉 [Read the Full v3.8.0 Release Article](https://www.turboconsolelog.io/articles/release-380)  
 👉 [Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)  
-👉 [Subscribe to Newsletter (30% Pro Discount)](https://www.turboconsolelog.io/join)
+👉 [Subscribe to Newsletter](https://www.turboconsolelog.io/join)
 
 ---
 

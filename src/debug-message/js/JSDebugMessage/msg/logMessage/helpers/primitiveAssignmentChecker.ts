@@ -1,79 +1,172 @@
-import ts from 'typescript';
-import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  isLiteral,
+  isIdentifier,
+  isThisExpression,
+  isMemberExpression,
+  isVariableDeclaration,
+  isObjectPattern,
+  isTemplateLiteral,
+  isProperty,
+  isRestElement,
+  walk,
+} from '../../acorn-utils';
 
-function isPrimitiveRHS(expr: ts.Expression): boolean {
-  switch (expr.kind) {
-    case ts.SyntaxKind.NumericLiteral:
-    case ts.SyntaxKind.StringLiteral:
-    case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
-    case ts.SyntaxKind.TrueKeyword:
-    case ts.SyntaxKind.FalseKeyword:
-    case ts.SyntaxKind.NullKeyword:
-      return true;
-
-    case ts.SyntaxKind.Identifier:
-      return true; // covers bare identifiers like `foo`
-
-    case ts.SyntaxKind.PropertyAccessExpression: {
-      let node: ts.Expression = expr;
-      while (ts.isPropertyAccessExpression(node)) {
-        if (!ts.isIdentifier(node.name)) return false;
-        node = node.expression;
-      }
-      return ts.isIdentifier(node);
-    }
-
-    default:
-      return false;
+function isPrimitiveRHS(expr: AcornNode): boolean {
+  // Literal values (numbers, strings, booleans, null)
+  if (isLiteral(expr)) {
+    return true;
   }
+
+  // Template literals without substitutions
+  if (isTemplateLiteral(expr) && expr.expressions.length === 0) {
+    return true;
+  }
+
+  // Bare identifiers like `foo`
+  if (isIdentifier(expr)) {
+    return true;
+  }
+
+  // `this` keyword
+  if (isThisExpression(expr)) {
+    return true;
+  }
+
+  // Property access chains like `user.profile.details`
+  if (isMemberExpression(expr)) {
+    let node: AcornNode = expr;
+    const visited = new Set<AcornNode>();
+    let depth = 0;
+    const MAX_DEPTH = 1000;
+
+    while (isMemberExpression(node)) {
+      // Safeguards against infinite loops
+      if (depth >= MAX_DEPTH) {
+        console.warn(
+          `isPrimitiveRHS: Hit max depth limit (${MAX_DEPTH}) - preventing infinite loop`,
+        );
+        return false;
+      }
+      if (visited.has(node)) {
+        return false;
+      }
+      visited.add(node);
+      depth++;
+
+      // Only allow non-computed property access (dot notation)
+      if (node.computed) return false;
+      if (!isIdentifier(node.property)) return false;
+      node = node.object;
+    }
+    return isIdentifier(node) || isThisExpression(node);
+  }
+
+  return false;
+}
+
+/**
+ * Recursively searches for a variable name within a destructuring pattern.
+ * Handles nested destructuring like: const { props: { children } } = this;
+ */
+function findVariableInPattern(
+  pattern: AcornNode,
+  variableName: string,
+  visited: Set<AcornNode> = new Set(),
+  depth = 0,
+): boolean {
+  // Safety: prevent infinite recursion
+  const MAX_DEPTH = 1000; // Generous max depth for deeply nested destructuring
+  if (depth >= MAX_DEPTH) {
+    console.warn(
+      `findVariableInPattern: Hit max depth limit (${MAX_DEPTH}) - preventing infinite recursion`,
+    );
+    return false;
+  }
+
+  // Safety: prevent circular references
+  if (visited.has(pattern)) {
+    return false;
+  }
+
+  if (!isObjectPattern(pattern)) return false;
+
+  visited.add(pattern);
+
+  // TypeScript types ObjectPattern.properties as Property[], but runtime can include RestElement
+  const properties = pattern.properties as AcornNode[];
+
+  for (const prop of properties) {
+    // Handle Property nodes: { key: value } or { children }
+    if (isProperty(prop)) {
+      const value = prop.value;
+
+      // Direct match: { children }
+      if (isIdentifier(value) && value.name === variableName) {
+        return true;
+      }
+
+      // Nested destructuring: { props: { children } }
+      if (isObjectPattern(value)) {
+        if (findVariableInPattern(value, variableName, visited, depth + 1)) {
+          return true;
+        }
+      }
+    }
+    // Handle RestElement: { ...rest }
+    else if (isRestElement(prop)) {
+      const argument = prop.argument;
+      if (isIdentifier(argument) && argument.name === variableName) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 export function primitiveAssignmentChecker(
-  sourceFile: ts.SourceFile,
-  document: TextDocument,
+  ast: AcornNode,
   selectionLine: number,
   variableName: string,
 ): { isChecked: boolean } {
   let isChecked = false;
 
-  ts.forEachChild(sourceFile, function visit(node: ts.Node): void {
-    if (isChecked) return;
+  if (!ast) {
+    return { isChecked: false };
+  }
 
-    const start = document.positionAt(node.getStart()).line;
-    const end = document.positionAt(node.getEnd()).line;
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (isChecked) return true;
+
+    // Check if node has location information
+    if (!node.loc) return;
+
+    const start = node.loc.start.line - 1; // Acorn uses 1-based lines
+    const end = node.loc.end.line - 1;
+
     if (selectionLine < start || selectionLine > end) return;
 
-    if (
-      ts.isVariableStatement(node) &&
-      node.declarationList.declarations.length
-    ) {
-      for (const decl of node.declarationList.declarations) {
-        const { name, initializer } = decl;
-        if (!initializer || !isPrimitiveRHS(initializer)) continue;
+    if (isVariableDeclaration(node) && node.declarations.length > 0) {
+      for (const decl of node.declarations) {
+        const { id, init } = decl;
+        if (!init || !isPrimitiveRHS(init)) continue;
 
         // Handle direct assignment: const foo = 42;
-        if (ts.isIdentifier(name) && name.text === variableName) {
+        if (isIdentifier(id) && id.name === variableName) {
           isChecked = true;
-          return;
+          return true;
         }
 
-        // Handle destructuring: const { foo } = user;
-        if (ts.isObjectBindingPattern(name)) {
-          for (const element of name.elements) {
-            if (
-              ts.isBindingElement(element) &&
-              ts.isIdentifier(element.name) &&
-              element.name.text === variableName
-            ) {
-              isChecked = true;
-              return;
-            }
+        // Handle destructuring (including nested): const { foo } = user; or const { props: { children } } = this;
+        if (isObjectPattern(id)) {
+          if (findVariableInPattern(id, variableName)) {
+            isChecked = true;
+            return true;
           }
         }
       }
     }
-
-    ts.forEachChild(node, visit);
   });
 
   return { isChecked };

@@ -76,7 +76,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -125,7 +125,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange1],
@@ -189,7 +189,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange1, mockRange2, mockRange3, mockRange4],
@@ -244,7 +244,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -296,7 +296,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -352,7 +352,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -399,7 +399,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -524,7 +524,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '      ',
             lines: [mockRange1],
@@ -594,7 +594,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([]);
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([]);
 
         vscode.window.activeTextEditor = mockEditor;
 
@@ -631,7 +631,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -673,7 +673,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -715,7 +715,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -740,7 +740,9 @@ describe('deleteAllLogMessagesCommand', () => {
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
-          mockDocument,
+          expect.anything(),
+          expect.anything(),
+          mockDocument.uri.fsPath,
           'error',
           'Debug',
           '~',
@@ -759,7 +761,7 @@ describe('deleteAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([]);
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([]);
 
         vscode.window.activeTextEditor = mockEditor;
 
@@ -777,7 +779,9 @@ describe('deleteAllLogMessagesCommand', () => {
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
-          mockDocument,
+          expect.anything(),
+          expect.anything(),
+          mockDocument.uri.fsPath,
           'log',
           'Debug',
           '~',

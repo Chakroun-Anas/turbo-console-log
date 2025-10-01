@@ -1,26 +1,20 @@
-import ts from 'typescript';
 import { templateStringLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import testCases from './cases';
 
 describe('templateStringLine', () => {
-  for (const doc of testCases) {
-    it(`should return correct insertion line – ${doc.name}`, () => {
-      const document = makeTextDocument(doc.lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+  for (const testCase of testCases) {
+    it(testCase.name, () => {
+      const document = makeTextDocument(testCase.lines);
+      const ast = parseCode(document.getText())!;
       const result = templateStringLine(
-        sourceFile,
+        ast,
         document,
-        doc.selectionLine,
-        doc.variableName,
+        testCase.selectionLine,
+        testCase.variableName,
       );
-      expect(result).toBe(doc.expectedLine);
+      expect(result).toBe(testCase.expectedLine);
     });
   }
 });

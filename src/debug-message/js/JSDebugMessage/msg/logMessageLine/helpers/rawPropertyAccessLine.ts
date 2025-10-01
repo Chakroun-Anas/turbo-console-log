@@ -1,8 +1,14 @@
-import ts from 'typescript';
 import { TextDocument, Position } from 'vscode';
+import {
+  isProperty,
+  isVariableDeclaration,
+  walk,
+  type AcornNode,
+  type VariableDeclaration,
+} from '../../acorn-utils';
 
 export function rawPropertyAccessLine(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
@@ -14,39 +20,43 @@ export function rawPropertyAccessLine(
   const offsetStart = document.offsetAt(new Position(selectionLine, charIndex));
   const offsetEnd = offsetStart + variableName.length;
 
-  let foundNode: ts.Node | undefined;
+  let foundProperty: AcornNode | undefined;
 
-  function visit(node: ts.Node) {
-    const nodeStart = node.getFullStart();
-    const nodeEnd = node.getEnd();
-
-    if (nodeStart <= offsetStart && nodeEnd >= offsetEnd) {
-      if (ts.isPropertyAssignment(node) && !foundNode) {
-        foundNode = node;
-      }
+  // First, find the Property node at the selection
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (
+      node.start <= offsetStart &&
+      node.end >= offsetEnd &&
+      isProperty(node) &&
+      !foundProperty
+    ) {
+      foundProperty = node;
+      return true; // Stop early once found
     }
+  });
 
-    ts.forEachChild(node, visit);
-  }
-
-  visit(sourceFile);
-
-  if (!foundNode) {
+  if (!foundProperty) {
     return selectionLine + 1;
   }
 
-  // Walk up to the top-level VariableDeclaration or VariableStatement
-  let current: ts.Node | undefined = foundNode;
-  while (
-    current &&
-    !ts.isVariableStatement(current) &&
-    !ts.isVariableDeclaration(current)
-  ) {
-    current = current.parent;
-  }
+  // Now find the VariableDeclaration that contains this property
+  let containingVarDecl: VariableDeclaration | undefined;
+  const propertyStart = foundProperty.start;
+  const propertyEnd = foundProperty.end;
 
-  if (current) {
-    const endPos = document.positionAt(current.getEnd());
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (isVariableDeclaration(node)) {
+      const varDecl = node as VariableDeclaration;
+      // Check if the property is within this variable declaration's range
+      if (varDecl.start <= propertyStart && varDecl.end >= propertyEnd) {
+        containingVarDecl = varDecl;
+        return true; // Stop early
+      }
+    }
+  });
+
+  if (containingVarDecl) {
+    const endPos = document.positionAt(containingVarDecl.end);
     return endPos.line + 1;
   }
 

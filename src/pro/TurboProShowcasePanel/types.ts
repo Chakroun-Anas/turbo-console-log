@@ -9,6 +9,7 @@ export interface ArticlePanelComponent {
   description: string;
   illustrationSrc: string;
   url: string;
+  illustrationFocus?: 'top' | 'center' | 'bottom';
 }
 
 export interface CountDownPanelComponent {
@@ -36,19 +37,29 @@ export interface TablePanelComponent {
   rows: Array<{ [column: string]: string }>;
 }
 
+export interface MediaShowcaseCTAPanelComponent {
+  illustrationSrcs: Array<string>;
+  cta: {
+    text: string;
+    url: string;
+  };
+}
+
 export type FreemiumPanelComponent =
   | ParagraphPanelComponent
   | ArticlePanelComponent
   | CountDownPanelComponent
   | SurveyPanelComponent
-  | TablePanelComponent;
+  | TablePanelComponent
+  | MediaShowcaseCTAPanelComponent;
 
 export type DynamicFreemiumPanelContentType =
   | 'paragraph'
   | 'article'
   | 'countdown'
   | 'survey'
-  | 'table';
+  | 'table'
+  | 'media-showcase-cta';
 
 export interface DynamicFreemiumPanelContent {
   type: DynamicFreemiumPanelContentType;
@@ -66,4 +77,5 @@ export interface SeparatedContent {
   articlesHtml: string;
   surveyHtml: string;
   tableHtml: string;
+  mediaShowcaseCTAHtml: string;
 }

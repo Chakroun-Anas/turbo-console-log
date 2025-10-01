@@ -13,9 +13,11 @@ import {
   getFileName,
   getEnclosingContext,
 } from './helpers';
+import type { AcornNode } from '../acorn-utils';
 
 /**
  * Constructs the debugging message content using helper functions.
+ * @param ast The pre-parsed AST (to avoid re-parsing)
  * @param document The text document
  * @param selectedVar The selected variable name
  * @param lineOfSelectedVar The line number of the selected variable
@@ -24,6 +26,7 @@ import {
  * @returns The constructed debugging message content
  */
 export function constructDebuggingMsgContent(
+  ast: AcornNode,
   document: TextDocument,
   selectedVar: string,
   lineOfSelectedVar: number,
@@ -47,7 +50,9 @@ export function constructDebuggingMsgContent(
   } = extensionProperties;
 
   const fileName = getFileName(document.fileName);
+
   const { className, functionName } = getEnclosingContext(
+    ast,
     document,
     lineOfSelectedVar,
     insertEnclosingClass,
@@ -60,10 +65,8 @@ export function constructDebuggingMsgContent(
   // Build message parts using helper functions
   const parts: string[] = [];
 
-  // Add prefix
   parts.push(...addPrefix(logMessagePrefix, delimiterInsideMessage));
 
-  // Add file info
   parts.push(
     ...addFileInfo(
       fileName,
@@ -73,21 +76,18 @@ export function constructDebuggingMsgContent(
       delimiterInsideMessage,
     ),
   );
-
-  // Add enclosing context
   parts.push(
     ...addEnclosingContext(className, functionName, delimiterInsideMessage),
   );
-
-  // Add variable
   parts.push(...addVariable(selectedVar, logMessageSuffix));
 
   // Build final message
-  return buildLogMessage(
+  const result = buildLogMessage(
     parts,
     logFunction,
     quote,
     selectedVar,
     extensionProperties.addSemicolonInTheEnd,
   );
+  return result;
 }

@@ -1,282 +1,10 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
-
-/**
- * Comprehensive helper function to check if a node contains the target variable reference
- * Handles both variable name matching and position-based matching for complex expressions
- */
-function containsVariable(
-  node: ts.Node,
-  variableName: string,
-  document: TextDocument,
-  selectionLine: number,
-): boolean {
-  if (!node) return false;
-
-  // Position-based matching for complex expressions
-  // This handles cases where the entire expression/object is selected
-  const start = document.positionAt(node.getStart()).line;
-  const end = document.positionAt(node.getEnd()).line;
-
-  // If the selection line is within this node's range, it could be the target
-  if (selectionLine >= start && selectionLine <= end) {
-    // For complex expressions like object literals, array literals, etc.
-    // we consider them a match if the selection is within their bounds
-    if (
-      ts.isObjectLiteralExpression(node) ||
-      ts.isArrayLiteralExpression(node) ||
-      ts.isCallExpression(node) ||
-      ts.isBinaryExpression(node) ||
-      ts.isConditionalExpression(node) ||
-      ts.isTemplateExpression(node)
-    ) {
-      // Check if this node spans exactly the selection or if it's a reasonable match
-      // We'll be permissive here since the user explicitly selected this content
-      return true;
-    }
-  }
-
-  // 1. Simple identifier: variableName
-  if (ts.isIdentifier(node)) {
-    return node.text === variableName;
-  }
-
-  // 2. Property access: object.property, person.name, etc.
-  if (ts.isPropertyAccessExpression(node)) {
-    const fullPath = getPropertyAccessPath(node);
-    return (
-      fullPath === variableName ||
-      containsVariable(node.expression, variableName, document, selectionLine)
-    );
-  }
-
-  // 3. Element access: object['key'], array[index], etc.
-  if (ts.isElementAccessExpression(node)) {
-    return (
-      containsVariable(
-        node.expression,
-        variableName,
-        document,
-        selectionLine,
-      ) ||
-      containsVariable(
-        node.argumentExpression,
-        variableName,
-        document,
-        selectionLine,
-      )
-    );
-  }
-
-  // 4. Call expressions: func(), object.method(), etc.
-  if (ts.isCallExpression(node)) {
-    if (
-      containsVariable(node.expression, variableName, document, selectionLine)
-    )
-      return true;
-    return node.arguments.some((arg) =>
-      containsVariable(arg, variableName, document, selectionLine),
-    );
-  }
-
-  // 5. Binary expressions: a + b, x === y, etc.
-  if (ts.isBinaryExpression(node)) {
-    return (
-      containsVariable(node.left, variableName, document, selectionLine) ||
-      containsVariable(node.right, variableName, document, selectionLine)
-    );
-  }
-
-  // 6. Prefix/Postfix unary expressions: !flag, ++counter, typeof x, etc.
-  if (ts.isPrefixUnaryExpression(node)) {
-    return containsVariable(
-      node.operand,
-      variableName,
-      document,
-      selectionLine,
-    );
-  }
-  if (ts.isPostfixUnaryExpression(node)) {
-    return containsVariable(
-      node.operand,
-      variableName,
-      document,
-      selectionLine,
-    );
-  }
-
-  // 7. Conditional (ternary) expressions: condition ? a : b
-  if (ts.isConditionalExpression(node)) {
-    return (
-      containsVariable(node.condition, variableName, document, selectionLine) ||
-      containsVariable(node.whenTrue, variableName, document, selectionLine) ||
-      containsVariable(node.whenFalse, variableName, document, selectionLine)
-    );
-  }
-
-  // 8. Array literals: [a, b, c]
-  if (ts.isArrayLiteralExpression(node)) {
-    return node.elements.some((element) =>
-      containsVariable(element, variableName, document, selectionLine),
-    );
-  }
-
-  // 9. Object literals: { key: value }
-  if (ts.isObjectLiteralExpression(node)) {
-    return node.properties.some((prop) => {
-      if (ts.isPropertyAssignment(prop)) {
-        return (
-          containsVariable(prop.name, variableName, document, selectionLine) ||
-          containsVariable(
-            prop.initializer,
-            variableName,
-            document,
-            selectionLine,
-          )
-        );
-      }
-      if (ts.isShorthandPropertyAssignment(prop)) {
-        return containsVariable(
-          prop.name,
-          variableName,
-          document,
-          selectionLine,
-        );
-      }
-      if (ts.isSpreadAssignment(prop)) {
-        return containsVariable(
-          prop.expression,
-          variableName,
-          document,
-          selectionLine,
-        );
-      }
-      // TypeScript only generates the above three property types for object literals
-      return false;
-    });
-  }
-
-  // 10. Template literals: `Hello ${name}`
-  if (ts.isTemplateExpression(node)) {
-    return node.templateSpans.some((span) =>
-      containsVariable(span.expression, variableName, document, selectionLine),
-    );
-  }
-
-  // 11. Parenthesized expressions: (expression)
-  if (ts.isParenthesizedExpression(node)) {
-    return containsVariable(
-      node.expression,
-      variableName,
-      document,
-      selectionLine,
-    );
-  }
-
-  // 12. Type assertions: expr as Type, <Type>expr
-  if (ts.isAsExpression(node) || ts.isTypeAssertionExpression(node)) {
-    return containsVariable(
-      node.expression,
-      variableName,
-      document,
-      selectionLine,
-    );
-  }
-
-  // 13. Spread elements: ...array
-  if (ts.isSpreadElement(node)) {
-    return containsVariable(
-      node.expression,
-      variableName,
-      document,
-      selectionLine,
-    );
-  }
-
-  // 14. Await expressions: await promise
-  if (ts.isAwaitExpression(node)) {
-    return containsVariable(
-      node.expression,
-      variableName,
-      document,
-      selectionLine,
-    );
-  }
-
-  // 15. Arrow functions: (param) => expr
-  if (ts.isArrowFunction(node)) {
-    // Check if variable name matches any parameter (simple identifier parameters only)
-    const paramNames = node.parameters
-      .filter((p) => ts.isIdentifier(p.name))
-      .map((p) => (p.name as ts.Identifier).text);
-
-    if (paramNames.includes(variableName)) return false; // It's a parameter, not external variable
-
-    return containsVariable(node.body, variableName, document, selectionLine);
-  }
-
-  // 16. Function expressions: function() { ... }
-  if (ts.isFunctionExpression(node)) {
-    // Check if variable name matches any parameter (simple identifier parameters only)
-    const paramNames = node.parameters
-      .filter((p) => ts.isIdentifier(p.name))
-      .map((p) => (p.name as ts.Identifier).text);
-
-    if (paramNames.includes(variableName)) return false;
-
-    return containsVariable(node.body, variableName, document, selectionLine);
-  }
-
-  // 17. Block statements: { ... }
-  if (ts.isBlock(node)) {
-    return node.statements.some((stmt) =>
-      containsVariable(stmt, variableName, document, selectionLine),
-    );
-  }
-
-  // 18. Expression statements
-  if (ts.isExpressionStatement(node)) {
-    return containsVariable(
-      node.expression,
-      variableName,
-      document,
-      selectionLine,
-    );
-  }
-
-  // 19. Recursively check all child nodes for any other cases
-  let found = false;
-  ts.forEachChild(node, (child) => {
-    if (
-      !found &&
-      containsVariable(child, variableName, document, selectionLine)
-    ) {
-      found = true;
-    }
-  });
-
-  return found;
-}
-
-/**
- * Helper function to get the full property access path
- * e.g., person.profile.name -> "person.profile.name"
- */
-function getPropertyAccessPath(node: ts.PropertyAccessExpression): string {
-  const parts: string[] = [];
-
-  let current: ts.Node = node;
-  while (ts.isPropertyAccessExpression(current)) {
-    parts.unshift(current.name.text);
-    current = current.expression;
-  }
-
-  if (ts.isIdentifier(current)) {
-    parts.unshift(current.text);
-  }
-
-  return parts.join('.');
-}
+import {
+  type AcornNode,
+  isIdentifier,
+  isMemberExpression,
+  walk,
+} from '../../acorn-utils';
 
 /**
  * AST-based checker to determine if a variable is within a return statement context
@@ -286,7 +14,7 @@ function getPropertyAccessPath(node: ts.PropertyAccessExpression): string {
  * @returns Object indicating if the check passed
  */
 export function withinReturnStatementChecker(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
@@ -294,32 +22,161 @@ export function withinReturnStatementChecker(
   const wanted = variableName.trim();
   if (!wanted) return { isChecked: false };
 
+  const sourceCode = document.getText();
+
+  if (!ast) {
+    return { isChecked: false };
+  }
+
   let isChecked = false;
 
-  ts.forEachChild(sourceFile, function visit(node): void {
-    if (isChecked) return;
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (isChecked) return true;
 
     // Look for return statements
-    if (ts.isReturnStatement(node)) {
-      const start = document.positionAt(node.getStart()).line;
-      const end = document.positionAt(node.getEnd()).line;
+    if (node.type === 'ReturnStatement') {
+      const returnStmt = node as { argument?: AcornNode };
 
-      // Check if the selection line is within the return statement
-      if (selectionLine >= start && selectionLine <= end) {
-        // Check if the return statement contains the target variable
-        if (
-          node.expression &&
-          containsVariable(node.expression, wanted, document, selectionLine)
-        ) {
-          isChecked = true;
-          return;
+      if (
+        returnStmt.argument &&
+        node.start !== undefined &&
+        node.end !== undefined
+      ) {
+        const start = document.positionAt(node.start).line;
+        const end = document.positionAt(node.end).line;
+
+        // Check if the selection line is within the return statement
+        if (selectionLine >= start && selectionLine <= end) {
+          // Check if the return statement contains the target variable
+          if (
+            containsVariable(
+              returnStmt.argument,
+              wanted,
+              sourceCode,
+              document,
+              selectionLine,
+            )
+          ) {
+            isChecked = true;
+            return true;
+          }
         }
       }
     }
-
-    // Continue traversing child nodes
-    ts.forEachChild(node, visit);
   });
 
   return { isChecked };
+}
+
+/**
+ * Comprehensive helper function to check if a node contains the target variable reference
+ * Handles both variable name matching and position-based matching for complex expressions
+ */
+function containsVariable(
+  node: AcornNode,
+  variableName: string,
+  sourceCode: string,
+  document: TextDocument,
+  selectionLine: number,
+  visited = new Set<AcornNode>(),
+  depth = 0,
+): boolean {
+  if (!node) return false;
+
+  // Safeguards against infinite recursion
+  const MAX_DEPTH = 1000;
+
+  if (depth >= MAX_DEPTH) {
+    console.warn(
+      `containsVariable: Hit max depth limit (${MAX_DEPTH}) - preventing infinite recursion`,
+    );
+    return false;
+  }
+
+  if (visited.has(node)) {
+    return false;
+  }
+
+  visited.add(node);
+
+  // Special handling for arrow functions and function expressions
+  // Check if the variable is a parameter of the function - if so, don't consider it external
+  if (
+    node.type === 'ArrowFunctionExpression' ||
+    node.type === 'FunctionExpression'
+  ) {
+    const func = node as { params?: AcornNode[] };
+    if (func.params) {
+      // Check if variableName matches any parameter name
+      for (const param of func.params) {
+        if (isIdentifier(param) && param.name === variableName) {
+          // This variable is a parameter of this function, not an external variable
+          return false;
+        }
+      }
+    }
+  }
+
+  // Position-based matching for complex expressions
+  // This handles cases where the entire expression/object is selected
+  if (node.start !== undefined && node.end !== undefined) {
+    const start = document.positionAt(node.start).line;
+    const end = document.positionAt(node.end).line;
+
+    // If the selection line is within this node's range, it could be the target
+    if (selectionLine >= start && selectionLine <= end) {
+      // For complex expressions like object literals, array literals, etc.
+      // we consider them a match if the selection is within their bounds
+      if (
+        node.type === 'ObjectExpression' ||
+        node.type === 'ArrayExpression' ||
+        node.type === 'CallExpression' ||
+        node.type === 'BinaryExpression' ||
+        node.type === 'ConditionalExpression' ||
+        node.type === 'TemplateLiteral'
+      ) {
+        // Check if this node spans exactly the selection or if it's a reasonable match
+        // We'll be permissive here since the user explicitly selected this content
+        return true;
+      }
+    }
+  }
+
+  // Simple identifier: variableName
+  if (isIdentifier(node)) {
+    return node.name === variableName;
+  }
+
+  // Property access: object.property, person.name, etc.
+  if (isMemberExpression(node)) {
+    if (node.start !== undefined && node.end !== undefined) {
+      const fullText = sourceCode.substring(node.start, node.end);
+      if (fullText === variableName || fullText.includes(variableName)) {
+        return true;
+      }
+    }
+  }
+
+  // Recursively check children
+  let found = false;
+  walk(node, (child: AcornNode) => {
+    if (found) return true;
+    if (
+      child !== node &&
+      containsVariable(
+        child,
+        variableName,
+        sourceCode,
+        document,
+        selectionLine,
+        visited,
+        depth + 1,
+      )
+    ) {
+      found = true;
+      return true;
+    }
+  });
+
+  return found;
 }

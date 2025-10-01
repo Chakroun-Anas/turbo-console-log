@@ -1,131 +1,175 @@
-import ts from 'typescript';
-import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  isVariableDeclaration,
+  isIdentifier,
+  isObjectPattern,
+  isArrayPattern,
+  isCallExpression,
+  isExpressionStatement,
+  isAssignmentExpression,
+  isMemberExpression,
+  isObjectExpression,
+  isFunctionExpression,
+  isArrowFunctionExpression,
+  isChainExpression,
+  walk,
+} from '../../acorn-utils';
+
+/**
+ * Helper function to unwrap ChainExpression nodes to get the underlying expression
+ */
+function unwrapChainExpression(node: AcornNode): AcornNode {
+  if (isChainExpression(node)) {
+    const chainNode = node as { expression?: AcornNode };
+    return chainNode.expression || node;
+  }
+  return node;
+}
 
 export function objectFunctionCallAssignmentChecker(
-  sourceFile: ts.SourceFile,
-  document: TextDocument,
+  ast: AcornNode,
   selectionLine: number,
   variableName: string,
 ) {
   let isChecked = false;
 
-  ts.forEachChild(sourceFile, function visit(node) {
-    if (isChecked) return;
+  if (!ast) {
+    return { isChecked: false };
+  }
 
-    // Handle variable declarations (existing logic)
-    if (ts.isVariableStatement(node)) {
-      for (const decl of node.declarationList.declarations) {
-        const { name, initializer } = decl;
-        const startLine = document.positionAt(decl.getStart()).line;
-        const endLine = document.positionAt(decl.getEnd()).line;
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (isChecked) return true;
 
-        if (
-          selectionLine < startLine ||
-          selectionLine > endLine ||
-          !initializer
-        )
+    // Handle variable declarations
+    if (isVariableDeclaration(node)) {
+      for (const decl of node.declarations) {
+        if (!decl.loc) continue;
+
+        const startLine = decl.loc.start.line - 1; // Acorn uses 1-based lines
+        const endLine = decl.loc.end.line - 1;
+
+        if (selectionLine < startLine || selectionLine > endLine || !decl.init)
           continue;
 
-        const isTargetVar = (n: ts.BindingName) =>
-          ts.isIdentifier(n) && n.text === variableName;
+        const { id, init } = decl;
+        const unwrappedInit = unwrapChainExpression(init);
 
-        // Case: const result = obj.method() or exec(...)
-        if (isTargetVar(name) && ts.isCallExpression(initializer)) {
+        // Case: const result = obj.method() or exec(...) or session?.getUser()?.info()
+        if (
+          isIdentifier(id) &&
+          id.name === variableName &&
+          isCallExpression(unwrappedInit)
+        ) {
           isChecked = true;
-          return;
+          return true;
         }
 
         // Case: const { data } = obj.method()
         if (
-          ts.isObjectBindingPattern(name) &&
-          name.elements.some(
-            (el) =>
-              ts.isBindingElement(el) &&
-              ts.isIdentifier(el.name) &&
-              el.name.text === variableName,
+          isObjectPattern(id) &&
+          id.properties.some(
+            (prop) =>
+              prop.type === 'Property' &&
+              isIdentifier(prop.value) &&
+              prop.value.name === variableName,
           ) &&
-          ts.isCallExpression(initializer)
+          isCallExpression(unwrappedInit)
         ) {
           isChecked = true;
-          return;
+          return true;
         }
 
         // Case: const [githubSha] = process.argv.slice(2)
         if (
-          ts.isArrayBindingPattern(name) &&
-          name.elements.some(
-            (el) =>
-              ts.isBindingElement(el) &&
-              ts.isIdentifier(el.name) &&
-              el.name.text === variableName,
+          isArrayPattern(id) &&
+          id.elements.some(
+            (el) => el && isIdentifier(el) && el.name === variableName,
           ) &&
-          ts.isCallExpression(initializer)
+          isCallExpression(unwrappedInit)
         ) {
           isChecked = true;
-          return;
+          return true;
         }
 
         // Case: const result = wrapperFn({ queryFn: () => obj.method() })
-        if (isTargetVar(name) && ts.isCallExpression(initializer)) {
-          for (const arg of initializer.arguments) {
-            if (
-              ts.isObjectLiteralExpression(arg) &&
-              arg.properties.some((prop) => {
-                if (
-                  ts.isPropertyAssignment(prop) &&
-                  (ts.isFunctionExpression(prop.initializer) ||
-                    ts.isArrowFunction(prop.initializer))
-                ) {
-                  return ts.forEachChild(
-                    prop.initializer,
-                    function searchNestedCall(n): boolean {
-                      if (
-                        ts.isCallExpression(n) &&
-                        ts.isPropertyAccessExpression(n.expression)
-                      ) {
-                        return true;
+        if (
+          isIdentifier(id) &&
+          id.name === variableName &&
+          isCallExpression(unwrappedInit)
+        ) {
+          const callNode = unwrappedInit as { arguments?: AcornNode[] };
+          if (callNode.arguments) {
+            for (const arg of callNode.arguments) {
+              if (
+                isObjectExpression(arg) &&
+                arg.properties.some((prop) => {
+                  if (
+                    prop.type === 'Property' &&
+                    (isFunctionExpression(prop.value) ||
+                      isArrowFunctionExpression(prop.value))
+                  ) {
+                    // Search for nested CallExpression with MemberExpression callee
+                    let found = false;
+                    walk(prop.value, (n) => {
+                      if (isCallExpression(n)) {
+                        const callee = (n as { callee?: AcornNode }).callee;
+                        if (callee && isMemberExpression(callee)) {
+                          found = true;
+                          return true;
+                        }
                       }
-                      return ts.forEachChild(n, searchNestedCall) || false;
-                    },
-                  );
-                }
-                return false;
-              })
-            ) {
-              isChecked = true;
-              return;
+                    });
+                    return found;
+                  }
+                  return false;
+                })
+              ) {
+                isChecked = true;
+                return true;
+              }
             }
           }
         }
       }
     }
 
-    // New logic: handle assignment expressions (e.g., optionalDependencies[key] = optionalDependencies[key].replace(...))
-    if (
-      ts.isExpressionStatement(node) &&
-      ts.isBinaryExpression(node.expression)
-    ) {
-      const { left, right } = node.expression;
-      const startLine = document.positionAt(node.getStart()).line;
-      const endLine = document.positionAt(node.getEnd()).line;
-      // Only check if selectionLine matches
+    // Handle assignment expressions (e.g., optionalDependencies[key] = optionalDependencies[key].replace(...))
+    if (isExpressionStatement(node)) {
+      const expr = node.expression;
+      if (!expr.loc) return;
+
+      const startLine = expr.loc.start.line - 1;
+      const endLine = expr.loc.end.line - 1;
+
       if (selectionLine < startLine || selectionLine > endLine) return;
 
-      // Match left side: identifier or element access
-      let leftText = '';
-      if (ts.isIdentifier(left)) {
-        leftText = left.text;
-      } else if (ts.isElementAccessExpression(left)) {
-        leftText = left.getText();
-      }
+      if (isAssignmentExpression(expr)) {
+        const { left, right } = expr;
 
-      if (leftText === variableName && ts.isCallExpression(right)) {
-        isChecked = true;
-        return;
+        // Get text representation of left side
+        let leftText = '';
+        if (isIdentifier(left)) {
+          leftText = left.name;
+        } else if (isMemberExpression(left)) {
+          // For computed member access like obj[key], reconstruct the text
+          const obj = left.object;
+          const prop = left.property;
+          if (isIdentifier(obj) && isIdentifier(prop)) {
+            if ((left as { computed?: boolean }).computed) {
+              leftText = `${obj.name}[${prop.name}]`;
+            } else {
+              leftText = `${obj.name}.${prop.name}`;
+            }
+          }
+        }
+
+        const unwrappedRight = unwrapChainExpression(right);
+        if (leftText === variableName && isCallExpression(unwrappedRight)) {
+          isChecked = true;
+          return true;
+        }
       }
     }
-
-    ts.forEachChild(node, visit);
   });
 
   return { isChecked };

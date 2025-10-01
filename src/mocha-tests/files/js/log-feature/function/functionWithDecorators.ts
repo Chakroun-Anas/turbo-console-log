@@ -1,15 +1,27 @@
 // @ts-nocheck
 
-@Get()
+@Controller('projects')
+export class ProjectController {
+  @Get()
   @SuccessApiResponse('Success', [Object])
   @ApiQuery({ name: 'fields', type: [String], required: false })
-  @ApiOptionalQuery('text', 'skip', 'take', 'withCount', { parameter: 'fields', type: [String] })
-  async function findAll(
+  @ApiOptionalQuery('text', 'skip', 'take', 'withCount', {
+    parameter: 'fields',
+    type: [String],
+  })
+  async findAll(
     @Query('text') text?: string,
     @Query('skip') skip?: number,
     @Query('take') take?: number,
     @Query('withCount') withCount?: boolean,
     @Query('fields') fields?: FieldArray<Object>,
   ): Promise<PagedResult<Object> | Object[]> {
-    return this.sdkProjectService.findSdkProjects(text, skip, take, withCount, fields);
+    return this.sdkProjectService.findSdkProjects(
+      text,
+      skip,
+      take,
+      withCount,
+      fields,
+    );
+  }
 }

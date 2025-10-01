@@ -1,7 +1,12 @@
 export default {
   name: 'object destructuring single line',
-  lines: ['const { user } = state;', 'return user;'],
-  selectionLine: 0,
+  lines: [
+    'function test() {',
+    '  const { user } = state;',
+    '  return user;',
+    '}',
+  ],
+  selectionLine: 1,
   variableName: 'user',
-  expectedLine: 1,
+  expectedLine: 2,
 };

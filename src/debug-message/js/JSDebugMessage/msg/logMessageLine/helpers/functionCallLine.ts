@@ -1,100 +1,171 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  type VariableDeclaration,
+  isIdentifier,
+  isCallExpression,
+  isAwaitExpression,
+  isTSAsExpression,
+  isParenthesizedExpression,
+  isMemberExpression,
+  isExpressionStatement,
+  isAssignmentExpression,
+  isObjectPattern,
+  isArrayPattern,
+  isLogicalExpression,
+  walk,
+} from '../../acorn-utils';
 
-function getFullExpressionEnd(initializer: ts.Expression): number {
-  let current: ts.Node = initializer;
+function getFullExpressionEnd(initializer: AcornNode): number {
+  const current: AcornNode = initializer;
 
   // Go up while parent is part of the expression (e.g. .catch, .then, etc.)
-  while (
-    current.parent &&
-    (ts.isCallExpression(current.parent) ||
-      ts.isPropertyAccessExpression(current.parent) ||
-      ts.isAwaitExpression(current.parent) ||
-      ts.isAsExpression(current.parent) ||
-      ts.isParenthesizedExpression(current.parent))
-  ) {
-    current = current.parent;
-  }
+  // In Acorn, we need to walk the tree to find the outermost relevant expression
+  // Since Acorn doesn't have parent pointers, we'll calculate the end differently
+  // by finding the maximum end position of all child nodes
 
-  return current.end;
+  let maxEnd = current.end || 0;
+
+  walk(current, (node: AcornNode) => {
+    if (node.end && node.end > maxEnd) {
+      maxEnd = node.end;
+    }
+  });
+
+  return maxEnd;
 }
 
 export function functionCallLine(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
   let targetEnd = -1;
+  const code = document.getText();
 
-  ts.forEachChild(sourceFile, function visit(node: ts.Node): void {
-    // Handle variable declarations (existing logic)
-    if (ts.isVariableDeclaration(node)) {
-      const isIdentifier =
-        ts.isIdentifier(node.name) && node.name.text === variableName;
+  walk(ast, (node: AcornNode): boolean | void => {
+    // Handle variable declarations
+    if (node.type === 'VariableDeclaration') {
+      const varDecl = node as VariableDeclaration;
 
-      const isDestructuring =
-        ts.isObjectBindingPattern(node.name) ||
-        ts.isArrayBindingPattern(node.name);
+      for (const decl of varDecl.declarations) {
+        if (decl.start === undefined || decl.end === undefined) continue;
 
-      if (!isIdentifier && !isDestructuring) {
-        ts.forEachChild(node, visit);
-        return;
-      }
+        const isIdentifierMatch =
+          isIdentifier(decl.id) && decl.id.name === variableName;
 
-      const initializer = node.initializer;
-      if (!initializer) return;
+        const isDestructuring =
+          isObjectPattern(decl.id) || isArrayPattern(decl.id);
 
-      const isRelevantCall =
-        ts.isCallExpression(initializer) ||
-        (ts.isAsExpression(initializer) &&
-          ts.isCallExpression(initializer.expression)) ||
-        (ts.isParenthesizedExpression(initializer) &&
-          ts.isCallExpression(initializer.expression)) ||
-        ts.isAwaitExpression(initializer);
+        if (!isIdentifierMatch && !isDestructuring) {
+          continue;
+        }
 
-      if (!isRelevantCall) return;
+        const initializer = decl.init;
+        if (!initializer) continue;
 
-      const startLine = document.positionAt(node.getStart()).line;
-      const endLine = document.positionAt(node.getEnd()).line;
+        const isRelevantCall = containsFunctionCall(initializer);
 
-      if (selectionLine >= startLine && selectionLine <= endLine) {
-        targetEnd = getFullExpressionEnd(initializer);
-        return;
-      }
-    }
+        if (!isRelevantCall) continue;
 
-    if (
-      ts.isExpressionStatement(node) &&
-      ts.isBinaryExpression(node.expression)
-    ) {
-      const { left, right, operatorToken } = node.expression;
-      // Only handle '=' assignments
-      if (operatorToken.kind !== ts.SyntaxKind.EqualsToken) return;
+        // Use the VariableDeclaration's range for selection check, not the declarator's
+        if (node.start === undefined || node.end === undefined) continue;
 
-      // Match left side: identifier or element access
-      let leftText = '';
-      if (ts.isIdentifier(left)) {
-        leftText = left.text;
-      } else if (ts.isElementAccessExpression(left)) {
-        leftText = left.getText();
-      }
+        const startLine = document.positionAt(node.start).line;
+        const endLine = document.positionAt(node.end).line;
 
-      if (leftText === variableName && ts.isCallExpression(right)) {
-        const startLine = document.positionAt(node.getStart()).line;
-        const endLine = document.positionAt(node.getEnd()).line;
         if (selectionLine >= startLine && selectionLine <= endLine) {
-          targetEnd = node.getEnd();
-          return;
+          targetEnd = getFullExpressionEnd(initializer);
+          return true;
         }
       }
     }
 
-    ts.forEachChild(node, visit);
+    // Handle assignment expressions: variable = functionCall()
+    if (isExpressionStatement(node)) {
+      const expr = (node as { expression?: AcornNode }).expression;
+      if (expr && isAssignmentExpression(expr)) {
+        const assignment = expr as {
+          operator: string;
+          left?: AcornNode;
+          right?: AcornNode;
+        };
+
+        // Only handle '=' assignments
+        if (assignment.operator !== '=') return;
+
+        const { left, right } = assignment;
+        if (!left || !right) return;
+
+        // Match left side: identifier or member/element access
+        let leftText = '';
+        if (isIdentifier(left)) {
+          leftText = left.name;
+        } else if (
+          isMemberExpression(left) &&
+          left.start !== undefined &&
+          left.end !== undefined
+        ) {
+          leftText = code.substring(left.start, left.end);
+        }
+
+        if (leftText === variableName && isCallExpression(right)) {
+          if (node.start === undefined || node.end === undefined) return;
+
+          const startLine = document.positionAt(node.start).line;
+          const endLine = document.positionAt(node.end).line;
+
+          if (selectionLine >= startLine && selectionLine <= endLine) {
+            targetEnd = node.end;
+            return true;
+          }
+        }
+      }
+    }
   });
 
   if (targetEnd === -1) return selectionLine + 1;
 
   const { line: endLine } = document.positionAt(targetEnd);
   return endLine + 1;
+}
+
+/**
+ * Recursively checks if an expression contains any function call,
+ * handling complex nested expressions with await, logical operators, etc.
+ */
+function containsFunctionCall(expr: AcornNode): boolean {
+  if (!expr) return false;
+
+  const visited = new Set<AcornNode>();
+  const MAX_DEPTH = 1000;
+  let depth = 0;
+
+  function check(node: AcornNode): boolean {
+    if (!node || visited.has(node) || depth++ >= MAX_DEPTH) return false;
+    visited.add(node);
+
+    // Direct function call
+    if (isCallExpression(node)) return true;
+
+    // Await expression: check the awaited expression
+    if (isAwaitExpression(node)) {
+      return check(node.argument);
+    }
+
+    // Logical expression: check both sides
+    if (isLogicalExpression(node)) {
+      return check(node.left) || check(node.right);
+    }
+
+    // Unwrap type assertions and parentheses
+    if (isTSAsExpression(node) || isParenthesizedExpression(node)) {
+      return check(node.expression);
+    }
+
+    return false;
+  }
+
+  return check(expr);
 }

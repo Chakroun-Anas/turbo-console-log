@@ -1,26 +1,20 @@
-import ts from 'typescript';
 import { propertyMethodCallLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import testCases from './cases';
 
 describe('propertyMethodCallLine', () => {
-  for (const test of testCases) {
-    it(test.name, () => {
-      const doc = makeTextDocument(test.lines);
-      const sourceFile = ts.createSourceFile(
-        doc.fileName,
-        doc.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
+  for (const testCase of testCases) {
+    it(testCase.name, () => {
+      const document = makeTextDocument(testCase.lines);
+      const ast = parseCode(document.getText())!;
+      const result = propertyMethodCallLine(
+        ast,
+        document,
+        testCase.selectionLine,
+        testCase.selectedText,
       );
-      const line = propertyMethodCallLine(
-        sourceFile,
-        doc,
-        test.selectionLine,
-        test.selectedText,
-      );
-      expect(line).toBe(test.expectedLine);
+      expect(result).toBe(testCase.expectedLine);
     });
   }
 });

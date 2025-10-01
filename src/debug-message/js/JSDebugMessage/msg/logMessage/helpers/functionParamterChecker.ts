@@ -1,8 +1,16 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  isIdentifier,
+  isObjectPattern,
+  isArrayPattern,
+  isRestElement,
+  isAssignmentPattern,
+  walk,
+} from '../../acorn-utils';
 
 export function functionParameterChecker(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
@@ -12,23 +20,67 @@ export function functionParameterChecker(
 
   let match = false;
 
-  ts.forEachChild(sourceFile, function visit(node) {
-    if (match) return;
+  if (!ast) {
+    return { isChecked: false };
+  }
 
-    if (ts.isParameter(node)) {
-      const startLine = document.positionAt(node.getStart()).line;
-      const endLine = document.positionAt(node.getEnd()).line;
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (match) return true;
 
-      if (selectionLine >= startLine && selectionLine <= endLine) {
-        if (paramContainsIdentifier(node.name, wanted)) {
-          match = true;
-          return;
+    // Check if this is a function with params
+    if (
+      node.type === 'FunctionDeclaration' ||
+      node.type === 'FunctionExpression' ||
+      node.type === 'ArrowFunctionExpression'
+    ) {
+      const params = (
+        node as {
+          params?: AcornNode[];
+        }
+      ).params;
+      if (!params || !Array.isArray(params)) return;
+
+      for (const param of params) {
+        // Use start/end positions instead of loc
+        if (param.start === undefined) continue;
+
+        // For simple Identifier params, end might be undefined or incorrect
+        // Calculate it from the identifier name length or use typeAnnotation.end
+        let paramEnd = param.end;
+
+        // Validate that end is after start (acorn-typescript bug with decorators can cause invalid end values)
+        if (paramEnd === undefined || paramEnd <= param.start) {
+          if (isIdentifier(param) && 'name' in param) {
+            // Try to use typeAnnotation.end if available
+            if (
+              'typeAnnotation' in param &&
+              param.typeAnnotation &&
+              typeof param.typeAnnotation === 'object' &&
+              'end' in param.typeAnnotation
+            ) {
+              paramEnd = (param.typeAnnotation as { end: number }).end;
+            } else {
+              // Fallback: calculate from identifier name length
+              paramEnd = param.start + (param.name as string).length;
+            }
+          }
+        }
+
+        if (paramEnd === undefined || paramEnd <= param.start) continue;
+
+        const startLine = document.positionAt(param.start).line;
+        const endLine = document.positionAt(paramEnd).line;
+
+        if (selectionLine >= startLine && selectionLine <= endLine) {
+          if (paramContainsIdentifier(param, wanted, new Set(), 0)) {
+            match = true;
+            return true;
+          }
         }
       }
     }
-
-    ts.forEachChild(node, visit);
   });
+
   return {
     isChecked: match,
   };
@@ -37,20 +89,85 @@ export function functionParameterChecker(
 /*──────────────── helper ────────────────*/
 
 function paramContainsIdentifier(
-  name: ts.BindingName,
+  param: AcornNode,
   wanted: string,
+  visited = new Set<AcornNode>(),
+  depth = 0,
 ): boolean {
-  if (ts.isIdentifier(name)) {
-    return name.text === wanted;
+  // Safeguards against infinite recursion
+  const MAX_DEPTH = 1000; // Generous max depth for nested destructuring patterns
+
+  if (depth >= MAX_DEPTH) {
+    console.warn(
+      `paramContainsIdentifier: Hit max depth limit (${MAX_DEPTH}) - preventing infinite recursion`,
+    );
+    return false;
   }
 
-  if (ts.isObjectBindingPattern(name) || ts.isArrayBindingPattern(name)) {
-    return name.elements.some((el) => {
-      // Guard against omitted or malformed elements
-      if (ts.isBindingElement(el)) {
-        return paramContainsIdentifier(el.name, wanted);
+  if (visited.has(param)) {
+    return false;
+  }
+
+  visited.add(param);
+
+  // Handle rest parameters: ...numbers
+  if (isRestElement(param)) {
+    const restElem = param as { argument: AcornNode };
+    return paramContainsIdentifier(
+      restElem.argument,
+      wanted,
+      visited,
+      depth + 1,
+    );
+  }
+
+  // Handle assignment patterns (default values): x = 1
+  if (isAssignmentPattern(param)) {
+    const assignPat = param as { left: AcornNode };
+    return paramContainsIdentifier(assignPat.left, wanted, visited, depth + 1);
+  }
+
+  // Simple identifier: name
+  if (isIdentifier(param)) {
+    return param.name === wanted;
+  }
+
+  // Object destructuring: { user, email } or { config: { apiKey } }
+  if (isObjectPattern(param)) {
+    const objPat = param as { properties: AcornNode[] };
+    return objPat.properties.some((prop) => {
+      if (prop.type === 'Property') {
+        const property = prop as unknown as { value: AcornNode };
+        // For { user }, prop.value is the identifier
+        // For { config: { apiKey } }, prop.value is another ObjectPattern
+        return paramContainsIdentifier(
+          property.value,
+          wanted,
+          visited,
+          depth + 1,
+        );
+      }
+      // Handle RestElement in object patterns: { ...rest }
+      if (prop.type === 'RestElement') {
+        const restProp = prop as unknown as { argument: AcornNode };
+        return paramContainsIdentifier(
+          restProp.argument,
+          wanted,
+          visited,
+          depth + 1,
+        );
       }
       return false;
+    });
+  }
+
+  // Array destructuring: [first, second] or [[id]]
+  if (isArrayPattern(param)) {
+    const arrPat = param as { elements: (AcornNode | null)[] };
+    return arrPat.elements.some((el) => {
+      // Skip holes in array patterns: [, second]
+      if (!el) return false;
+      return paramContainsIdentifier(el, wanted, visited, depth + 1);
     });
   }
 

@@ -31,12 +31,12 @@ export default (): void => {
         activeTextEditor,
         'functionWithDecorators.ts',
       );
-      const expectedLogMessageLine = naturalEditorLine(14);
+      const expectedLogMessageLine = naturalEditorLine(19);
       if (activeTextEditor) {
         activeTextEditor.selections = [
           new vscode.Selection(
-            new NaturalEditorPosition(9, 20),
-            new NaturalEditorPosition(9, 24),
+            new NaturalEditorPosition(13, 20),
+            new NaturalEditorPosition(13, 24),
           ),
         ];
         await vscode.commands.executeCommand(

@@ -23,6 +23,7 @@ export const workspace = {
     get: jest.fn(() => true), // Default to telemetry enabled for tests
   })),
   onDidChangeConfiguration: jest.fn(),
+  openTextDocument: jest.fn(),
 };
 
 export const extensions = {
@@ -38,6 +39,7 @@ export const env = {
 
 export const Uri = {
   parse: jest.fn(),
+  file: jest.fn((path: string) => ({ fsPath: path })),
 };
 
 export class Position {
