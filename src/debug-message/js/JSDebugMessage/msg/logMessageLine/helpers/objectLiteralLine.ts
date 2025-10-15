@@ -1,41 +1,54 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  type VariableDeclaration,
+  isIdentifier,
+  isObjectExpression,
+  walk,
+} from '../../acorn-utils';
 
 export function objectLiteralLine(
-  sourceFile: ts.SourceFile,
-  _document: TextDocument,
+  ast: AcornNode,
+  document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
   let insertionLine = selectionLine + 1;
   let found = false;
 
-  function visit(node: ts.Node) {
-    if (found) return;
-    if (
-      ts.isVariableDeclaration(node) &&
-      ts.isIdentifier(node.name) &&
-      node.name.text === variableName &&
-      node.initializer &&
-      ts.isObjectLiteralExpression(node.initializer)
-    ) {
-      const { line: startLine } = sourceFile.getLineAndCharacterOfPosition(
-        node.initializer.getStart(),
-      );
-      const { line: endLine } = sourceFile.getLineAndCharacterOfPosition(
-        node.initializer.getEnd(),
-      );
-      if (selectionLine >= startLine && selectionLine <= endLine) {
-        insertionLine = endLine + 1;
-        found = true;
-        return;
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (found) return true; // Stop walking
+
+    if (node.type === 'VariableDeclaration') {
+      const varDecl = node as VariableDeclaration;
+
+      for (const decl of varDecl.declarations) {
+        if (
+          isIdentifier(decl.id) &&
+          (decl.id as { name: string }).name === variableName &&
+          decl.init &&
+          isObjectExpression(decl.init)
+        ) {
+          // Check if decl has location info
+          if (!decl.loc) continue;
+
+          // Get the full declaration range (includes type annotation)
+          const declStartLine = decl.loc.start.line - 1; // Acorn uses 1-based lines
+          const declEndLine = decl.loc.end.line - 1;
+
+          // Check if selection is anywhere within the declaration
+          if (selectionLine >= declStartLine && selectionLine <= declEndLine) {
+            if (decl.init.end === undefined) continue;
+
+            const endLine = document.positionAt(decl.init.end).line;
+            insertionLine = endLine + 1;
+            found = true;
+            return true; // Stop walking
+          }
+        }
       }
     }
-
-    ts.forEachChild(node, visit);
-  }
-
-  visit(sourceFile);
+  });
 
   return insertionLine;
 }

@@ -1,95 +1,137 @@
-import ts from 'typescript';
-import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  isVariableDeclaration,
+  isIdentifier,
+  isArrayExpression,
+  isArrayPattern,
+  isExpressionStatement,
+  isAssignmentExpression,
+  isMemberExpression,
+  walk,
+} from '../../acorn-utils';
+
+/**
+ * Helper to get full property name like "config.module.rules"
+ */
+function getFullPropertyName(node: AcornNode): string {
+  const parts: string[] = [];
+
+  let current: AcornNode = node;
+
+  // Safeguards against infinite loops
+  const visited = new Set<AcornNode>();
+  const MAX_DEPTH = 1000; // Generous max depth for deeply nested member expressions
+  let depth = 0;
+
+  while (
+    isMemberExpression(current) &&
+    depth < MAX_DEPTH &&
+    !visited.has(current)
+  ) {
+    visited.add(current);
+    depth++;
+    if (current.computed) {
+      // Don't support computed property access like obj[key]
+      return '';
+    }
+    if (isIdentifier(current.property)) {
+      parts.unshift(current.property.name);
+    }
+    current = current.object;
+  }
+  if (isIdentifier(current)) {
+    parts.unshift(current.name);
+  }
+
+  // Log safety limit hits for debugging
+  if (depth >= MAX_DEPTH) {
+    console.warn(
+      `getFullPropertyName: Hit max depth limit (${MAX_DEPTH}) - preventing infinite loop`,
+    );
+  }
+  if (current && visited.has(current)) {
+    console.warn(
+      `getFullPropertyName: Detected cycle in member expression chain - preventing infinite loop`,
+    );
+  }
+
+  return parts.join('.');
+}
 
 export function arrayAssignmentChecker(
-  sourceFile: ts.SourceFile,
-  document: TextDocument,
+  ast: AcornNode,
   selectionLine: number,
   variableName: string,
 ) {
   let isChecked = false;
 
-  ts.forEachChild(sourceFile, function visit(node) {
+  if (!ast) {
+    return { isChecked: false };
+  }
+
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (isChecked) return true;
+
+    // Check if node has location information
+    if (!node.loc) return;
+
+    const startLine = node.loc.start.line - 1; // Acorn uses 1-based lines
+    const endLine = node.loc.end.line - 1;
+
     // Case 1: const items = [1, 2, 3]
-    if (ts.isVariableStatement(node)) {
-      for (const decl of node.declarationList.declarations) {
-        const name = decl.name;
-        const initializer = decl.initializer;
+    if (isVariableDeclaration(node)) {
+      for (const decl of node.declarations) {
+        const { id, init } = decl;
 
-        if (!initializer) continue;
+        if (!init) continue;
 
-        const { line } = document.positionAt(decl.getStart());
-        if (line !== selectionLine) continue;
+        // Check if declaration is on the selection line
+        if (!decl.loc) continue;
+        const declLine = decl.loc.start.line - 1;
+        if (declLine !== selectionLine) continue;
 
+        // Simple array assignment: const items = [1, 2, 3]
         if (
-          ts.isIdentifier(name) &&
-          name.text === variableName &&
-          ts.isArrayLiteralExpression(initializer)
+          isIdentifier(id) &&
+          id.name === variableName &&
+          isArrayExpression(init)
         ) {
           isChecked = true;
-          return;
+          return true;
         }
 
-        if (
-          ts.isArrayBindingPattern(name) &&
-          ts.isArrayLiteralExpression(initializer)
-        ) {
-          const found = name.elements.some(
-            (el) =>
-              ts.isBindingElement(el) &&
-              ts.isIdentifier(el.name) &&
-              el.name.text === variableName,
+        // Array destructuring: const [a, b] = [1, 2]
+        if (isArrayPattern(id) && isArrayExpression(init)) {
+          const found = id.elements.some(
+            (el) => el && isIdentifier(el) && el.name === variableName,
           );
           if (found) {
             isChecked = true;
-            return;
+            return true;
           }
         }
       }
     }
 
-    if (
-      ts.isExpressionStatement(node) &&
-      ts.isBinaryExpression(node.expression) &&
-      node.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken
-    ) {
-      const left = node.expression.left;
-      const right = node.expression.right;
+    // Case 2: config.module.rules = [...]
+    if (isExpressionStatement(node)) {
+      const expr = node.expression;
 
-      const startLine = document.positionAt(node.getStart()).line;
-      const endLine = document.positionAt(node.getEnd()).line;
       if (selectionLine < startLine || selectionLine > endLine) return;
 
-      if (
-        ts.isArrayLiteralExpression(right) &&
-        ts.isPropertyAccessExpression(left)
-      ) {
-        const fullName = getFullPropertyName(left);
-        if (fullName === variableName) {
-          isChecked = true;
-          return;
+      if (isAssignmentExpression(expr) && expr.operator === '=') {
+        const { left, right } = expr;
+
+        if (isArrayExpression(right) && isMemberExpression(left)) {
+          const fullName = getFullPropertyName(left);
+          if (fullName === variableName) {
+            isChecked = true;
+            return true;
+          }
         }
       }
     }
-
-    ts.forEachChild(node, visit);
   });
 
   return { isChecked };
-}
-
-// 👇 Helper to get full name like "config.module.rules"
-function getFullPropertyName(node: ts.PropertyAccessExpression): string {
-  const parts: string[] = [];
-
-  let current: ts.Expression = node;
-  while (ts.isPropertyAccessExpression(current)) {
-    parts.unshift(current.name.text);
-    current = current.expression;
-  }
-  if (ts.isIdentifier(current)) {
-    parts.unshift(current.text);
-  }
-
-  return parts.join('.');
 }

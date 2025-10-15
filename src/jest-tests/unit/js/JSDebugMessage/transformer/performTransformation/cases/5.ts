@@ -1,0 +1,36 @@
+// React map callback with array destructuring parameters
+export default {
+  name: 'React map callback with array destructuring parameters',
+  lines: [
+    'Object.entries({ ...metaData.exif, ...metaData.mediaType }).map(',
+    '  ([key, data], index) => (',
+    '    // eslint-disable-next-line react/no-array-index-key',
+    '    <Fragment key={`${key}${index}`}>',
+    '      <tr className="header">',
+    '        <th>{key}</th>',
+    '        <th className="line" />',
+    '      </tr>',
+    '    </Fragment>',
+    '  )',
+    ')',
+  ],
+  selectedVar: 'key',
+  line: 1, // Line with destructuring parameters: ([key, data], index) =>
+  debuggingMsg: 'console.log("🚀 ~ key:", key)',
+  expected: [
+    'Object.entries({ ...metaData.exif, ...metaData.mediaType }).map(',
+    '  ([key, data], index) => {',
+    '    console.log("🚀 ~ key:", key);',
+    '    return (',
+    '      // eslint-disable-next-line react/no-array-index-key',
+    '      <Fragment key={`${key}${index}`}>',
+    '        <tr className="header">',
+    '          <th>{key}</th>',
+    '          <th className="line" />',
+    '        </tr>',
+    '      </Fragment>',
+    '    );',
+    '  }',
+    ')',
+  ],
+};

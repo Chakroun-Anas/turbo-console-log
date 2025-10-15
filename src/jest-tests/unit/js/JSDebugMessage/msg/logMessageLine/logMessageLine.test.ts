@@ -1,7 +1,7 @@
-import ts from 'typescript';
 import { line } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine';
 import { LogMessage, LogMessageType } from '@/entities';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/makeTextDocument';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 
 // Import the helpers that we want to mock
 import {
@@ -17,6 +17,8 @@ import {
   rawPropertyAccessLine,
   propertyMethodCallLine,
   functionParameterLine,
+  wanderingExpressionLine,
+  withinConditionBlockLine,
   withinReturnStatementLine,
 } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers';
 
@@ -25,13 +27,7 @@ jest.mock('@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers');
 
 describe('logMessageLine', () => {
   const mockDocument = makeTextDocument(['const value = 42;']);
-  const sourceFile = ts.createSourceFile(
-    mockDocument.fileName,
-    mockDocument.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
+  const ast = parseCode(mockDocument.getText())!;
   const selectionLine = 0;
   const selectedVar = 'value';
 
@@ -60,13 +56,7 @@ describe('logMessageLine', () => {
       logMessageType: 'UnknownType' as LogMessageType,
     };
 
-    const result = line(
-      sourceFile,
-      mockDocument,
-      selectionLine,
-      selectedVar,
-      logMsg,
-    );
+    const result = line(ast, mockDocument, selectionLine, selectedVar, logMsg);
 
     expect(result).toBe(selectionLine + 1);
 
@@ -145,6 +135,18 @@ describe('logMessageLine', () => {
         type: LogMessageType.Ternary,
         helper: ternaryExpressionLine,
       },
+      {
+        type: LogMessageType.WanderingExpression,
+        helper: wanderingExpressionLine,
+      },
+      {
+        type: LogMessageType.WithinConditionBlock,
+        helper: withinConditionBlockLine,
+      },
+      {
+        type: LogMessageType.WithinReturnStatement,
+        helper: withinReturnStatementLine,
+      },
     ];
 
     testCases.forEach(({ type, helper }) => {
@@ -156,15 +158,16 @@ describe('logMessageLine', () => {
       (helper as jest.Mock).mockReturnValue(expectedLine);
 
       const result = line(
-        sourceFile,
+        ast,
         mockDocument,
         selectionLine,
         selectedVar,
         logMsg,
       );
 
+      // All helpers now use AST as the first parameter
       expect(helper).toHaveBeenCalledWith(
-        sourceFile,
+        ast,
         mockDocument,
         selectionLine,
         selectedVar,
@@ -187,6 +190,7 @@ describe('logMessageLine', () => {
         templateStringLine,
         binaryExpressionLine,
         ternaryExpressionLine,
+        wanderingExpressionLine,
       ];
 
       allHelpers.forEach((otherHelper) => {

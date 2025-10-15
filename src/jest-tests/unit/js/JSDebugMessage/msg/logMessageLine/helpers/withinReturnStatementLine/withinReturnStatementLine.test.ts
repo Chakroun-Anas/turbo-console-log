@@ -1,26 +1,20 @@
-import ts from 'typescript';
-import { withinReturnStatementLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers';
-import { makeTextDocument } from '@/jest-tests/mocks/helpers';
+import { withinReturnStatementLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers/withinReturnStatementLine';
+import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import testCases from './cases';
 
-describe('withinReturnStatementLine – each layout style', () => {
-  for (const test of testCases) {
-    it(`should return correct insertion line for: ${test.name}`, () => {
-      const doc = makeTextDocument(test.lines);
-      const sourceFile = ts.createSourceFile(
-        doc.fileName,
-        doc.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+describe('withinReturnStatementLine', () => {
+  testCases.forEach((testCase) => {
+    it(testCase.name, () => {
+      const document = makeTextDocument(testCase.lines);
+      const ast = parseCode(document.getText())!;
       const result = withinReturnStatementLine(
-        sourceFile,
-        doc,
-        test.selectionLine,
-        test.variableName,
+        ast,
+        document,
+        testCase.selectionLine,
+        testCase.variableName,
       );
-      expect(result).toBe(test.expected);
+      expect(result).toBe(testCase.expected);
     });
-  }
+  });
 });

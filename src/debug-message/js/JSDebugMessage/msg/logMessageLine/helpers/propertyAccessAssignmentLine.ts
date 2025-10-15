@@ -1,70 +1,115 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  type VariableDeclaration,
+  isIdentifier,
+  isMemberExpression,
+  isTSAsExpression,
+  isParenthesizedExpression,
+  isExpressionStatement,
+  isAssignmentExpression,
+  walk,
+} from '../../acorn-utils';
 
 export function propertyAccessAssignmentLine(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
   let insertionLine = selectionLine + 1;
+  const code = document.getText();
 
-  ts.forEachChild(sourceFile, function visit(node) {
+  walk(ast, (node: AcornNode): void => {
     // Case 1: const foo = obj.prop;
-    if (
-      ts.isVariableDeclaration(node) &&
-      ts.isIdentifier(node.name) &&
-      node.name.text === variableName &&
-      node.initializer
-    ) {
-      const nodeStart = document.positionAt(node.getStart()).line;
-      const nodeEnd = document.positionAt(node.getEnd()).line;
-      if (selectionLine < nodeStart || selectionLine > nodeEnd) return;
+    if (node.type === 'VariableDeclaration') {
+      const varDecl = node as VariableDeclaration;
 
-      const unwrapped = unwrap(node.initializer);
-      if (
-        ts.isPropertyAccessExpression(unwrapped) ||
-        ts.isElementAccessExpression(unwrapped) ||
-        ts.isNonNullChain(unwrapped)
-      ) {
-        insertionLine = nodeEnd + 1;
+      for (const decl of varDecl.declarations) {
+        if (
+          isIdentifier(decl.id) &&
+          (decl.id as { name: string }).name === variableName &&
+          decl.init
+        ) {
+          if (node.start === undefined || node.end === undefined) continue;
+
+          const nodeStart = document.positionAt(node.start).line;
+          const nodeEnd = document.positionAt(node.end).line;
+          if (selectionLine < nodeStart || selectionLine > nodeEnd) continue;
+
+          const unwrapped = unwrap(decl.init);
+          if (
+            isMemberExpression(unwrapped) ||
+            unwrapped.type === 'ChainExpression' ||
+            unwrapped.type === 'TSNonNullExpression'
+          ) {
+            insertionLine = nodeEnd + 1;
+          }
+        }
       }
     }
 
     // Case 2: this.foo = obj.prop;
-    if (
-      ts.isExpressionStatement(node) &&
-      ts.isBinaryExpression(node.expression) &&
-      node.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken
-    ) {
-      const nodeStart = document.positionAt(node.getStart()).line;
-      const nodeEnd = document.positionAt(node.getEnd()).line;
-      if (selectionLine < nodeStart || selectionLine > nodeEnd) return;
-
-      const left = node.expression.left;
-
+    if (isExpressionStatement(node)) {
+      const expr = (node as { expression: AcornNode }).expression;
       if (
-        ts.isPropertyAccessExpression(left) &&
-        ts.isIdentifier(left.name) &&
-        left.getText() === variableName
+        isAssignmentExpression(expr) &&
+        (expr as { operator: string }).operator === '='
       ) {
-        insertionLine = nodeEnd + 1;
+        if (node.start === undefined || node.end === undefined) return;
+
+        const nodeStart = document.positionAt(node.start).line;
+        const nodeEnd = document.positionAt(node.end).line;
+        if (selectionLine < nodeStart || selectionLine > nodeEnd) return;
+
+        const left = (expr as { left: AcornNode }).left;
+
+        if (isMemberExpression(left)) {
+          // Get the text representation of the left side
+          const leftText = getNodeText(code, left);
+          if (leftText === variableName) {
+            insertionLine = nodeEnd + 1;
+          }
+        }
       }
     }
-
-    ts.forEachChild(node, visit);
   });
 
   return insertionLine;
 }
 
-function unwrap(expr: ts.Expression): ts.Expression {
+function unwrap(expr: AcornNode): AcornNode {
+  let current = expr;
+  const visited = new Set<AcornNode>();
+  let depth = 0;
+  const MAX_DEPTH = 1000;
+
   while (
-    ts.isAsExpression(expr) ||
-    ts.isParenthesizedExpression(expr) ||
-    ts.isNonNullExpression(expr)
+    isTSAsExpression(current) ||
+    isParenthesizedExpression(current) ||
+    current.type === 'TSNonNullExpression'
   ) {
-    expr = expr.expression;
+    // Safeguards against infinite loops
+    if (depth >= MAX_DEPTH) {
+      console.warn(
+        `unwrap: Hit max depth limit (${MAX_DEPTH}) - preventing infinite loop`,
+      );
+      return current;
+    }
+    if (visited.has(current)) {
+      return current;
+    }
+    visited.add(current);
+    depth++;
+
+    current = (current as unknown as { expression: AcornNode }).expression;
   }
-  return expr;
+  return current;
+}
+
+function getNodeText(code: string, node: AcornNode): string {
+  if (node.start !== undefined && node.end !== undefined) {
+    return code.substring(node.start, node.end);
+  }
+  return '';
 }

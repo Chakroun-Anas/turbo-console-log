@@ -1,4 +1,3 @@
-import ts from 'typescript';
 import { msg } from '@/debug-message/js/JSDebugMessage/msg';
 import { logMessage } from '@/debug-message/js/JSDebugMessage/msg/logMessage';
 import { line as logMessageLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine';
@@ -12,9 +11,11 @@ import {
   applyTransformedCode,
 } from '@/debug-message/js/JSDebugMessage/msg/transformer';
 import { omit } from '@/debug-message/js/JSDebugMessage/msg/helpers/omit';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/makeTextDocument';
 import { createMockTextEditorEdit } from '@/jest-tests/mocks/helpers/createMockTextEditorEdit';
 import { ExtensionProperties, LogMessage, LogMessageType } from '@/entities';
+import * as vscode from 'vscode';
 
 // Mock all dependencies
 jest.mock('@/debug-message/js/JSDebugMessage/msg/logMessage');
@@ -25,9 +26,11 @@ jest.mock('@/debug-message/js/JSDebugMessage/msg/insertDebugMessage');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/transformer');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/helpers/omit');
+jest.mock('@/debug-message/js/JSDebugMessage/msg/acorn-utils');
 
 describe('msg', () => {
   // Mock functions
+  const mockParseCode = parseCode as jest.MockedFunction<typeof parseCode>;
   const mockLogMessage = logMessage as jest.MockedFunction<typeof logMessage>;
   const mockLogMessageLine = logMessageLine as jest.MockedFunction<
     typeof logMessageLine
@@ -54,16 +57,12 @@ describe('msg', () => {
   >;
   const mockOmit = omit as jest.MockedFunction<typeof omit>;
 
+  // Mock vscode.window.showErrorMessage
+  const mockShowErrorMessage = jest.fn();
+
   // Test data
   const mockTextEditor = createMockTextEditorEdit();
   const mockDocument = makeTextDocument(['const value = 42;']);
-  const sourceFile = ts.createSourceFile(
-    mockDocument.fileName,
-    mockDocument.getText(),
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
   const selectedVar = 'value';
   const lineOfSelectedVar = 0;
   const tabSize = 2;
@@ -79,10 +78,24 @@ describe('msg', () => {
     logMessageType: LogMessageType.PrimitiveAssignment,
   };
 
+  const mockAst = {
+    type: 'Program',
+    body: [],
+    sourceType: 'module',
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
 
+    // Mock vscode.window
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (vscode.window as any) = {
+      showErrorMessage: mockShowErrorMessage,
+    };
+
     // Set up default mock return values
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockParseCode.mockReturnValue(mockAst as any);
     mockLogMessage.mockReturnValue(mockLogMsg);
     mockLogMessageLine.mockReturnValue(1);
     mockSpacesBeforeLogMsg.mockReturnValue('  ');
@@ -90,6 +103,53 @@ describe('msg', () => {
     mockConstructDebuggingMsg.mockReturnValue('console.log("value", value);');
     mockNeedTransformation.mockReturnValue(false);
     mockOmit.mockReturnValue({} as Partial<ExtensionProperties>);
+  });
+
+  describe('error handling', () => {
+    it('should show error message and return early when parseCode throws an error', () => {
+      const parseError = new Error('Unexpected token');
+      mockParseCode.mockImplementation(() => {
+        throw parseError;
+      });
+
+      msg(
+        mockTextEditor,
+        mockDocument,
+        selectedVar,
+        lineOfSelectedVar,
+        tabSize,
+        extensionProperties,
+        'log',
+      );
+
+      expect(mockShowErrorMessage).toHaveBeenCalledWith(
+        'Turbo AST: Unexpected token',
+      );
+      expect(mockLogMessage).not.toHaveBeenCalled();
+      expect(mockInsertDebugMessage).not.toHaveBeenCalled();
+    });
+
+    it('should handle non-Error exceptions when parseCode fails', () => {
+      mockParseCode.mockImplementation(() => {
+        throw 'String error';
+      });
+
+      msg(
+        mockTextEditor,
+        mockDocument,
+        selectedVar,
+        lineOfSelectedVar,
+        tabSize,
+        extensionProperties,
+        'log',
+      );
+
+      expect(mockShowErrorMessage).toHaveBeenCalledWith(
+        'Turbo AST: Unknown error',
+      );
+      expect(mockLogMessage).not.toHaveBeenCalled();
+      expect(mockInsertDebugMessage).not.toHaveBeenCalled();
+    });
   });
 
   describe('normal flow (no transformation needed)', () => {
@@ -106,13 +166,13 @@ describe('msg', () => {
 
       // Verify the orchestration flow
       expect(mockLogMessage).toHaveBeenCalledWith(
-        sourceFile,
+        expect.any(Object), // AST
         mockDocument,
         lineOfSelectedVar,
         selectedVar,
       );
       expect(mockLogMessageLine).toHaveBeenCalledWith(
-        sourceFile,
+        expect.any(Object), // AST
         mockDocument,
         lineOfSelectedVar,
         selectedVar,
@@ -126,6 +186,7 @@ describe('msg', () => {
       expect(mockConstructDebuggingMsgContent).toHaveBeenCalled();
       expect(mockConstructDebuggingMsg).toHaveBeenCalled();
       expect(mockNeedTransformation).toHaveBeenCalledWith(
+        expect.any(Object), // AST
         mockDocument,
         lineOfSelectedVar,
         selectedVar,
@@ -193,11 +254,13 @@ describe('msg', () => {
       );
 
       expect(mockNeedTransformation).toHaveBeenCalledWith(
+        expect.any(Object), // AST
         mockDocument,
         lineOfSelectedVar,
         selectedVar,
       );
       expect(mockPerformTransformation).toHaveBeenCalledWith(
+        expect.any(Object), // AST
         mockDocument,
         lineOfSelectedVar,
         selectedVar,
@@ -255,6 +318,7 @@ describe('msg', () => {
 
       expect(mockSpacesBeforeLogMsg).toHaveBeenCalledWith(mockDocument, 5, 1);
       expect(mockConstructDebuggingMsgContent).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'Program' }), // AST object
         mockDocument,
         'obj.prop',
         lineOfSelectedVar,
@@ -286,6 +350,7 @@ describe('msg', () => {
         1,
       );
       expect(mockConstructDebuggingMsgContent).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'Program' }), // AST object
         mockDocument,
         selectedVar,
         lineOfSelectedVar,
@@ -341,6 +406,7 @@ describe('msg', () => {
         mockLineOfLogMsg,
       );
       expect(mockConstructDebuggingMsgContent).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'Program' }), // AST object
         mockDocument,
         selectedVar,
         lineOfSelectedVar,

@@ -1,19 +1,29 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  isIdentifier,
+  isFunctionDeclaration,
+  isFunctionExpression,
+  isArrowFunctionExpression,
+  isMethodDefinition,
+  isClassMethod,
+  isBlockStatement,
+  walk,
+} from '../../acorn-utils';
 
 /**
  * Determines the appropriate line to insert a log
  * for a function parameter.
  */
 export function functionParameterLine(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ): number {
   // Find the parameter node that matches our variable name and is on the selection line
   const parameterNode = findParameterNodeOnLine(
-    sourceFile,
+    ast,
     selectionLine,
     variableName,
     document,
@@ -21,13 +31,12 @@ export function functionParameterLine(
   if (!parameterNode) return selectionLine + 1;
 
   // Find the function that contains this parameter
-  let node: ts.Node | undefined = parameterNode;
-  while (node && !isFunctionLike(node)) node = node.parent;
-  if (!node) return selectionLine + 1;
+  const func = findContainingFunction(ast, parameterNode);
+  if (!func) return selectionLine + 1;
 
-  const func = node as ts.FunctionLikeDeclaration;
-  if (func.body && ts.isBlock(func.body)) {
-    const bracePos = document.positionAt(func.body.getStart());
+  const body = (func as { body?: AcornNode }).body;
+  if (body && isBlockStatement(body)) {
+    const bracePos = document.positionAt(body.start!);
     const braceLine = bracePos.line;
     const braceLineText = document.lineAt(braceLine).text;
 
@@ -47,51 +56,105 @@ export function functionParameterLine(
 /*──────────── helpers ────────────*/
 
 function findParameterNodeOnLine(
-  root: ts.Node,
+  root: AcornNode,
   selectionLine: number,
   variableName: string,
   document: TextDocument,
-): ts.Node | null {
-  let foundParameter: ts.Node | null = null;
+): AcornNode | null {
+  let foundParameter: AcornNode | null = null;
 
-  function visit(node: ts.Node): void {
+  walk(root, (node: AcornNode): boolean | void => {
     // Check if this node is a parameter identifier that matches our criteria
-    if (ts.isIdentifier(node) && node.text === variableName) {
-      const nodePos = document.positionAt(node.getStart());
+    if (
+      isIdentifier(node) &&
+      (node as { name: string }).name === variableName
+    ) {
+      if (node.start === undefined) return;
+
+      const nodePos = document.positionAt(node.start);
       if (nodePos.line === selectionLine) {
-        // Check if this identifier is actually a parameter or part of a parameter destructuring
-        let parent = node.parent;
-
-        // Handle direct parameter case
-        if (parent && ts.isParameter(parent) && parent.name === node) {
+        // Check if this identifier is part of a function parameter
+        // We need to verify this is within a parameter context
+        if (isWithinParameter(root, node)) {
           foundParameter = node;
-          return;
-        }
-
-        // Handle destructuring pattern case (e.g., { title, onClick })
-        while (parent) {
-          if (ts.isParameter(parent)) {
-            foundParameter = node;
-            return;
-          }
-          parent = parent.parent;
+          return true; // Stop walking
         }
       }
     }
+  });
 
-    ts.forEachChild(node, visit);
-  }
-
-  visit(root);
   return foundParameter;
 }
 
-function isFunctionLike(n: ts.Node): n is ts.FunctionLikeDeclaration {
+function isWithinParameter(root: AcornNode, targetNode: AcornNode): boolean {
+  // Walk the tree to find if targetNode is within a function's params array
+  let isParam = false;
+
+  walk(root, (node: AcornNode): boolean | void => {
+    if (isFunctionLike(node)) {
+      const params = (node as { params?: AcornNode[] }).params;
+      if (params) {
+        for (const param of params) {
+          if (containsNode(param, targetNode)) {
+            isParam = true;
+            return true; // Stop walking
+          }
+        }
+      }
+    }
+  });
+
+  return isParam;
+}
+
+function containsNode(parent: AcornNode, target: AcornNode): boolean {
+  if (parent === target) return true;
+
+  let found = false;
+  walk(parent, (node: AcornNode): boolean | void => {
+    if (
+      node === target ||
+      (node.start === target.start &&
+        node.end === target.end &&
+        node.type === target.type)
+    ) {
+      found = true;
+      return true; // Stop walking
+    }
+  });
+
+  return found;
+}
+
+function findContainingFunction(
+  root: AcornNode,
+  paramNode: AcornNode,
+): AcornNode | null {
+  let containingFunc: AcornNode | null = null;
+
+  walk(root, (node: AcornNode): boolean | void => {
+    if (isFunctionLike(node)) {
+      const params = (node as { params?: AcornNode[] }).params;
+      if (params) {
+        for (const param of params) {
+          if (containsNode(param, paramNode)) {
+            containingFunc = node;
+            return true; // Stop walking
+          }
+        }
+      }
+    }
+  });
+
+  return containingFunc;
+}
+
+function isFunctionLike(node: AcornNode): boolean {
   return (
-    ts.isFunctionDeclaration(n) ||
-    ts.isFunctionExpression(n) ||
-    ts.isArrowFunction(n) ||
-    ts.isMethodDeclaration(n) ||
-    ts.isConstructorDeclaration(n)
+    isFunctionDeclaration(node) ||
+    isFunctionExpression(node) ||
+    isArrowFunctionExpression(node) ||
+    isMethodDefinition(node) ||
+    isClassMethod(node)
   );
 }

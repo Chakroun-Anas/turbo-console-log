@@ -56,6 +56,7 @@ describe('getDynamicHtml', () => {
       articlesHtml: '<div class="articles">Articles</div>',
       surveyHtml: '<div class="survey">Survey</div>',
       tableHtml: '<div class="table">Table</div>',
+      mediaShowcaseCTAHtml: '',
     });
     mockGetCommonStyles.mockReturnValue('.container { margin: 0; }');
     mockGetJavaScript.mockReturnValue(
@@ -149,6 +150,7 @@ describe('getDynamicHtml', () => {
       articlesHtml: '',
       surveyHtml: '',
       tableHtml: '',
+      mediaShowcaseCTAHtml: '',
     });
 
     const dynamicContent = createMockDynamicPanel();
@@ -184,6 +186,7 @@ describe('getDynamicHtml', () => {
         '<article><h2>Article Title</h2><p>Article content</p></article>',
       surveyHtml: '<section class="survey"><h3>Survey</h3></section>',
       tableHtml: '<table><tr><td>Table content</td></tr></table>',
+      mediaShowcaseCTAHtml: '',
     });
 
     const dynamicContent = createMockDynamicPanel({

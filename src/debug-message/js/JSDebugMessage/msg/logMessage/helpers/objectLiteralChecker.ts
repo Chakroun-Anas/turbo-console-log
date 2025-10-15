@@ -1,35 +1,47 @@
-import ts from 'typescript';
-import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  isVariableDeclaration,
+  isIdentifier,
+  isObjectExpression,
+  walk,
+} from '../../acorn-utils';
 
 export function objectLiteralChecker(
-  sourceFile: ts.SourceFile,
-  _document: TextDocument,
+  ast: AcornNode,
   selectionLine: number,
   variableName: string,
 ) {
   let isChecked = false;
 
-  function visit(node: ts.Node) {
-    if (
-      ts.isVariableDeclaration(node) &&
-      ts.isIdentifier(node.name) &&
-      node.name.text === variableName &&
-      node.initializer &&
-      ts.isObjectLiteralExpression(node.initializer)
-    ) {
-      const declLine = sourceFile.getLineAndCharacterOfPosition(
-        node.getStart(),
-      ).line;
-      if (declLine === selectionLine) {
-        isChecked = true;
-        return;
-      }
-    }
-
-    ts.forEachChild(node, visit);
+  if (!ast) {
+    return { isChecked: false };
   }
 
-  visit(sourceFile);
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (isChecked) return true;
+
+    if (isVariableDeclaration(node)) {
+      for (const decl of node.declarations) {
+        if (!decl.loc) continue;
+
+        const startLine = decl.loc.start.line - 1; // Acorn uses 1-based lines
+
+        if (startLine !== selectionLine || !decl.init) continue;
+
+        const { id, init } = decl;
+
+        // Check if it's a direct object literal assignment: const config = { ... }
+        if (
+          isIdentifier(id) &&
+          id.name === variableName &&
+          isObjectExpression(init)
+        ) {
+          isChecked = true;
+          return true;
+        }
+      }
+    }
+  });
 
   return { isChecked };
 }

@@ -23,6 +23,7 @@ export function contentByType(
       articlesHtml: '',
       surveyHtml: '',
       tableHtml: '',
+      mediaShowcaseCTAHtml: '',
     };
   }
 
@@ -30,6 +31,7 @@ export function contentByType(
   const articles: DynamicFreemiumPanelContent[] = [];
   const surveys: DynamicFreemiumPanelContent[] = [];
   const tables: DynamicFreemiumPanelContent[] = [];
+  const mediaShowcaseCTAs: DynamicFreemiumPanelContent[] = [];
 
   // Separate content by type
   dynamicContent.content.forEach((contentItem) => {
@@ -42,6 +44,9 @@ export function contentByType(
         break;
       case 'table':
         tables.push(contentItem);
+        break;
+      case 'media-showcase-cta':
+        mediaShowcaseCTAs.push(contentItem);
         break;
       default:
         topContent.push(contentItem);
@@ -66,5 +71,15 @@ export function contentByType(
     .map((contentItem) => renderContentItem(contentItem))
     .join('');
 
-  return { topContentHtml, articlesHtml, surveyHtml, tableHtml };
+  const mediaShowcaseCTAHtml = mediaShowcaseCTAs
+    .map((contentItem) => renderContentItem(contentItem))
+    .join('');
+
+  return {
+    topContentHtml,
+    articlesHtml,
+    surveyHtml,
+    tableHtml,
+    mediaShowcaseCTAHtml,
+  };
 }

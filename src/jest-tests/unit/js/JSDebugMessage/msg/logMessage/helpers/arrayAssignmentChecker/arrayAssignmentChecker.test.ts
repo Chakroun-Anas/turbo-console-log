@@ -1,6 +1,6 @@
-import ts from 'typescript';
 import { arrayAssignmentChecker } from '@/debug-message/js/JSDebugMessage/msg/logMessage/helpers/arrayAssignmentChecker';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import passingCases from './passingCases';
 import failingCases from './failingCases';
 
@@ -8,16 +8,9 @@ describe('arrayAssignmentChecker', () => {
   for (const doc of passingCases) {
     it(`should detect array assignment – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = arrayAssignmentChecker(
-        sourceFile,
-        document,
+        ast,
         doc.selectionLine,
         doc.variableName,
       );
@@ -28,16 +21,9 @@ describe('arrayAssignmentChecker', () => {
   for (const doc of failingCases) {
     it(`should not detect array assignment – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      const sourceFile = ts.createSourceFile(
-        document.fileName,
-        document.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(document.getText())!;
       const result = arrayAssignmentChecker(
-        sourceFile,
-        document,
+        ast,
         doc.selectionLine,
         doc.variableName,
       );

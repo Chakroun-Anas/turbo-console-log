@@ -1,7 +1,6 @@
 import { TextDocument, TextEditorEdit } from 'vscode';
-import { BlockType, ExtensionProperties, Message } from '../../../entities';
+import { ExtensionProperties, Message } from '../../../entities';
 import { DebugMessage } from '../../DebugMessage';
-import { enclosingBlockName } from './enclosingBlockName';
 import { detectAll } from './detectAll';
 import { msg } from './msg';
 
@@ -25,21 +24,18 @@ export const jsDebugMessage: DebugMessage = {
       logFunction,
     );
   },
-  enclosingBlockName(
-    document: TextDocument,
-    lineOfSelectedVar: number,
-    blockType: BlockType,
-  ): string {
-    return enclosingBlockName(document, lineOfSelectedVar, blockType);
-  },
-  detectAll(
-    document: TextDocument,
+  async detectAll(
+    fs: typeof import('fs'),
+    vscode: typeof import('vscode'),
+    filePath: string,
     logFunction: ExtensionProperties['logFunction'],
     logMessagePrefix: ExtensionProperties['logMessagePrefix'],
     delimiterInsideMessage: ExtensionProperties['delimiterInsideMessage'],
-  ): Message[] {
+  ): Promise<Message[]> {
     return detectAll(
-      document,
+      fs,
+      vscode,
+      filePath,
       logFunction,
       logMessagePrefix,
       delimiterInsideMessage,

@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "types": ["jest", "node"],
-    "noEmit": true
+    "noEmit": true,
+    "allowJs": true
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]

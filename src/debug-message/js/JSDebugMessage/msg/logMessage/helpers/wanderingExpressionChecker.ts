@@ -1,8 +1,20 @@
-import ts from 'typescript';
 import { TextDocument, Position } from 'vscode';
+import {
+  type AcornNode,
+  type FunctionDeclaration,
+  type FunctionExpression,
+  type ArrowFunctionExpression,
+  isIdentifier,
+  isMemberExpression,
+  isObjectExpression,
+  isFunctionDeclaration,
+  isFunctionExpression,
+  isArrowFunctionExpression,
+  walk,
+} from '../../acorn-utils';
 
 export function wanderingExpressionChecker(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   selectedText: string,
@@ -20,68 +32,177 @@ export function wanderingExpressionChecker(
     index = lineText.indexOf(trimmedText, index + 1);
   }
 
-  let matched = false;
+  const sourceCode = document.getText();
 
-  function isWandering(node: ts.Node): boolean {
-    const parent = node.parent;
+  if (!ast) {
+    return { isChecked: false };
+  }
 
-    // Exclude if selected node is a declaration name
-    if (
-      (ts.isVariableDeclaration(parent) && parent.name === node) ||
-      (ts.isPropertyAssignment(parent) && parent.name === node)
+  // Build a parent map for checking parent nodes
+  const parentMap = new Map<AcornNode, AcornNode>();
+
+  walk(ast, (node: AcornNode) => {
+    // Store parent references for common structures
+    if (node.type === 'VariableDeclarator') {
+      const declarator = node as { id?: AcornNode; init?: AcornNode };
+      if (declarator.id) parentMap.set(declarator.id, node);
+      if (declarator.init) parentMap.set(declarator.init, node);
+    } else if (node.type === 'Property') {
+      const prop = node as { key?: AcornNode; value?: AcornNode };
+      if (prop.key) parentMap.set(prop.key, node);
+      if (prop.value) parentMap.set(prop.value, node);
+    } else if (node.type === 'MemberExpression') {
+      const member = node as { object?: AcornNode; property?: AcornNode };
+      if (member.object) parentMap.set(member.object, node);
+      if (member.property) parentMap.set(member.property, node);
+    } else if (node.type === 'CallExpression') {
+      const call = node as { callee?: AcornNode; arguments?: AcornNode[] };
+      if (call.callee) parentMap.set(call.callee, node);
+      if (call.arguments) {
+        call.arguments.forEach((arg) => {
+          if (arg) parentMap.set(arg, node);
+        });
+      }
+    } else if (
+      node.type === 'FunctionDeclaration' ||
+      node.type === 'FunctionExpression' ||
+      node.type === 'ArrowFunctionExpression'
     ) {
-      return false;
+      const func = node as { params?: AcornNode[]; body?: AcornNode };
+      if (func.params) {
+        func.params.forEach((param) => {
+          if (param) parentMap.set(param, node);
+        });
+      }
+      if (func.body) parentMap.set(func.body, node);
+    } else if (node.type === 'ReturnStatement') {
+      const ret = node as { argument?: AcornNode | null };
+      if (ret.argument) parentMap.set(ret.argument, node);
+    } else if (node.type === 'ExpressionStatement') {
+      const expr = node as { expression?: AcornNode };
+      if (expr.expression) parentMap.set(expr.expression, node);
+    } else if (node.type === 'ObjectExpression') {
+      const obj = node as { properties?: AcornNode[] };
+      if (obj.properties) {
+        obj.properties.forEach((prop) => {
+          if (prop) parentMap.set(prop, node);
+        });
+      }
+    } else if (node.type === 'BlockStatement') {
+      const block = node as { body?: AcornNode[] };
+      if (block.body) {
+        block.body.forEach((stmt) => {
+          if (stmt) parentMap.set(stmt, node);
+        });
+      }
+    }
+  });
+
+  function getNodeText(node: AcornNode): string {
+    if (node.start !== undefined && node.end !== undefined) {
+      return sourceCode.substring(node.start, node.end).trim();
+    }
+    return '';
+  }
+
+  function isWandering(node: AcornNode): boolean {
+    const parent = parentMap.get(node);
+
+    if (!parent) {
+      return true; // No parent info, assume wandering
     }
 
-    // Exclude object literal keys
-    if (ts.isObjectLiteralExpression(parent)) {
+    // Exclude if selected node is a declaration name
+    if (parent.type === 'VariableDeclarator') {
+      const declarator = parent as { id?: AcornNode };
+      if (declarator.id === node) {
+        return false;
+      }
+    }
+
+    // Exclude if it's a property assignment key
+    if (parent.type === 'Property') {
+      const prop = parent as { key?: AcornNode };
+      if (prop.key === node) {
+        return false;
+      }
+    }
+
+    // Exclude if parent is object literal
+    if (isObjectExpression(parent)) {
       return false;
     }
 
     // Exclude function parameters (referenced usage)
-    let current = node.parent;
+    let current: AcornNode | undefined = parent;
+    const visited = new Set<AcornNode>();
+    let depth = 0;
+    const MAX_DEPTH = 1000;
+
     while (current) {
-      if (
-        ts.isFunctionDeclaration(current) ||
-        ts.isFunctionExpression(current) ||
-        ts.isArrowFunction(current)
-      ) {
-        const paramNames = current.parameters.map((p) =>
-          ts.isIdentifier(p.name) ? p.name.text : null,
+      // Safeguards against infinite loops
+      if (depth >= MAX_DEPTH) {
+        console.warn(
+          `isWandering: Hit max depth limit (${MAX_DEPTH}) - preventing infinite loop`,
         );
-        if (ts.isIdentifier(node) && paramNames.includes(node.text)) {
+        break;
+      }
+      if (visited.has(current)) {
+        break;
+      }
+      visited.add(current);
+      depth++;
+
+      if (
+        isFunctionDeclaration(current) ||
+        isFunctionExpression(current) ||
+        isArrowFunctionExpression(current)
+      ) {
+        const func = current as
+          | FunctionDeclaration
+          | FunctionExpression
+          | ArrowFunctionExpression;
+        const paramNames = func.params
+          .map((p) => (isIdentifier(p) ? p.name : null))
+          .filter(Boolean) as string[];
+
+        if (isIdentifier(node) && paramNames.includes(node.name)) {
           return false;
         }
         break;
       }
-      current = current.parent;
+      current = parentMap.get(current);
     }
 
     return true;
   }
 
-  function visit(node: ts.Node) {
-    const nodeStart = node.getStart(sourceFile);
-    const nodeEnd = node.getEnd();
-    const nodeText = node.getText(sourceFile).trim();
+  let matched = false;
 
-    const isPotential =
-      nodeText === trimmedText &&
-      potentialMatches.some((m) => m.start === nodeStart && m.end === nodeEnd);
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (matched) return true;
 
-    if (
-      isPotential &&
-      (ts.isIdentifier(node) || ts.isPropertyAccessExpression(node)) &&
-      isWandering(node)
-    ) {
-      matched = true;
+    if (node.start === undefined || node.end === undefined) {
       return;
     }
 
-    ts.forEachChild(node, visit);
-  }
+    const nodeText = getNodeText(node);
 
-  visit(sourceFile);
+    const isPotential =
+      nodeText === trimmedText &&
+      potentialMatches.some(
+        (m) => m.start === node.start && m.end === node.end,
+      );
+
+    if (
+      isPotential &&
+      (isIdentifier(node) || isMemberExpression(node)) &&
+      isWandering(node)
+    ) {
+      matched = true;
+      return true;
+    }
+  });
 
   return { isChecked: matched };
 }

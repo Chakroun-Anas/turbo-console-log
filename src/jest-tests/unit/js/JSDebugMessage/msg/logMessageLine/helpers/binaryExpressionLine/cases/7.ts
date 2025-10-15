@@ -1,7 +1,13 @@
 export default {
   name: 'parenthesized expression',
-  lines: ['// pre-comment', 'const val = (x + y);', 'return val;'],
-  selectionLine: 1,
+  lines: [
+    'function test() {',
+    '  // pre-comment',
+    '  const val = (x + y);',
+    '  return val;',
+    '}',
+  ],
+  selectionLine: 2,
   variableName: 'val',
-  expectedLine: 2,
+  expectedLine: 3,
 };

@@ -5,12 +5,14 @@ import {
   CountDownPanelComponent,
   SurveyPanelComponent,
   TablePanelComponent,
+  MediaShowcaseCTAPanelComponent,
 } from '../types';
 import { renderParagraphComponent } from './renderParagraphComponent';
 import { renderArticleComponent } from './renderArticleComponent';
 import { renderCountDownComponent } from './renderCountDownComponent';
 import { renderSurveyComponent } from './renderSurveyComponent';
 import { renderTableComponent } from './renderTableComponent';
+import { renderMediaShowcaseCTAComponent } from './renderMediaShowcaseCTAComponent';
 
 /**
  * Render a single content item based on its type
@@ -39,6 +41,10 @@ export function renderContentItem(
       );
     case 'table':
       return renderTableComponent(contentItem.component as TablePanelComponent);
+    case 'media-showcase-cta':
+      return renderMediaShowcaseCTAComponent(
+        contentItem.component as MediaShowcaseCTAPanelComponent,
+      );
     default:
       // Future content types can be added here
       return '';

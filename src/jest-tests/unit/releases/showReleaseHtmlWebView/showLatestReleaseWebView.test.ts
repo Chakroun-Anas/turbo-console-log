@@ -68,14 +68,14 @@ describe('showLatestReleaseWebView', () => {
     showLatestReleaseWebView(mockContext, '3.7.0');
 
     expect(mockShowInformationMessage).toHaveBeenCalledWith(
-      'Decide what is next for Turbo by taking a one minute survey 🚀',
-      'Take Survey',
-      'Maybe Later',
+      'Turbo v3.8.0: Pro Hide Logs, 85% smaller bundle, 89% faster startup & enhanced AST accuracy 🚀',
+      "See What's New",
+      'Remind Me Later',
     );
   });
 
   it('should open CTA URL when dynamic CTA button is clicked', async () => {
-    mockShowInformationMessage.mockResolvedValue('Take Survey');
+    mockShowInformationMessage.mockResolvedValue("See What's New");
 
     const mockOpenExternal = jest
       .spyOn(vscode.env, 'openExternal')
@@ -87,7 +87,7 @@ describe('showLatestReleaseWebView', () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(mockOpenExternal).toHaveBeenCalledWith(
-      vscode.Uri.parse('https://www.turboconsolelog.io/community-survey'),
+      vscode.Uri.parse('https://www.turboconsolelog.io/articles/release-380'),
     );
   });
 });

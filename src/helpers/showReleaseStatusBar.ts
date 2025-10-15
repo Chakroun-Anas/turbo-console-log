@@ -20,26 +20,26 @@ export function showReleaseStatusBar(
     vscode.StatusBarAlignment.Left,
     100,
   );
-  statusBarItem.text = `🚀 v${latestWebViewReleaseVersion} → Decide what is next for Turbo!`;
+  statusBarItem.text = `🚀 v${latestWebViewReleaseVersion} → Pro Hide Logs & Massive improvements!`;
   statusBarItem.tooltip =
-    'Take a one minute survey shaping the future of Turbo';
+    'New: Pro Hide Logs feature, 85% smaller bundle, 89% faster startup and enhanced AST accuracy. Click for options.';
 
   // Create command for status bar click
   const commandId = `turbo.releaseCta.${Date.now()}`;
   const disposable = vscode.commands.registerCommand(commandId, async () => {
     // Build buttons array based on available actions
-    const buttons = ['Take Survey', 'Maybe Later', 'Dismiss'];
+    const buttons = ['Open Release Notes', 'Remind Me Later', 'Dismiss'];
 
     // Show toast with appropriate buttons
     const toastResult = await vscode.window.showInformationMessage(
-      'Decide what is next for Turbo by taking a one minute survey 🚀',
+      'Turbo v3.8.0: Pro Hide Logs, 85% smaller bundle, 89% faster startup & enhanced AST accuracy 🚀',
       ...buttons,
     );
 
     // Handle CTA actions
-    if (toastResult === 'Take Survey') {
+    if (toastResult === 'Open Release Notes') {
       vscode.env.openExternal(
-        vscode.Uri.parse(TURBO_WEBSITE_BASE_URL + '/community-survey'),
+        vscode.Uri.parse(TURBO_WEBSITE_BASE_URL + '/articles/release-380'),
       );
       // Remove status bar and mark as dismissed
       statusBarItem.dispose();

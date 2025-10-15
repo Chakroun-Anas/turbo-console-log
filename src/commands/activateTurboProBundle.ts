@@ -51,10 +51,10 @@ export function activateTurboProBundleCommand(): Command {
           'ChakrounAnas.turbo-console-log',
         )?.packageJSON.version;
         const proBundle = await fetchProBundle(licenseKey, version);
-        runProBundle(extensionProperties, proBundle);
+        runProBundle(extensionProperties, proBundle, context);
         writeProBundleToCache(context, licenseKey, proBundle, version);
         showNotification(
-          "🚀 Turbo Console Log Pro Activated, don't forget to reload your window!",
+          "🎉 Turbo Console Log Pro Activated, don't forget to reload your window please!",
           10000,
         );
       } catch (error) {

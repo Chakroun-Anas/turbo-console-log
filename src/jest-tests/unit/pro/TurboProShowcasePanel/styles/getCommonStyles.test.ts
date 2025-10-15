@@ -110,6 +110,14 @@ describe('getCommonStyles', () => {
     expect(result).toContain('.footer');
   });
 
+  it('should include media showcase CTA styles', () => {
+    const result = getCommonStyles();
+
+    expect(result).toContain('.media-showcase-cta');
+    expect(result).toContain('.media-showcase-image');
+    expect(result).toContain('.media-showcase-cta-button');
+  });
+
   it('should include responsive styles or breakpoints', () => {
     const result = getCommonStyles();
 

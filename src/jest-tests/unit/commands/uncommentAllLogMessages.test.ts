@@ -76,7 +76,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange],
@@ -130,7 +130,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange1],
@@ -205,7 +205,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
             lines: [mockRange1, mockRange2, mockRange3, mockRange4],
@@ -263,7 +263,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([]);
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([]);
 
         vscode.window.activeTextEditor = mockEditor;
 
@@ -301,7 +301,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '',
             lines: [mockRange],
@@ -348,7 +348,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '',
             lines: [mockRange],
@@ -395,7 +395,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '',
             lines: [mockRange],
@@ -421,7 +421,9 @@ describe('uncommentAllLogMessagesCommand', () => {
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
-          mockDocument,
+          expect.anything(),
+          expect.anything(),
+          mockDocument.uri.fsPath,
           'error',
           'Debug',
           '~',
@@ -492,7 +494,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '      ',
             lines: [mockRange1],
@@ -560,7 +562,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([]);
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([]);
 
         vscode.window.activeTextEditor = mockEditor;
 
@@ -578,7 +580,9 @@ describe('uncommentAllLogMessagesCommand', () => {
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
-          mockDocument,
+          expect.anything(),
+          expect.anything(),
+          mockDocument.uri.fsPath,
           'log',
           'Debug',
           '~',
@@ -594,7 +598,7 @@ describe('uncommentAllLogMessagesCommand', () => {
           selections: [],
         });
 
-        mockDebugMessage.detectAll = jest.fn().mockReturnValue([]);
+        mockDebugMessage.detectAll = jest.fn().mockResolvedValue([]);
 
         vscode.window.activeTextEditor = mockEditor;
 
@@ -612,7 +616,9 @@ describe('uncommentAllLogMessagesCommand', () => {
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
-          mockDocument,
+          expect.anything(),
+          expect.anything(),
+          mockDocument.uri.fsPath,
           'log',
           'Debug',
           '~',

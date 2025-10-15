@@ -12,8 +12,13 @@ export function getStaticHtml(): string {
   const staticContent = getStaticContent();
 
   // Use the same content separation logic as dynamic version
-  const { topContentHtml, articlesHtml, surveyHtml, tableHtml } =
-    contentByType(staticContent);
+  const {
+    topContentHtml,
+    articlesHtml,
+    surveyHtml,
+    tableHtml,
+    mediaShowcaseCTAHtml,
+  } = contentByType(staticContent);
 
   return `
   <html>
@@ -27,6 +32,9 @@ export function getStaticHtml(): string {
       <div class="container">
         <!-- Dynamic Content Section -->
         ${topContentHtml}
+        
+        <!-- Media Showcase CTA Section -->
+        ${mediaShowcaseCTAHtml}
         
         <!-- Dynamic Survey Section -->
         ${surveyHtml}

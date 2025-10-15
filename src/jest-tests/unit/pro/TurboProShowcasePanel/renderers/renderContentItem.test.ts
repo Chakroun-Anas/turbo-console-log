@@ -6,6 +6,7 @@ import {
   CountDownPanelComponent,
   SurveyPanelComponent,
   TablePanelComponent,
+  MediaShowcaseCTAPanelComponent,
 } from '@/pro/TurboProShowcasePanel/types';
 
 // Mock all the renderer functions to focus on the dispatch logic
@@ -36,12 +37,19 @@ jest.mock(
 jest.mock('@/pro/TurboProShowcasePanel/renderers/renderTableComponent', () => ({
   renderTableComponent: jest.fn(),
 }));
+jest.mock(
+  '@/pro/TurboProShowcasePanel/renderers/renderMediaShowcaseCTAComponent',
+  () => ({
+    renderMediaShowcaseCTAComponent: jest.fn(),
+  }),
+);
 
 import { renderParagraphComponent } from '@/pro/TurboProShowcasePanel/renderers/renderParagraphComponent';
 import { renderArticleComponent } from '@/pro/TurboProShowcasePanel/renderers/renderArticleComponent';
 import { renderCountDownComponent } from '@/pro/TurboProShowcasePanel/renderers/renderCountDownComponent';
 import { renderSurveyComponent } from '@/pro/TurboProShowcasePanel/renderers/renderSurveyComponent';
 import { renderTableComponent } from '@/pro/TurboProShowcasePanel/renderers/renderTableComponent';
+import { renderMediaShowcaseCTAComponent } from '@/pro/TurboProShowcasePanel/renderers/renderMediaShowcaseCTAComponent';
 
 const mockRenderParagraphComponent =
   renderParagraphComponent as jest.MockedFunction<
@@ -59,6 +67,10 @@ const mockRenderSurveyComponent = renderSurveyComponent as jest.MockedFunction<
 const mockRenderTableComponent = renderTableComponent as jest.MockedFunction<
   typeof renderTableComponent
 >;
+const mockRenderMediaShowcaseCTAComponent =
+  renderMediaShowcaseCTAComponent as jest.MockedFunction<
+    typeof renderMediaShowcaseCTAComponent
+  >;
 
 describe('renderContentItem', () => {
   let consoleSpy: jest.SpyInstance;
@@ -161,6 +173,32 @@ describe('renderContentItem', () => {
     expect(result).toBe('<table>Commands</table>');
   });
 
+  it('should render media showcase CTA component', () => {
+    const component: MediaShowcaseCTAPanelComponent = {
+      illustrationSrcs: [
+        'https://example.com/image1.png',
+        'https://example.com/image2.png',
+      ],
+      cta: {
+        text: 'Learn More',
+        url: 'https://example.com/feature',
+      },
+    };
+    const content: DynamicFreemiumPanelContent = {
+      type: 'media-showcase-cta',
+      component,
+    };
+
+    mockRenderMediaShowcaseCTAComponent.mockReturnValue(
+      '<div>Media Showcase</div>',
+    );
+
+    const result = renderContentItem(content);
+
+    expect(mockRenderMediaShowcaseCTAComponent).toHaveBeenCalledWith(component);
+    expect(result).toBe('<div>Media Showcase</div>');
+  });
+
   it('should handle unknown content type gracefully', () => {
     const unknownContent = {
       type: 'unknown',
@@ -186,5 +224,6 @@ describe('renderContentItem', () => {
     expect(mockRenderCountDownComponent).not.toHaveBeenCalled();
     expect(mockRenderSurveyComponent).not.toHaveBeenCalled();
     expect(mockRenderTableComponent).not.toHaveBeenCalled();
+    expect(mockRenderMediaShowcaseCTAComponent).not.toHaveBeenCalled();
   });
 });

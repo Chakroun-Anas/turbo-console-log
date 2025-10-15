@@ -1,4 +1,4 @@
-import { TextDocument, Range, Position } from 'vscode';
+import { TextDocument, Range, Position, Uri } from 'vscode';
 
 export const makeTextDocument = (
   lines: string[],
@@ -6,6 +6,7 @@ export const makeTextDocument = (
 ): TextDocument =>
   ({
     fileName,
+    uri: { fsPath: fileName } as Uri,
     lineCount: lines.length,
     getText: (range?: Range) => {
       if (!range) return lines.join('\n');

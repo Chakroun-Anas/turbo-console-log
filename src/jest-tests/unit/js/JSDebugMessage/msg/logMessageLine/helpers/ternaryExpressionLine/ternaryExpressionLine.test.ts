@@ -1,21 +1,15 @@
-import ts from 'typescript';
 import { ternaryExpressionLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import testCases from './cases';
 
 describe('ternaryExpressionLine – various scenarios', () => {
   for (const test of testCases) {
     it(`returns correct line for: ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
-      const sourceFile = ts.createSourceFile(
-        doc.fileName,
-        doc.getText(),
-        ts.ScriptTarget.Latest,
-        true,
-        ts.ScriptKind.TS,
-      );
+      const ast = parseCode(doc.getText())!;
       const line = ternaryExpressionLine(
-        sourceFile,
+        ast,
         doc,
         test.selectionLine,
         test.variableName,

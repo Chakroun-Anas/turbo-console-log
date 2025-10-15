@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as fs from 'fs';
 import { Command, Message } from '../entities';
 import { showNotification } from '../ui';
 
@@ -28,8 +29,10 @@ export function correctAllLogMessagesCommand(): Command {
         ? document.fileName.split('/').pop()
         : document.fileName.split('\\').pop();
 
-      const logMessages: Message[] = debugMessage.detectAll(
-        document,
+      const logMessages: Message[] = await debugMessage.detectAll(
+        fs,
+        vscode,
+        document.uri.fsPath,
         extensionProperties.logFunction,
         extensionProperties.logMessagePrefix,
         extensionProperties.delimiterInsideMessage,

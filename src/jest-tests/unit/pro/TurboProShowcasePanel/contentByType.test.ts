@@ -7,6 +7,7 @@ import {
   CountDownPanelComponent,
   SurveyPanelComponent,
   TablePanelComponent,
+  MediaShowcaseCTAPanelComponent,
 } from '@/pro/TurboProShowcasePanel/types';
 
 // Mock the renderContentItem function
@@ -32,6 +33,7 @@ describe('contentByType', () => {
       articlesHtml: '',
       surveyHtml: '',
       tableHtml: '',
+      mediaShowcaseCTAHtml: '',
     });
   });
 
@@ -49,6 +51,7 @@ describe('contentByType', () => {
       articlesHtml: '',
       surveyHtml: '',
       tableHtml: '',
+      mediaShowcaseCTAHtml: '',
     });
   });
 
@@ -65,6 +68,7 @@ describe('contentByType', () => {
       articlesHtml: '',
       surveyHtml: '',
       tableHtml: '',
+      mediaShowcaseCTAHtml: '',
     });
   });
 
@@ -92,6 +96,7 @@ describe('contentByType', () => {
       articlesHtml: '',
       surveyHtml: '',
       tableHtml: '',
+      mediaShowcaseCTAHtml: '',
     });
   });
 
@@ -120,6 +125,7 @@ describe('contentByType', () => {
       articlesHtml: '<article>Article content</article>',
       surveyHtml: '',
       tableHtml: '',
+      mediaShowcaseCTAHtml: '',
     });
   });
 
@@ -147,6 +153,7 @@ describe('contentByType', () => {
       articlesHtml: '',
       surveyHtml: '<div>Survey content</div>',
       tableHtml: '',
+      mediaShowcaseCTAHtml: '',
     });
   });
 
@@ -174,6 +181,7 @@ describe('contentByType', () => {
       articlesHtml: '',
       surveyHtml: '',
       tableHtml: '<table>Table content</table>',
+      mediaShowcaseCTAHtml: '',
     });
   });
 
@@ -202,6 +210,40 @@ describe('contentByType', () => {
       articlesHtml: '',
       surveyHtml: '',
       tableHtml: '',
+      mediaShowcaseCTAHtml: '',
+    });
+  });
+
+  it('should separate media showcase CTA content to mediaShowcaseCTAHtml', () => {
+    const mediaShowcaseComponent: MediaShowcaseCTAPanelComponent = {
+      illustrationSrcs: [
+        'https://example.com/image1.png',
+        'https://example.com/image2.png',
+      ],
+      cta: {
+        text: 'Learn More',
+        url: 'https://example.com/feature',
+      },
+    };
+    const content: DynamicFreemiumPanelContent[] = [
+      { type: 'media-showcase-cta', component: mediaShowcaseComponent },
+    ];
+    const dynamicContent: DynamicFreemiumPanel = {
+      tooltip: 'Test tooltip',
+      date: '2025-09-27',
+      content,
+    };
+
+    mockRenderContentItem.mockReturnValue('<div>Media showcase content</div>');
+
+    const result = contentByType(dynamicContent);
+
+    expect(result).toEqual({
+      topContentHtml: '',
+      articlesHtml: '',
+      surveyHtml: '',
+      tableHtml: '',
+      mediaShowcaseCTAHtml: '<div>Media showcase content</div>',
     });
   });
 
@@ -254,6 +296,7 @@ describe('contentByType', () => {
       articlesHtml: '<article>Article</article>',
       surveyHtml: '<div>Survey</div>',
       tableHtml: '<table>Table</table>',
+      mediaShowcaseCTAHtml: '',
     });
   });
 

@@ -1,8 +1,49 @@
 import { enclosingBlockName } from '@/debug-message/js/JSDebugMessage/enclosingBlockName/enclosingBlockName';
 import { BlockType } from '@/entities';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
 describe('enclosingBlockName', () => {
+  describe('destructured parameters regression test', () => {
+    it('should not hang on arrow function with destructured parameters in JSX', () => {
+      const document = makeTextDocument([
+        '// @ts-nocheck',
+        '',
+        'export function FancyComponent({',
+        '  importantProp,',
+        '}: FancyComponentProps): JSX.Element {',
+        '  const someContext = React.useContext(GreatContext);',
+        '  return (',
+        '    <SomeComponent',
+        '      isGreat',
+        '      steps={steps.map(({ step, name, stepFields }) => {',
+        '        return {',
+        '          name,',
+        '          step,',
+        '          allowNext: stepFields.every(({ name, isRequired }) => {',
+        '            return (',
+        '              !isRequired ||',
+        '              (!!formContext?.watch(name) && !formContext?.errors?.[name])',
+        '            );',
+        '          }),',
+        '        };',
+        '      })}',
+        '    />',
+        '  );',
+        '}',
+      ]);
+      // Line 13 corresponds to the stepFields.every arrow function
+      // This should not hang and should return the enclosing function name
+      const ast = parseCode(document.getText())!;
+      const result = enclosingBlockName(
+        ast,
+        document,
+        13,
+        'function' as BlockType,
+      );
+      expect(result).toBe('FancyComponent');
+    });
+  });
   const passingCases = [
     {
       name: 'inside named function',
@@ -94,7 +135,9 @@ describe('enclosingBlockName', () => {
   for (const testCase of passingCases) {
     it(`should detect enclosing ${testCase.blockType} – ${testCase.name}`, () => {
       const document = makeTextDocument(testCase.lines);
+      const ast = parseCode(document.getText())!;
       const result = enclosingBlockName(
+        ast,
         document,
         testCase.selectionLine,
         testCase.blockType as BlockType,
@@ -106,7 +149,9 @@ describe('enclosingBlockName', () => {
   for (const testCase of failingCases) {
     it(`should return empty string when no enclosing ${testCase.blockType} – ${testCase.name}`, () => {
       const document = makeTextDocument(testCase.lines);
+      const ast = parseCode(document.getText())!;
       const result = enclosingBlockName(
+        ast,
         document,
         testCase.selectionLine,
         testCase.blockType as BlockType,

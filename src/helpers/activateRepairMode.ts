@@ -49,8 +49,10 @@ async function registerRunProBundleCommand({
   proBundle,
   config,
   turboProBundleRepairPanel,
+  context,
 }: Pick<RepairMode, 'config' | 'turboProBundleRepairPanel'> & {
   proBundle: string;
+  context: vscode.ExtensionContext;
 }): Promise<void> {
   const commandName = 'turboConsoleLog.retryProBundleRun';
   const commands = await vscode.commands.getCommands(true);
@@ -59,7 +61,7 @@ async function registerRunProBundleCommand({
   }
   vscode.commands.registerCommand(commandName, async () => {
     try {
-      await runProBundle(config, proBundle);
+      await runProBundle(config, proBundle, context);
     } catch (error) {
       turboProBundleRepairPanel.updateView(
         'run',
@@ -96,6 +98,7 @@ export function activateRepairMode({
         proBundle,
         config,
         turboProBundleRepairPanel,
+        context,
       });
       break;
     case 'update':

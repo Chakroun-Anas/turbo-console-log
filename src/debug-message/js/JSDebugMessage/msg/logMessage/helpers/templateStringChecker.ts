@@ -1,38 +1,53 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  type VariableDeclarator,
+  isIdentifier,
+  isTemplateLiteral,
+  isTaggedTemplateExpression,
+  walk,
+} from '../../acorn-utils';
 
 export function templateStringChecker(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   variableName: string,
 ) {
-  let isChecked = false;
-
-  function visit(node: ts.Node) {
-    if (
-      ts.isVariableDeclaration(node) &&
-      ts.isIdentifier(node.name) &&
-      node.name.text === variableName &&
-      node.initializer &&
-      (ts.isTemplateExpression(node.initializer) ||
-        ts.isNoSubstitutionTemplateLiteral(node.initializer) ||
-        ts.isTaggedTemplateExpression(node.initializer))
-    ) {
-      // Find the line where this declaration actually starts
-      const declLine = sourceFile.getLineAndCharacterOfPosition(
-        node.getStart(sourceFile),
-      ).line;
-
-      if (declLine === selectionLine) {
-        isChecked = true;
-        return; // we found our match, can bail out early
-      }
-    }
-
-    ts.forEachChild(node, visit);
+  if (!ast) {
+    return { isChecked: false };
   }
 
-  visit(sourceFile);
+  let isChecked = false;
+
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (isChecked) return true; // early exit
+
+    // Check for variable declarations with template literal initializers
+    if (node.type === 'VariableDeclarator') {
+      const declarator = node as VariableDeclarator;
+      const id = declarator.id;
+      const init = declarator.init;
+
+      // Check if it's the variable we're looking for
+      if (
+        id &&
+        isIdentifier(id) &&
+        id.name === variableName &&
+        init &&
+        (isTemplateLiteral(init) || isTaggedTemplateExpression(init))
+      ) {
+        // Check if the node is on the selection line
+        if (node.start !== undefined) {
+          const position = document.positionAt(node.start);
+          if (position.line === selectionLine) {
+            isChecked = true;
+            return true; // early exit
+          }
+        }
+      }
+    }
+  });
+
   return { isChecked };
 }

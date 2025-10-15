@@ -11,6 +11,7 @@ import { detectAll } from '../../debug-message/js/JSDebugMessage/detectAll';
 export async function runProBundle(
   extensionProperties: ExtensionProperties,
   proBundle: string,
+  context: vscode.ExtensionContext,
 ): Promise<void> {
   const exports: Record<string, unknown> = {};
   const module = { exports };
@@ -44,7 +45,7 @@ export async function runProBundle(
     exports.turboConsoleLogPro || module.exports?.turboConsoleLogPro;
   if (typeof turboConsoleLogPro === 'function') {
     try {
-      await turboConsoleLogPro(extensionProperties);
+      await turboConsoleLogPro(extensionProperties, context);
       deactivateRepairMode();
       activateProMode();
     } catch (error) {

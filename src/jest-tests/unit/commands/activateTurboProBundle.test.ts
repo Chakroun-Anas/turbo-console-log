@@ -165,6 +165,7 @@ describe('activateTurboProBundleCommand', () => {
       expect(proUtilities.runProBundle).toHaveBeenCalledWith(
         mockExtensionProperties,
         mockBundle,
+        mockContext,
       );
       expect(proUtilities.writeProBundleToCache).toHaveBeenCalledWith(
         mockContext,
@@ -173,7 +174,7 @@ describe('activateTurboProBundleCommand', () => {
         '3.3.0',
       );
       expect(showNotification).toHaveBeenCalledWith(
-        "🚀 Turbo Console Log Pro Activated, don't forget to reload your window!",
+        "🎉 Turbo Console Log Pro Activated, don't forget to reload your window please!",
         10000,
       );
     });

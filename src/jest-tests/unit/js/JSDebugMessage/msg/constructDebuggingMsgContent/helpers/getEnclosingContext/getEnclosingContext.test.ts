@@ -1,105 +1,126 @@
 import { getEnclosingContext } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/getEnclosingContext';
 import { enclosingBlockName } from '@/debug-message/js/JSDebugMessage/enclosingBlockName';
+import { findEnclosingBlocks } from '@/debug-message/js/JSDebugMessage/enclosingBlockName/findEnclosingBlocks';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers';
+import { parseCode } from '@/debug-message/js/JSDebugMessage/msg/acorn-utils';
 
-// Mock the enclosingBlockName dependency
+// Mock the dependencies
 jest.mock('@/debug-message/js/JSDebugMessage/enclosingBlockName');
+jest.mock(
+  '@/debug-message/js/JSDebugMessage/enclosingBlockName/findEnclosingBlocks',
+);
 
 describe('getEnclosingContext', () => {
-  // Mock function
-  const mockEnclosingBlockName = enclosingBlockName as jest.MockedFunction<typeof enclosingBlockName>;
+  // Mock functions
+  const mockEnclosingBlockName = enclosingBlockName as jest.MockedFunction<
+    typeof enclosingBlockName
+  >;
+  const mockFindEnclosingBlocks = findEnclosingBlocks as jest.MockedFunction<
+    typeof findEnclosingBlocks
+  >;
 
   // Test data
   const mockDocument = makeTextDocument(['const value = 42;']);
+  const ast = parseCode(mockDocument.getText())!;
   const lineOfSelectedVar = 0;
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Set up default mock return values
     mockEnclosingBlockName.mockReturnValue('');
+    mockFindEnclosingBlocks.mockReturnValue({
+      className: '',
+      functionName: '',
+    });
   });
 
   describe('when both insertEnclosingClass and insertEnclosingFunction are true', () => {
-    it('should call enclosingBlockName for both class and function', () => {
-      mockEnclosingBlockName
-        .mockReturnValueOnce('MyClass')
-        .mockReturnValueOnce('myMethod');
+    it('should call findEnclosingBlocks for both class and function in a single traversal', () => {
+      mockFindEnclosingBlocks.mockReturnValue({
+        className: 'MyClass',
+        functionName: 'myMethod',
+      });
 
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         true,
-        true
+        true,
       );
 
-      expect(mockEnclosingBlockName).toHaveBeenCalledTimes(2);
-      expect(mockEnclosingBlockName).toHaveBeenNthCalledWith(
-        1,
+      // Should use the optimized single-traversal function
+      expect(mockFindEnclosingBlocks).toHaveBeenCalledTimes(1);
+      expect(mockFindEnclosingBlocks).toHaveBeenCalledWith(
+        ast,
         mockDocument,
         lineOfSelectedVar,
-        'class'
       );
-      expect(mockEnclosingBlockName).toHaveBeenNthCalledWith(
-        2,
-        mockDocument,
-        lineOfSelectedVar,
-        'function'
-      );
+      // Should NOT call enclosingBlockName when both are needed
+      expect(mockEnclosingBlockName).not.toHaveBeenCalled();
       expect(result).toEqual({
         className: 'MyClass',
-        functionName: 'myMethod'
+        functionName: 'myMethod',
       });
     });
 
     it('should handle empty class and function names', () => {
-      mockEnclosingBlockName.mockReturnValue('');
+      mockFindEnclosingBlocks.mockReturnValue({
+        className: '',
+        functionName: '',
+      });
 
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         true,
-        true
+        true,
       );
 
       expect(result).toEqual({
         className: '',
-        functionName: ''
+        functionName: '',
       });
     });
 
     it('should handle only class name found', () => {
-      mockEnclosingBlockName
-        .mockReturnValueOnce('OuterClass')
-        .mockReturnValueOnce('');
+      mockFindEnclosingBlocks.mockReturnValue({
+        className: 'OuterClass',
+        functionName: '',
+      });
 
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         true,
-        true
+        true,
       );
 
       expect(result).toEqual({
         className: 'OuterClass',
-        functionName: ''
+        functionName: '',
       });
     });
 
     it('should handle only function name found', () => {
-      mockEnclosingBlockName
-        .mockReturnValueOnce('')
-        .mockReturnValueOnce('globalFunction');
+      mockFindEnclosingBlocks.mockReturnValue({
+        className: '',
+        functionName: 'globalFunction',
+      });
 
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         true,
-        true
+        true,
       );
 
       expect(result).toEqual({
         className: '',
-        functionName: 'globalFunction'
+        functionName: 'globalFunction',
       });
     });
   });
@@ -109,21 +130,23 @@ describe('getEnclosingContext', () => {
       mockEnclosingBlockName.mockReturnValue('TestClass');
 
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         true,
-        false
+        false,
       );
 
       expect(mockEnclosingBlockName).toHaveBeenCalledTimes(1);
       expect(mockEnclosingBlockName).toHaveBeenCalledWith(
+        ast,
         mockDocument,
         lineOfSelectedVar,
-        'class'
+        'class',
       );
       expect(result).toEqual({
         className: 'TestClass',
-        functionName: ''
+        functionName: '',
       });
     });
 
@@ -131,10 +154,11 @@ describe('getEnclosingContext', () => {
       mockEnclosingBlockName.mockReturnValue('SomeClass');
 
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         true,
-        false
+        false,
       );
 
       expect(result.functionName).toBe('');
@@ -147,21 +171,23 @@ describe('getEnclosingContext', () => {
       mockEnclosingBlockName.mockReturnValue('helperFunction');
 
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         false,
-        true
+        true,
       );
 
       expect(mockEnclosingBlockName).toHaveBeenCalledTimes(1);
       expect(mockEnclosingBlockName).toHaveBeenCalledWith(
+        ast,
         mockDocument,
         lineOfSelectedVar,
-        'function'
+        'function',
       );
       expect(result).toEqual({
         className: '',
-        functionName: 'helperFunction'
+        functionName: 'helperFunction',
       });
     });
 
@@ -169,10 +195,11 @@ describe('getEnclosingContext', () => {
       mockEnclosingBlockName.mockReturnValue('utilityFunction');
 
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         false,
-        true
+        true,
       );
 
       expect(result.className).toBe('');
@@ -181,27 +208,30 @@ describe('getEnclosingContext', () => {
   });
 
   describe('when both insertEnclosingClass and insertEnclosingFunction are false', () => {
-    it('should not call enclosingBlockName at all', () => {
+    it('should not call any functions', () => {
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         false,
-        false
+        false,
       );
 
       expect(mockEnclosingBlockName).not.toHaveBeenCalled();
+      expect(mockFindEnclosingBlocks).not.toHaveBeenCalled();
       expect(result).toEqual({
         className: '',
-        functionName: ''
+        functionName: '',
       });
     });
 
     it('should always return empty strings for both properties', () => {
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         false,
-        false
+        false,
       );
 
       expect(result.className).toBe('');
@@ -210,35 +240,34 @@ describe('getEnclosingContext', () => {
   });
 
   describe('parameter passing', () => {
-    it('should pass correct document and line number to enclosingBlockName', () => {
-      const customDocument = makeTextDocument(['function test() { const x = 1; }']);
+    it('should pass correct AST, document and line number to findEnclosingBlocks when both needed', () => {
+      const customDocument = makeTextDocument([
+        'function test() { const x = 1; }',
+      ]);
+      const customAst = parseCode(customDocument.getText())!;
       const customLine = 5;
 
-      getEnclosingContext(customDocument, customLine, true, true);
+      getEnclosingContext(customAst, customDocument, customLine, true, true);
 
-      expect(mockEnclosingBlockName).toHaveBeenCalledWith(
+      expect(mockFindEnclosingBlocks).toHaveBeenCalledWith(
+        customAst,
         customDocument,
         customLine,
-        'class'
-      );
-      expect(mockEnclosingBlockName).toHaveBeenCalledWith(
-        customDocument,
-        customLine,
-        'function'
       );
     });
 
-    it('should handle different line numbers correctly', () => {
+    it('should pass correct AST, document and line number to enclosingBlockName when only one needed', () => {
       const testCases = [0, 1, 10, 99];
 
-      testCases.forEach(lineNumber => {
+      testCases.forEach((lineNumber) => {
         jest.clearAllMocks();
-        getEnclosingContext(mockDocument, lineNumber, true, false);
+        getEnclosingContext(ast, mockDocument, lineNumber, true, false);
 
         expect(mockEnclosingBlockName).toHaveBeenCalledWith(
+          ast,
           mockDocument,
           lineNumber,
-          'class'
+          'class',
         );
       });
     });
@@ -247,10 +276,11 @@ describe('getEnclosingContext', () => {
   describe('return value structure', () => {
     it('should always return an object with className and functionName properties', () => {
       const result = getEnclosingContext(
+        ast,
         mockDocument,
         lineOfSelectedVar,
         false,
-        false
+        false,
       );
 
       expect(result).toHaveProperty('className');
@@ -260,17 +290,24 @@ describe('getEnclosingContext', () => {
     });
 
     it('should preserve exact return values from enclosingBlockName', () => {
-      const specialValues = ['', 'NormalName', 'name_with_underscores', 'CamelCase', '123Numbers'];
+      const specialValues = [
+        '',
+        'NormalName',
+        'name_with_underscores',
+        'CamelCase',
+        '123Numbers',
+      ];
 
-      specialValues.forEach(value => {
+      specialValues.forEach((value) => {
         jest.clearAllMocks();
         mockEnclosingBlockName.mockReturnValue(value);
 
         const result = getEnclosingContext(
+          ast,
           mockDocument,
           lineOfSelectedVar,
           true,
-          false
+          false,
         );
 
         expect(result.className).toBe(value);
@@ -278,40 +315,36 @@ describe('getEnclosingContext', () => {
     });
   });
 
-  describe('call order', () => {
-    it('should call class detection before function detection', () => {
-      mockEnclosingBlockName
-        .mockReturnValueOnce('ClassFirst')
-        .mockReturnValueOnce('FunctionSecond');
+  describe('optimization behavior', () => {
+    it('should use findEnclosingBlocks (single traversal) when both are needed', () => {
+      mockFindEnclosingBlocks.mockReturnValue({
+        className: 'MyClass',
+        functionName: 'myMethod',
+      });
 
-      getEnclosingContext(mockDocument, lineOfSelectedVar, true, true);
+      getEnclosingContext(ast, mockDocument, lineOfSelectedVar, true, true);
 
-      expect(mockEnclosingBlockName).toHaveBeenNthCalledWith(
-        1,
-        mockDocument,
-        lineOfSelectedVar,
-        'class'
-      );
-      expect(mockEnclosingBlockName).toHaveBeenNthCalledWith(
-        2,
-        mockDocument,
-        lineOfSelectedVar,
-        'function'
-      );
+      // Verify it uses the optimized single-traversal function
+      expect(mockFindEnclosingBlocks).toHaveBeenCalledTimes(1);
+      expect(mockEnclosingBlockName).not.toHaveBeenCalled();
     });
 
-    it('should maintain call order even when class returns empty', () => {
-      mockEnclosingBlockName
-        .mockReturnValueOnce('')
-        .mockReturnValueOnce('SomeFunction');
+    it('should use enclosingBlockName (single lookup) when only one is needed', () => {
+      mockEnclosingBlockName.mockReturnValue('TestClass');
 
-      getEnclosingContext(mockDocument, lineOfSelectedVar, true, true);
+      getEnclosingContext(ast, mockDocument, lineOfSelectedVar, true, false);
 
-      const firstCall = mockEnclosingBlockName.mock.calls[0];
-      const secondCall = mockEnclosingBlockName.mock.calls[1];
+      // Verify it uses the single-block function
+      expect(mockEnclosingBlockName).toHaveBeenCalledTimes(1);
+      expect(mockFindEnclosingBlocks).not.toHaveBeenCalled();
+    });
 
-      expect(firstCall[2]).toBe('class');
-      expect(secondCall[2]).toBe('function');
+    it('should not traverse at all when neither is needed', () => {
+      getEnclosingContext(ast, mockDocument, lineOfSelectedVar, false, false);
+
+      // Verify no AST traversal happens
+      expect(mockEnclosingBlockName).not.toHaveBeenCalled();
+      expect(mockFindEnclosingBlocks).not.toHaveBeenCalled();
     });
   });
 });

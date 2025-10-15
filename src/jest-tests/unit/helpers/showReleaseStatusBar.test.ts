@@ -89,10 +89,10 @@ describe('showReleaseStatusBar', () => {
       100,
     );
     expect(mockStatusBarItem.text).toBe(
-      '🚀 v3.5.0 → Decide what is next for Turbo!',
+      '🚀 v3.5.0 → Pro Hide Logs & Massive improvements!',
     );
     expect(mockStatusBarItem.tooltip).toBe(
-      'Take a one minute survey shaping the future of Turbo',
+      'New: Pro Hide Logs feature, 85% smaller bundle, 89% faster startup and enhanced AST accuracy. Click for options.',
     );
     expect(mockStatusBarItem.show).toHaveBeenCalled();
   });
@@ -127,9 +127,9 @@ describe('showReleaseStatusBar', () => {
       await commandHandler();
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        `Decide what is next for Turbo by taking a one minute survey 🚀`,
-        'Take Survey',
-        'Maybe Later',
+        `Turbo v3.8.0: Pro Hide Logs, 85% smaller bundle, 89% faster startup & enhanced AST accuracy 🚀`,
+        'Open Release Notes',
+        'Remind Me Later',
         'Dismiss',
       );
     });

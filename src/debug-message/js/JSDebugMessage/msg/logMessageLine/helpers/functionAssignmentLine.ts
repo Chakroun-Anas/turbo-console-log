@@ -1,66 +1,130 @@
-import ts from 'typescript';
 import { TextDocument } from 'vscode';
+import {
+  type AcornNode,
+  type FunctionExpression,
+  type ArrowFunctionExpression,
+  type VariableDeclaration,
+  isIdentifier,
+  isFunctionExpression,
+  isArrowFunctionExpression,
+  isExpressionStatement,
+  isAssignmentExpression,
+  isMemberExpression,
+  isParenthesizedExpression,
+  isTSAsExpression,
+  isTSTypeAssertion,
+  isBlockStatement,
+  walk,
+} from '../../acorn-utils';
 
 export function functionAssignmentLine(
-  sourceFile: ts.SourceFile,
+  ast: AcornNode,
   document: TextDocument,
   selectionLine: number,
   selectedVar: string,
 ): number {
   let insertionLine = selectionLine + 1;
 
-  ts.forEachChild(sourceFile, function visit(node) {
+  walk(ast, (node: AcornNode): boolean | void => {
     // Case ①: const fn = (...) => {...} or function (...) {...}
-    if (
-      ts.isVariableDeclaration(node) &&
-      ts.isIdentifier(node.name) &&
-      node.name.text === selectedVar &&
-      node.initializer
-    ) {
-      const unwrapped = unwrap(node.initializer);
-      if (ts.isFunctionExpression(unwrapped) || ts.isArrowFunction(unwrapped)) {
-        insertionLine = getFunctionBodyEndLine(unwrapped, document) + 1;
-        return;
+    if (node.type === 'VariableDeclaration') {
+      const varDecl = node as VariableDeclaration;
+
+      for (const decl of varDecl.declarations) {
+        if (
+          isIdentifier(decl.id) &&
+          decl.id.name === selectedVar &&
+          decl.init
+        ) {
+          const unwrapped = unwrap(decl.init);
+          if (
+            isFunctionExpression(unwrapped) ||
+            isArrowFunctionExpression(unwrapped)
+          ) {
+            insertionLine = getFunctionBodyEndLine(unwrapped, document) + 1;
+            return true;
+          }
+        }
       }
     }
 
     // Case ②: obj.fn = (...) => {...}
-    if (
-      ts.isExpressionStatement(node) &&
-      ts.isBinaryExpression(node.expression) &&
-      node.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
-      ts.isPropertyAccessExpression(node.expression.left) &&
-      node.expression.left.name.text === selectedVar
-    ) {
-      const rhs = unwrap(node.expression.right);
-      if (ts.isFunctionExpression(rhs) || ts.isArrowFunction(rhs)) {
-        insertionLine = getFunctionBodyEndLine(rhs, document) + 1;
-        return;
+    if (isExpressionStatement(node)) {
+      const expr = (node as { expression?: AcornNode }).expression;
+      if (expr && isAssignmentExpression(expr)) {
+        const assignment = expr as {
+          operator: string;
+          left?: AcornNode;
+          right?: AcornNode;
+        };
+
+        if (
+          assignment.operator === '=' &&
+          assignment.left &&
+          isMemberExpression(assignment.left)
+        ) {
+          const member = assignment.left as {
+            property?: AcornNode;
+          };
+
+          if (
+            member.property &&
+            isIdentifier(member.property) &&
+            member.property.name === selectedVar &&
+            assignment.right
+          ) {
+            const rhs = unwrap(assignment.right);
+            if (isFunctionExpression(rhs) || isArrowFunctionExpression(rhs)) {
+              insertionLine = getFunctionBodyEndLine(rhs, document) + 1;
+              return true;
+            }
+          }
+        }
       }
     }
-
-    ts.forEachChild(node, visit);
   });
 
   return insertionLine;
 }
 
-function unwrap(expr: ts.Expression): ts.Expression {
+function unwrap(expr: AcornNode): AcornNode {
+  const visited = new Set<AcornNode>();
+  let depth = 0;
+  const MAX_DEPTH = 1000;
+
   while (
-    ts.isParenthesizedExpression(expr) ||
-    ts.isAsExpression(expr) ||
-    ts.isTypeAssertionExpression(expr)
+    isParenthesizedExpression(expr) ||
+    isTSAsExpression(expr) ||
+    isTSTypeAssertion(expr)
   ) {
-    expr = expr.expression;
+    // Safeguards against infinite loops
+    if (depth >= MAX_DEPTH) {
+      console.warn(
+        `unwrap: Hit max depth limit (${MAX_DEPTH}) - preventing infinite loop`,
+      );
+      return expr;
+    }
+    if (visited.has(expr)) {
+      return expr;
+    }
+    visited.add(expr);
+    depth++;
+
+    expr = (expr as { expression: AcornNode }).expression;
   }
   return expr;
 }
 
 function getFunctionBodyEndLine(
-  node: ts.FunctionExpression | ts.ArrowFunction,
+  node: FunctionExpression | ArrowFunctionExpression,
   document: TextDocument,
 ): number {
   if (!node.body) return 0;
-  const endPos = ts.isBlock(node.body) ? node.body.end : node.body.getEnd();
+
+  const body = node.body as AcornNode;
+  const endPos = isBlockStatement(body) ? body.end : body.end;
+
+  if (endPos === undefined) return 0;
+
   return document.positionAt(endPos).line;
 }

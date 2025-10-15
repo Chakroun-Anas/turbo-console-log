@@ -309,6 +309,7 @@ describe('activateRepairMode', () => {
       expect(runProBundleMock).toHaveBeenCalledWith(
         mockConfig,
         'test-bundle-code',
+        mockContext,
       );
     });
 

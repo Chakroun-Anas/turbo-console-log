@@ -2,6 +2,60 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.8.0] - 2025-10-14
+
+### 🎭 New Pro Feature: Hide Logs
+
+The most requested feature is here! **Hide Logs** lets you temporarily mute specific log entries without deleting them:
+
+- **Hide file logs**: Hide all logs in specific files
+- **Hide folder logs**: Hide all logs in a specific folder
+- **Toggle visibility**: Reveal all hidden logs with a single action
+
+Managing dozens of log statements just got effortless. Hide everything that's not relevant to your current task, then reveal it all when needed.
+
+### 🧠 Major Engine Upgrade: TypeScript AST → Acorn AST
+
+We've completely rebuilt the parsing engine for better performance and reliability:
+
+#### 📊 Performance Improvements
+
+- **96% smaller package**: 2.6MB → ~108KB (package size)
+- **~85% smaller bundle**: 3.7MB → ~560KB (bundled size)
+- **~89% faster activation**: 860ms → ~96ms (startup time)
+
+Your extension now loads almost instantly with a dramatically smaller footprint.
+
+#### 🛠️ AST Engine: Parsing Pattern Improvements
+
+The migration to Acorn fixed several edge-case parsing patterns. Log insertion now works correctly in complex real-world code:
+
+- **Variables within return statements**: Correctly identifies when a log should stay inside the return block (e.g., callback parameters, inline expressions) vs. before the return
+- **JSX and React patterns**: Full support for modern React code including hooks, fragments, conditional rendering, and implicit arrow function returns
+- **Computed property destructuring**: Nested object destructuring patterns with dynamic computed property names (`[id]` syntax)
+- **Multi-line object literals**: Complex objects spanning dozens of lines with type annotations, arrow functions, and deep property nesting
+- **Binary expressions with optional chaining**: Inequality comparisons using `!==` with optional chaining operators now parse correctly
+- **Async destructuring assignments**: Multi-line destructuring from async function calls with type assertions and fallback values
+- **Nested default parameters**: Arrow functions with multi-line parameter lists where defaults are themselves function expressions
+- **Class method decorators**: Parameters within methods that have multiple decorators (NestJS, Angular patterns)
+
+### 📌 Temporary Limitation
+
+Vue 3 Composition API in separate `.js`/`.ts` files is fully supported. However, Single-File Components (`.vue` with `<script>` blocks) aren't parsed yet.
+
+**Workaround**: Isolate your `<script>` logic in a standalone file while we add first-class SFC support. [Track progress here](https://github.com/Chakroun-Anas/turbo-console-log/issues/292).
+
+### 🔮 What's Next: v3.9.0
+
+The next iteration focuses on broader AST engine strengthening — refining edge-case handling, improving parsing resilience, and expanding framework coverage. Vue Single-File Component support is part of this roadmap, bringing native `.vue` parsing alongside deeper pattern recognition for modern JavaScript constructs.
+
+### 🚀 Enhanced Pro Experience
+
+All Pro features now run on the new Acorn engine — lighter, faster, and more responsive. Hide Logs is the first of several power-user upgrades coming in future releases.
+
+👉 [Read the Full v3.8.0 Release Article](https://www.turboconsolelog.io/articles/release-380)  
+👉 [Upgrade to Turbo Pro](https://www.turboconsolelog.io/pro)
+
 ## [3.7.2] - 2025-09-29
 
 ### 🔧 Bug Fixes & Improvements

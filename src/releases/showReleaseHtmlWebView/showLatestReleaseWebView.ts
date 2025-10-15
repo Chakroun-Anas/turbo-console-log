@@ -26,10 +26,10 @@ export function showLatestReleaseWebView(
   writeToGlobalState(context, 'IS_NEW_USER', false);
 
   const notificationMessage: string =
-    'Decide what is next for Turbo by taking a one minute survey 🚀';
-  const ctaUrl: string = `${TURBO_WEBSITE_BASE_URL}/community-survey`;
-  const ctaText: string = 'Take Survey';
-  const ctaLaterText: string = 'Maybe Later';
+    'Turbo v3.8.0: Pro Hide Logs, 85% smaller bundle, 89% faster startup & enhanced AST accuracy 🚀';
+  const ctaUrl: string = `${TURBO_WEBSITE_BASE_URL}/articles/release-380`;
+  const ctaText: string = "See What's New";
+  const ctaLaterText: string = 'Remind Me Later';
 
   // Show notification first (non-blocking)
   const buttons = [ctaText, ctaLaterText];

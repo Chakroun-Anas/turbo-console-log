@@ -26,9 +26,9 @@ export async function updateProBundle(
   try {
     const proBundle = await fetchProBundle(licenseKey, proVersion);
     writeProBundleToCache(context, licenseKey, proBundle, proVersion);
-    await runProBundle(extensionProperties, proBundle);
+    await runProBundle(extensionProperties, proBundle, context);
     showNotification(
-      `🚀 Pro Bundle Updated v${proVersion}, don't forget to reload your window!`,
+      `🎉 Pro Bundle Updated v${proVersion}, don't forget to reload your window please!`,
       10000,
     );
   } catch (error) {
