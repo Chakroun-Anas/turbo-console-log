@@ -2,6 +2,38 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.8.1] - 2025-10-16
+
+### 🎯 Vue Single File Component (SFC) Support — Limitation Removed
+
+Turbo Console Log now fully supports **Vue Single File Components (.vue files)** with `<template>`, `<script>`, and `<style>` sections. This addresses the temporary limitation introduced by the lightweight Acorn AST engine migration in v3.8.0.
+
+#### ✨ What's New
+
+- **Native `.vue` File Parsing**: Full support for `<script>` and `<script setup>` blocks within Vue SFC structure
+- **Dual-Script Context Awareness**: Intelligently handles Vue files with both `<script>` and `<script setup>` sections
+- **No New Dependencies**: Built entirely on the existing Acorn AST engine — no additional parsers needed
+- **Composition API & Options API**: Works seamlessly with both Vue coding styles
+- **TypeScript in Vue**: Full support for `<script lang="ts">` and `<script setup lang="ts">`
+
+#### 🚀 Performance & Architecture
+
+- **Lightweight Implementation**: No external Vue parser dependencies — keeps the extension fast and minimal
+- **AST-Powered Precision**: Leverages the same Acorn engine from v3.8.0 for accurate code understanding
+- **Production-Ready**: Comprehensive test coverage across all 31 helper functions (16 checkers + 15 line helpers)
+
+#### 🧪 Quality Assurance
+
+- **40+ New Tests**: Dedicated Vue SFC test cases across all AST layers
+- **Edge Case Handling**: Graceful error messages for files without `<script>` tags or selections outside script blocks
+- **Zero Regressions**: All 1,193 tests passing with Vue support fully integrated
+
+#### 📝 What This Means
+
+The **"Temporary Limitation"** mentioned in v3.8.0 is now **completely resolved**. Vue developers can now use Turbo Console Log directly in `.vue` files without any workarounds.
+
+👉 [Read the Full v3.8.0 Release Article](https://www.turboconsolelog.io/articles/release-380)
+
 ## [3.8.0] - 2025-10-14
 
 ### 🎭 New Pro Feature: Hide Logs

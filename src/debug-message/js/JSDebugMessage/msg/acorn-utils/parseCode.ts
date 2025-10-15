@@ -1,37 +1,59 @@
 import * as acorn from 'acorn';
 import { tsPlugin } from '@sveltejs/acorn-typescript';
 import type { AcornNode } from './types';
+import { extractVueScript, adjustASTLocations } from './vue';
 
 /**
  * Parses JavaScript/TypeScript source code into an Acorn AST.
+ * Supports Vue SFC files by extracting script content and adjusting line numbers.
  *
  * @param sourceCode - The source code to parse
  * @param fileExtension - Optional file extension (e.g., '.vue', '.js', '.ts')
- * @returns The parsed AST
+ * @param selectionLine - Optional line number for context-aware Vue SFC script extraction (0-based)
+ * @returns The parsed AST with adjusted locations for Vue SFC
  * @throws Error if parsing fails
  */
 export function parseCode(
   sourceCode: string,
   fileExtension?: string,
+  selectionLine?: number,
 ): AcornNode {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const parser = acorn.Parser.extend(tsPlugin({ jsx: true })) as any;
-    const ast = parser.parse(sourceCode, {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      locations: true,
-    });
-    return ast as AcornNode;
-  } catch (error) {
-    // Check if this is a Vue file
-    const isVueFile = fileExtension?.toLowerCase() === '.vue';
-    if (isVueFile) {
+  let codeToParse = sourceCode;
+  let lineOffset = 0;
+  let byteOffset = 0;
+  const isVueFile = fileExtension?.toLowerCase() === '.vue';
+
+  // Extract script from Vue SFC if applicable
+  if (isVueFile) {
+    const extracted = extractVueScript(sourceCode, selectionLine);
+
+    if (!extracted) {
       throw new Error(
-        'Only Vue 3 Composition API scripts are supported at the moment. Please isolate your <script> code or test it in a standalone file.',
+        'No <script> block found in this .vue file. Add a <script> or <script setup> section to use Turbo logging.',
       );
     }
 
+    codeToParse = extracted.scriptContent;
+    lineOffset = extracted.lineOffset;
+    byteOffset = extracted.byteOffset;
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const parser = acorn.Parser.extend(tsPlugin({ jsx: true })) as any;
+    let ast = parser.parse(codeToParse, {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      locations: true,
+    }) as AcornNode;
+
+    // Adjust AST locations if we extracted from Vue SFC
+    if (lineOffset > 0 || byteOffset > 0) {
+      ast = adjustASTLocations(ast, lineOffset, byteOffset);
+    }
+
+    return ast;
+  } catch (error) {
     throw new Error(
       `Failed to parse source code: ${error instanceof Error ? error.message : 'Unknown error'}`,
     );

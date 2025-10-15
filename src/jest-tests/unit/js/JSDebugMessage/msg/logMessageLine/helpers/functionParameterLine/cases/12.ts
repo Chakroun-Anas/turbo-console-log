@@ -1,0 +1,22 @@
+export default {
+  name: 'Vue SFC - function parameter in method',
+  fileExtension: '.vue',
+  lines: [
+    '<template>',
+    '  <div>{{ greeting }}</div>',
+    '</template>',
+    '',
+    '<script>',
+    'export default {',
+    '  methods: {',
+    '    greet(name, age) {',
+    '      return `Hello ${name}, you are ${age} years old`;',
+    '    }',
+    '  }',
+    '};',
+    '</script>',
+  ],
+  selectionLine: 7,
+  variableName: 'name',
+  expected: 8,
+};

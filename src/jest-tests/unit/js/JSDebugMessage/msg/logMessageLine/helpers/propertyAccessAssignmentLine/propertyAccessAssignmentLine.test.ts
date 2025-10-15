@@ -7,7 +7,8 @@ describe('propertyAccessAssignmentLine – insert after property access assignme
   for (const test of testCases) {
     it(`should return correct insertion line – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
-      const ast = parseCode(doc.getText())!;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (doc as any).fileExtension)!;
       const result = propertyAccessAssignmentLine(
         ast,
         doc,

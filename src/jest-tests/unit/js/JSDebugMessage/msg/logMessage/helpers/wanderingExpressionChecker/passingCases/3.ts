@@ -1,0 +1,23 @@
+export default {
+  name: 'Vue SFC - wandering expression in lifecycle hook',
+  fileExtension: '.vue',
+  lines: [
+    '<template>',
+    '  <div>{{ count }}</div>',
+    '</template>',
+    '',
+    '<script>',
+    'export default {',
+    '  data() {',
+    '    return { count: 0 };',
+    '  },',
+    '  mounted() {',
+    '    const value = this.count;',
+    '    console.log(this.count);',
+    '  }',
+    '};',
+    '</script>',
+  ],
+  selectionLine: 11,
+  variableName: 'this.count',
+};

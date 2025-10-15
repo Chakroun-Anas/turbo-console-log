@@ -7,11 +7,12 @@ import failingCases from './failingCases';
 describe('rawPropertyAccessChecker', () => {
   for (const test of passingCases) {
     it(`should detect property access – ${test.name}`, () => {
-      const document = makeTextDocument(test.lines);
-      const ast = parseCode(document.getText())!;
+      const doc = makeTextDocument(test.lines);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (test as any).fileExtension)!;
       const result = rawPropertyAccessChecker(
         ast,
-        document,
+        doc,
         test.selectionLine,
         test.selectedText,
       );
@@ -22,11 +23,12 @@ describe('rawPropertyAccessChecker', () => {
 
   for (const test of failingCases) {
     it(`should not detect property access – ${test.name}`, () => {
-      const document = makeTextDocument(test.lines);
-      const ast = parseCode(document.getText())!;
+      const doc = makeTextDocument(test.lines);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (test as any).fileExtension)!;
       const result = rawPropertyAccessChecker(
         ast,
-        document,
+        doc,
         test.selectionLine,
         test.selectedText,
       );

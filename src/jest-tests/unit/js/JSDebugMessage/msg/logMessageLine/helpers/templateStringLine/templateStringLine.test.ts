@@ -6,11 +6,12 @@ import testCases from './cases';
 describe('templateStringLine', () => {
   for (const testCase of testCases) {
     it(testCase.name, () => {
-      const document = makeTextDocument(testCase.lines);
-      const ast = parseCode(document.getText())!;
+      const doc = makeTextDocument(testCase.lines);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (testCase as any).fileExtension)!;
       const result = templateStringLine(
         ast,
-        document,
+        doc,
         testCase.selectionLine,
         testCase.variableName,
       );

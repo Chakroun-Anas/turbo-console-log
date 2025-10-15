@@ -8,7 +8,8 @@ describe('propertyAccessAssignmentChecker', () => {
   for (const test of passingCases) {
     it(`should detect property access assignment – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
-      const ast = parseCode(doc.getText())!;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (test as any).fileExtension)!;
       const result = propertyAccessAssignmentChecker(
         ast,
         doc,
@@ -22,7 +23,8 @@ describe('propertyAccessAssignmentChecker', () => {
   for (const test of failingCases) {
     it(`should not detect property access assignment – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
-      const ast = parseCode(doc.getText());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (test as any).fileExtension)!;
       const result = propertyAccessAssignmentChecker(
         ast,
         doc,

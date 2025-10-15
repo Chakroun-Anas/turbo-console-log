@@ -8,7 +8,12 @@ describe('functionCallAssignmentChecker', () => {
   for (const doc of passingCases) {
     it(`✓ should detect function call – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      const ast = parseCode(document.getText())!;
+      const ast = parseCode(
+        document.getText(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (doc as any).fileExtension,
+        doc.selectionLine,
+      )!;
       const result = functionCallAssignmentChecker(
         ast,
         doc.selectionLine,
@@ -21,7 +26,12 @@ describe('functionCallAssignmentChecker', () => {
   for (const doc of failingCases) {
     it(`✗ should not detect function call – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      const ast = parseCode(document.getText())!;
+      const ast = parseCode(
+        document.getText(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (doc as any).fileExtension,
+        doc.selectionLine,
+      )!;
       const result = functionCallAssignmentChecker(
         ast,
         doc.selectionLine,

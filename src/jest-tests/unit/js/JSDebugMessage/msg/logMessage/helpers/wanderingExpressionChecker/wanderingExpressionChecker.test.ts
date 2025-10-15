@@ -5,29 +5,31 @@ import passingCases from './passingCases';
 import failingCases from './failingCases';
 
 describe('wanderingExpressionChecker', () => {
-  passingCases.forEach(({ name, lines, selectionLine, variableName }) => {
-    it(`passes: ${name}`, () => {
-      const document = makeTextDocument(lines);
-      const ast = parseCode(document.getText())!;
+  passingCases.forEach((testCase) => {
+    it(`passes: ${testCase.name}`, () => {
+      const doc = makeTextDocument(testCase.lines);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (testCase as any).fileExtension)!;
       const result = wanderingExpressionChecker(
         ast,
-        document,
-        selectionLine,
-        variableName,
+        doc,
+        testCase.selectionLine,
+        testCase.variableName,
       );
       expect(result.isChecked).toBe(true);
     });
   });
 
-  failingCases.forEach(({ name, lines, selectionLine, variableName }) => {
-    it(`fails: ${name}`, () => {
-      const document = makeTextDocument(lines);
-      const ast = parseCode(document.getText())!;
+  failingCases.forEach((testCase) => {
+    it(`fails: ${testCase.name}`, () => {
+      const doc = makeTextDocument(testCase.lines);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (testCase as any).fileExtension)!;
       const result = wanderingExpressionChecker(
         ast,
-        document,
-        selectionLine,
-        variableName,
+        doc,
+        testCase.selectionLine,
+        testCase.variableName,
       );
       expect(result.isChecked).toBe(false);
     });

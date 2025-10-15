@@ -1,0 +1,23 @@
+export default {
+  name: 'Vue SFC - wandering expression in mounted',
+  fileExtension: '.vue',
+  lines: [
+    '<template>',
+    '  <div>{{ value }}</div>',
+    '</template>',
+    '',
+    '<script>',
+    'export default {',
+    '  data() {',
+    '    return { value: 0 };',
+    '  },',
+    '  mounted() {',
+    '    this.value;',
+    '  }',
+    '};',
+    '</script>',
+  ],
+  selectionLine: 10,
+  variableName: 'this.value',
+  expectedLine: 11,
+};

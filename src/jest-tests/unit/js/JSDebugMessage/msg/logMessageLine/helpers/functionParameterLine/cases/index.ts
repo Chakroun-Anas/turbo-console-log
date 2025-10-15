@@ -9,6 +9,7 @@ import case8 from './8';
 import case9 from './9';
 import case10 from './10';
 import case11 from './11';
+import case12 from './12';
 
 const testCases = [
   case1,
@@ -22,6 +23,7 @@ const testCases = [
   case9,
   case10,
   case11,
+  case12,
 ];
 
 export default testCases;
