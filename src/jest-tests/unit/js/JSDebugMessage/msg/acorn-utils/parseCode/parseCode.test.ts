@@ -9,7 +9,11 @@ describe('parseCode', () => {
         const sourceCodeString = Array.isArray(testCase.sourceCode)
           ? testCase.sourceCode.join('\n')
           : testCase.sourceCode;
-        const result = parseCode(sourceCodeString);
+        const result = parseCode(
+          sourceCodeString,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (testCase as any).fileExtension || undefined,
+        );
 
         // Check that the result is a valid AST node
         expect(result).toBeDefined();
@@ -31,7 +35,13 @@ describe('parseCode', () => {
           const sourceCodeString = Array.isArray(testCase.sourceCode)
             ? testCase.sourceCode.join('\n')
             : testCase.sourceCode;
-          parseCode(sourceCodeString);
+          parseCode(
+            sourceCodeString,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (testCase as any).fileExtension || undefined,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (testCase as any).selectionLine,
+          );
         }).toThrow(testCase.expectedError);
       });
     }

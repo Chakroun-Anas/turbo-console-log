@@ -7,7 +7,8 @@ describe('binaryExpressionLine – insertion line after binary expression', () =
   for (const documnet of documents) {
     it(`returns correct insertion line – ${documnet.name}`, () => {
       const doc = makeTextDocument(documnet.lines);
-      const ast = parseCode(doc.getText())!;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (documnet as any).fileExtension)!;
       const insertionLine = binaryExpressionLine(
         ast,
         doc,

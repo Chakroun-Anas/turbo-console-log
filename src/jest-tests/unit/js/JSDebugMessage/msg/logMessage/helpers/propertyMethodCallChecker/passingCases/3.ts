@@ -1,0 +1,23 @@
+export default {
+  name: 'Vue SFC - property method call in lifecycle',
+  fileExtension: '.vue',
+  lines: [
+    '<template>',
+    '  <div>{{ items }}</div>',
+    '</template>',
+    '',
+    '<script>',
+    'export default {',
+    '  data() {',
+    '    return { items: [1, 2, 3] };',
+    '  },',
+    '  mounted() {',
+    '    const filtered = this.items.filter(x => x > 1);',
+    '    console.log(filtered);',
+    '  }',
+    '};',
+    '</script>',
+  ],
+  selectionLine: 10,
+  selectedText: 'this.items',
+};

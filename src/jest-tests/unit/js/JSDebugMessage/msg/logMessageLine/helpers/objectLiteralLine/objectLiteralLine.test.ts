@@ -7,7 +7,8 @@ describe('objectLiteralLine', () => {
   for (const doc of testCases) {
     it(`should return correct insertion line – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      const ast = parseCode(document.getText())!;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(document.getText(), (doc as any).fileExtension)!;
       const result = objectLiteralLine(
         ast,
         document,

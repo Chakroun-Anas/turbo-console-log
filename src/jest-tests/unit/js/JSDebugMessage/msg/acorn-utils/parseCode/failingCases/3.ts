@@ -1,0 +1,30 @@
+export default {
+  name: 'Vue SFC with selection outside script tag',
+  fileExtension: '.vue',
+  selectionLine: 2, // Line 2 is inside the <template> section
+  sourceCode: [
+    '<template>',
+    '  <div>',
+    '    <h1>{{ title }}</h1>',
+    '    <p>{{ message }}</p>',
+    '  </div>',
+    '</template>',
+    '',
+    '<script>',
+    'export default {',
+    '  data() {',
+    '    return {',
+    '      title: "Hello",',
+    '      message: "World"',
+    '    };',
+    '  }',
+    '};',
+    '</script>',
+    '',
+    '<style scoped>',
+    'div { padding: 1rem; }',
+    '</style>',
+  ],
+  expectedError:
+    'Turbo logging works only inside <script> or <script setup> blocks in Vue files.',
+};

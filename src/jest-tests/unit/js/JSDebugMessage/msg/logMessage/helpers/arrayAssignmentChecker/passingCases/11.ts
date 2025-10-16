@@ -1,0 +1,22 @@
+export default {
+  name: 'Vue SFC - array assignment in computed property',
+  fileExtension: '.vue',
+  lines: [
+    '<template>',
+    '  <div>{{ items }}</div>',
+    '</template>',
+    '',
+    '<script>',
+    'export default {',
+    '  computed: {',
+    '    items() {',
+    '      const numbers = [1, 2, 3, 4, 5];',
+    '      return numbers.map(n => n * 2);',
+    '    }',
+    '  }',
+    '};',
+    '</script>',
+  ],
+  selectionLine: 8,
+  variableName: 'numbers',
+};

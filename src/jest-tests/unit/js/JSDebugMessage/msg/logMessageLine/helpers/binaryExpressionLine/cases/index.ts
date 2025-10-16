@@ -8,6 +8,7 @@ import case7 from './7';
 import case8 from './8';
 import case9 from './9';
 import case10 from './10';
+import case11 from './11';
 
 const documents = [
   case1,
@@ -20,6 +21,7 @@ const documents = [
   case8,
   case9,
   case10,
+  case11,
 ];
 
 export default documents;

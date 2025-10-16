@@ -2,6 +2,11 @@ export function proBundleNeedsUpdate(
   currentVersion: string,
   proBundleVersion?: string,
 ): boolean {
+  // Special case: v3.8.0 → v3.8.1 adds Vue SFC feature but doesn't require Pro bundle update
+  if (currentVersion === '3.8.1' && proBundleVersion === '3.8.0') {
+    return false;
+  }
+
   function compareVersions(v1: string, v2?: string): number {
     if (!v2) return 1;
     const a = v1.split('.').map(Number);

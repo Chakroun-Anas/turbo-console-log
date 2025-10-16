@@ -50,7 +50,7 @@ export function msg(
   let ast;
 
   try {
-    ast = parseCode(code, extension);
+    ast = parseCode(code, extension, lineOfSelectedVar);
   } catch (error) {
     // Show error notification to the user
     window.showErrorMessage(

@@ -1,0 +1,22 @@
+export default {
+  name: 'Vue SFC - object literal in data',
+  fileExtension: '.vue',
+  lines: [
+    '<template>',
+    '  <div>{{ user.name }}</div>',
+    '</template>',
+    '',
+    '<script>',
+    'export default {',
+    '  data() {',
+    '    return {',
+    '      user: { name: "John", age: 30 }',
+    '    };',
+    '  }',
+    '};',
+    '</script>',
+  ],
+  selectionLine: 8,
+  variableName: 'user',
+  expectedLine: 9,
+};

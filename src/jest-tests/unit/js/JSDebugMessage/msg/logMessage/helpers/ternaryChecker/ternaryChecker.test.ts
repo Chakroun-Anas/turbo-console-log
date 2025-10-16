@@ -5,29 +5,31 @@ import passingCases from './passingCases';
 import failingCases from './failingCases';
 
 describe('ternaryChecker', () => {
-  for (const doc of passingCases) {
-    it(`should detect ternary – ${doc.name}`, () => {
-      const textDocument = makeTextDocument(doc.lines);
-      const ast = parseCode(textDocument.getText())!;
+  for (const passingCase of passingCases) {
+    it(`should detect ternary – ${passingCase.name}`, () => {
+      const doc = makeTextDocument(passingCase.lines);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (passingCase as any).fileExtension)!;
       const result = ternaryChecker(
         ast,
-        textDocument,
-        doc.selectionLine,
-        doc.variableName,
+        doc,
+        passingCase.selectionLine,
+        passingCase.variableName,
       );
       expect(result.isChecked).toBe(true);
     });
   }
 
-  for (const doc of failingCases) {
-    it(`should not detect ternary – ${doc.name}`, () => {
-      const textDocument = makeTextDocument(doc.lines);
-      const ast = parseCode(textDocument.getText())!;
+  for (const passingCase of failingCases) {
+    it(`should not detect ternary – ${passingCase.name}`, () => {
+      const doc = makeTextDocument(passingCase.lines);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (passingCase as any).fileExtension)!;
       const result = ternaryChecker(
         ast,
-        textDocument,
-        doc.selectionLine,
-        doc.variableName,
+        doc,
+        passingCase.selectionLine,
+        passingCase.variableName,
       );
       expect(result.isChecked).toBe(false);
     });

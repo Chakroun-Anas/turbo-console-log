@@ -5,29 +5,31 @@ import passingCases from './passingCases';
 import failingCases from './failingCases';
 
 describe('templateStringChecker', () => {
-  for (const doc of passingCases) {
-    it(`should detect template string – ${doc.name}`, () => {
-      const document = makeTextDocument(doc.lines);
-      const ast = parseCode(document.getText())!;
+  for (const passingCase of passingCases) {
+    it(`should detect template string – ${passingCase.name}`, () => {
+      const doc = makeTextDocument(passingCase.lines);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (passingCase as any).fileExtension)!;
       const result = templateStringChecker(
         ast,
-        document,
-        doc.selectionLine,
-        doc.variableName,
+        doc,
+        passingCase.selectionLine,
+        passingCase.variableName,
       );
       expect(result.isChecked).toBe(true);
     });
   }
 
-  for (const doc of failingCases) {
-    it(`should not detect template string – ${doc.name}`, () => {
-      const document = makeTextDocument(doc.lines);
-      const ast = parseCode(document.getText())!;
+  for (const passingCase of failingCases) {
+    it(`should not detect template string – ${passingCase.name}`, () => {
+      const doc = makeTextDocument(passingCase.lines);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ast = parseCode(doc.getText(), (passingCase as any).fileExtension)!;
       const result = templateStringChecker(
         ast,
-        document,
-        doc.selectionLine,
-        doc.variableName,
+        doc,
+        passingCase.selectionLine,
+        passingCase.variableName,
       );
       expect(result.isChecked).toBe(false);
     });
