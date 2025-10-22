@@ -12,6 +12,9 @@ describe('proBundleNeedsUpdate', () => {
     expect(proBundleNeedsUpdate('3.8.0', '3.7.1')).toBe(true);
     expect(proBundleNeedsUpdate('3.8.0', '3.7.2')).toBe(true);
     expect(proBundleNeedsUpdate('3.8.1', '3.7.2')).toBe(true);
+    expect(proBundleNeedsUpdate('3.8.2', '3.7.1')).toBe(true);
+    expect(proBundleNeedsUpdate('3.8.2', '3.7.2')).toBe(true);
+    expect(proBundleNeedsUpdate('3.8.2', '3.8.1')).toBe(true);
   });
 
   it('should return false for v3.8.0 → v3.8.1 (Vue SFC feature exception)', () => {

@@ -2,6 +2,27 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.8.2] - 2025-10-22
+
+### 🎃 Halloween Update: Pro Bug Fix & Spooky New Theme
+
+#### 🐛 Turbo Pro: Critical VDOM Bug Fix
+
+- **Fixed Tree Panel Late Initialization Issue**: Resolved a major bug where opening the Turbo Pro tree panel mid-session would only display logs inserted _after_ the panel was opened, requiring a reload to see all workspace logs.
+- **Complete Log Visibility**: The tree panel now correctly displays _all_ turbo logs across the entire workspace/folder, regardless of when the panel is opened during your session.
+- **No More Reloads Needed**: Instant, complete visibility of all your debug logs — past, present, and future — without manual reloads.
+
+#### 🧙‍♀️ Halloween Theme & Enhanced Documentation
+
+We've given Turbo Console Log a festive makeover just in time for Halloween! 🎃✨
+
+- **🎥 New Pro Video with Halloween Theme**: Check out the updated [Turbo Pro demo video](https://www.turboconsolelog.io/pro#see-it-in-action) featuring our spooky seasonal theme
+- **📚 Enhanced Documentation**: Explore the completely refreshed [documentation](https://www.turboconsolelog.io/documentation) with the Halloween aesthetic — making debugging a little more fun this season!
+
+Whether you're Pro or freemium, take a moment to explore the new look and discover tips to supercharge your debugging workflow.
+
+Happy Halloween, and happy debugging! 🎃👻
+
 ## [3.8.1] - 2025-10-16
 
 ### 🎯 Vue Single File Component (SFC) Support — Limitation Removed
