@@ -1,5 +1,6 @@
 export default {
   name: 'multi-line function parameter with type annotation',
+  fileExtension: '.ts',
   lines: [
     'function saveUser(',
     '  id: number,',

@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'nested destructuring inside method',
   lines: [
     'class Controller {',

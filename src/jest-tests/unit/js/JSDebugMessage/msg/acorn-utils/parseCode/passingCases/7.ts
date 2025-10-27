@@ -1,5 +1,6 @@
 export default {
   name: 'Complex React TypeScript dashboard with advanced types and patterns',
+  fileExtension: '.tsx',
   sourceCode: [
     '// File: ComplexDashboard.tsx',
     'import React, {',

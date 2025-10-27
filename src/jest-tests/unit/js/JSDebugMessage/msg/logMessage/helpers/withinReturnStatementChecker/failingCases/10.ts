@@ -1,6 +1,7 @@
 // Variable in different statement before return
 export default {
   name: 'variable in different statement',
+  fileExtension: '.ts',
   lines: [
     'function process(data) {',
     '  console.log(data.status);',

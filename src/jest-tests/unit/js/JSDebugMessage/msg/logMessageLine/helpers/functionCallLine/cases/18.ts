@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'array destructuring from process.argv.slice() with surrounding context',
   lines: [
     'const deployTarball = async () => {',

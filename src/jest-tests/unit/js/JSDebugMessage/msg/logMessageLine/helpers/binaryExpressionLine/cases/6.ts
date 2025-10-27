@@ -1,5 +1,6 @@
 export default {
   name: 'complex binary expression, cursor in middle',
+  fileExtension: '.ts',
   lines: [
     'const status =',
     '  (a && b) ||',

@@ -1,6 +1,7 @@
 // Shorthand property assignment in object literal
 export default {
   name: 'shorthand property assignment in return',
+  fileExtension: '.ts',
   lines: [
     'function createUser(name) {',
     '  return { name, active: true };',

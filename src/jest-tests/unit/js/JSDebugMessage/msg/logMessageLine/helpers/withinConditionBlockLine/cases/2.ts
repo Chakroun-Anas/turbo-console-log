@@ -9,6 +9,7 @@ export default {
     '}',
   ],
   selectionLine: 1,
+  fileExtension: '.ts',
   variableName: 'process.env.GITHUB_ACTIONS',
   expectedLine: 0,
 };

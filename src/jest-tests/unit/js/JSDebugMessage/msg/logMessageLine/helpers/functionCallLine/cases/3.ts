@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'multi-line object passed to function',
   lines: [
     'const result = doSomething({',

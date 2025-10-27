@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.tsx',
   name: 'React ErrorBoundary with nested destructuring - children variable',
   lines: [
     'import { Component } from "react";',

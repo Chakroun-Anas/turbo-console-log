@@ -10,10 +10,9 @@ describe('needTransformation', () => {
       const document = makeTextDocument(testCase.lines);
       const ast = parseCode(
         document.getText(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (testCase as any).fileExtension,
+        testCase.fileExtension,
         testCase.selectionLine,
-      )!;
+      );
       const result = needTransformation(
         ast,
         document,
@@ -29,10 +28,9 @@ describe('needTransformation', () => {
       const document = makeTextDocument(testCase.lines);
       const ast = parseCode(
         document.getText(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (testCase as any).fileExtension,
+        testCase.fileExtension,
         testCase.selectionLine,
-      )!;
+      );
       const result = needTransformation(
         ast,
         document,

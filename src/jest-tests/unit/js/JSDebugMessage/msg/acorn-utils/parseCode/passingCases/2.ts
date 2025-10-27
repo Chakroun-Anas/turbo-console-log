@@ -1,5 +1,6 @@
 export default {
   name: 'React TypeScript component with hooks',
+  fileExtension: '.tsx',
   sourceCode: [
     '// File: SimpleTodoList.tsx',
     'import React, { useEffect, useMemo, useState } from "react";',

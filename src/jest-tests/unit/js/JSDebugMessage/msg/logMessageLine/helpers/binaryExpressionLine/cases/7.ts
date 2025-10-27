@@ -1,5 +1,6 @@
 export default {
   name: 'parenthesized expression',
+  fileExtension: '.ts',
   lines: [
     'function test() {',
     '  // pre-comment',

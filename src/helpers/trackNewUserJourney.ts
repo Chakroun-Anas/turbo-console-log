@@ -2,9 +2,10 @@ import * as vscode from 'vscode';
 import {
   readFromGlobalState,
   writeToGlobalState,
-  showNewsletterStatusBar,
+  isFreshInstall,
 } from './index';
 import { createTelemetryService } from '../telemetry';
+import { GlobalStateKey } from '@/entities';
 
 /**
  * Tracks the new user journey for log insertion commands
@@ -14,27 +15,32 @@ import { createTelemetryService } from '../telemetry';
 export async function trackNewUserJourney(
   context: vscode.ExtensionContext,
 ): Promise<void> {
-  // Check if user is new and hasn't seen the milestone notification yet
-  const isNewUser = readFromGlobalState<boolean>(context, 'IS_NEW_USER');
+  // Check if user is on fresh install and hasn't seen the milestone notification yet
+  const isOnFreshInstall = isFreshInstall(context);
   const hasShownTenCommandsMilestoneNotification = readFromGlobalState<boolean>(
     context,
-    'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION',
+    GlobalStateKey.HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION,
   );
 
-  // Only track for new users who haven't seen the notification
-  if (!isNewUser || hasShownTenCommandsMilestoneNotification) {
+  // Only track for fresh install users who haven't seen the notification
+  if (!isOnFreshInstall || hasShownTenCommandsMilestoneNotification) {
     return;
   }
 
   // Increment command usage count
   let commandUsageCount =
-    readFromGlobalState<number>(context, 'COMMAND_USAGE_COUNT') || 0;
+    readFromGlobalState<number>(context, GlobalStateKey.COMMAND_USAGE_COUNT) ||
+    0;
   commandUsageCount++;
-  writeToGlobalState(context, 'COMMAND_USAGE_COUNT', commandUsageCount);
+  writeToGlobalState(
+    context,
+    GlobalStateKey.COMMAND_USAGE_COUNT,
+    commandUsageCount,
+  );
 
   // Check if user has reached the 10 command milestone
   if (commandUsageCount === 10) {
-    // Show newsletter notification with actions (non-blocking)
+    // Show newsletter notification with actions (non-blocking, one-time only)
     const notificationPromise = vscode.window.showInformationMessage(
       "🎉 Great job! You've used Turbo 10 times. Join our newsletter for exclusive surveys, tips, updates!",
       'Join Newsletter',
@@ -50,16 +56,10 @@ export async function trackNewUserJourney(
       }
     });
 
-    // Show persistent newsletter status bar that survives VS Code reloads
-    showNewsletterStatusBar(context);
-
-    // Set flag to indicate that status bar should be shown on future activations
-    writeToGlobalState(context, 'SHOULD_SHOW_NEWSLETTER_STATUS_BAR', true);
-
-    // Mark that notification has been shown and user is no longer "new" (immediately)
+    // Mark that notification has been shown (no persistent status bar)
     writeToGlobalState(
       context,
-      'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION',
+      GlobalStateKey.HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION,
       true,
     );
 

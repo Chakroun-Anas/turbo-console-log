@@ -1,9 +1,9 @@
-import type { AcornNode } from '../types';
+import type { AcornNode } from './types';
 
 /**
  * Recursively adjusts all line and byte offset positions in the AST.
- * This is necessary when parsing extracted script content from Vue SFC to ensure
- * both line numbers and byte offsets match the original document.
+ * This is necessary when parsing extracted script content from Vue SFC or HTML files
+ * to ensure both line numbers and byte offsets match the original document.
  *
  * @param node - The AST node to adjust
  * @param lineOffset - The number of lines to add to all line positions

@@ -7,6 +7,7 @@ export default {
     'return true;',
     '}',
   ],
+  fileExtension: '.ts',
   selectionLine: 0,
   variableName: 'currentRoot',
   expectedLine: 2,

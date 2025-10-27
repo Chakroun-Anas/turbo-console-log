@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'function call inside object literal queryFn',
   lines: [
     'const currencies = useQuery({',

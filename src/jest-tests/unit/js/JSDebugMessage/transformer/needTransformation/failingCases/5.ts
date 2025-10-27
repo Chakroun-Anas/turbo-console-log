@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'variable inside arrow function with block (useMemo context)',
   lines: [
     'import { useMemo } from "react";',

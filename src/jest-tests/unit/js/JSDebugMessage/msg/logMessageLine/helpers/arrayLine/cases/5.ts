@@ -1,5 +1,6 @@
 export default {
   name: 'array assignment to deeply nested object property',
+  fileExtension: '.ts',
   lines: [
     'config.module.rules = [',
     '  ...filterModuleRules(config),',

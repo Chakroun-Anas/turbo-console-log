@@ -14,10 +14,9 @@ describe('performTransformation', () => {
       const doc = makeTextDocument(testCase.lines);
       const ast = parseCode(
         doc.getText(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (testCase as any).fileExtension,
+        testCase.fileExtension,
         testCase.line,
-      )!;
+      );
       const result = performTransformation(
         ast,
         doc,

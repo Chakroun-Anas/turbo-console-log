@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'template literal passed as argument',
   lines: ['const query = send(`', '  SELECT *', '  FROM users', '`);'],
   selectionLine: 0,

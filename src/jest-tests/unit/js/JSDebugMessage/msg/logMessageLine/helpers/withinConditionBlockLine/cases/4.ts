@@ -5,6 +5,7 @@ export default {
     'console.log(normalAssignment);',
   ],
   selectionLine: 0,
+  fileExtension: '.ts',
   variableName: 'someValue',
   expectedLine: 1,
 };

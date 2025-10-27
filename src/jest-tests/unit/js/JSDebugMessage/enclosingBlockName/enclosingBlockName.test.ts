@@ -34,11 +34,12 @@ describe('enclosingBlockName', () => {
       ]);
       // Line 13 corresponds to the stepFields.every arrow function
       // This should not hang and should return the enclosing function name
-      const ast = parseCode(document.getText())!;
+      const selectionLine = 13;
+      const ast = parseCode(document.getText(), '.tsx', selectionLine)!;
       const result = enclosingBlockName(
         ast,
         document,
-        13,
+        selectionLine,
         'function' as BlockType,
       );
       expect(result).toBe('FancyComponent');
@@ -135,7 +136,7 @@ describe('enclosingBlockName', () => {
   for (const testCase of passingCases) {
     it(`should detect enclosing ${testCase.blockType} – ${testCase.name}`, () => {
       const document = makeTextDocument(testCase.lines);
-      const ast = parseCode(document.getText())!;
+      const ast = parseCode(document.getText(), 'ts', testCase.selectionLine)!;
       const result = enclosingBlockName(
         ast,
         document,
@@ -149,7 +150,7 @@ describe('enclosingBlockName', () => {
   for (const testCase of failingCases) {
     it(`should return empty string when no enclosing ${testCase.blockType} – ${testCase.name}`, () => {
       const document = makeTextDocument(testCase.lines);
-      const ast = parseCode(document.getText())!;
+      const ast = parseCode(document.getText(), '.ts', testCase.selectionLine)!;
       const result = enclosingBlockName(
         ast,
         document,

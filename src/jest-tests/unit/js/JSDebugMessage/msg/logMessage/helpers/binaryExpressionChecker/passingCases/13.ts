@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'binary expression with optional chaining and inequality (!==)',
   lines: [
     'import { join } from "path";',

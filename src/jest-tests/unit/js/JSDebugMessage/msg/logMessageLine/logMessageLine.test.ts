@@ -27,9 +27,9 @@ jest.mock('@/debug-message/js/JSDebugMessage/msg/logMessageLine/helpers');
 
 describe('logMessageLine', () => {
   const mockDocument = makeTextDocument(['const value = 42;']);
-  const ast = parseCode(mockDocument.getText())!;
   const selectionLine = 0;
   const selectedVar = 'value';
+  const ast = parseCode(mockDocument.getText(), '.ts', 0)!;
 
   beforeEach(() => {
     // Reset all mocks before each test

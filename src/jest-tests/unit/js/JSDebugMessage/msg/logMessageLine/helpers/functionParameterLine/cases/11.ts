@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'async function parameter in Promise.all map with complete Next.js deployment script',
   lines: [
     '// @ts-check',

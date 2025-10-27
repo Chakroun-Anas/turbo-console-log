@@ -7,18 +7,14 @@ import {
   getExtensionProperties,
   activateRepairMode,
   activateFreemiumLauncherMode,
+  traceExtensionVersionHistory,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
   TurboProBundleRepairPanel,
   TurboProShowcasePanel,
 } from './pro';
-import {
-  releaseNotes,
-  getLatestWebViewReleaseVersion,
-  getPreviousWebViewReleaseVersion,
-  showReleaseHtmlWebView,
-} from './releases';
+import { releaseNotes } from './releases';
 import {
   proBundleNeedsUpdate,
   runProBundle,
@@ -32,6 +28,7 @@ export async function activate(
     vscode.workspace.getConfiguration('turboConsoleLog');
   const extensionProperties: ExtensionProperties =
     getExtensionProperties(config);
+  // Register all commands
   const commands: Array<Command> = getAllCommands();
   for (const { name, handler } of commands) {
     vscode.commands.registerCommand(name, (args: unknown[]) => {
@@ -43,6 +40,8 @@ export async function activate(
       });
     });
   }
+
+  // Register webview panels and tree views
   const turboProShowCasePanel = new TurboProShowcasePanel(context);
   const turboProBundleRepairPanel = new TurboProBundleRepairPanel('', 'run');
   const freemiumLauncherProvider = new TurboFreemiumLauncherPanel();
@@ -64,22 +63,20 @@ export async function activate(
       freemiumLauncherProvider,
     ),
   );
+
+  // Get current extension version
   const version = vscode.extensions.getExtension(
     'ChakrounAnas.turbo-console-log',
   )?.packageJSON.version;
-  const previousWebViewReleaseVersion = getPreviousWebViewReleaseVersion();
-  const latestWebViewReleaseVersion = getLatestWebViewReleaseVersion();
+
+  // Trace version history and handle fresh install welcome
+  // (creates or updates version array in global state + shows welcome for new users)
+  traceExtensionVersionHistory(context, version);
+
+  // Handle Pro user logic
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');
   const proBundle = readFromGlobalState<string>(context, 'pro-bundle');
   const proBundleVersion = readFromGlobalState<string>(context, 'version');
-  showReleaseHtmlWebView(
-    context,
-    previousWebViewReleaseVersion,
-    latestWebViewReleaseVersion,
-    extensionProperties.releaseReviewTargetWindow,
-    new Date(),
-    releaseNotes[latestWebViewReleaseVersion]?.date ?? new Date(),
-  );
   const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
   if (isProUser) {
     if (
@@ -126,5 +123,6 @@ export async function activate(
     return;
   }
 
+  // Activate freemium launcher for non-Pro users
   activateFreemiumLauncherMode(context, freemiumLauncherProvider);
 }

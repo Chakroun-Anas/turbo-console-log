@@ -1,6 +1,7 @@
 // Variable in conditional before return
 export default {
   name: 'variable in conditional before return',
+  fileExtension: '.ts',
   lines: [
     'function processUser(user) {',
     '  if (user.isActive) {',

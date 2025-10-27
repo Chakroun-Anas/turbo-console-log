@@ -1,0 +1,1 @@
+export { extractHtmlScript } from './extractHtmlScript';

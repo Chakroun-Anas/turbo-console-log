@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'multi-line typed function declaration',
   lines: [
     'function fetchData(',

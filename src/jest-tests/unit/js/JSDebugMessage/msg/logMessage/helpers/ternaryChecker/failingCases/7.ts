@@ -1,5 +1,6 @@
 export default {
   name: 'ternary in other var inside same object scope',
+  fileExtension: '.ts',
   lines: [
     'const props = {',
     "  title: 'Hello',",

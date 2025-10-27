@@ -1,5 +1,6 @@
 export default {
   name: 'binary expression assignment within try-catch block',
+  fileExtension: '.tsx',
   lines: [
     'import { join } from "path";',
     'import { useTheme } from "styled-components";',

@@ -1,5 +1,6 @@
 export default {
   name: 'nested object literal inside assignment',
+  fileExtension: '.ts',
   lines: [
     'const settings = {',
     '  layout: {',

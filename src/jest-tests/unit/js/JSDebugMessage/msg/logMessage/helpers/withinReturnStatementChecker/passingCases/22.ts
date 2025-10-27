@@ -1,6 +1,7 @@
 // Position-based matching for entire object literal selection
 export default {
   name: 'position-based object literal selection',
+  fileExtension: '.ts',
   lines: [
     'function getPersonInfos(person) {',
     '  return {',

@@ -5,6 +5,7 @@ export default {
     '  .workspace?.workspaceFolders?.[0]?.uri.fsPath;',
     'if (currentRoot) { console.log(currentRoot); }',
   ],
+  fileExtension: '.ts',
   selectionLine: 0,
   variableName: 'currentRoot',
   expectedLine: 2,

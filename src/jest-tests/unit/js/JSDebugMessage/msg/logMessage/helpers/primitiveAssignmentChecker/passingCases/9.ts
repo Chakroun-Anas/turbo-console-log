@@ -1,5 +1,6 @@
 export default {
   name: 'React ErrorBoundary nested destructuring with children',
+  fileExtension: '.tsx',
   lines: [
     'import { Component } from "react";',
     'import { isDev } from "utils/functions";',

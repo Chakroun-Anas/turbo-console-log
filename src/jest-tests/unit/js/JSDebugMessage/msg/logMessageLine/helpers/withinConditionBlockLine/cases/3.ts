@@ -7,6 +7,7 @@ export default {
     '}',
   ],
   selectionLine: 1,
+  fileExtension: '.ts',
   variableName: 'user.isActive',
   expectedLine: 1,
 };

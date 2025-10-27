@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.tsx',
   name: 'React map callback with array destructuring parameters',
   lines: [
     'import { Fragment, memo, useEffect, useMemo, useState } from "react";',

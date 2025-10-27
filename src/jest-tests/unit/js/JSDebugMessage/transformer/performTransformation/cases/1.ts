@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'arrow function with implicit return',
   lines: ['const double = (x) => x * 2;'],
   selectedVar: 'x',

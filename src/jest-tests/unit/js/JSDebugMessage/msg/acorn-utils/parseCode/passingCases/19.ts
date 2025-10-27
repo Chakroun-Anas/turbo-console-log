@@ -1,0 +1,27 @@
+export default {
+  name: 'Svelte - TypeScript with module context',
+  fileExtension: '.svelte',
+  sourceCode: [
+    '<script lang="ts" context="module">',
+    '  export const API_URL = "https://api.example.com";',
+    '</script>',
+    '',
+    '<script lang="ts">',
+    '  import { onMount } from "svelte";',
+    '  ',
+    '  let data: string[] = [];',
+    '  ',
+    '  onMount(async () => {',
+    '    const response = await fetch(API_URL);',
+    '    data = await response.json();',
+    '  });',
+    '</script>',
+    '',
+    '<div>',
+    '  {#each data as item}',
+    '    <p>{item}</p>',
+    '  {/each}',
+    '</div>',
+  ],
+  selectionLine: 10, // Line where "const response" is - 0-based
+};

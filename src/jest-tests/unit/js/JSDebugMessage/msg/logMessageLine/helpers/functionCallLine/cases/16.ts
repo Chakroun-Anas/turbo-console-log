@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'reduce call inside a for-loop following a method subscription',
   lines: [
     '// @ts-nocheck',

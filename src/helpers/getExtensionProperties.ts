@@ -21,6 +21,5 @@ export function getExtensionProperties(
     includeLineNum: workspaceConfig.includeLineNum || false,
     includeFilename: workspaceConfig.includeFilename || false,
     logFunction: workspaceConfig.logFunction || 'log',
-    releaseReviewTargetWindow: workspaceConfig.releaseReviewTargetWindow,
   };
 }

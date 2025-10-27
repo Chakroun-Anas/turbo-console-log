@@ -1,5 +1,6 @@
 export default {
   name: 'logical AND assignment',
+  fileExtension: '.ts',
   lines: [
     'function test() {',
     '  let x = 1;',

@@ -5,6 +5,7 @@ export default {
     '  console.log("Existing code");',
     '}',
   ],
+  fileExtension: '.ts',
   selectionLine: 0,
   variableName: 'process.env.GITHUB_ACTIONS',
   expectedLine: 0,

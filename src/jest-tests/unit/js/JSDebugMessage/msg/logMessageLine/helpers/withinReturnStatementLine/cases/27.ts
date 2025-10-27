@@ -1,6 +1,7 @@
 // JSX return statement with optional chaining - log should go before the return
 export default {
   name: 'JSX return with optional chaining (user.meta?.city)',
+  fileExtension: '.tsx',
   lines: [
     'export default function Page({ user, items }) {',
     '  const fullName = `${user.firstName} ${user.lastName}`;',

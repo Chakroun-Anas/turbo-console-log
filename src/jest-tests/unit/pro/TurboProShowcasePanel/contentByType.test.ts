@@ -149,9 +149,9 @@ describe('contentByType', () => {
     const result = contentByType(dynamicContent);
 
     expect(result).toEqual({
-      topContentHtml: '',
+      topContentHtml: '<div>Survey content</div>',
       articlesHtml: '',
-      surveyHtml: '<div>Survey content</div>',
+      surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
     });
@@ -177,10 +177,10 @@ describe('contentByType', () => {
     const result = contentByType(dynamicContent);
 
     expect(result).toEqual({
-      topContentHtml: '',
+      topContentHtml: '<table>Table content</table>',
       articlesHtml: '',
       surveyHtml: '',
-      tableHtml: '<table>Table content</table>',
+      tableHtml: '',
       mediaShowcaseCTAHtml: '',
     });
   });
@@ -239,11 +239,11 @@ describe('contentByType', () => {
     const result = contentByType(dynamicContent);
 
     expect(result).toEqual({
-      topContentHtml: '',
+      topContentHtml: '<div>Media showcase content</div>',
       articlesHtml: '',
       surveyHtml: '',
       tableHtml: '',
-      mediaShowcaseCTAHtml: '<div>Media showcase content</div>',
+      mediaShowcaseCTAHtml: '',
     });
   });
 
@@ -270,10 +270,10 @@ describe('contentByType', () => {
     };
 
     const content: DynamicFreemiumPanelContent[] = [
-      { type: 'paragraph', component: paragraphComponent },
-      { type: 'article', component: articleComponent },
-      { type: 'survey', component: surveyComponent },
-      { type: 'table', component: tableComponent },
+      { type: 'paragraph', order: 1, component: paragraphComponent },
+      { type: 'article', order: 4, component: articleComponent },
+      { type: 'survey', order: 2, component: surveyComponent },
+      { type: 'table', order: 3, component: tableComponent },
     ];
 
     const dynamicContent: DynamicFreemiumPanel = {
@@ -283,19 +283,19 @@ describe('contentByType', () => {
     };
 
     mockRenderContentItem
-      .mockReturnValueOnce('<p>Paragraph</p>')
-      .mockReturnValueOnce('<article>Article</article>')
-      .mockReturnValueOnce('<div>Survey</div>')
-      .mockReturnValueOnce('<table>Table</table>');
+      .mockReturnValueOnce('<p>Paragraph</p>') // order: 1 (non-article, first)
+      .mockReturnValueOnce('<div>Survey</div>') // order: 2 (non-article, second)
+      .mockReturnValueOnce('<table>Table</table>') // order: 3 (non-article, third)
+      .mockReturnValueOnce('<article>Article</article>'); // order: 4 (article, last)
 
     const result = contentByType(dynamicContent);
 
     expect(mockRenderContentItem).toHaveBeenCalledTimes(4);
     expect(result).toEqual({
-      topContentHtml: '<p>Paragraph</p>',
+      topContentHtml: '<p>Paragraph</p><div>Survey</div><table>Table</table>',
       articlesHtml: '<article>Article</article>',
-      surveyHtml: '<div>Survey</div>',
-      tableHtml: '<table>Table</table>',
+      surveyHtml: '',
+      tableHtml: '',
       mediaShowcaseCTAHtml: '',
     });
   });

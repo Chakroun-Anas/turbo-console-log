@@ -3,4 +3,5 @@ export default {
   selectionLine: 0,
   variableName: 'result',
   name: 'should detect ternary in variable initializer',
+  fileExtension: '.ts',
 };

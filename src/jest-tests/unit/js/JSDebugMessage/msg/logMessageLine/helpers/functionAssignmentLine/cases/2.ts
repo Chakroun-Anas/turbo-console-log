@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'arrow function assigned to variable, block body',
   lines: [
     'const compute = (x: number) => {',

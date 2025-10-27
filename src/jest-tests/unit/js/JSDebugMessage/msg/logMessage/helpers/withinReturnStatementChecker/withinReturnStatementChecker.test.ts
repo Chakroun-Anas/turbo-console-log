@@ -8,8 +8,11 @@ describe('withinReturnStatementChecker', () => {
   for (const testCase of passingCases) {
     it(`should detect: ${testCase.name}`, () => {
       const doc = makeTextDocument(testCase.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (testCase as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        testCase.fileExtension,
+        testCase.selectionLine,
+      );
       const result = withinReturnStatementChecker(
         ast,
         doc,
@@ -23,8 +26,11 @@ describe('withinReturnStatementChecker', () => {
   for (const testCase of failingCases) {
     it(`should reject: ${testCase.name}`, () => {
       const doc = makeTextDocument(testCase.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (testCase as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        testCase.fileExtension,
+        testCase.selectionLine,
+      );
       const result = withinReturnStatementChecker(
         ast,
         doc,

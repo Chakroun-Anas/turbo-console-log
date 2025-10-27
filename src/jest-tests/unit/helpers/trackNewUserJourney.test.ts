@@ -1,6 +1,10 @@
 import * as vscode from 'vscode';
 import { trackNewUserJourney } from '@/helpers/trackNewUserJourney';
-import { readFromGlobalState, writeToGlobalState } from '@/helpers';
+import {
+  readFromGlobalState,
+  writeToGlobalState,
+  isFreshInstall,
+} from '@/helpers';
 import { createTelemetryService } from '@/telemetry';
 import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
 
@@ -9,6 +13,7 @@ jest.mock('@/helpers', () => ({
   readFromGlobalState: jest.fn(),
   writeToGlobalState: jest.fn(),
   showNewsletterStatusBar: jest.fn(),
+  isFreshInstall: jest.fn(),
 }));
 
 jest.mock('@/telemetry', () => ({
@@ -33,6 +38,9 @@ describe('trackNewUserJourney', () => {
   >;
   const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
     typeof writeToGlobalState
+  >;
+  const mockIsFreshInstall = isFreshInstall as jest.MockedFunction<
+    typeof isFreshInstall
   >;
   const mockCreateTelemetryService =
     createTelemetryService as jest.MockedFunction<
@@ -74,8 +82,10 @@ describe('trackNewUserJourney', () => {
 
   describe('when user is not new', () => {
     beforeEach(() => {
+      // Mock isFreshInstall to return false (existing user)
+      mockIsFreshInstall.mockReturnValue(false);
+
       mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (key === 'IS_NEW_USER') return false;
         if (key === 'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION')
           return false;
         if (key === 'COMMAND_USAGE_COUNT') return 5;
@@ -96,8 +106,10 @@ describe('trackNewUserJourney', () => {
 
   describe('when user has already seen milestone notification', () => {
     beforeEach(() => {
+      // Mock isFreshInstall to return true (fresh install)
+      mockIsFreshInstall.mockReturnValue(true);
+
       mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (key === 'IS_NEW_USER') return true;
         if (key === 'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION')
           return true;
         if (key === 'COMMAND_USAGE_COUNT') return 15;
@@ -118,8 +130,10 @@ describe('trackNewUserJourney', () => {
 
   describe('when user is new and has not seen milestone notification', () => {
     beforeEach(() => {
+      // Mock isFreshInstall to return true (fresh install)
+      mockIsFreshInstall.mockReturnValue(true);
+
       mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (key === 'IS_NEW_USER') return true;
         if (key === 'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION')
           return false;
         if (key === 'COMMAND_USAGE_COUNT') return 5;
@@ -139,7 +153,6 @@ describe('trackNewUserJourney', () => {
 
     it('should handle undefined command usage count as 0', async () => {
       mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (key === 'IS_NEW_USER') return true;
         if (key === 'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION')
           return false;
         if (key === 'COMMAND_USAGE_COUNT') return undefined;
@@ -167,7 +180,6 @@ describe('trackNewUserJourney', () => {
     describe('when reaching 10 command milestone', () => {
       beforeEach(() => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
-          if (key === 'IS_NEW_USER') return true;
           if (key === 'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION')
             return false;
           if (key === 'COMMAND_USAGE_COUNT') return 9; // Will become 10 after increment
@@ -236,11 +248,6 @@ describe('trackNewUserJourney', () => {
           'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION',
           true,
         );
-        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-          mockContext,
-          'SHOULD_SHOW_NEWSLETTER_STATUS_BAR',
-          true,
-        );
       });
 
       it('should send telemetry event', async () => {
@@ -285,12 +292,6 @@ describe('trackNewUserJourney', () => {
         );
         expect(mockWriteToGlobalState).toHaveBeenNthCalledWith(
           2,
-          mockContext,
-          'SHOULD_SHOW_NEWSLETTER_STATUS_BAR',
-          true,
-        );
-        expect(mockWriteToGlobalState).toHaveBeenNthCalledWith(
-          3,
           mockContext,
           'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION',
           true,

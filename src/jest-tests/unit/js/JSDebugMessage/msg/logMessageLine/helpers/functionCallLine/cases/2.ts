@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'chained method call on single line',
   lines: ['const value = user.getProfile().getName();'],
   selectionLine: 0,

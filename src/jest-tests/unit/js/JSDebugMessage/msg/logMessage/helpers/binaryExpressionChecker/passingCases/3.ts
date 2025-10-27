@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'logical AND assignment (&&)',
   lines: [
     'const ReactSecretInternals =',

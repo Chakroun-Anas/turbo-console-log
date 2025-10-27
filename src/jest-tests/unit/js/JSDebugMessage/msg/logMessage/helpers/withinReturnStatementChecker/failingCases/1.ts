@@ -1,6 +1,7 @@
 // Variable in assignment before return statement
 export default {
   name: 'variable in assignment before return',
+  fileExtension: '.ts',
   lines: [
     'function processData(data) {',
     '  const processed = data.value;',

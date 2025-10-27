@@ -1,4 +1,5 @@
 import { TextEditorEdit, TextDocument, window } from 'vscode';
+import path from 'path';
 import {
   ExtensionProperties,
   LogMessage,
@@ -43,14 +44,13 @@ export function msg(
   const code = document.getText();
 
   // Get file extension from document URI
-  const filePath = document.uri?.path || document.fileName || '';
-  const fileExtension = filePath.split('.').pop();
-  const extension = fileExtension ? `.${fileExtension}` : undefined;
+  const filePath = document.uri.fsPath;
+  const fileExtension = path.extname(filePath);
 
   let ast;
 
   try {
-    ast = parseCode(code, extension, lineOfSelectedVar);
+    ast = parseCode(code, fileExtension, lineOfSelectedVar);
   } catch (error) {
     // Show error notification to the user
     window.showErrorMessage(

@@ -1,5 +1,6 @@
 export default {
   name: 'variable not a function parameter',
+  fileExtension: '.ts',
   lines: [
     'const value = 42;',
     'function test() {',

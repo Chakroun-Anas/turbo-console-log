@@ -1,5 +1,6 @@
 // More complex: render function with implicit JSX return (should need transformation)
 export default {
+  fileExtension: '.tsx',
   name: 'render function with implicit JSX return and nested property',
   lines: [
     'const renderItem = (item: Item, idx: number) =>',

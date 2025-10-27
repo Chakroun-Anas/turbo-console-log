@@ -1,6 +1,7 @@
 // Spread assignment in object literal
 export default {
   name: 'spread assignment in return',
+  fileExtension: '.ts',
   lines: [
     'function mergeUser(user, extra) {',
     '  return { ...user, active: true };',

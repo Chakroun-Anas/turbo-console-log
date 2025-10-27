@@ -1,0 +1,27 @@
+export default {
+  name: 'Astro - Component with inline script and frontmatter',
+  fileExtension: '.astro',
+  sourceCode: [
+    '---',
+    'const serverData = { count: 0 };',
+    'const apiUrl = "https://api.example.com";',
+    '---',
+    '',
+    '<html>',
+    '  <body>',
+    '    <button id="counter">Count: {serverData.count}</button>',
+    '  </body>',
+    '</html>',
+    '',
+    '<script>',
+    '  const button = document.getElementById("counter");',
+    '  let count = 0;',
+    '  ',
+    '  button?.addEventListener("click", () => {',
+    '    count++;',
+    '    button.textContent = `Count: ${count}`;',
+    '  });',
+    '</script>',
+  ],
+  selectionLine: 13, // Line where "let count = 0" in <script> tag - 0-based
+};

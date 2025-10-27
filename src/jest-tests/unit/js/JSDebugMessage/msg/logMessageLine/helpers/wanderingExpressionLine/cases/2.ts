@@ -1,5 +1,6 @@
 export default {
   name: 'property access in ternary',
+  fileExtension: '.ts',
   lines: [
     'const greeting = user.profile.name',
     '  ? `Hello, ${user.profile.name}!`',

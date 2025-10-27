@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'async function call inside IIFE',
   lines: [
     'const data = await (async () => {',

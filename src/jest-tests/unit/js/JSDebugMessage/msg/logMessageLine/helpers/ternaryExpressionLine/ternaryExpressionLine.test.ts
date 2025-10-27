@@ -7,8 +7,11 @@ describe('ternaryExpressionLine – various scenarios', () => {
   for (const test of testCases) {
     it(`returns correct line for: ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (test as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        test.fileExtension,
+        test.selectionLine,
+      );
       const line = ternaryExpressionLine(
         ast,
         doc,

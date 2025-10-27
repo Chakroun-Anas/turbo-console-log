@@ -8,8 +8,11 @@ describe('templateStringChecker', () => {
   for (const passingCase of passingCases) {
     it(`should detect template string – ${passingCase.name}`, () => {
       const doc = makeTextDocument(passingCase.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (passingCase as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        passingCase.fileExtension,
+        passingCase.selectionLine,
+      );
       const result = templateStringChecker(
         ast,
         doc,
@@ -23,8 +26,11 @@ describe('templateStringChecker', () => {
   for (const passingCase of failingCases) {
     it(`should not detect template string – ${passingCase.name}`, () => {
       const doc = makeTextDocument(passingCase.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (passingCase as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        passingCase.fileExtension,
+        passingCase.selectionLine,
+      );
       const result = templateStringChecker(
         ast,
         doc,

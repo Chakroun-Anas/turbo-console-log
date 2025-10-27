@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'async fetch with complex destructuring - response.json() call',
   lines: [
     'fetch("https://api.webamp.org/graphql", {',

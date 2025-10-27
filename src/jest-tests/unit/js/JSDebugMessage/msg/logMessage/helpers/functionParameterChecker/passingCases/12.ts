@@ -1,6 +1,7 @@
 // Class method with decorators (valid TypeScript - NestJS style)
 export default {
   name: 'class method with decorators and parameter decorators',
+  fileExtension: '.ts',
   lines: [
     '// @ts-nocheck',
     '',

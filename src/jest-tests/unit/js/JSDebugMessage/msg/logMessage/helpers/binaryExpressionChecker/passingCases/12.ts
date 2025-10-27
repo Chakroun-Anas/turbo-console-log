@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'complex assignment with binary expression and property access',
   lines: [
     'eventData =',

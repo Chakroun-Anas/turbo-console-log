@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'arrow function with object literal return (parenthesized)',
   lines: [
     'const data = items.map(raw => ({',

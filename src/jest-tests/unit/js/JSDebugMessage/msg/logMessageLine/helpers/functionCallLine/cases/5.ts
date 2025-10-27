@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'function call with nested calls and config object',
   lines: [
     'const result = callApi({',

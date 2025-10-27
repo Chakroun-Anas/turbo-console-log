@@ -1,5 +1,6 @@
 export default {
   name: 'function expression with complex parameter destructuring',
+  fileExtension: '.ts',
   lines: [
     'function test() {',
     '  const value = 42;',

@@ -8,8 +8,11 @@ describe('propertyMethodCallChecker', () => {
   for (const test of passingCases) {
     it(`should detect property method call – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (test as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        test.fileExtension,
+        test.selectionLine,
+      );
       const result = propertyMethodCallChecker(
         ast,
         doc,
@@ -23,8 +26,11 @@ describe('propertyMethodCallChecker', () => {
   for (const test of failingCases) {
     it(`should not detect property method call – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (test as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        test.fileExtension,
+        test.selectionLine,
+      );
       const result = propertyMethodCallChecker(
         ast,
         doc,

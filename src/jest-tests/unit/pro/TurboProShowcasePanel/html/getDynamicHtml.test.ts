@@ -16,8 +16,9 @@ jest.mock('@/pro/TurboProShowcasePanel/contentByType', () => ({
   contentByType: jest.fn(() => ({
     topContentHtml: '<div class="top-content">Top Content</div>',
     articlesHtml: '<div class="articles">Articles</div>',
-    surveyHtml: '<div class="survey">Survey</div>',
-    tableHtml: '<div class="table">Table</div>',
+    surveyHtml: '',
+    tableHtml: '',
+    mediaShowcaseCTAHtml: '',
   })),
 }));
 
@@ -110,16 +111,14 @@ describe('getDynamicHtml', () => {
     const topContentIndex = result.indexOf(
       '<div class="top-content">Top Content</div>',
     );
-    const surveyIndex = result.indexOf('<div class="survey">Survey</div>');
     const articlesIndex = result.indexOf(
       '<div class="articles">Articles</div>',
     );
-    const tableIndex = result.indexOf('<div class="table">Table</div>');
 
-    // Verify order: top content, then survey, then table, then articles
-    expect(topContentIndex).toBeLessThan(surveyIndex);
-    expect(surveyIndex).toBeLessThan(tableIndex);
-    expect(tableIndex).toBeLessThan(articlesIndex);
+    // Verify order: top content, then articles
+    expect(topContentIndex).toBeGreaterThan(-1);
+    expect(articlesIndex).toBeGreaterThan(-1);
+    expect(topContentIndex).toBeLessThan(articlesIndex);
   });
 
   it('should include common styles in head section', () => {
@@ -184,8 +183,8 @@ describe('getDynamicHtml', () => {
         '<div>Complex top content with <strong>HTML</strong></div>',
       articlesHtml:
         '<article><h2>Article Title</h2><p>Article content</p></article>',
-      surveyHtml: '<section class="survey"><h3>Survey</h3></section>',
-      tableHtml: '<table><tr><td>Table content</td></tr></table>',
+      surveyHtml: '',
+      tableHtml: '',
       mediaShowcaseCTAHtml: '',
     });
 
@@ -203,7 +202,5 @@ describe('getDynamicHtml', () => {
 
     expect(result).toContain('Complex top content with <strong>HTML</strong>');
     expect(result).toContain('<article><h2>Article Title</h2>');
-    expect(result).toContain('<section class="survey">');
-    expect(result).toContain('<table><tr><td>Table content</td></tr></table>');
   });
 });

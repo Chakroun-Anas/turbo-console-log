@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'reduce call with object accumulator function',
   lines: [
     'const values = FLAG_COLUMNS.reduce((acc, key) => {',
