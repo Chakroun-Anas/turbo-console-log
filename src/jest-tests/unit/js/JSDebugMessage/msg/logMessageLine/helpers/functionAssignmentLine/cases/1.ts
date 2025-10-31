@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'named function expression assigned to variable',
   lines: [
     'const doStuff = function doStuff() {',

@@ -1,5 +1,6 @@
 export default {
   name: 'complex multi-line object with type annotation - WALLPAPER_PATHS',
+  fileExtension: '.ts',
   lines: [
     'import {',
     '  type WallpaperMenuItem,',

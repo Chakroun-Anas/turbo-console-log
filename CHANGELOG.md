@@ -2,6 +2,33 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.9.0] - 2025-10-30
+
+### 🎃 Halloween Special Edition: Universal Framework Support
+
+#### 🚀 AST Engine: Universal Framework Support
+
+Our Full AST Engine has reached new heights of sophistication. With v3.9.0, Turbo Console Log now provides first-class support for modern web frameworks that were previously challenging to handle for our new Acorn AST parser:
+
+- **HTML Files with Script Tags**: Intelligent parsing of JavaScript and TypeScript within HTML `<script>` blocks
+- **Decorator Handling**: Enhanced support for TypeScript decorators right after type declarations, a common pattern in frameworks like Angular and NestJS
+- **Astro Framework Support**: Complete parsing support for Astro's unique component architecture, including component scripts and TypeScript integration
+- **Svelte Framework Support**: Native handling of Svelte's reactive syntax, stores, and component lifecycle methods
+- **Smarter Generic Detection**: Improved distinction between regular TypeScript files and JSX files when handling generic syntax
+
+These improvements mean that whether you're building with Astro's islands architecture, Svelte's reactive paradigm, or mixing HTML with embedded scripts, Turbo will understand your code context and insert logs with precision.
+
+#### ✨ Pro Bundle: Halloween Promo
+
+There has never been a better time to grab Turbo Pro:
+
+- **Revolutionary Performance**: The TypeScript AST to Acorn migration made Turbo 96% smaller and 89% faster startup — your VS Code experience has never been smoother
+- **Strengthened AST Engine**: With v3.9.0's universal framework support, our AST engine now handles virtually any JavaScript/TypeScript codebase
+- **Hide Logs Feature**: The #1 most requested Pro feature lets you selectively hide logs from the tree panel for cleaner logs navigation
+
+👉 [Read the Full v3.9.0 Release Article](https://www.turboconsolelog.io/articles/release-390)  
+👉 [Upgrade to Turbo Pro](https://www.turboconsolelog.io/pro)
+
 ## [3.8.2] - 2025-10-22
 
 ### 🎃 Halloween Update: Pro Bug Fix & Spooky New Theme

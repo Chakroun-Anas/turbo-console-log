@@ -1,5 +1,6 @@
 export default {
   name: 'ternary exists but on different variable below',
+  fileExtension: '.ts',
   lines: [
     'const config = { retries: 3 };',
     '',

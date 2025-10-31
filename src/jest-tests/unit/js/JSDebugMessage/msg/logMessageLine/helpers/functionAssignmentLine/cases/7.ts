@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'named function expression with inner block comment',
   lines: [
     'const log = function log() {',

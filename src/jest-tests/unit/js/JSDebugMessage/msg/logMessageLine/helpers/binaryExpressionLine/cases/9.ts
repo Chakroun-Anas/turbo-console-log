@@ -1,5 +1,6 @@
 export default {
   name: 'complex assignment with binary expression - GitHub event parsing',
+  fileExtension: '.ts',
   lines: [
     'async function deployToPreview() {',
     '  const fs = require("fs").promises;',

@@ -13,6 +13,8 @@ describe('parseCode', () => {
           sourceCodeString,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (testCase as any).fileExtension || undefined,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (testCase as any).selectionLine,
         );
 
         // Check that the result is a valid AST node

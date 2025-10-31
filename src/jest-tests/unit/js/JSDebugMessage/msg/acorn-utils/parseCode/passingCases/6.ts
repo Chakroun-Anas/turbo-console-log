@@ -1,5 +1,6 @@
 export default {
   name: 'Complex React JSX dashboard with advanced patterns',
+  fileExtension: '.jsx',
   sourceCode: [
     '// File: ComplexDashboard.jsx',
     'import React, {',

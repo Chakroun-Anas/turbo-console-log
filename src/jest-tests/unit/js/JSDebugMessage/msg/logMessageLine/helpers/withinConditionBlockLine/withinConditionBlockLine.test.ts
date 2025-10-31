@@ -5,11 +5,21 @@ import cases from './index';
 
 describe('withinConditionBlockLine', () => {
   cases.forEach(
-    ({ name, lines, selectionLine, variableName, expectedLine }) => {
+    ({
+      name,
+      lines,
+      selectionLine,
+      variableName,
+      expectedLine,
+      fileExtension,
+    }) => {
       it(name, () => {
         const document = makeTextDocument(lines);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(document.getText(), (document as any).fileExtension)!;
+        const ast = parseCode(
+          document.getText(),
+          fileExtension,
+          selectionLine,
+        )!;
         const result = withinConditionBlockLine(
           ast,
           document,

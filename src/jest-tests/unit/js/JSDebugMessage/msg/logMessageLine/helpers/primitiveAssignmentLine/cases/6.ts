@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'object destructuring single line',
   lines: [
     'function test() {',

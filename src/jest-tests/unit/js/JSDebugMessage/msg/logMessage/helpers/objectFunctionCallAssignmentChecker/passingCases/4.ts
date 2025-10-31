@@ -1,5 +1,6 @@
 export default {
   name: 'deeply nested chain across lines',
+  fileExtension: '.ts',
   lines: [
     'const finalResult = user',
     '  .getProfile()',

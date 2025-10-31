@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'function call with deeply nested config',
   lines: [
     'const res = compute({',

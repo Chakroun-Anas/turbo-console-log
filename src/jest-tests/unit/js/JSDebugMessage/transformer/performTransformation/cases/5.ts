@@ -1,5 +1,6 @@
 // React map callback with array destructuring parameters
 export default {
+  fileExtension: '.tsx',
   name: 'React map callback with array destructuring parameters',
   lines: [
     'Object.entries({ ...metaData.exif, ...metaData.mediaType }).map(',

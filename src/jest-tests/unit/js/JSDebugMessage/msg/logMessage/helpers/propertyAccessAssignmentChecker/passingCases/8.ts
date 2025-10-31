@@ -1,5 +1,6 @@
 export default {
   name: 'property access assignment inside function block',
+  fileExtension: '.ts',
   lines: [
     'function getUsers() {', // 0
     '  $scope.isLoadingData = true;', // 1

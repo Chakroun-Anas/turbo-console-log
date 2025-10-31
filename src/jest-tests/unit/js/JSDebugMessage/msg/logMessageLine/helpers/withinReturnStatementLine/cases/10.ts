@@ -1,6 +1,7 @@
 // Variable not in return statement (fallback case)
 export default {
   name: 'variable not in return statement',
+  fileExtension: '.ts',
   lines: [
     'function processData(data) {',
     '  const processed = data.value;',

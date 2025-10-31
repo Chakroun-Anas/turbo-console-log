@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console log or custom log functions.",
-  "version": "3.8.2",
+  "version": "3.9.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.94.0"
@@ -124,17 +124,6 @@
           "type": "string",
           "default": "log",
           "description": "Specify the log function to use with 'displayCustomLogMessage' command. "
-        },
-        "turboConsoleLog.releaseReviewTargetWindow": {
-          "type": "string",
-          "enum": [
-            "Morning",
-            "Afternoon",
-            "Evening",
-            "Night"
-          ],
-          "default": "Night",
-          "description": "Choose your preferred time window for receiving release notifications. Options: Morning (7-12), Afternoon (13-17), Evening (17-21), or Night (21-2)."
         },
         "turboConsoleLog.isTurboTelemetryEnabled": {
           "type": "boolean",
@@ -376,7 +365,7 @@
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "watch": "npm run esbuild --watch",
-    "lint": "tsc --noEmit && eslint src --ext ts",
+    "lint": "tsc --noEmit && tsc --project src/jest-tests/tsconfig.json --noEmit && eslint src --ext ts",
     "pretest": "yarn run esbuild-base",
     "test:compile": "rm -rf out && tsc -p ./ && mkdir out/mocha-tests/files && cp -r src/mocha-tests/files/ out/mocha-tests/files/",
     "test": "npm run test:compile && npm run test:jest && node ./out/mocha-tests/runTests.js",
@@ -426,8 +415,8 @@
     "isPreReleaseVersion": false
   },
   "dependencies": {
+    "@sveltejs/acorn-typescript": "file:../../acorn-typescript/sveltejs-acorn-typescript-1.0.6.tgz",
     "acorn": "^8.15.0",
-    "@sveltejs/acorn-typescript": "^1.0.6",
     "axios": "^1.9.0",
     "ignore": "^7.0.5",
     "p-limit": "^6.2.0"

@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'execSync function call with complex surrounding code context',
   lines: [
     'const checkIsRelease = async () => {',

@@ -1,5 +1,6 @@
 export default {
   name: 'comparison assignment with selection inside comment',
+  fileExtension: '.ts',
   lines: [
     '// prepare comparison',
     'const isEqual = a === b;',

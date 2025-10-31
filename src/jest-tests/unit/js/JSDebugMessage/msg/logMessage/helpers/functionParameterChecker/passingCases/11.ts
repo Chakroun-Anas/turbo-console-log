@@ -1,6 +1,7 @@
 // Multi-line arrow function with nested default function parameter
 export default {
   name: 'arrow function with multi-line parameters and nested default',
+  fileExtension: '.ts',
   lines: [
     '(',
     '  firstParam: any,',

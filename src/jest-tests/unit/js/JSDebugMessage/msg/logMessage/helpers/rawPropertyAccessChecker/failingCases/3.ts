@@ -1,6 +1,7 @@
 // Destructuring pattern should NOT be detected as property access
 export default {
   name: 'destructuring pattern (should reject)',
+  fileExtension: '.ts',
   lines: [
     'function logPersonInfo(person: Person) {',
     '  const {',

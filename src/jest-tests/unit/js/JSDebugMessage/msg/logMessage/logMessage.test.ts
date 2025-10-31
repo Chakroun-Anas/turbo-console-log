@@ -30,7 +30,7 @@ jest.mock('@/debug-message/js/JSDebugMessage/msg/logMessage/helpers');
 describe('logMessage', () => {
   const mockDocument = makeTextDocument(['const value = 42;']);
   const code = mockDocument.getText();
-  const ast = parseCode(code)!;
+  const ast = parseCode(code, '.ts', 0);
   const selectionLine = 0;
   const selectedVar = 'value';
 

@@ -64,6 +64,7 @@ export type DynamicFreemiumPanelContentType =
 export interface DynamicFreemiumPanelContent {
   type: DynamicFreemiumPanelContentType;
   component: FreemiumPanelComponent;
+  order?: number; // Optional order property for controlling render sequence
 }
 
 export interface DynamicFreemiumPanel {

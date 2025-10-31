@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'arrow function with destructured parameter - wallpaper case',
   lines: [
     'WALLPAPER_PATHS[wallpaperName]()',

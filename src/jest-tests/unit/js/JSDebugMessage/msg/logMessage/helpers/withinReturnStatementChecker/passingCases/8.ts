@@ -1,6 +1,7 @@
 // Multi-line return statement
 export default {
   name: 'multi-line return statement',
+  fileExtension: '.ts',
   lines: [
     'function calculateTotal(order) {',
     '  return order.items.reduce(',

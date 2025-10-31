@@ -1,6 +1,7 @@
 // Variable in function but not in return
 export default {
   name: 'variable in function body but not return',
+  fileExtension: '.ts',
   lines: [
     'function calculateTotal(items) {',
     '  console.log(items.length);',

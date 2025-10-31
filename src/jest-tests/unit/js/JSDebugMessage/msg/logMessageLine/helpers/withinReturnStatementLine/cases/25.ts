@@ -1,6 +1,7 @@
 // Recursive child node checking
 export default {
   name: 'recursive child node checking',
+  fileExtension: '.ts',
   lines: [
     'function deepNested(value) {',
     '  return { nested: { deep: { value } } };',

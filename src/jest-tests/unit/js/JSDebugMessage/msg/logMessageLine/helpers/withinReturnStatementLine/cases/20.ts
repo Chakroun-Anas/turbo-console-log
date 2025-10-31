@@ -1,6 +1,7 @@
 // Await expression in return
 export default {
   name: 'await expression in return',
+  fileExtension: '.ts',
   lines: [
     'async function fetchData(promise) {',
     '  return await promise;',

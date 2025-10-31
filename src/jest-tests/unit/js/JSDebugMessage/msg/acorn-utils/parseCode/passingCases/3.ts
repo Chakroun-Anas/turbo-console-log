@@ -1,5 +1,6 @@
 export default {
   name: 'React JSX component (JavaScript)',
+  fileExtension: '.jsx',
   sourceCode: [
     '// File: SimpleTodoList.jsx',
     'import React, { useState, useEffect, useMemo } from "react";',

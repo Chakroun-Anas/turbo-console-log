@@ -1,6 +1,7 @@
 // Array with multiple elements containing target variable
 export default {
   name: 'array with multiple elements',
+  fileExtension: '.ts',
   lines: [
     'function createArray(user) {',
     '  return [user.id, user.name, user.email];',

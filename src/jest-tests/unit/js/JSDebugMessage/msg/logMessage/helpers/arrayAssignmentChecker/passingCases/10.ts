@@ -1,5 +1,6 @@
 export default {
   name: 'array assignment with spread and map inside object property',
+  fileExtension: '.ts',
   lines: [
     'config.module.rules = [',
     '  ...filterModuleRules(config),',

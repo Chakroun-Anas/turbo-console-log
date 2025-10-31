@@ -1,11 +1,8 @@
-// Array literal in return statement
+// Array in return statement
 export default {
-  name: 'array literal in return',
-  lines: [
-    'function getNames(people) {',
-    '  return [person.name, person.lastName];',
-    '}',
-  ],
+  name: 'array in return',
+  fileExtension: '.ts',
+  lines: ['function getNumbers() {', '  return [1, 2, 3, 4, 5];', '}'],
   selectionLine: 1,
-  variableName: 'person.name',
+  variableName: '[1, 2, 3, 4, 5]',
 };

@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'function assigned with newline before name',
   lines: [
     'const',

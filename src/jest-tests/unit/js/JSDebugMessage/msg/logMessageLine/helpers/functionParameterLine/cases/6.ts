@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.tsx',
   name: 'destructured props in arrow component',
   lines: [
     'const MyComponent = ({',

@@ -1,5 +1,6 @@
 export default {
   name: 'Angular component with decorators - count is not raw property access',
+  fileExtension: '.ts',
   lines: [
     '// @ts-nocheck',
     '// File: hello.component.ts  (REAL ANGULAR — will fail on Acorn without decorator support)',

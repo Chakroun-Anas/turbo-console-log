@@ -1,6 +1,7 @@
 // Expression statement in block
 export default {
   name: 'expression statement in block',
+  fileExtension: '.ts',
   lines: [
     'function useVariable(value) {',
     '  return (() => { value; return 1; })();',

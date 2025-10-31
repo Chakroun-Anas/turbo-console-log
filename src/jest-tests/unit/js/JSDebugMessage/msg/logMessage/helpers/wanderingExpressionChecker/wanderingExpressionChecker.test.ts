@@ -8,8 +8,11 @@ describe('wanderingExpressionChecker', () => {
   passingCases.forEach((testCase) => {
     it(`passes: ${testCase.name}`, () => {
       const doc = makeTextDocument(testCase.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (testCase as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        testCase.fileExtension,
+        testCase.selectionLine,
+      );
       const result = wanderingExpressionChecker(
         ast,
         doc,
@@ -23,8 +26,11 @@ describe('wanderingExpressionChecker', () => {
   failingCases.forEach((testCase) => {
     it(`fails: ${testCase.name}`, () => {
       const doc = makeTextDocument(testCase.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (testCase as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        testCase.fileExtension,
+        testCase.selectionLine,
+      );
       const result = wanderingExpressionChecker(
         ast,
         doc,

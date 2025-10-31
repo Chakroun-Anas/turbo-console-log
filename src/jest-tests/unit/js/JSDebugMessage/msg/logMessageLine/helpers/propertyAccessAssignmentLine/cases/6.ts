@@ -9,6 +9,7 @@ export default {
     '  );',
     '}',
   ],
+  fileExtension: '.ts',
   selectionLine: 1,
   variableName: 'this.subscription',
   expectedLine: 6,

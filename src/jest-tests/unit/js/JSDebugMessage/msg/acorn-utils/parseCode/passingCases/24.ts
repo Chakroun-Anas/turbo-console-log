@@ -1,0 +1,21 @@
+export default {
+  name: 'TypeScript - Generic arrow function without trailing comma',
+  fileExtension: '.ts',
+  sourceCode: [
+    '// Generic arrow functions should work in .ts files',
+    'const identity = <T>(value: T): T => value;',
+    '',
+    'const mapArray = <T, U>(arr: T[], fn: (item: T) => U): U[] => {',
+    '  return arr.map(fn);',
+    '};',
+    '',
+    '// Multiple type parameters',
+    'const pair = <A, B>(a: A, b: B): [A, B] => [a, b];',
+    '',
+    '// With constraints',
+    'const getValue = <T extends { value: any }>(obj: T) => obj.value;',
+    '',
+    'const result = identity<string>("hello");',
+  ],
+  selectionLine: 1,
+};

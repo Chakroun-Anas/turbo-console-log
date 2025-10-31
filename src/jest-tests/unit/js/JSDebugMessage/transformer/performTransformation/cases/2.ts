@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'empty function declaration',
   lines: ['function greet(name) {}'],
   selectedVar: 'name',

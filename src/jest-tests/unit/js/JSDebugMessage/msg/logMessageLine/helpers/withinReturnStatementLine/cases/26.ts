@@ -1,6 +1,7 @@
 // Position-based matching for complex expressions
 export default {
   name: 'position-based complex expression',
+  fileExtension: '.ts',
   lines: [
     'function complexCalculation(a, b) {',
     '  return a * b + (a - b);',

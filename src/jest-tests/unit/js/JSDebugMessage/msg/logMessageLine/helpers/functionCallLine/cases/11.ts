@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'function call with comment inside args',
   lines: [
     'const output = transform({',

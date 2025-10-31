@@ -41,7 +41,8 @@ describe('activate - command registration', () => {
 
     // Mock extension properties
     jest.spyOn(helpers, 'getExtensionProperties').mockReturnValue({
-      releaseReviewTargetWindow: 'Night',
+      wrapLogMessage: false,
+      logMessagePrefix: '🚀',
     } as ExtensionProperties);
 
     // Mock commands
@@ -90,14 +91,6 @@ describe('activate - command registration', () => {
       },
     }));
 
-    // Safe mocks for release version helpers
-    (releases.getPreviousWebViewReleaseVersion as jest.Mock).mockReturnValue(
-      '2.16.0',
-    );
-    (releases.getLatestWebViewReleaseVersion as jest.Mock).mockReturnValue(
-      '3.0.0',
-    );
-    (releases.showReleaseHtmlWebView as jest.Mock).mockImplementation(() => {});
     (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
 
     // Reset pro utilities mocks specifically
@@ -123,20 +116,16 @@ describe('activate - command registration', () => {
       expect.any(Function),
     );
   });
-  it('Invoke showing the release webview with correct versions', () => {
+  it('calls traceExtensionVersionHistory with current version', () => {
     const fakeContext = {
       subscriptions: [],
     } as unknown as vscode.ExtensionContext;
 
     activate(fakeContext);
 
-    expect(releases.showReleaseHtmlWebView).toHaveBeenCalledWith(
+    expect(helpers.traceExtensionVersionHistory).toHaveBeenCalledWith(
       fakeContext,
-      '2.16.0',
       '3.0.0',
-      'Night',
-      expect.any(Date), // currentDate parameter
-      expect.any(Date), // releaseDate parameter
     );
   });
   it('calls updateProBundle if pro is active and update is needed', () => {

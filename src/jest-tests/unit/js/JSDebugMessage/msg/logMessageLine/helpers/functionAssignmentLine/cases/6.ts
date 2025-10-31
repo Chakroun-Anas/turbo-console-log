@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'arrow function inside parentheses',
   lines: [
     'const wrapped = (',

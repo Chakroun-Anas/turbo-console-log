@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'async arrow function with block body',
   lines: [
     'const fetchData = async () => {',

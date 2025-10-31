@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'arrow function spanning multiple lines before body',
   lines: [
     'const add = (',

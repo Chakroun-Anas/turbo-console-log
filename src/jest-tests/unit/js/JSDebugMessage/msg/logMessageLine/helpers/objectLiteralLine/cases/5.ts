@@ -1,5 +1,6 @@
 export default {
-  name: 'nested object inside object',
+  name: 'object literal with computed property',
+  fileExtension: '.ts',
   lines: [
     'const config = {',
     '  theme: "light",',

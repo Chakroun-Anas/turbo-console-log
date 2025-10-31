@@ -1,5 +1,6 @@
 export default {
   name: 'template literal with substitution',
+  fileExtension: '.ts',
   lines: [
     'function test() {',
     '  const name = "John";',

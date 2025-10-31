@@ -1,5 +1,6 @@
 // Arrow function returning JSX with nested property access
 export default {
+  fileExtension: '.tsx',
   name: 'render function with implicit JSX return and nested property',
   lines: [
     'const renderItem = (item: Item, idx: number) =>',

@@ -1,0 +1,1 @@
+export { extractSvelteScript } from './extractSvelteScript';

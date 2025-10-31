@@ -7,6 +7,7 @@ export default {
     '  }',
     '}',
   ],
+  fileExtension: '.ts',
   selectionLine: 0,
   variableName: 'app.config.database.host',
   expectedLine: 0,

@@ -81,3 +81,6 @@ export { walk } from './walk';
 
 // Parser
 export { parseCode } from './parseCode';
+
+// AST utilities
+export { adjustASTLocations } from './adjustASTLocations';

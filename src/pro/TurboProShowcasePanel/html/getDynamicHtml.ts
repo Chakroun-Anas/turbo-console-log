@@ -10,13 +10,7 @@ import { getJavaScript } from '../javascript/javascript';
  */
 export function getDynamicHtml(dynamicContent: DynamicFreemiumPanel): string {
   // Separate content by type for different placement
-  const {
-    topContentHtml,
-    articlesHtml,
-    surveyHtml,
-    tableHtml,
-    mediaShowcaseCTAHtml,
-  } = contentByType(dynamicContent);
+  const { topContentHtml, articlesHtml } = contentByType(dynamicContent);
 
   return `
   <html>
@@ -28,19 +22,10 @@ export function getDynamicHtml(dynamicContent: DynamicFreemiumPanel): string {
     </head>
     <body>
       <div class="container">
-        <!-- Dynamic Content Section -->
+        <!-- All Content in Order (except articles) -->
         ${topContentHtml}
-        
-        <!-- Media Showcase CTA Section -->
-        ${mediaShowcaseCTAHtml}
-        
-        <!-- Dynamic Survey Section -->
-        ${surveyHtml}
-        
-        <!-- Dynamic Table Section -->
-        ${tableHtml}
 
-        <!-- Dynamic Articles Section -->
+        <!-- Articles Section -->
         ${
           articlesHtml
             ? `

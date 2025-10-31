@@ -1,6 +1,7 @@
 // Block statement in arrow function
 export default {
   name: 'block statement in arrow function',
+  fileExtension: '.ts',
   lines: [
     'function createComplexHandler(value) {',
     '  return () => { return value; };',

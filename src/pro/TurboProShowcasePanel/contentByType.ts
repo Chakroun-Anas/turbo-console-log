@@ -27,59 +27,41 @@ export function contentByType(
     };
   }
 
-  const topContent: DynamicFreemiumPanelContent[] = [];
+  // Separate articles from other content
   const articles: DynamicFreemiumPanelContent[] = [];
-  const surveys: DynamicFreemiumPanelContent[] = [];
-  const tables: DynamicFreemiumPanelContent[] = [];
-  const mediaShowcaseCTAs: DynamicFreemiumPanelContent[] = [];
+  const otherContent: DynamicFreemiumPanelContent[] = [];
 
-  // Separate content by type
   dynamicContent.content.forEach((contentItem) => {
-    switch (contentItem.type) {
-      case 'article':
-        articles.push(contentItem);
-        break;
-      case 'survey':
-        surveys.push(contentItem);
-        break;
-      case 'table':
-        tables.push(contentItem);
-        break;
-      case 'media-showcase-cta':
-        mediaShowcaseCTAs.push(contentItem);
-        break;
-      default:
-        topContent.push(contentItem);
-        break;
+    if (contentItem.type === 'article') {
+      articles.push(contentItem);
+    } else {
+      otherContent.push(contentItem);
     }
   });
 
-  // Generate HTML for each section
-  const topContentHtml = topContent
+  // Sort function for order property (ascending), treating undefined as 0
+  const sortByOrder = (
+    a: DynamicFreemiumPanelContent,
+    b: DynamicFreemiumPanelContent,
+  ) => (a.order ?? 0) - (b.order ?? 0);
+
+  // Generate unified HTML for all non-article content in order
+  const topContentHtml = otherContent
+    .sort(sortByOrder)
     .map((contentItem) => renderContentItem(contentItem))
     .join('');
 
+  // Generate articles HTML separately (still ordered)
   const articlesHtml = articles
-    .map((contentItem) => renderContentItem(contentItem))
-    .join('');
-
-  const surveyHtml = surveys
-    .map((contentItem) => renderContentItem(contentItem))
-    .join('');
-
-  const tableHtml = tables
-    .map((contentItem) => renderContentItem(contentItem))
-    .join('');
-
-  const mediaShowcaseCTAHtml = mediaShowcaseCTAs
+    .sort(sortByOrder)
     .map((contentItem) => renderContentItem(contentItem))
     .join('');
 
   return {
     topContentHtml,
     articlesHtml,
-    surveyHtml,
-    tableHtml,
-    mediaShowcaseCTAHtml,
+    surveyHtml: '', // No longer separated - included in topContentHtml
+    tableHtml: '', // No longer separated - included in topContentHtml
+    mediaShowcaseCTAHtml: '', // No longer separated - included in topContentHtml
   };
 }

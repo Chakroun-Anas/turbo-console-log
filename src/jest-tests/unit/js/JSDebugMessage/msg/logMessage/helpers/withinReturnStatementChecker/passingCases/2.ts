@@ -1,6 +1,7 @@
 // Object literal in return statement - the main edge case we fixed
 export default {
   name: 'object literal in return',
+  fileExtension: '.ts',
   lines: [
     'function getPersonInfos(person) {',
     '  return {',

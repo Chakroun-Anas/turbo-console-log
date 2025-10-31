@@ -8,8 +8,11 @@ describe('objectFunctionCallAssignmentChecker', () => {
   for (const doc of passingCases) {
     it(`should detect object function call – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(document.getText(), (doc as any).fileExtension)!;
+      const ast = parseCode(
+        document.getText(),
+        doc.fileExtension,
+        doc.selectionLine,
+      );
       const result = objectFunctionCallAssignmentChecker(
         ast,
         doc.selectionLine,
@@ -22,8 +25,11 @@ describe('objectFunctionCallAssignmentChecker', () => {
   for (const doc of failingCases) {
     it(`should not detect object function call – ${doc.name}`, () => {
       const document = makeTextDocument(doc.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(document.getText(), (doc as any).fileExtension)!;
+      const ast = parseCode(
+        document.getText(),
+        doc.fileExtension,
+        doc.selectionLine,
+      );
       const result = objectFunctionCallAssignmentChecker(
         ast,
         doc.selectionLine,

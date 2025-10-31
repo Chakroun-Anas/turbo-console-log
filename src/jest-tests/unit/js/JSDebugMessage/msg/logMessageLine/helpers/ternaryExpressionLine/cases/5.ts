@@ -1,5 +1,6 @@
 export default {
   name: 'nested ternary inside assignment',
+  fileExtension: '.ts',
   lines: [
     'const output = cond1',
     "  ? (cond2 ? 'A' : 'B')",

@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'callback function passed as argument',
   lines: [
     'const handler = setListener("click", () => {',

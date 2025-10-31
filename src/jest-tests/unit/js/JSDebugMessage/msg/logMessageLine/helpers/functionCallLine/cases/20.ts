@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'object assignment with optionalDependencies[key].replace',
   lines: [
     'const optionalDependencies = { DEPLOY_URL: "foo" };',

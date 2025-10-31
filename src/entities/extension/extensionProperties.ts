@@ -13,5 +13,4 @@ export type ExtensionProperties = {
   includeLineNum: boolean;
   quote: string;
   logFunction: string;
-  releaseReviewTargetWindow: 'Morning' | 'Afternoon' | 'Evening' | 'Night';
 };

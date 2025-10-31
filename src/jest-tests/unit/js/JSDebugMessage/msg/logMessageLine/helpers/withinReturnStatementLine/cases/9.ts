@@ -1,6 +1,7 @@
 // Complex nested object in return with indentation
 export default {
   name: 'complex nested object in return',
+  fileExtension: '.ts',
   lines: [
     'function getUserData(user) {',
     '  return {',

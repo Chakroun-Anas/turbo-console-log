@@ -1,5 +1,6 @@
 export default {
   name: 'typescript ignored block with ternary',
+  fileExtension: '.ts',
   lines: [
     '// @ts-nocheck',
     'export const c =',

@@ -1,5 +1,6 @@
 export default {
   name: 'array destructuring from process.argv.slice() with object function call',
+  fileExtension: '.ts',
   lines: [
     'const [',
     '  githubSha,',

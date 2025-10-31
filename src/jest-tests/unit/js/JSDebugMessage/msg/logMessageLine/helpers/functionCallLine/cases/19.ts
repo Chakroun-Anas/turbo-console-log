@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'should insert before assignment with await execa in function call',
   lines: [
     'async function getChangedFiles(diffRevision) {',

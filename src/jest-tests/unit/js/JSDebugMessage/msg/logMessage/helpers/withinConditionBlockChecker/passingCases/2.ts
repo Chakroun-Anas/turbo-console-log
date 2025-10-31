@@ -1,5 +1,6 @@
 export default {
   name: 'should detect property access in complex if condition',
+  fileExtension: '.ts',
   lines: [
     'if (',
     '  process.env.GITHUB_ACTIONS === "true" &&',

@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'two-level property access (person.family.mother)',
   lines: [
     'const person = {',

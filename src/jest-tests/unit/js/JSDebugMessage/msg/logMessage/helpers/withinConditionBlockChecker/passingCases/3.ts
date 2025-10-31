@@ -1,5 +1,6 @@
 export default {
   name: 'should handle nested property access',
+  fileExtension: '.ts',
   lines: [
     'if (app.config.database.host === "localhost") {',
     '  connectToLocal();',

@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'nested functions with same param name',
   lines: [
     'function outer(data) {',

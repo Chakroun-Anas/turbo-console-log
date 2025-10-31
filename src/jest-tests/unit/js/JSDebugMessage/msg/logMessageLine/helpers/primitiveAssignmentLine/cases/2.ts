@@ -1,4 +1,5 @@
 export default {
+  fileExtension: '.ts',
   name: 'string literal',
   lines: ['const message = "hello";', 'doSomething();'],
   selectionLine: 0,

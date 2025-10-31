@@ -7,8 +7,11 @@ describe('wanderingExpressionLine', () => {
   cases.forEach((testCase) => {
     it(testCase.name, () => {
       const doc = makeTextDocument(testCase.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(doc.getText(), (testCase as any).fileExtension)!;
+      const ast = parseCode(
+        doc.getText(),
+        testCase.fileExtension,
+        testCase.selectionLine,
+      );
       const resultLine = wanderingExpressionLine(
         ast,
         doc,

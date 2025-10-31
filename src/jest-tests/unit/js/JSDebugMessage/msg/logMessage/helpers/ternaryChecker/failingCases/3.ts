@@ -1,5 +1,6 @@
 export default {
   name: 'ternary in deep nested variable, wrong target',
+  fileExtension: '.ts',
   lines: [
     'const settings = {',
     '  theme: "light",',

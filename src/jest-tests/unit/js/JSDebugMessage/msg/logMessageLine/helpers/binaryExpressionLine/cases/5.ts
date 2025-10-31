@@ -1,5 +1,6 @@
 export default {
   name: 'multi-line logical OR expression',
+  fileExtension: '.ts',
   lines: [
     'const config =',
     '  externalConfig ||',

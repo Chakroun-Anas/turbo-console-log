@@ -8,54 +8,53 @@ export function getStaticContent(): DynamicFreemiumPanel {
   const content: DynamicFreemiumPanelContent[] = [
     {
       type: 'paragraph',
+      order: 1,
       component: {
-        title: 'Turbo v3.8.0 is Live ⚡️ 🌳',
+        title: '🚀 Turbo v3.9.0 is Live: Universal Framework Support',
         content:
-          'Hide Logs (Pro) is here — plus a new Acorn AST engine that makes Turbo 96% smaller, 89% faster, and far smarter at handling complex cases (return variables, JSX, decorators, destructuring, and more).',
+          'Our Acorn-based AST engine now supports Astro and Svelte, parses JS/TS inside HTML <script> blocks, handles TypeScript decorators more reliably, and better distinguishes generics in TS vs JSX. More stacks work, with higher precision.',
       },
     },
     {
       type: 'media-showcase-cta',
+      order: 2,
       component: {
         illustrationSrcs: [
-          'https://www.turboconsolelog.io/assets/turbo-perf-boost.png',
-          'https://www.turboconsolelog.io/assets/turbo-pro-hide-logs.png',
+          'https://www.turboconsolelog.io/assets/turbo-pro-halloween.png',
         ],
         cta: {
-          text: 'Read the full release article',
-          url: 'https://www.turboconsolelog.io/articles/release-380?utm_source=panel&utm_campaign=release_380&utm_medium=panel_cta_media',
+          text: 'Read v3.9.0 Release Article',
+          url: 'https://www.turboconsolelog.io/articles/release-390?utm_source=panel&utm_campaign=release_390&utm_medium=panel_cta_article',
         },
       },
     },
     {
-      type: 'article',
+      type: 'paragraph',
+      order: 3,
       component: {
-        title:
-          'Turbo Sundays #1: As a developer, always have your own side project ✨',
-        description:
-          "In today's world, having a regular job with a stable paycheck is the natural path. But every developer should have at least one side project - something that exists outside company walls.",
-        illustrationSrc:
-          'https://www.turboconsolelog.io/assets/turbo-sunday-side-project.png',
-        illustrationFocus: 'center',
-        url: 'https://www.turboconsolelog.io/articles/turbo-sundays-001?utm_source=panel&utm_campaign=release_380&utm_medium=panel_cta_article',
+        title: '🎃 Halloween Special: 20% OFF Turbo Pro',
+        content:
+          'Ends Sunday night. Lifetime license, one-time payment. Discount is auto-applied at checkout.',
       },
     },
     {
-      type: 'article',
+      type: 'countdown',
+      order: 4,
       component: {
-        title: 'The Story Behind Turbo Console Log',
-        description:
-          'Why we built Turbo Console Log — from simple idea to a tool trusted by 2M+ developers.',
-        illustrationSrc:
-          'https://www.turboconsolelog.io/assets/arc-de-triomphe-picture.webp',
-        url: 'https://www.turboconsolelog.io/articles/motivation-behind-tcl?utm_source=panel&utm_campaign=release_380&utm_medium=panel_cta_story',
+        eventName: 'Halloween Deal',
+        targetDateUTC: new Date('2025-11-02T23:59:59Z'),
+        illustrationSrc: 'turbo-pro-halloween-discount-20.png',
+        CTA: {
+          text: '🎃 Get 20% OFF - Lifetime License',
+          url: 'https://www.turboconsolelog.io/pro?discount=HALLOWEEN2025',
+        },
       },
     },
   ];
 
   return {
-    tooltip: 'Turbo v3.8.0 — Pro Hide Logs & Acorn Engine ⚡',
-    date: new Date('2025-10-14T14:00:00.000Z'),
+    tooltip: 'Turbo v3.9.0: 🎃 Halloween Special Edition',
+    date: new Date('2025-10-30T00:00:00.000Z'),
     content,
   };
 }

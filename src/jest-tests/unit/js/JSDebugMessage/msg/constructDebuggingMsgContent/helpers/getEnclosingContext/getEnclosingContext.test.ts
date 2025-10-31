@@ -21,7 +21,8 @@ describe('getEnclosingContext', () => {
 
   // Test data
   const mockDocument = makeTextDocument(['const value = 42;']);
-  const ast = parseCode(mockDocument.getText())!;
+  const selectionLine = 0;
+  const ast = parseCode(mockDocument.getText(), '.ts', selectionLine)!;
   const lineOfSelectedVar = 0;
 
   beforeEach(() => {
@@ -244,9 +245,8 @@ describe('getEnclosingContext', () => {
       const customDocument = makeTextDocument([
         'function test() { const x = 1; }',
       ]);
-      const customAst = parseCode(customDocument.getText())!;
-      const customLine = 5;
-
+      const customLine = 1;
+      const customAst = parseCode(customDocument.getText(), '.ts', customLine)!;
       getEnclosingContext(customAst, customDocument, customLine, true, true);
 
       expect(mockFindEnclosingBlocks).toHaveBeenCalledWith(

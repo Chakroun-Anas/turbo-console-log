@@ -7,8 +7,11 @@ describe('rawPropertyAccessLine', () => {
   for (const testCase of testCases) {
     it(testCase.name, () => {
       const document = makeTextDocument(testCase.lines);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const ast = parseCode(document.getText(), (document as any).fileExtension)!;
+      const ast = parseCode(
+        document.getText(),
+        testCase.fileExtension,
+        testCase.selectionLine,
+      );
       const result = rawPropertyAccessLine(
         ast,
         document,
