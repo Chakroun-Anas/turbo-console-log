@@ -461,6 +461,85 @@ class TelemetryService implements TurboAnalyticsProvider {
     }
   }
 
+  public async reportNotificationInteraction(
+    notificationEvent: string,
+    interactionType: 'shown' | 'clicked' | 'dismissed',
+    variant: string,
+    reactionTimeMs?: number,
+  ): Promise<void> {
+    try {
+      // Check if telemetry is enabled before proceeding
+      if (!this.canSendTelemetry()) {
+        console.log(
+          '[Turbo Console Log] Telemetry is disabled, skipping notification interaction reporting',
+        );
+        return;
+      }
+
+      const developerId = this.generateDeveloperId();
+      const extensionVersion = vscode.extensions.getExtension(
+        'ChakrounAnas.turbo-console-log',
+      )?.packageJSON.version;
+      const vscodeVersion = vscode.version;
+      const platform = process.platform;
+
+      // Get current time and timezone information
+      const now = new Date();
+      const timezoneOffset = now.getTimezoneOffset();
+
+      const analyticsData = {
+        developerId,
+        notificationEvent,
+        interactionType,
+        variant,
+        reactionTimeMs,
+        timezoneOffset,
+        extensionVersion,
+        vscodeVersion,
+        platform,
+      };
+
+      console.log(
+        '[Turbo Console Log] Sending notification interaction analytics data:',
+        {
+          developerId,
+          notificationEvent,
+          interactionType,
+          variant,
+          reactionTimeMs,
+          extensionVersion,
+          vscodeVersion,
+          platform,
+          timezoneOffset: timezoneOffset,
+        },
+      );
+
+      // Send the analytics data to the endpoint
+      await axios.post(
+        `${TURBO_WEBSITE_BASE_URL}/api/reportNotificationInteraction`,
+        analyticsData,
+        {
+          timeout: 5000, // 5 second timeout to avoid blocking the extension
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': `turbo-console-log-extension/${extensionVersion}`,
+          },
+        },
+      );
+
+      console.log(
+        `[Turbo Console Log] Notification interaction (${interactionType}) report sent successfully for variant ${variant}`,
+      );
+    } catch (error) {
+      // Silently fail to ensure extension functionality is not affected
+      // Only log to console for debugging purposes
+      console.warn(
+        '[Turbo Console Log] Failed to send notification interaction analytics:',
+        error,
+      );
+    }
+  }
+
   public dispose(): void {
     // No cleanup needed since we removed the event listeners
     // This method is kept for interface compatibility

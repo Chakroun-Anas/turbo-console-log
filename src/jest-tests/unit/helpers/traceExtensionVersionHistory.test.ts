@@ -3,12 +3,12 @@ import { traceExtensionVersionHistory } from '@/helpers/traceExtensionVersionHis
 import { readFromGlobalState } from '@/helpers/readFromGlobalState';
 import { writeToGlobalState } from '@/helpers/writeToGlobalState';
 import { createTelemetryService } from '@/telemetry';
-import * as vscode from 'vscode';
+import { showNotification, NotificationEvent } from '@/notifications';
 
 jest.mock('@/helpers/readFromGlobalState');
 jest.mock('@/helpers/writeToGlobalState');
 jest.mock('@/telemetry');
-jest.mock('vscode');
+jest.mock('@/notifications');
 
 describe('traceExtensionVersionHistory', () => {
   let mockContext: ExtensionContext;
@@ -24,9 +24,8 @@ describe('traceExtensionVersionHistory', () => {
     createTelemetryService as jest.MockedFunction<
       typeof createTelemetryService
     >;
-  const mockShowInformationMessage = vscode.window
-    .showInformationMessage as jest.MockedFunction<
-    typeof vscode.window.showInformationMessage
+  const mockShowNotification = showNotification as jest.MockedFunction<
+    typeof showNotification
   >;
 
   beforeEach(() => {
@@ -41,6 +40,7 @@ describe('traceExtensionVersionHistory', () => {
       reportFreemiumPanelOpening: jest.fn(),
       reportFreemiumPanelCtaClick: jest.fn(),
       dispose: jest.fn(),
+      reportNotificationInteraction: jest.fn(),
     } as ReturnType<typeof createTelemetryService>);
   });
 
@@ -60,8 +60,8 @@ describe('traceExtensionVersionHistory', () => {
         [currentVersion],
       );
 
-      expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        'Welcome aboard 🚀 Turbo is ready to boost your debugging!',
+      expect(mockShowNotification).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
 
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
@@ -94,7 +94,7 @@ describe('traceExtensionVersionHistory', () => {
         'EXTENSION_VERSION_HISTORY',
         [currentVersion],
       );
-      expect(mockShowInformationMessage).toHaveBeenCalled();
+      expect(mockShowNotification).toHaveBeenCalled();
 
       const telemetryService = mockCreateTelemetryService();
       expect(telemetryService.reportFreshInstall).toHaveBeenCalled();
@@ -117,7 +117,7 @@ describe('traceExtensionVersionHistory', () => {
         [currentVersion],
       );
 
-      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+      expect(mockShowNotification).not.toHaveBeenCalled();
 
       expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
         mockContext,
@@ -147,7 +147,7 @@ describe('traceExtensionVersionHistory', () => {
         [currentVersion],
       );
 
-      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+      expect(mockShowNotification).not.toHaveBeenCalled();
 
       expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
         mockContext,
@@ -171,7 +171,7 @@ describe('traceExtensionVersionHistory', () => {
 
       traceExtensionVersionHistory(mockContext, currentVersion);
 
-      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+      expect(mockShowNotification).not.toHaveBeenCalled();
       const telemetryService = mockCreateTelemetryService();
       expect(telemetryService.reportUpdate).toHaveBeenCalledWith(mockContext);
       expect(telemetryService.reportFreshInstall).not.toHaveBeenCalled();
@@ -194,7 +194,7 @@ describe('traceExtensionVersionHistory', () => {
         ['3.7.0', '3.8.0', currentVersion],
       );
 
-      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+      expect(mockShowNotification).not.toHaveBeenCalled();
 
       const telemetryService = mockCreateTelemetryService();
       expect(telemetryService.reportUpdate).toHaveBeenCalledWith(mockContext);
@@ -216,7 +216,7 @@ describe('traceExtensionVersionHistory', () => {
         existingHistory,
       );
 
-      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+      expect(mockShowNotification).not.toHaveBeenCalled();
 
       const telemetryService = mockCreateTelemetryService();
       expect(telemetryService.reportUpdate).not.toHaveBeenCalled();
@@ -287,6 +287,7 @@ describe('traceExtensionVersionHistory', () => {
         reportFreemiumPanelOpening: jest.fn(),
         reportFreemiumPanelCtaClick: jest.fn(),
         dispose: jest.fn(),
+        reportNotificationInteraction: jest.fn(),
       } as ReturnType<typeof createTelemetryService>);
 
       const consoleWarnSpy = jest
@@ -317,7 +318,7 @@ describe('traceExtensionVersionHistory', () => {
         'EXTENSION_VERSION_HISTORY',
         [currentVersion],
       );
-      expect(mockShowInformationMessage).toHaveBeenCalled();
+      expect(mockShowNotification).toHaveBeenCalled();
     });
 
     it('should handle empty string version gracefully', () => {
@@ -407,7 +408,7 @@ describe('traceExtensionVersionHistory', () => {
 
       traceExtensionVersionHistory(mockContext, currentVersion);
 
-      expect(mockShowInformationMessage).toHaveBeenCalled();
+      expect(mockShowNotification).toHaveBeenCalled();
       const telemetryService = mockCreateTelemetryService();
       expect(telemetryService.reportFreshInstall).toHaveBeenCalled();
     });
@@ -423,7 +424,7 @@ describe('traceExtensionVersionHistory', () => {
 
       traceExtensionVersionHistory(mockContext, currentVersion);
 
-      expect(mockShowInformationMessage).toHaveBeenCalled();
+      expect(mockShowNotification).toHaveBeenCalled();
       const telemetryService = mockCreateTelemetryService();
       expect(telemetryService.reportFreshInstall).toHaveBeenCalled();
     });
@@ -437,7 +438,7 @@ describe('traceExtensionVersionHistory', () => {
 
       traceExtensionVersionHistory(mockContext, currentVersion);
 
-      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+      expect(mockShowNotification).not.toHaveBeenCalled();
       const telemetryService = mockCreateTelemetryService();
       expect(telemetryService.reportUpdate).toHaveBeenCalled();
       expect(telemetryService.reportFreshInstall).not.toHaveBeenCalled();

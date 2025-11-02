@@ -1,9 +1,9 @@
 import type { ExtensionContext } from 'vscode';
-import * as vscode from 'vscode';
 import { GlobalStateKey } from '@/entities';
 import { readFromGlobalState } from './readFromGlobalState';
 import { writeToGlobalState } from './writeToGlobalState';
 import { createTelemetryService } from '@/telemetry';
+import { showNotification, NotificationEvent } from '@/notifications';
 
 /**
  * Traces extension version history by maintaining an array of versions the user has installed.
@@ -89,10 +89,7 @@ export function traceExtensionVersionHistory(
   // Handle fresh install welcome and journey initialization
   if (isFreshInstall) {
     // Show welcome notification
-    vscode.window.showInformationMessage(
-      'Welcome aboard 🚀 Turbo is ready to boost your debugging!',
-    );
-
+    showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
     // Initialize fresh install journey tracking
     writeToGlobalState(context, 'COMMAND_USAGE_COUNT', 0);
     writeToGlobalState(

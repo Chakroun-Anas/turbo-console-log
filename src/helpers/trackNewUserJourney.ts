@@ -41,20 +41,20 @@ export async function trackNewUserJourney(
   // Check if user has reached the 10 command milestone
   if (commandUsageCount === 10) {
     // Show newsletter notification with actions (non-blocking, one-time only)
-    const notificationPromise = vscode.window.showInformationMessage(
-      "🎉 Great job! You've used Turbo 10 times. Join our newsletter for exclusive surveys, tips, updates!",
-      'Join Newsletter',
-      'Maybe Later',
-    );
+    // const notificationPromise = vscode.window.showInformationMessage(
+    //   "🎉 Great job! You've used Turbo 10 times. Join our newsletter for exclusive surveys, tips, updates!",
+    //   'Join Newsletter',
+    //   'Maybe Later',
+    // );
 
     // Handle notification result asynchronously (don't block)
-    notificationPromise.then((result) => {
-      if (result === 'Join Newsletter') {
-        vscode.env.openExternal(
-          vscode.Uri.parse('https://www.turboconsolelog.io/join'),
-        );
-      }
-    });
+    // notificationPromise.then((result) => {
+    //   if (result === 'Join Newsletter') {
+    //     vscode.env.openExternal(
+    //       vscode.Uri.parse('https://www.turboconsolelog.io/join'),
+    //     );
+    //   }
+    // });
 
     // Mark that notification has been shown (no persistent status bar)
     writeToGlobalState(
