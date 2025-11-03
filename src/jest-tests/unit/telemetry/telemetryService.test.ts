@@ -1208,6 +1208,410 @@ describe('TelemetryService', () => {
     });
   });
 
+  describe('reportNotificationInteraction', () => {
+    beforeEach(() => {
+      // Reset singleton and mocks for each test
+      resetTelemetryService();
+      jest.clearAllMocks();
+
+      // Setup axios mock as resolved by default
+      mockedAxios.post.mockResolvedValue({ status: 200 });
+
+      // Reset env mock values to enabled state
+      mockVscodeEnv.isTelemetryEnabled = true;
+
+      // Reset workspace mock to enabled state
+      const mockWorkspace = vscode.workspace as jest.Mocked<
+        typeof vscode.workspace
+      >;
+      mockWorkspace.getConfiguration.mockReturnValue({
+        get: jest.fn().mockReturnValue(true),
+      } as unknown as vscode.WorkspaceConfiguration);
+
+      // Reset extension mock
+      const mockExtensions = vscode.extensions as jest.Mocked<
+        typeof vscode.extensions
+      >;
+      mockExtensions.getExtension.mockReturnValue({
+        packageJSON: { version: '3.5.0' },
+      } as vscode.Extension<unknown>);
+    });
+
+    it('should send notification interaction analytics when telemetry is enabled', async () => {
+      const mockDate = new Date('2025-08-18T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportNotificationInteraction(
+        'onboarding-tips',
+        'shown',
+        'variant-a',
+      );
+
+      expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationInteraction',
+        expect.objectContaining({
+          developerId: 'dev_abcd1234567890ef',
+          notificationEvent: 'onboarding-tips',
+          interactionType: 'shown',
+          variant: 'variant-a',
+          reactionTimeMs: undefined,
+          timezoneOffset: mockDate.getTimezoneOffset(),
+          extensionVersion: '3.5.0',
+          vscodeVersion: '1.85.0',
+          platform: expect.any(String),
+        }),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/3.5.0',
+          },
+        }),
+      );
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notification interaction (shown) report sent successfully for variant variant-a',
+      );
+    });
+
+    it('should send click interaction with reaction time', async () => {
+      const mockDate = new Date('2025-08-18T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportNotificationInteraction(
+        'pro-features',
+        'clicked',
+        'variant-b',
+        2500,
+      );
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationInteraction',
+        expect.objectContaining({
+          notificationEvent: 'pro-features',
+          interactionType: 'clicked',
+          variant: 'variant-b',
+          reactionTimeMs: 2500,
+        }),
+        expect.any(Object),
+      );
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notification interaction (clicked) report sent successfully for variant variant-b',
+      );
+    });
+
+    it('should send dismiss interaction', async () => {
+      const service = createTelemetryService();
+      await service.reportNotificationInteraction(
+        'feature-announcement',
+        'dismissed',
+        'variant-c',
+        1200,
+      );
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationInteraction',
+        expect.objectContaining({
+          notificationEvent: 'feature-announcement',
+          interactionType: 'dismissed',
+          variant: 'variant-c',
+          reactionTimeMs: 1200,
+        }),
+        expect.any(Object),
+      );
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notification interaction (dismissed) report sent successfully for variant variant-c',
+      );
+    });
+
+    it('should handle all interaction types correctly', async () => {
+      const service = createTelemetryService();
+
+      // Test shown
+      await service.reportNotificationInteraction(
+        'event-1',
+        'shown',
+        'variant-x',
+      );
+      expect(mockedAxios.post).toHaveBeenLastCalledWith(
+        expect.any(String),
+        expect.objectContaining({ interactionType: 'shown' }),
+        expect.any(Object),
+      );
+
+      // Test clicked
+      await service.reportNotificationInteraction(
+        'event-2',
+        'clicked',
+        'variant-y',
+        1500,
+      );
+      expect(mockedAxios.post).toHaveBeenLastCalledWith(
+        expect.any(String),
+        expect.objectContaining({ interactionType: 'clicked' }),
+        expect.any(Object),
+      );
+
+      // Test dismissed
+      await service.reportNotificationInteraction(
+        'event-3',
+        'dismissed',
+        'variant-z',
+        800,
+      );
+      expect(mockedAxios.post).toHaveBeenLastCalledWith(
+        expect.any(String),
+        expect.objectContaining({ interactionType: 'dismissed' }),
+        expect.any(Object),
+      );
+
+      expect(mockedAxios.post).toHaveBeenCalledTimes(3);
+    });
+
+    it('should skip analytics when telemetry is disabled globally', async () => {
+      mockVscodeEnv.isTelemetryEnabled = false;
+      const disabledService = createTelemetryService();
+
+      await disabledService.reportNotificationInteraction(
+        'event',
+        'shown',
+        'variant',
+      );
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Telemetry is disabled, skipping notification interaction reporting',
+      );
+    });
+
+    it('should skip analytics when custom telemetry is disabled', async () => {
+      const mockWorkspace = vscode.workspace as jest.Mocked<
+        typeof vscode.workspace
+      >;
+      mockWorkspace.getConfiguration.mockReturnValue({
+        get: jest.fn().mockReturnValue(false),
+      } as unknown as vscode.WorkspaceConfiguration);
+
+      const disabledService = createTelemetryService();
+      await disabledService.reportNotificationInteraction(
+        'event',
+        'clicked',
+        'variant',
+      );
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Telemetry is disabled, skipping notification interaction reporting',
+      );
+    });
+
+    it('should handle axios errors gracefully', async () => {
+      const error = new Error('Network error');
+      mockedAxios.post.mockRejectedValue(error);
+
+      const service = createTelemetryService();
+      await service.reportNotificationInteraction(
+        'test-event',
+        'shown',
+        'test-variant',
+      );
+
+      expect(mockConsoleWarn).toHaveBeenCalledWith(
+        '[Turbo Console Log] Failed to send notification interaction analytics:',
+        error,
+      );
+    });
+
+    it('should generate consistent analytics payload structure', async () => {
+      const mockDate = new Date('2025-08-18T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportNotificationInteraction(
+        'my-event',
+        'clicked',
+        'my-variant',
+        3000,
+      );
+
+      const callArgs = mockedAxios.post.mock.calls[0];
+      const payload = callArgs[1] as {
+        developerId: string;
+        notificationEvent: string;
+        interactionType: string;
+        variant: string;
+        reactionTimeMs: number;
+        timezoneOffset: number;
+        extensionVersion: string;
+        vscodeVersion: string;
+        platform: string;
+      };
+
+      expect(payload.developerId).toBe('dev_abcd1234567890ef');
+      expect(payload.notificationEvent).toBe('my-event');
+      expect(payload.interactionType).toBe('clicked');
+      expect(payload.variant).toBe('my-variant');
+      expect(payload.reactionTimeMs).toBe(3000);
+      expect(payload.timezoneOffset).toBe(mockDate.getTimezoneOffset());
+      expect(payload.extensionVersion).toBe('3.5.0');
+      expect(payload.vscodeVersion).toBe('1.85.0');
+      expect(typeof payload.platform).toBe('string');
+    });
+
+    it('should use correct API endpoint and headers', async () => {
+      const service = createTelemetryService();
+      await service.reportNotificationInteraction('event', 'shown', 'variant');
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationInteraction',
+        expect.any(Object),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/3.5.0',
+          },
+        }),
+      );
+    });
+
+    it('should handle missing extension version gracefully', async () => {
+      const mockExtensions = vscode.extensions as jest.Mocked<
+        typeof vscode.extensions
+      >;
+      mockExtensions.getExtension.mockReturnValue(undefined);
+
+      const service = createTelemetryService();
+      await service.reportNotificationInteraction(
+        'event',
+        'dismissed',
+        'variant',
+      );
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationInteraction',
+        expect.objectContaining({
+          extensionVersion: undefined,
+        }),
+        expect.objectContaining({
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/undefined',
+          },
+        }),
+      );
+    });
+
+    it('should handle different event and variant names', async () => {
+      const service = createTelemetryService();
+
+      const testCases = [
+        { event: 'welcome-message', variant: 'v1' },
+        { event: 'feature-update', variant: 'control' },
+        { event: 'pro-promotion', variant: 'aggressive' },
+        { event: 'survey-request', variant: 'friendly' },
+      ];
+
+      for (const testCase of testCases) {
+        await service.reportNotificationInteraction(
+          testCase.event,
+          'shown',
+          testCase.variant,
+        );
+      }
+
+      expect(mockedAxios.post).toHaveBeenCalledTimes(testCases.length);
+
+      testCases.forEach((testCase, index) => {
+        const callArgs = mockedAxios.post.mock.calls[index];
+        const payload = callArgs[1] as {
+          notificationEvent: string;
+          variant: string;
+        };
+        expect(payload.notificationEvent).toBe(testCase.event);
+        expect(payload.variant).toBe(testCase.variant);
+      });
+    });
+
+    it('should handle reaction time edge cases', async () => {
+      const service = createTelemetryService();
+
+      // Zero reaction time
+      await service.reportNotificationInteraction(
+        'instant-click',
+        'clicked',
+        'variant',
+        0,
+      );
+      expect(mockedAxios.post).toHaveBeenLastCalledWith(
+        expect.any(String),
+        expect.objectContaining({ reactionTimeMs: 0 }),
+        expect.any(Object),
+      );
+
+      // Very large reaction time
+      await service.reportNotificationInteraction(
+        'slow-click',
+        'clicked',
+        'variant',
+        60000,
+      );
+      expect(mockedAxios.post).toHaveBeenLastCalledWith(
+        expect.any(String),
+        expect.objectContaining({ reactionTimeMs: 60000 }),
+        expect.any(Object),
+      );
+
+      // Undefined reaction time (for shown events)
+      await service.reportNotificationInteraction(
+        'shown-only',
+        'shown',
+        'variant',
+      );
+      expect(mockedAxios.post).toHaveBeenLastCalledWith(
+        expect.any(String),
+        expect.objectContaining({ reactionTimeMs: undefined }),
+        expect.any(Object),
+      );
+    });
+
+    it('should log correct console messages for each interaction type', async () => {
+      const service = createTelemetryService();
+
+      await service.reportNotificationInteraction(
+        'event-1',
+        'shown',
+        'variant-a',
+      );
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notification interaction (shown) report sent successfully for variant variant-a',
+      );
+
+      await service.reportNotificationInteraction(
+        'event-2',
+        'clicked',
+        'variant-b',
+      );
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notification interaction (clicked) report sent successfully for variant variant-b',
+      );
+
+      await service.reportNotificationInteraction(
+        'event-3',
+        'dismissed',
+        'variant-c',
+      );
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notification interaction (dismissed) report sent successfully for variant variant-c',
+      );
+    });
+  });
+
   describe('dispose', () => {
     it('should dispose without errors', () => {
       expect(() => telemetryService.dispose()).not.toThrow();

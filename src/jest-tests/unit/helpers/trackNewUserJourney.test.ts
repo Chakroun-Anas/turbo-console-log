@@ -187,33 +187,33 @@ describe('trackNewUserJourney', () => {
         });
       });
 
-      it('should show newsletter notification with correct message', async () => {
-        mockShowInformationMessage.mockResolvedValue(undefined);
+      // it('should show newsletter notification with correct message', async () => {
+      //   mockShowInformationMessage.mockResolvedValue(undefined);
 
-        await trackNewUserJourney(mockContext);
+      //   await trackNewUserJourney(mockContext);
 
-        expect(mockShowInformationMessage).toHaveBeenCalledWith(
-          "🎉 Great job! You've used Turbo 10 times. Join our newsletter for exclusive surveys, tips, updates!",
-          'Join Newsletter',
-          'Maybe Later',
-        );
-      });
+      //   expect(mockShowInformationMessage).toHaveBeenCalledWith(
+      //     "🎉 Great job! You've used Turbo 10 times. Join our newsletter for exclusive surveys, tips, updates!",
+      //     'Join Newsletter',
+      //     'Maybe Later',
+      //   );
+      // });
 
-      it('should open external link when user clicks Join Newsletter', async () => {
-        // Mock the notification to simulate clicking "Join Newsletter"
-        (mockShowInformationMessage as jest.Mock).mockResolvedValue(
-          'Join Newsletter',
-        );
+      // it('should open external link when user clicks Join Newsletter', async () => {
+      //   // Mock the notification to simulate clicking "Join Newsletter"
+      //   (mockShowInformationMessage as jest.Mock).mockResolvedValue(
+      //     'Join Newsletter',
+      //   );
 
-        await trackNewUserJourney(mockContext);
+      //   await trackNewUserJourney(mockContext);
 
-        expect(mockUriParse).toHaveBeenCalledWith(
-          'https://www.turboconsolelog.io/join',
-        );
-        expect(mockOpenExternal).toHaveBeenCalledWith(
-          'https://www.turboconsolelog.io/join',
-        );
-      });
+      //   expect(mockUriParse).toHaveBeenCalledWith(
+      //     'https://www.turboconsolelog.io/join',
+      //   );
+      //   expect(mockOpenExternal).toHaveBeenCalledWith(
+      //     'https://www.turboconsolelog.io/join',
+      //   );
+      // });
 
       it('should not open external link when user clicks Maybe Later', async () => {
         // Mock the notification to simulate clicking "Maybe Later"

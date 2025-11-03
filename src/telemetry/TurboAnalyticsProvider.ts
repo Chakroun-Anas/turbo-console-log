@@ -43,6 +43,17 @@ export interface TurboAnalyticsProvider {
   ): Promise<void>;
 
   /**
+   * Reports notification interactions (shown, clicked, dismissed)
+   * Only sends data if both VS Code telemetry and custom telemetry are enabled
+   */
+  reportNotificationInteraction(
+    notificationEvent: string,
+    interactionType: 'shown' | 'clicked' | 'dismissed',
+    variant: string,
+    reactionTimeMs?: number,
+  ): Promise<void>;
+
+  /**
    * Dispose of any resources and event listeners
    * Should be called when the extension is deactivated
    */
