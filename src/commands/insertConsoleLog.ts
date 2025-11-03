@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
-import { trackNewUserJourney } from '../helpers';
+import { trackLogInsertions } from '../helpers';
 
 export function insertConsoleLogCommand(): Command {
   return {
@@ -41,8 +41,8 @@ export function insertConsoleLogCommand(): Command {
         }
       }
 
-      // Track new user journey after successful log insertion
-      trackNewUserJourney(context);
+      // Track logs insertions
+      trackLogInsertions(context);
     },
   };
 }

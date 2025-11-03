@@ -7,7 +7,7 @@ import { activateFreemiumMode } from './activeFreemiumMode';
 import { activateRepairMode } from './activateRepairMode';
 import { activateProMode } from './activateProMode';
 import { deactivateRepairMode } from './deactivateRepairMode';
-import { trackNewUserJourney } from './trackNewUserJourney';
+import { trackLogInsertions } from './trackLogInsertions';
 import { isProUser } from './isProUser';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
@@ -21,7 +21,7 @@ export {
   activateProMode,
   activateRepairMode,
   deactivateRepairMode,
-  trackNewUserJourney,
+  trackLogInsertions,
   isProUser,
   traceExtensionVersionHistory,
   isFreshInstall,

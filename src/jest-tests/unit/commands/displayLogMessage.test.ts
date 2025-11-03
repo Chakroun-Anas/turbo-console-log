@@ -8,19 +8,19 @@ import {
   makeDebugMessage,
   makeExtensionContext,
 } from '@/jest-tests/mocks/helpers';
-import { trackNewUserJourney } from '@/helpers/trackNewUserJourney';
+import { trackLogInsertions } from '@/helpers/trackLogInsertions';
 
 jest.mock('@/utilities', () => ({
   getTabSize: () => 2,
 }));
 
-jest.mock('@/helpers/trackNewUserJourney', () => ({
-  trackNewUserJourney: jest.fn(),
+jest.mock('@/helpers/trackLogInsertions', () => ({
+  trackLogInsertions: jest.fn(),
 }));
 
 describe('displayLogMessageCommand', () => {
-  const mockTrackNewUserJourney = trackNewUserJourney as jest.MockedFunction<
-    typeof trackNewUserJourney
+  const mockTrackNewUserJourney = trackLogInsertions as jest.MockedFunction<
+    typeof trackLogInsertions
   >;
 
   beforeEach(() => {
