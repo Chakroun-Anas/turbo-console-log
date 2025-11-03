@@ -2,6 +2,12 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.9.2] - 2025-11-03
+
+### 🔧 Infrastructure & Quality Improvements
+
+- Internal improvements to extension infrastructure
+
 ## [3.9.1] - 2025-11-02
 
 ### 🔧 Infrastructure & Quality Improvements

@@ -40,10 +40,6 @@ export async function showNotification(
       notificationData.ctaText,
       'Maybe Later',
     );
-    console.log(
-      '🚀 ~ showNotification.ts:44 ~ showNotification ~ action:',
-      action,
-    );
 
     // Calculate reaction time (cap at 60 seconds to exclude stale time)
     const rawReactionTimeMs = Date.now() - startTime;
@@ -95,11 +91,30 @@ export async function showNotification(
   } catch (error) {
     console.error('Failed to show notification:', error);
 
-    // Fallback to static message if API fails
+    // Define fallback messages per event type
+    const fallbackMessages: Record<
+      NotificationEvent,
+      { message: string; ctaText: string; ctaUrl: string }
+    > = {
+      [NotificationEvent.EXTENSION_FRESH_INSTALL]: {
+        message:
+          "Welcome to Turbo Console Log! Let's boost your debugging speed 🚀",
+        ctaText: 'Motivation',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/overview/motivation`,
+      },
+      [NotificationEvent.EXTENSION_FIFTY_INSERTS]: {
+        message:
+          "🎉 50 Turbo logs inserted! You're on fire! Unlock Pro features to boost productivity 🚀",
+        ctaText: 'See Pro Benefits',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+    };
+
+    const fallback = fallbackMessages[notificationEvent];
     const fallbackStartTime = Date.now();
     const fallbackAction = await vscode.window.showInformationMessage(
-      "Welcome to Turbo Console Log! Let's boost your debugging speed 🚀",
-      'Motivation',
+      fallback.message,
+      fallback.ctaText,
       'Maybe Later',
     );
     const rawFallbackReactionTimeMs = Date.now() - fallbackStartTime;
@@ -110,7 +125,7 @@ export async function showNotification(
 
     // Track fallback notification interaction with default variant
     const defaultVariant = 'fallback';
-    if (fallbackAction === 'Motivation') {
+    if (fallbackAction === fallback.ctaText) {
       telemetryService
         .reportNotificationInteraction(
           notificationEvent,
@@ -122,10 +137,10 @@ export async function showNotification(
           console.warn('Failed to report fallback click event:', err),
         );
 
-      // Open the motivation URL in external browser
+      // Open the CTA URL in external browser
       await vscode.env.openExternal(
         vscode.Uri.parse(
-          `https://www.turboconsolelog.io/documentation/overview/motivation?event=${notificationEvent}&variant=${defaultVariant}`,
+          `${fallback.ctaUrl}?event=${notificationEvent}&variant=${defaultVariant}`,
         ),
       );
     } else if (fallbackAction === 'Maybe Later') {
