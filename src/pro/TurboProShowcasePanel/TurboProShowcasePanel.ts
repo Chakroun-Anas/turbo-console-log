@@ -4,6 +4,7 @@ import { getDynamicHtml } from './html/getDynamicHtml';
 import { getStaticHtml } from './html/getStaticHtml';
 import { GlobalStateKeys } from '../../helpers/GlobalStateKeys';
 import { createTelemetryService } from '../../telemetry/telemetryService';
+import { trackPanelOpenings } from '../../helpers/trackPanelOpenings';
 
 export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
   public static readonly viewType = 'turboConsoleLogFreemiumPanel';
@@ -20,6 +21,9 @@ export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
       if (webviewView.visible) {
         const telemetryService = createTelemetryService();
         telemetryService.reportFreemiumPanelOpening();
+
+        // Track panel openings for notification triggers
+        trackPanelOpenings(this.context);
       }
     });
 

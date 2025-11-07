@@ -542,4 +542,271 @@ describe('showNotification', () => {
       );
     });
   });
+
+  describe('EXTENSION_PANEL_FREQUENT_ACCESS event handling', () => {
+    const mockNotificationData = {
+      message: '🎯 You love the panel! Join our newsletter for exclusive tips.',
+      ctaText: 'Subscribe',
+      ctaUrl:
+        'https://www.turboconsolelog.io/join?event=extensionPanelFrequentAccess&variant=A',
+      variant: 'A',
+    };
+
+    beforeEach(() => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => mockNotificationData,
+      });
+    });
+
+    it('should show notification with 3 buttons including "I already did"', async () => {
+      mockShowInformationMessage.mockResolvedValue('Maybe Later');
+
+      const mockContext = {
+        subscriptions: [],
+        globalState: {
+          get: jest.fn(),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      await showNotification(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        undefined,
+        mockContext,
+      );
+
+      expect(mockShowInformationMessage).toHaveBeenCalledWith(
+        mockNotificationData.message,
+        mockNotificationData.ctaText,
+        'I already did',
+        'Maybe Later',
+      );
+    });
+
+    it('should not track telemetry when "I already did" is clicked', async () => {
+      mockShowInformationMessage.mockResolvedValue('I already did');
+
+      const mockContext = {
+        subscriptions: [],
+        globalState: {
+          get: jest.fn(),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      await showNotification(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        undefined,
+        mockContext,
+      );
+
+      // Should only track "shown" event, not dismissal
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).toHaveBeenCalledTimes(1);
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        'shown',
+        'A',
+      );
+    });
+
+    it('should update global state when "I already did" is clicked', async () => {
+      mockShowInformationMessage.mockResolvedValue('I already did');
+
+      const mockContext = {
+        subscriptions: [],
+        globalState: {
+          get: jest.fn(),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      await showNotification(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        undefined,
+        mockContext,
+      );
+
+      expect(mockContext.globalState.update).toHaveBeenCalledWith(
+        'HAS_SUBSCRIBED_TO_NEWSLETTER',
+        true,
+      );
+    });
+
+    it('should not update global state when "I already did" clicked but no context provided', async () => {
+      mockShowInformationMessage.mockResolvedValue('I already did');
+
+      await showNotification(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        undefined,
+        undefined,
+      );
+
+      // Should not throw error
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).toHaveBeenCalledTimes(1);
+    });
+
+    it('should open CTA URL when main button is clicked', async () => {
+      mockShowInformationMessage.mockResolvedValue('Subscribe');
+
+      const mockContext = {
+        subscriptions: [],
+        globalState: {
+          get: jest.fn(),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      await showNotification(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        undefined,
+        mockContext,
+      );
+
+      expect(mockOpenExternal).toHaveBeenCalledWith(
+        mockNotificationData.ctaUrl,
+      );
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        'clicked',
+        'A',
+        expect.any(Number),
+      );
+    });
+
+    it('should track dismissal when "Maybe Later" is clicked', async () => {
+      mockShowInformationMessage.mockResolvedValue('Maybe Later');
+
+      const mockContext = {
+        subscriptions: [],
+        globalState: {
+          get: jest.fn(),
+          update: jest.fn(),
+        },
+      } as unknown as vscode.ExtensionContext;
+
+      await showNotification(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        undefined,
+        mockContext,
+      );
+
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        'dismissed',
+        'A',
+        expect.any(Number),
+      );
+    });
+
+    describe('fallback flow for EXTENSION_PANEL_FREQUENT_ACCESS', () => {
+      beforeEach(() => {
+        mockFetch.mockRejectedValue(new Error('Network error'));
+      });
+
+      it('should show fallback notification with 3 buttons', async () => {
+        mockShowInformationMessage.mockResolvedValue('Maybe Later');
+
+        const mockContext = {
+          subscriptions: [],
+          globalState: {
+            get: jest.fn(),
+            update: jest.fn(),
+          },
+        } as unknown as vscode.ExtensionContext;
+
+        await showNotification(
+          NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+          undefined,
+          mockContext,
+        );
+
+        expect(mockShowInformationMessage).toHaveBeenCalledWith(
+          '🎯 You love the panel! Join our newsletter for exclusive tips and updates.',
+          'Subscribe',
+          'I already did',
+          'Maybe Later',
+        );
+      });
+
+      it('should update global state on fallback "I already did" click', async () => {
+        mockShowInformationMessage.mockResolvedValue('I already did');
+
+        const mockContext = {
+          subscriptions: [],
+          globalState: {
+            get: jest.fn(),
+            update: jest.fn(),
+          },
+        } as unknown as vscode.ExtensionContext;
+
+        await showNotification(
+          NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+          undefined,
+          mockContext,
+        );
+
+        expect(mockContext.globalState.update).toHaveBeenCalledWith(
+          'HAS_SUBSCRIBED_TO_NEWSLETTER',
+          true,
+        );
+      });
+
+      it('should not track telemetry for fallback "I already did" click', async () => {
+        mockShowInformationMessage.mockResolvedValue('I already did');
+
+        const mockContext = {
+          subscriptions: [],
+          globalState: {
+            get: jest.fn(),
+            update: jest.fn(),
+          },
+        } as unknown as vscode.ExtensionContext;
+
+        await showNotification(
+          NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+          undefined,
+          mockContext,
+        );
+
+        // Should not track any interaction (no "clicked" or "dismissed" tracking)
+        // Fallback flow doesn't have "shown" tracking - only API success flow does
+        expect(
+          mockTelemetryService.reportNotificationInteraction,
+        ).not.toHaveBeenCalled();
+      });
+
+      it('should open fallback CTA URL with correct parameters', async () => {
+        mockShowInformationMessage.mockResolvedValue('Subscribe');
+
+        const mockContext = {
+          subscriptions: [],
+          globalState: {
+            get: jest.fn(),
+            update: jest.fn(),
+          },
+        } as unknown as vscode.ExtensionContext;
+
+        await showNotification(
+          NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+          undefined,
+          mockContext,
+        );
+
+        expect(mockOpenExternal).toHaveBeenCalledWith(
+          'https://www.turboconsolelog.io/join?event=extensionPanelFrequentAccess&variant=fallback',
+        );
+      });
+    });
+  });
 });

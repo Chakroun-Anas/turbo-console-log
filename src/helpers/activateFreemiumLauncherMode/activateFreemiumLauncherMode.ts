@@ -5,6 +5,7 @@ import { manageDynamicFreemiumPanel } from './launcherContent';
 import { writeToGlobalState } from '../writeToGlobalState';
 import { GlobalStateKeys } from '../GlobalStateKeys';
 import { createTelemetryService } from '../../telemetry/telemetryService';
+import { trackPanelOpenings } from '../trackPanelOpenings';
 
 export function activateFreemiumLauncherMode(
   context: vscode.ExtensionContext,
@@ -29,6 +30,9 @@ export function activateFreemiumLauncherMode(
       // Report freemium panel opening event for analytics
       const telemetryService = createTelemetryService();
       telemetryService.reportFreemiumPanelOpening();
+
+      // Track panel openings for notification triggers
+      trackPanelOpenings(context);
 
       // remove the badge (user has "seen" it)
       if (launcherView) {
