@@ -7,6 +7,7 @@ import { manageDynamicFreemiumPanel } from '@/helpers/activateFreemiumLauncherMo
 import { writeToGlobalState } from '@/helpers/writeToGlobalState';
 import { GlobalStateKeys } from '@/helpers/GlobalStateKeys';
 import { createTelemetryService } from '@/telemetry/telemetryService';
+import { trackPanelOpenings } from '@/helpers/trackPanelOpenings';
 
 // Mock the dependencies
 jest.mock('@/helpers/activeFreemiumMode');
@@ -15,6 +16,7 @@ jest.mock(
 );
 jest.mock('@/helpers/writeToGlobalState');
 jest.mock('@/telemetry/telemetryService');
+jest.mock('@/helpers/trackPanelOpenings');
 
 const mockActivateFreemiumMode = activateFreemiumMode as jest.MockedFunction<
   typeof activateFreemiumMode
@@ -25,6 +27,9 @@ const mockManageDynamicFreemiumPanel =
   >;
 const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
   typeof writeToGlobalState
+>;
+const mockTrackPanelOpenings = trackPanelOpenings as jest.MockedFunction<
+  typeof trackPanelOpenings
 >;
 
 // Mock telemetry service
@@ -237,6 +242,29 @@ describe('activateFreemiumLauncherMode', () => {
       expect(
         mockTelemetryService.reportFreemiumPanelOpening,
       ).not.toHaveBeenCalled();
+    });
+
+    it('should call trackPanelOpenings when view becomes visible', () => {
+      visibilityChangeHandler({ visible: true });
+
+      expect(mockTrackPanelOpenings).toHaveBeenCalledWith(context);
+    });
+
+    it('should not call trackPanelOpenings when view becomes hidden', () => {
+      visibilityChangeHandler({ visible: false });
+
+      expect(mockTrackPanelOpenings).not.toHaveBeenCalled();
+    });
+
+    it('should call trackPanelOpenings after telemetry and before activateFreemiumMode', () => {
+      visibilityChangeHandler({ visible: true });
+
+      // Verify all three are called
+      expect(
+        mockTelemetryService.reportFreemiumPanelOpening,
+      ).toHaveBeenCalled();
+      expect(mockTrackPanelOpenings).toHaveBeenCalled();
+      expect(mockActivateFreemiumMode).toHaveBeenCalled();
     });
   });
 

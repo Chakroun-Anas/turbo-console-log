@@ -2,6 +2,8 @@ import vscode from 'vscode';
 import { NotificationEvent } from './NotificationEvent';
 import { ExtensionNotificationResponse } from './ExtensionNotificationResponse';
 import { createTelemetryService } from '../telemetry/telemetryService';
+import { writeToGlobalState } from '../helpers/writeToGlobalState';
+import { GlobalStateKey } from '@/entities';
 
 const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
 // const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
@@ -9,6 +11,7 @@ const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
 export async function showNotification(
   notificationEvent: NotificationEvent,
   version?: string,
+  context?: vscode.ExtensionContext,
 ): Promise<void> {
   const telemetryService = createTelemetryService();
   let notificationData: ExtensionNotificationResponse | null = null;
@@ -35,11 +38,20 @@ export async function showNotification(
     const startTime = Date.now();
 
     // Show notification with CTA
-    const action = await vscode.window.showInformationMessage(
-      notificationData.message,
-      notificationData.ctaText,
-      'Maybe Later',
-    );
+    // For panel frequent access, add "I already did" option
+    const action =
+      notificationEvent === NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS
+        ? await vscode.window.showInformationMessage(
+            notificationData.message,
+            notificationData.ctaText,
+            'I already did',
+            'Maybe Later',
+          )
+        : await vscode.window.showInformationMessage(
+            notificationData.message,
+            notificationData.ctaText,
+            'Maybe Later',
+          );
 
     // Calculate reaction time (cap at 60 seconds to exclude stale time)
     const rawReactionTimeMs = Date.now() - startTime;
@@ -63,6 +75,15 @@ export async function showNotification(
 
       // Open the CTA URL in external browser
       await vscode.env.openExternal(vscode.Uri.parse(notificationData.ctaUrl));
+    } else if (action === 'I already did') {
+      // User indicated they already subscribed - no need to track as dismissal
+      if (context) {
+        writeToGlobalState(
+          context,
+          GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER,
+          true,
+        );
+      }
     } else if (action === 'Maybe Later') {
       // Track explicit dismissal with reaction time (fire-and-forget with error handling)
       telemetryService
@@ -108,15 +129,29 @@ export async function showNotification(
         ctaText: 'See Pro Benefits',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
+      [NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS]: {
+        message:
+          '🎯 You love the panel! Join our newsletter for exclusive tips and updates.',
+        ctaText: 'Subscribe',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/join`,
+      },
     };
 
     const fallback = fallbackMessages[notificationEvent];
     const fallbackStartTime = Date.now();
-    const fallbackAction = await vscode.window.showInformationMessage(
-      fallback.message,
-      fallback.ctaText,
-      'Maybe Later',
-    );
+    const fallbackAction =
+      notificationEvent === NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS
+        ? await vscode.window.showInformationMessage(
+            fallback.message,
+            fallback.ctaText,
+            'I already did',
+            'Maybe Later',
+          )
+        : await vscode.window.showInformationMessage(
+            fallback.message,
+            fallback.ctaText,
+            'Maybe Later',
+          );
     const rawFallbackReactionTimeMs = Date.now() - fallbackStartTime;
     const fallbackReactionTimeMs = Math.min(
       rawFallbackReactionTimeMs,
@@ -143,6 +178,15 @@ export async function showNotification(
           `${fallback.ctaUrl}?event=${notificationEvent}&variant=${defaultVariant}`,
         ),
       );
+    } else if (fallbackAction === 'I already did') {
+      // User indicated they already subscribed - no need to track as dismissal
+      if (context) {
+        writeToGlobalState(
+          context,
+          GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER,
+          true,
+        );
+      }
     } else if (fallbackAction === 'Maybe Later') {
       // Track explicit dismissal with reaction time (fire-and-forget with error handling)
       telemetryService
