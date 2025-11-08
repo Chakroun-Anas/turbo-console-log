@@ -123,6 +123,12 @@ export async function showNotification(
         ctaText: 'Motivation',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/overview/motivation`,
       },
+      [NotificationEvent.EXTENSION_TEN_INSERTS]: {
+        message:
+          '🎓 10 logs already! Did you know you can comment or delete them all at once?',
+        ctaText: 'Learn How',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/comment-inserted-log-messages`,
+      },
       [NotificationEvent.EXTENSION_FIFTY_INSERTS]: {
         message:
           "🎉 50 Turbo logs inserted! You're on fire! Unlock Pro features to boost productivity 🚀",
