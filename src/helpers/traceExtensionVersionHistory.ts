@@ -88,8 +88,12 @@ export function traceExtensionVersionHistory(
 
   // Handle fresh install welcome and journey initialization
   if (isFreshInstall) {
-    // Show welcome notification
-    showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+    // Show welcome notification with version info
+    showNotification(
+      NotificationEvent.EXTENSION_FRESH_INSTALL,
+      currentVersion,
+      context,
+    );
     // Initialize fresh install journey tracking
     writeToGlobalState(context, 'COMMAND_USAGE_COUNT', 0);
     writeToGlobalState(

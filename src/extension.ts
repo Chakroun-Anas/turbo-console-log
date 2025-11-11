@@ -8,6 +8,7 @@ import {
   activateRepairMode,
   activateFreemiumLauncherMode,
   traceExtensionVersionHistory,
+  checkPendingNotifications,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -72,6 +73,9 @@ export async function activate(
   // Trace version history and handle fresh install welcome
   // (creates or updates version array in global state + shows welcome for new users)
   traceExtensionVersionHistory(context, version);
+
+  // Check for any pending notifications scheduled for this activation
+  checkPendingNotifications(context, version);
 
   // Handle Pro user logic
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');

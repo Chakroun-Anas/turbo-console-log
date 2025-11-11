@@ -210,7 +210,7 @@ describe('trackPanelOpenings', () => {
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.0.0',
         context,
       );
     });
@@ -230,7 +230,7 @@ describe('trackPanelOpenings', () => {
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.0.0',
         context,
       );
     });
@@ -250,7 +250,7 @@ describe('trackPanelOpenings', () => {
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.0.0',
         context,
       );
     });
@@ -318,7 +318,7 @@ describe('trackPanelOpenings', () => {
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.0.0',
         context,
       );
     });
@@ -370,7 +370,7 @@ describe('trackPanelOpenings', () => {
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.0.0',
         context,
       );
     });

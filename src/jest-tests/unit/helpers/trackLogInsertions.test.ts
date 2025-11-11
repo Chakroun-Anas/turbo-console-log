@@ -162,20 +162,18 @@ describe('trackLogInsertions', () => {
         });
       });
 
-      it('should show ten inserts notification', async () => {
+      it('should NOT show ten inserts notification immediately (delayed until next activation)', async () => {
         await trackLogInsertions(mockContext);
 
-        expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_TEN_INSERTS,
-        );
+        expect(mockShowNotification).not.toHaveBeenCalled();
       });
 
-      it('should mark ten inserts notification as shown', async () => {
+      it('should set pending ten inserts notification flag', async () => {
         await trackLogInsertions(mockContext);
 
         expect(mockWriteToGlobalState).toHaveBeenCalledWith(
           mockContext,
-          'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION',
+          'PENDING_TEN_INSERTS_NOTIFICATION',
           true,
         );
       });
@@ -192,7 +190,7 @@ describe('trackLogInsertions', () => {
         expect(mockWriteToGlobalState).toHaveBeenNthCalledWith(
           2,
           mockContext,
-          'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION',
+          'PENDING_TEN_INSERTS_NOTIFICATION',
           true,
         );
       });
@@ -239,6 +237,8 @@ describe('trackLogInsertions', () => {
 
         expect(mockShowNotification).toHaveBeenCalledWith(
           NotificationEvent.EXTENSION_FIFTY_INSERTS,
+          '3.0.0',
+          mockContext,
         );
       });
 
