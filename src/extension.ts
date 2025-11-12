@@ -9,6 +9,7 @@ import {
   activateFreemiumLauncherMode,
   traceExtensionVersionHistory,
   checkPendingNotifications,
+  detectPhpWorkspace,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -76,6 +77,9 @@ export async function activate(
 
   // Check for any pending notifications scheduled for this activation
   checkPendingNotifications(context, version);
+
+  // Detect PHP workspace and show announcement if applicable (one-time)
+  detectPhpWorkspace(context, version);
 
   // Handle Pro user logic
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');

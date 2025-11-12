@@ -25,4 +25,7 @@ export enum GlobalStateKey {
 
   // Pending notifications (scheduled for next activation)
   PENDING_TEN_INSERTS_NOTIFICATION = 'PENDING_TEN_INSERTS_NOTIFICATION',
+
+  // PHP workspace detection
+  HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION = 'HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION',
 }

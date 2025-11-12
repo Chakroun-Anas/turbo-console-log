@@ -12,6 +12,7 @@ import { isProUser } from './isProUser';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
 import { checkPendingNotifications } from './checkPendingNotifications';
+import { detectPhpWorkspace } from './detectPhpWorkspace';
 export {
   readFromGlobalState,
   writeToGlobalState,
@@ -27,4 +28,5 @@ export {
   traceExtensionVersionHistory,
   isFreshInstall,
   checkPendingNotifications,
+  detectPhpWorkspace,
 };
