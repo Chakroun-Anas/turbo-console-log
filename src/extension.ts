@@ -78,8 +78,8 @@ export async function activate(
   // Check for any pending notifications scheduled for this activation
   checkPendingNotifications(context, version);
 
-  // Detect PHP workspace and show announcement if applicable (one-time)
-  detectPhpWorkspace(context, version);
+  // Detect PHP workspace and schedule announcement for next activation (one-time)
+  detectPhpWorkspace(context);
 
   // Handle Pro user logic
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');

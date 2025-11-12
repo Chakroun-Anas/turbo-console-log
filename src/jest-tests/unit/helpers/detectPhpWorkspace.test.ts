@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { detectPhpWorkspace } from '@/helpers/detectPhpWorkspace';
 import { readFromGlobalState, writeToGlobalState } from '@/helpers';
 import { showNotification } from '@/notifications/showNotification';
-import { NotificationEvent } from '@/notifications/NotificationEvent';
 import { GlobalStateKey } from '@/entities';
 import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
 
@@ -57,8 +56,8 @@ describe('detectPhpWorkspace', () => {
       mockReadFromGlobalState.mockReturnValue(true);
     });
 
-    it('should not detect PHP files or show notification', async () => {
-      await detectPhpWorkspace(mockContext, '3.9.6');
+    it('should not detect PHP files or schedule notification', async () => {
+      await detectPhpWorkspace(mockContext);
 
       expect(mockFindFiles).not.toHaveBeenCalled();
       expect(mockShowNotification).not.toHaveBeenCalled();
@@ -78,7 +77,7 @@ describe('detectPhpWorkspace', () => {
           { fsPath: '/test/workspace/composer.json' },
         ] as vscode.Uri[]);
 
-        await detectPhpWorkspace(mockContext, '3.9.6');
+        await detectPhpWorkspace(mockContext);
 
         expect(mockFindFiles).toHaveBeenCalledWith(
           '{**/composer.json,**/*.php,**/artisan,**/wp-config.php}',
@@ -90,26 +89,28 @@ describe('detectPhpWorkspace', () => {
           GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
           true,
         );
-        expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-          '3.9.6',
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
           mockContext,
+          GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
+          true,
         );
+        expect(mockShowNotification).not.toHaveBeenCalled();
       });
 
-      it('should detect PHP workspace with different file types', async () => {
+      it('should schedule notification for different PHP file types', async () => {
         // Test with .php file
         mockFindFiles.mockResolvedValue([
           { fsPath: '/test/workspace/index.php' },
         ] as vscode.Uri[]);
 
-        await detectPhpWorkspace(mockContext, '3.9.6');
+        await detectPhpWorkspace(mockContext);
 
-        expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-          '3.9.6',
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
           mockContext,
+          GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
+          true,
         );
+        expect(mockShowNotification).not.toHaveBeenCalled();
       });
 
       it('should detect Laravel projects (artisan)', async () => {
@@ -117,13 +118,14 @@ describe('detectPhpWorkspace', () => {
           { fsPath: '/test/workspace/artisan' },
         ] as vscode.Uri[]);
 
-        await detectPhpWorkspace(mockContext, '3.9.6');
+        await detectPhpWorkspace(mockContext);
 
-        expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-          '3.9.6',
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
           mockContext,
+          GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
+          true,
         );
+        expect(mockShowNotification).not.toHaveBeenCalled();
       });
 
       it('should detect WordPress projects (wp-config.php)', async () => {
@@ -131,36 +133,23 @@ describe('detectPhpWorkspace', () => {
           { fsPath: '/test/workspace/wp-config.php' },
         ] as vscode.Uri[]);
 
-        await detectPhpWorkspace(mockContext, '3.9.6');
+        await detectPhpWorkspace(mockContext);
 
-        expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-          '3.9.6',
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
           mockContext,
+          GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
+          true,
         );
-      });
-
-      it('should not show notification when no PHP indicators are found', async () => {
-        mockFindFiles.mockResolvedValue([]);
-
-        await detectPhpWorkspace(mockContext, '3.9.6');
-
         expect(mockShowNotification).not.toHaveBeenCalled();
-        expect(mockWriteToGlobalState).not.toHaveBeenCalled();
       });
 
-      it('should work without version parameter', async () => {
-        mockFindFiles.mockResolvedValue([
-          { fsPath: '/test/workspace/composer.json' },
-        ] as vscode.Uri[]);
+      it('should not schedule notification when no PHP indicators are found', async () => {
+        mockFindFiles.mockResolvedValue([]);
 
         await detectPhpWorkspace(mockContext);
 
-        expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-          undefined,
-          mockContext,
-        );
+        expect(mockShowNotification).not.toHaveBeenCalled();
+        expect(mockWriteToGlobalState).not.toHaveBeenCalled();
       });
     });
 
@@ -173,32 +162,32 @@ describe('detectPhpWorkspace', () => {
 
         mockFindFiles.mockRejectedValue(new Error('File system error'));
 
-        await expect(
-          detectPhpWorkspace(mockContext, '3.9.6'),
-        ).resolves.not.toThrow();
+        await expect(detectPhpWorkspace(mockContext)).resolves.not.toThrow();
 
         expect(mockShowNotification).not.toHaveBeenCalled();
         consoleWarnSpy.mockRestore();
       });
 
-      it('should mark notification as shown before showing to avoid duplicates', async () => {
-        const callOrder: string[] = [];
-
+      it('should schedule notification (not show immediately)', async () => {
         mockFindFiles.mockResolvedValue([
           { fsPath: '/test/workspace/composer.json' },
         ] as vscode.Uri[]);
 
-        mockWriteToGlobalState.mockImplementation(() => {
-          callOrder.push('write-state');
-        });
+        await detectPhpWorkspace(mockContext);
 
-        mockShowNotification.mockImplementation(async () => {
-          callOrder.push('show-notification');
-        });
-
-        await detectPhpWorkspace(mockContext, '3.9.6');
-
-        expect(callOrder).toEqual(['write-state', 'show-notification']);
+        // Should write both the "shown" flag and pending flag
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
+          true,
+        );
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
+          true,
+        );
+        // Should NOT show notification immediately
+        expect(mockShowNotification).not.toHaveBeenCalled();
       });
     });
   });
@@ -219,8 +208,8 @@ describe('detectPhpWorkspace', () => {
       ];
     });
 
-    it('should not detect PHP files or show notification', async () => {
-      await detectPhpWorkspace(mockContext, '3.9.6');
+    it('should not detect PHP files or schedule notification', async () => {
+      await detectPhpWorkspace(mockContext);
 
       expect(mockFindFiles).not.toHaveBeenCalled();
       expect(mockShowNotification).not.toHaveBeenCalled();
@@ -229,13 +218,13 @@ describe('detectPhpWorkspace', () => {
   });
 
   describe('integration with GlobalStateKey', () => {
-    it('should use correct GlobalStateKey constant', async () => {
+    it('should use correct GlobalStateKey constants', async () => {
       mockReadFromGlobalState.mockReturnValue(false);
       mockFindFiles.mockResolvedValue([
         { fsPath: '/test/workspace/composer.json' },
       ] as vscode.Uri[]);
 
-      await detectPhpWorkspace(mockContext, '3.9.6');
+      await detectPhpWorkspace(mockContext);
 
       expect(mockReadFromGlobalState).toHaveBeenCalledWith(
         mockContext,
@@ -245,6 +234,12 @@ describe('detectPhpWorkspace', () => {
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,
         GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
+        true,
+      );
+
+      expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+        mockContext,
+        GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
         true,
       );
     });

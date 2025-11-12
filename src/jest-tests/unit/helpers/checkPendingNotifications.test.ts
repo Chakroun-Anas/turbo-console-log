@@ -199,7 +199,13 @@ describe('checkPendingNotifications', () => {
 
   describe('edge cases', () => {
     it('should handle multiple consecutive calls correctly', () => {
-      mockReadFromGlobalState.mockReturnValue(true);
+      // Mock only ten inserts pending (not PHP)
+      mockReadFromGlobalState.mockImplementation((context, key) => {
+        if (key === GlobalStateKey.PENDING_TEN_INSERTS_NOTIFICATION) {
+          return true;
+        }
+        return false;
+      });
       const version = '3.9.5';
 
       // First call should show notification
@@ -294,6 +300,70 @@ describe('checkPendingNotifications', () => {
         expect.anything(),
         expect.anything(),
       );
+    });
+  });
+
+  describe('PHP workspace pending notification', () => {
+    it('should clear pending flag when PHP notification is pending', () => {
+      mockReadFromGlobalState.mockImplementation((context, key) => {
+        return key === GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION;
+      });
+
+      checkPendingNotifications(mockContext, '3.9.6');
+
+      expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+        mockContext,
+        GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
+        false,
+      );
+    });
+
+    it('should show PHP workspace notification when pending', () => {
+      mockReadFromGlobalState.mockImplementation((context, key) => {
+        return key === GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION;
+      });
+      const version = '3.9.6';
+
+      checkPendingNotifications(mockContext, version);
+
+      expect(mockShowNotification).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
+        version,
+        mockContext,
+      );
+    });
+
+    it('should not show PHP notification when flag is false', () => {
+      mockReadFromGlobalState.mockReturnValue(false);
+
+      checkPendingNotifications(mockContext, '3.9.6');
+
+      expect(mockShowNotification).not.toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
+    it('should handle both pending notifications independently', () => {
+      // Both notifications pending
+      mockReadFromGlobalState.mockReturnValue(true);
+      const version = '3.9.6';
+
+      checkPendingNotifications(mockContext, version);
+
+      // Should show both notifications
+      expect(mockShowNotification).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_TEN_INSERTS,
+        version,
+        mockContext,
+      );
+      expect(mockShowNotification).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
+        version,
+        mockContext,
+      );
+      expect(mockShowNotification).toHaveBeenCalledTimes(2);
     });
   });
 });

@@ -1,12 +1,10 @@
 import * as vscode from 'vscode';
 import { readFromGlobalState, writeToGlobalState } from './index';
 import { GlobalStateKey } from '@/entities';
-import { showNotification } from '../notifications/showNotification';
-import { NotificationEvent } from '../notifications/NotificationEvent';
 
 /**
- * Detects if the current workspace is a PHP project and shows a notification
- * announcing upcoming PHP support (one-time only)
+ * Detects if the current workspace is a PHP project and schedules a notification
+ * announcing upcoming PHP support for next activation (one-time only)
  *
  * Detection criteria:
  * - Presence of .php files in the workspace
@@ -14,11 +12,9 @@ import { NotificationEvent } from '../notifications/NotificationEvent';
  * - PHP-specific folders (vendor/, public/index.php, etc.)
  *
  * @param context VS Code extension context
- * @param version Current extension version
  */
 export async function detectPhpWorkspace(
   context: vscode.ExtensionContext,
-  version?: string,
 ): Promise<void> {
   // Check if notification has already been shown
   const hasShownNotification = readFromGlobalState<boolean>(
@@ -48,11 +44,11 @@ export async function detectPhpWorkspace(
         true,
       );
 
-      // Show the PHP support announcement notification
-      showNotification(
-        NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-        version,
+      // Schedule notification for next activation (delayed notification strategy)
+      writeToGlobalState(
         context,
+        GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
+        true,
       );
     }
   } catch (error) {
