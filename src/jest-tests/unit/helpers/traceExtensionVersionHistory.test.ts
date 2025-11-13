@@ -62,6 +62,8 @@ describe('traceExtensionVersionHistory', () => {
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
       );
 
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(

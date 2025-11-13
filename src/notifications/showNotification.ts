@@ -141,6 +141,12 @@ export async function showNotification(
         ctaText: 'Subscribe',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/join`,
       },
+      [NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED]: {
+        message:
+          '🎉 PHP support is coming to Turbo Console Log! Want a sneak peek?',
+        ctaText: 'Read More',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3100`,
+      },
     };
 
     const fallback = fallbackMessages[notificationEvent];

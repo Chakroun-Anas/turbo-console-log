@@ -10,6 +10,11 @@ import { NotificationEvent } from '../notifications/NotificationEvent';
  * @param context VS Code extension context
  */
 export function trackPanelOpenings(context: vscode.ExtensionContext): void {
+  // Get extension version
+  const version = vscode.extensions.getExtension(
+    'ChakrounAnas.turbo-console-log',
+  )?.packageJSON.version;
+
   // Check if user has already subscribed to newsletter
   const hasSubscribedToNewsletter = readFromGlobalState<boolean>(
     context,
@@ -34,10 +39,10 @@ export function trackPanelOpenings(context: vscode.ExtensionContext): void {
 
   // Show notification every 10 openings (10, 20, 30, etc.)
   if (panelOpeningCount >= 10 && panelOpeningCount % 10 === 0) {
-    // Show frequent panel access notification (non-blocking)
+    // Show frequent panel access notification (non-blocking) with version info
     showNotification(
       NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-      undefined,
+      version,
       context,
     );
   }

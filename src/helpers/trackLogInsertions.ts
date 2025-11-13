@@ -13,6 +13,11 @@ import { NotificationEvent } from '../notifications/NotificationEvent';
 export async function trackLogInsertions(
   context: vscode.ExtensionContext,
 ): Promise<void> {
+  // Get extension version
+  const version = vscode.extensions.getExtension(
+    'ChakrounAnas.turbo-console-log',
+  )?.packageJSON.version;
+
   // Increment command usage count (track for all users, including Pro)
   let commandUsageCount =
     readFromGlobalState<number>(context, GlobalStateKey.COMMAND_USAGE_COUNT) ||
@@ -36,15 +41,14 @@ export async function trackLogInsertions(
   );
 
   if (!hasShownTenInsertsMilestoneNotification && commandUsageCount === 10) {
-    // Mark that notification has been shown
+    // Schedule notification for next activation (v3.9.5+)
+    // Instead of showing immediately, set a flag to show on next extension activation
+    // Note: We mark as "shown" in checkPendingNotifications when actually displayed
     writeToGlobalState(
       context,
-      GlobalStateKey.HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION,
+      GlobalStateKey.PENDING_TEN_INSERTS_NOTIFICATION,
       true,
     );
-
-    // Show ten inserts milestone notification (non-blocking, educational)
-    showNotification(NotificationEvent.EXTENSION_TEN_INSERTS);
   }
 
   // Check if user has reached the 50 inserts milestone
@@ -62,7 +66,11 @@ export async function trackLogInsertions(
       true,
     );
 
-    // Show fifty inserts milestone notification (non-blocking)
-    showNotification(NotificationEvent.EXTENSION_FIFTY_INSERTS);
+    // Show fifty inserts milestone notification (non-blocking) with version info
+    showNotification(
+      NotificationEvent.EXTENSION_FIFTY_INSERTS,
+      version,
+      context,
+    );
   }
 }
