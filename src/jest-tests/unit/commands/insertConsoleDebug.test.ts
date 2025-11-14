@@ -9,6 +9,7 @@ import {
   makeExtensionContext,
 } from '@/jest-tests/mocks/helpers';
 import { trackLogInsertions } from '@/helpers/trackLogInsertions';
+import { canInsertLogInDocument } from '@/helpers/canInsertLogInDocument';
 
 jest.mock('@/utilities', () => ({
   getTabSize: () => 2,
@@ -18,13 +19,21 @@ jest.mock('@/helpers/trackLogInsertions', () => ({
   trackLogInsertions: jest.fn(),
 }));
 
+jest.mock('@/helpers/canInsertLogInDocument');
+
 describe('insertConsoleDebugCommand', () => {
   const mockTrackNewUserJourney = trackLogInsertions as jest.MockedFunction<
     typeof trackLogInsertions
   >;
+  const mockCanInsertLogInDocument =
+    canInsertLogInDocument as jest.MockedFunction<
+      typeof canInsertLogInDocument
+    >;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default to allowing log insertion (JS/TS files or Pro user)
+    mockCanInsertLogInDocument.mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -274,5 +283,95 @@ describe('insertConsoleDebugCommand', () => {
     });
 
     expect(mockTrackNewUserJourney).toHaveBeenCalledWith(context);
+  });
+
+  describe('PHP Pro-only blocking', () => {
+    it('should not insert log when canInsertLogInDocument returns false', async () => {
+      mockCanInsertLogInDocument.mockReturnValue(false);
+
+      const mockDocument = makeTextDocument(['$myVar = 42;']);
+
+      const mockSelection = new vscode.Selection(
+        new vscode.Position(0, 1),
+        new vscode.Position(0, 7),
+      );
+
+      const mockEditBuilder = createMockTextEditorEdit();
+
+      const mockEditor = makeTextEditor({
+        document: mockDocument,
+        selections: [mockSelection],
+      });
+
+      mockEditor.edit = jest.fn().mockImplementation((cb) => {
+        cb(mockEditBuilder);
+        return Promise.resolve(true);
+      });
+
+      vscode.window.activeTextEditor = mockEditor;
+
+      const debugMessage = makeDebugMessage();
+      const context = makeExtensionContext();
+
+      const command = insertConsoleDebugCommand();
+
+      await command.handler({
+        context,
+        extensionProperties: {} as ExtensionProperties,
+        debugMessage,
+      });
+
+      expect(mockCanInsertLogInDocument).toHaveBeenCalled();
+      expect(debugMessage.msg).not.toHaveBeenCalled();
+      expect(mockTrackNewUserJourney).not.toHaveBeenCalled();
+    });
+
+    it('should insert log when canInsertLogInDocument returns true (JS/TS or Pro user)', async () => {
+      mockCanInsertLogInDocument.mockReturnValue(true);
+
+      const mockDocument = makeTextDocument(['const myVar = 42;']);
+
+      const mockSelection = new vscode.Selection(
+        new vscode.Position(0, 6),
+        new vscode.Position(0, 11),
+      );
+
+      const mockEditBuilder = createMockTextEditorEdit();
+
+      const mockEditor = makeTextEditor({
+        document: mockDocument,
+        selections: [mockSelection],
+      });
+
+      mockEditor.edit = jest.fn().mockImplementation((cb) => {
+        cb(mockEditBuilder);
+        return Promise.resolve(true);
+      });
+
+      vscode.window.activeTextEditor = mockEditor;
+
+      const debugMessage = makeDebugMessage();
+      const context = makeExtensionContext();
+
+      const command = insertConsoleDebugCommand();
+
+      await command.handler({
+        context,
+        extensionProperties: {} as ExtensionProperties,
+        debugMessage,
+      });
+
+      expect(mockCanInsertLogInDocument).toHaveBeenCalled();
+      expect(debugMessage.msg).toHaveBeenCalledWith(
+        mockEditBuilder,
+        mockDocument,
+        'myVar',
+        0,
+        2,
+        {},
+        'debug',
+      );
+      expect(mockTrackNewUserJourney).toHaveBeenCalledWith(context);
+    });
   });
 });

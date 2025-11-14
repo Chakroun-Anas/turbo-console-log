@@ -28,7 +28,7 @@ export async function updateProBundle(
     writeProBundleToCache(context, licenseKey, proBundle, proVersion);
     await runProBundle(extensionProperties, proBundle, context);
     showNotification(
-      `🎉 Pro Bundle Updated v${proVersion}, don't forget to reload your window please!`,
+      `🎉 Pro Bundle Updated v${proVersion}, reload your window please!`,
       10000,
     );
   } catch (error) {

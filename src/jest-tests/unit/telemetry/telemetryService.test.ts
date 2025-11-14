@@ -1612,6 +1612,260 @@ describe('TelemetryService', () => {
     });
   });
 
+  describe('reportWebviewInteraction', () => {
+    beforeEach(() => {
+      // Mock successful axios response
+      mockedAxios.post.mockResolvedValue({ status: 200 });
+    });
+
+    it('should send webview interaction analytics when telemetry is enabled', async () => {
+      const mockDate = new Date('2025-11-16T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportWebviewInteraction('3.10.0', 'A', 'shown');
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportWebviewInteraction',
+        expect.objectContaining({
+          developerId: expect.stringMatching(/^dev_/),
+          version: '3.10.0',
+          variant: 'A',
+          interactionType: 'shown',
+          timezoneOffset: mockDate.getTimezoneOffset(),
+          extensionVersion: '3.5.0',
+          vscodeVersion: '1.85.0',
+          platform: 'darwin',
+        }),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/3.5.0',
+          },
+        }),
+      );
+    });
+
+    it('should send webview click interaction with correct type', async () => {
+      const service = createTelemetryService();
+      await service.reportWebviewInteraction('3.10.0', 'B', 'clicked');
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportWebviewInteraction',
+        expect.objectContaining({
+          version: '3.10.0',
+          variant: 'B',
+          interactionType: 'clicked',
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should handle different webview versions', async () => {
+      const service = createTelemetryService();
+
+      await service.reportWebviewInteraction('3.10.0', 'A', 'shown');
+      await service.reportWebviewInteraction('3.11.0', 'B', 'clicked');
+      await service.reportWebviewInteraction('3.9.0', 'C', 'shown');
+
+      expect(mockedAxios.post).toHaveBeenCalledTimes(3);
+      expect(mockedAxios.post).toHaveBeenNthCalledWith(
+        1,
+        expect.any(String),
+        expect.objectContaining({ version: '3.10.0', variant: 'A' }),
+        expect.any(Object),
+      );
+      expect(mockedAxios.post).toHaveBeenNthCalledWith(
+        2,
+        expect.any(String),
+        expect.objectContaining({ version: '3.11.0', variant: 'B' }),
+        expect.any(Object),
+      );
+      expect(mockedAxios.post).toHaveBeenNthCalledWith(
+        3,
+        expect.any(String),
+        expect.objectContaining({ version: '3.9.0', variant: 'C' }),
+        expect.any(Object),
+      );
+    });
+
+    it('should not send analytics when VS Code telemetry is disabled', async () => {
+      resetTelemetryService();
+      mockVscodeEnv.isTelemetryEnabled = false;
+
+      const disabledService = createTelemetryService();
+      await disabledService.reportWebviewInteraction('3.10.0', 'A', 'shown');
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Telemetry is disabled, skipping webview interaction reporting',
+      );
+    });
+
+    it('should not send analytics when custom telemetry is disabled', async () => {
+      resetTelemetryService();
+      const mockWorkspace = vscode.workspace as jest.Mocked<
+        typeof vscode.workspace
+      >;
+      mockWorkspace.getConfiguration.mockReturnValue({
+        get: jest.fn().mockReturnValue(false),
+      } as unknown as vscode.WorkspaceConfiguration);
+
+      const disabledService = createTelemetryService();
+      await disabledService.reportWebviewInteraction('3.10.0', 'B', 'clicked');
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Telemetry is disabled, skipping webview interaction reporting',
+      );
+    });
+
+    it('should handle axios errors gracefully', async () => {
+      const error = new Error('Network error');
+      mockedAxios.post.mockRejectedValue(error);
+
+      const service = createTelemetryService();
+      await service.reportWebviewInteraction('3.10.0', 'A', 'shown');
+
+      expect(mockConsoleWarn).toHaveBeenCalledWith(
+        '[Turbo Console Log] Failed to send webview interaction analytics:',
+        error,
+      );
+    });
+
+    it('should generate consistent analytics payload structure', async () => {
+      const mockDate = new Date('2025-11-16T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportWebviewInteraction('3.10.0', 'C', 'clicked');
+
+      const callArgs = mockedAxios.post.mock.calls[0];
+      const payload = callArgs[1] as {
+        developerId: string;
+        version: string;
+        variant: string;
+        interactionType: string;
+        timezoneOffset: number;
+        extensionVersion: string;
+        vscodeVersion: string;
+        platform: string;
+      };
+
+      expect(payload.developerId).toBe('dev_abcd1234567890ef');
+      expect(payload.version).toBe('3.10.0');
+      expect(payload.variant).toBe('C');
+      expect(payload.interactionType).toBe('clicked');
+      expect(payload.timezoneOffset).toBe(mockDate.getTimezoneOffset());
+      expect(payload.extensionVersion).toBe('3.5.0');
+      expect(payload.vscodeVersion).toBe('1.85.0');
+      expect(typeof payload.platform).toBe('string');
+    });
+
+    it('should use correct API endpoint and headers', async () => {
+      const service = createTelemetryService();
+      await service.reportWebviewInteraction('3.10.0', 'A', 'shown');
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportWebviewInteraction',
+        expect.any(Object),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/3.5.0',
+          },
+        }),
+      );
+    });
+
+    it('should handle missing extension version gracefully', async () => {
+      const mockExtensions = vscode.extensions as jest.Mocked<
+        typeof vscode.extensions
+      >;
+      mockExtensions.getExtension.mockReturnValue(undefined);
+
+      const service = createTelemetryService();
+      await service.reportWebviewInteraction('3.10.0', 'B', 'shown');
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportWebviewInteraction',
+        expect.objectContaining({
+          extensionVersion: undefined,
+        }),
+        expect.objectContaining({
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/undefined',
+          },
+        }),
+      );
+    });
+
+    it('should handle all variant options (A, B, C, fallback)', async () => {
+      const service = createTelemetryService();
+
+      const testCases = [
+        { version: '3.10.0', variant: 'A', type: 'shown' as const },
+        { version: '3.10.0', variant: 'B', type: 'clicked' as const },
+        { version: '3.10.0', variant: 'C', type: 'shown' as const },
+        { version: '3.10.0', variant: 'fallback', type: 'clicked' as const },
+      ];
+
+      for (const testCase of testCases) {
+        await service.reportWebviewInteraction(
+          testCase.version,
+          testCase.variant,
+          testCase.type,
+        );
+      }
+
+      expect(mockedAxios.post).toHaveBeenCalledTimes(testCases.length);
+
+      testCases.forEach((testCase, index) => {
+        const callArgs = mockedAxios.post.mock.calls[index];
+        const payload = callArgs[1] as {
+          version: string;
+          variant: string;
+          interactionType: string;
+        };
+        expect(payload.version).toBe(testCase.version);
+        expect(payload.variant).toBe(testCase.variant);
+        expect(payload.interactionType).toBe(testCase.type);
+      });
+    });
+
+    it('should log correct console messages for each interaction type', async () => {
+      const service = createTelemetryService();
+
+      await service.reportWebviewInteraction('3.10.0', 'A', 'shown');
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Webview interaction (shown) report sent successfully for variant A',
+      );
+
+      await service.reportWebviewInteraction('3.10.0', 'B', 'clicked');
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Webview interaction (clicked) report sent successfully for variant B',
+      );
+    });
+
+    it('should include timezone offset from current date', async () => {
+      const mockDate = new Date('2025-11-16T15:30:00.000Z');
+      const expectedOffset = mockDate.getTimezoneOffset();
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportWebviewInteraction('3.10.0', 'C', 'shown');
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ timezoneOffset: expectedOffset }),
+        expect.any(Object),
+      );
+    });
+  });
+
   describe('dispose', () => {
     it('should dispose without errors', () => {
       expect(() => telemetryService.dispose()).not.toThrow();

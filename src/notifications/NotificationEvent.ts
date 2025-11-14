@@ -4,4 +4,5 @@ export enum NotificationEvent {
   EXTENSION_FIFTY_INSERTS = 'extensionFiftyInserts',
   EXTENSION_PANEL_FREQUENT_ACCESS = 'extensionPanelFrequentAccess',
   EXTENSION_PHP_WORKSPACE_DETECTED = 'extensionPhpWorkspaceDetected',
+  EXTENSION_PHP_PRO_ONLY = 'extensionPhpProOnly',
 }

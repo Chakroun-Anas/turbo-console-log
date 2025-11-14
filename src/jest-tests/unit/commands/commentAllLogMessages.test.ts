@@ -8,8 +8,27 @@ import {
   makeDebugMessage,
 } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
+import { loadPhpDebugMessage } from '@/helpers/loadPhpDebugMessage';
+import { canInsertLogInDocument } from '@/helpers/canInsertLogInDocument';
+
+jest.mock('@/helpers/loadPhpDebugMessage');
+jest.mock('@/helpers/canInsertLogInDocument');
 
 describe('commentAllLogMessagesCommand', () => {
+  const mockLoadPhpDebugMessage = loadPhpDebugMessage as jest.MockedFunction<
+    typeof loadPhpDebugMessage
+  >;
+  const mockCanInsertLogInDocument =
+    canInsertLogInDocument as jest.MockedFunction<
+      typeof canInsertLogInDocument
+    >;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockLoadPhpDebugMessage.mockResolvedValue(null);
+    mockCanInsertLogInDocument.mockReturnValue(true);
+  });
+
   it('should not throw or call debugMessage.detectAll when no editor is active', async () => {
     vscode.window.activeTextEditor = undefined; // simulate no open editor
 
@@ -205,5 +224,205 @@ describe('commentAllLogMessagesCommand', () => {
       new vscode.Position(0, 0),
       `// console.log("Debug myVar:", myVar);\n`,
     );
+  });
+
+  describe('PHP Pro bundle integration', () => {
+    it('should use PHP debug message for PHP files', async () => {
+      const phpDebugMessage = makeDebugMessage();
+      const mockRange = new vscode.Range(
+        new vscode.Position(0, 0),
+        new vscode.Position(0, 20),
+      );
+
+      phpDebugMessage.detectAll = jest.fn().mockReturnValue([
+        {
+          spaces: '',
+          lines: [mockRange],
+          isCommented: false,
+        },
+      ]);
+
+      mockLoadPhpDebugMessage.mockResolvedValue(phpDebugMessage);
+
+      const mockDocument = makeTextDocument(
+        ['<?php var_dump($var);'],
+        'test.php',
+        'php',
+      );
+
+      const mockEditBuilder = createMockTextEditorEdit();
+
+      const mockEditor = makeTextEditor({
+        document: mockDocument,
+        selections: [],
+      });
+
+      mockEditor.edit = jest.fn().mockImplementation((cb) => {
+        cb(mockEditBuilder);
+        return Promise.resolve(true);
+      });
+
+      vscode.window.activeTextEditor = mockEditor;
+
+      const jsDebugMessage = makeDebugMessage();
+      const context = makeExtensionContext();
+
+      const command = commentAllLogMessagesCommand();
+
+      await command.handler({
+        context,
+        extensionProperties: {} as ExtensionProperties,
+        debugMessage: jsDebugMessage,
+      });
+
+      expect(mockLoadPhpDebugMessage).toHaveBeenCalledWith(context);
+      expect(phpDebugMessage.detectAll).toHaveBeenCalled();
+      expect(jsDebugMessage.detectAll).not.toHaveBeenCalled();
+    });
+
+    it('should show error when PHP debug message fails to load', async () => {
+      mockLoadPhpDebugMessage.mockResolvedValue(null);
+
+      const mockDocument = makeTextDocument(
+        ['<?php var_dump($var);'],
+        'test.php',
+        'php',
+      );
+
+      const mockEditor = makeTextEditor({
+        document: mockDocument,
+        selections: [],
+      });
+
+      vscode.window.activeTextEditor = mockEditor;
+
+      const showErrorMessageSpy = jest.spyOn(vscode.window, 'showErrorMessage');
+
+      const debugMessage = makeDebugMessage();
+      const context = makeExtensionContext();
+
+      const command = commentAllLogMessagesCommand();
+
+      await command.handler({
+        context,
+        extensionProperties: {} as ExtensionProperties,
+        debugMessage,
+      });
+
+      expect(showErrorMessageSpy).toHaveBeenCalledWith(
+        'Failed to load PHP support from Pro bundle.',
+      );
+      expect(debugMessage.detectAll).not.toHaveBeenCalled();
+    });
+
+    it('should not load PHP debug message for non-PHP files', async () => {
+      const mockDocument = makeTextDocument(
+        ['console.log("test");'],
+        'test.js',
+        'javascript',
+      );
+
+      const mockEditBuilder = createMockTextEditorEdit();
+
+      const mockEditor = makeTextEditor({
+        document: mockDocument,
+        selections: [],
+      });
+
+      mockEditor.edit = jest.fn().mockImplementation((cb) => {
+        cb(mockEditBuilder);
+        return Promise.resolve(true);
+      });
+
+      const debugMessage = makeDebugMessage();
+      debugMessage.detectAll = jest.fn().mockReturnValue([]);
+
+      vscode.window.activeTextEditor = mockEditor;
+
+      const context = makeExtensionContext();
+
+      const command = commentAllLogMessagesCommand();
+
+      await command.handler({
+        context,
+        extensionProperties: {} as ExtensionProperties,
+        debugMessage,
+      });
+
+      expect(mockLoadPhpDebugMessage).not.toHaveBeenCalled();
+      expect(debugMessage.detectAll).toHaveBeenCalled();
+    });
+  });
+
+  describe('PHP Pro-only blocking', () => {
+    it('should not comment logs when canInsertLogInDocument returns false', async () => {
+      mockCanInsertLogInDocument.mockReturnValue(false);
+
+      const mockDocument = makeTextDocument(
+        ['<?php var_dump($var);'],
+        'test.php',
+        'php',
+      );
+
+      const mockEditor = makeTextEditor({
+        document: mockDocument,
+        selections: [],
+      });
+
+      vscode.window.activeTextEditor = mockEditor;
+
+      const debugMessage = makeDebugMessage();
+      debugMessage.detectAll = jest.fn().mockReturnValue([]);
+
+      const context = makeExtensionContext();
+
+      const command = commentAllLogMessagesCommand();
+
+      await command.handler({
+        context,
+        extensionProperties: {} as ExtensionProperties,
+        debugMessage,
+      });
+
+      expect(mockCanInsertLogInDocument).toHaveBeenCalled();
+      expect(mockLoadPhpDebugMessage).not.toHaveBeenCalled();
+      expect(debugMessage.detectAll).not.toHaveBeenCalled();
+    });
+
+    it('should comment logs when canInsertLogInDocument returns true', async () => {
+      mockCanInsertLogInDocument.mockReturnValue(true);
+
+      const mockDocument = makeTextDocument(['console.log("test");']);
+
+      const mockEditBuilder = createMockTextEditorEdit();
+
+      const mockEditor = makeTextEditor({
+        document: mockDocument,
+        selections: [],
+      });
+
+      mockEditor.edit = jest.fn().mockImplementation((cb) => {
+        cb(mockEditBuilder);
+        return Promise.resolve(true);
+      });
+
+      vscode.window.activeTextEditor = mockEditor;
+
+      const debugMessage = makeDebugMessage();
+      debugMessage.detectAll = jest.fn().mockReturnValue([]);
+
+      const context = makeExtensionContext();
+
+      const command = commentAllLogMessagesCommand();
+
+      await command.handler({
+        context,
+        extensionProperties: {} as ExtensionProperties,
+        debugMessage,
+      });
+
+      expect(mockCanInsertLogInDocument).toHaveBeenCalled();
+      expect(debugMessage.detectAll).toHaveBeenCalled();
+    });
   });
 });

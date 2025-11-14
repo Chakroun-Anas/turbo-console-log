@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Command, Message } from '../entities';
+import { loadPhpDebugMessage, canInsertLogInDocument } from '../helpers';
 
 export function commentAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.commentAllLogMessages',
-    handler: async ({ extensionProperties, debugMessage }) => {
+    handler: async ({ extensionProperties, debugMessage, context }) => {
       const { logFunction, logMessagePrefix, delimiterInsideMessage } =
         extensionProperties;
       const editor: vscode.TextEditor | undefined =
@@ -14,7 +15,32 @@ export function commentAllLogMessagesCommand(): Command {
         return;
       }
       const document: vscode.TextDocument = editor.document;
-      const logMessages: Message[] = await debugMessage.detectAll(
+
+      // Get extension version
+      const version = vscode.extensions.getExtension(
+        'ChakrounAnas.turbo-console-log',
+      )?.packageJSON.version;
+
+      // Check if log operations are allowed (PHP requires Pro)
+      const canOperate = canInsertLogInDocument(context, document, version);
+      if (!canOperate) {
+        return;
+      }
+
+      // For PHP files, load PHP debug message from Pro bundle
+      let activeDebugMessage = debugMessage;
+      if (document.languageId === 'php') {
+        const phpDebugMessage = await loadPhpDebugMessage(context);
+        if (!phpDebugMessage) {
+          vscode.window.showErrorMessage(
+            'Failed to load PHP support from Pro bundle.',
+          );
+          return;
+        }
+        activeDebugMessage = phpDebugMessage;
+      }
+
+      const logMessages: Message[] = await activeDebugMessage.detectAll(
         fs,
         vscode,
         document.uri.fsPath,

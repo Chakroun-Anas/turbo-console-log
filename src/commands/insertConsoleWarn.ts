@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
-import { trackLogInsertions } from '../helpers';
+import { trackLogInsertions, canInsertLogInDocument } from '../helpers';
 
 export function insertConsoleWarnCommand(): Command {
   return {
@@ -14,6 +14,25 @@ export function insertConsoleWarnCommand(): Command {
       }
       const tabSize: number | string = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
+
+      // Get extension version
+      const version = vscode.extensions.getExtension(
+        'ChakrounAnas.turbo-console-log',
+      )?.packageJSON.version;
+
+      // Check if log insertion is allowed (PHP requires Pro)
+      const canInsert = canInsertLogInDocument(context, document, version);
+      if (!canInsert) {
+        return;
+      }
+
+      // For PHP files, notify about available commands
+      if (document.languageId === 'php') {
+        vscode.window.showInformationMessage(
+          'PHP debugging commands: Ctrl/Cmd+K Ctrl/Cmd+L (var_dump), Ctrl/Cmd+K Ctrl/Cmd+N (print_r), Ctrl/Cmd+K Ctrl/Cmd+B/E (error_log)',
+        );
+        return;
+      }
       for (let index = 0; index < editor.selections.length; index++) {
         const selection: vscode.Selection = editor.selections[index];
         let wordUnderCursor = '';

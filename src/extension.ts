@@ -9,7 +9,8 @@ import {
   activateFreemiumLauncherMode,
   traceExtensionVersionHistory,
   checkPendingNotifications,
-  detectPhpWorkspace,
+  listenToPhpFileOpenings,
+  showReleaseWebView,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -78,8 +79,11 @@ export async function activate(
   // Check for any pending notifications scheduled for this activation
   checkPendingNotifications(context, version);
 
-  // Detect PHP workspace and schedule announcement for next activation (one-time)
-  detectPhpWorkspace(context);
+  // Show v3.10.0 release webview on first activation after update
+  showReleaseWebView(context);
+
+  // Listen to PHP file openings and show announcement immediately (v3.10.0 strategy)
+  listenToPhpFileOpenings(context);
 
   // Handle Pro user logic
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');

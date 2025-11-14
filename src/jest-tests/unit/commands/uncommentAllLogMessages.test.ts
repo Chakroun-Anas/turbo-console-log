@@ -9,14 +9,22 @@ import {
 } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
 import { DebugMessage } from '@/debug-message';
+import { canInsertLogInDocument } from '@/helpers/canInsertLogInDocument';
+
+jest.mock('@/helpers/canInsertLogInDocument');
 
 describe('uncommentAllLogMessagesCommand', () => {
   let mockExtensionProperties: ExtensionProperties;
   let mockDebugMessage: DebugMessage;
   let mockContext: vscode.ExtensionContext;
+  const mockCanInsertLogInDocument =
+    canInsertLogInDocument as jest.MockedFunction<
+      typeof canInsertLogInDocument
+    >;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockCanInsertLogInDocument.mockReturnValue(true);
 
     mockExtensionProperties = {
       logFunction: 'log',
@@ -636,6 +644,71 @@ describe('uncommentAllLogMessagesCommand', () => {
     it('should have a handler function', () => {
       const command = uncommentAllLogMessagesCommand();
       expect(typeof command.handler).toBe('function');
+    });
+  });
+
+  describe('PHP Pro-only blocking', () => {
+    it('should not uncomment logs when canInsertLogInDocument returns false', async () => {
+      mockCanInsertLogInDocument.mockReturnValue(false);
+
+      const mockDocument = makeTextDocument(
+        ['<?php // var_dump($var);'],
+        'test.php',
+        'php',
+      );
+
+      const mockEditor = makeTextEditor({
+        document: mockDocument,
+        selections: [],
+      });
+
+      vscode.window.activeTextEditor = mockEditor;
+
+      mockDebugMessage.detectAll = jest.fn().mockReturnValue([]);
+
+      const command = uncommentAllLogMessagesCommand();
+
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+      });
+
+      expect(mockCanInsertLogInDocument).toHaveBeenCalled();
+      expect(mockDebugMessage.detectAll).not.toHaveBeenCalled();
+    });
+
+    it('should uncomment logs when canInsertLogInDocument returns true', async () => {
+      mockCanInsertLogInDocument.mockReturnValue(true);
+
+      const mockDocument = makeTextDocument(['// console.log("test");']);
+
+      const mockEditBuilder = createMockTextEditorEdit();
+
+      const mockEditor = makeTextEditor({
+        document: mockDocument,
+        selections: [],
+      });
+
+      mockEditor.edit = jest.fn().mockImplementation((cb) => {
+        cb(mockEditBuilder);
+        return Promise.resolve(true);
+      });
+
+      vscode.window.activeTextEditor = mockEditor;
+
+      mockDebugMessage.detectAll = jest.fn().mockReturnValue([]);
+
+      const command = uncommentAllLogMessagesCommand();
+
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+      });
+
+      expect(mockCanInsertLogInDocument).toHaveBeenCalled();
+      expect(mockDebugMessage.detectAll).toHaveBeenCalled();
     });
   });
 });

@@ -143,9 +143,15 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED]: {
         message:
-          '🎉 PHP support is coming to Turbo Console Log! Want a sneak peek?',
-        ctaText: 'Read More',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3100`,
+          '🎉 PHP support is now live in Turbo Console Log! Upgrade to Pro for intelligent PHP logging.',
+        ctaText: 'Get Pro',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+      [NotificationEvent.EXTENSION_PHP_PRO_ONLY]: {
+        message:
+          '💎 PHP logging is a Pro feature! Upgrade to use Turbo with PHP projects.',
+        ctaText: 'Get Pro',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
     };
 
