@@ -41,6 +41,7 @@ describe('traceExtensionVersionHistory', () => {
       reportFreemiumPanelCtaClick: jest.fn(),
       dispose: jest.fn(),
       reportNotificationInteraction: jest.fn(),
+      reportWebviewInteraction: jest.fn(),
     } as ReturnType<typeof createTelemetryService>);
   });
 
@@ -290,6 +291,7 @@ describe('traceExtensionVersionHistory', () => {
         reportFreemiumPanelCtaClick: jest.fn(),
         dispose: jest.fn(),
         reportNotificationInteraction: jest.fn(),
+        reportWebviewInteraction: jest.fn(),
       } as ReturnType<typeof createTelemetryService>);
 
       const consoleWarnSpy = jest

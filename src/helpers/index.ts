@@ -9,10 +9,14 @@ import { activateProMode } from './activateProMode';
 import { deactivateRepairMode } from './deactivateRepairMode';
 import { trackLogInsertions } from './trackLogInsertions';
 import { isProUser } from './isProUser';
+import { isPhpFile } from './isPhpFile';
+import { canInsertLogInDocument } from './canInsertLogInDocument';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
 import { checkPendingNotifications } from './checkPendingNotifications';
-import { detectPhpWorkspace } from './detectPhpWorkspace';
+import { listenToPhpFileOpenings } from './listenToPhpFileOpenings';
+import { loadPhpDebugMessage } from './loadPhpDebugMessage';
+import { showReleaseWebView } from './showReleaseWebView';
 export {
   readFromGlobalState,
   writeToGlobalState,
@@ -25,8 +29,12 @@ export {
   deactivateRepairMode,
   trackLogInsertions,
   isProUser,
+  isPhpFile,
+  canInsertLogInDocument,
   traceExtensionVersionHistory,
   isFreshInstall,
   checkPendingNotifications,
-  detectPhpWorkspace,
+  listenToPhpFileOpenings,
+  loadPhpDebugMessage,
+  showReleaseWebView,
 };

@@ -56,7 +56,7 @@ describe('updateProBundle', () => {
     );
     expect(showNotification).toHaveBeenCalledWith(
       expect.stringContaining(
-        "Pro Bundle Updated v3.0.0, don't forget to reload your window please!",
+        'Pro Bundle Updated v3.0.0, reload your window please!',
       ),
       10000,
     );

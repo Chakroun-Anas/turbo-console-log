@@ -2,6 +2,35 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.10.0] - 2025-11-17
+
+### 🚀 PHP Support
+
+Turbo Console Log now supports PHP files, bringing the same powerful debugging capabilities to your full-stack projects. PHP support is available as part of Turbo Pro, extending the logging experience you know from JavaScript and TypeScript to PHP development.
+
+#### New Features
+
+- **PHP Debugging Functions**: Full support for `var_dump()`, `print_r()`, and `error_log()` with dedicated keyboard shortcuts
+- **Custom Log Functions**: Configure your own PHP logging function via settings for personalized debugging workflows
+- **Unified Log Management**: Comment, uncomment, delete, and correct PHP logs using the same familiar commands
+- **Pro Panel Integration**: PHP logs appear alongside JavaScript and TypeScript in the centralized tree view
+- **Automatic Correction**: Pro's auto-correction keeps PHP log messages synchronized with your codebase
+
+#### PHP Keyboard Shortcuts
+
+- **var_dump()**: `⌘K ⌘L` (Mac) / `Ctrl+K Ctrl+L` (Windows/Linux)
+- **print_r()**: `⌘K ⌘N` (Mac) / `Ctrl+K Ctrl+N` (Windows/Linux)
+- **error_log()**: `⌘K ⌘B` or `⌘K ⌘E` (Mac) / `Ctrl+K Ctrl+B` or `Ctrl+K Ctrl+E` (Windows/Linux)
+- **Custom Log**: `⌘K ⌘K` (Mac) / `Ctrl+K Ctrl+K` (Windows/Linux)
+
+#### Enhanced Pro Experience
+
+- **Real-Time PHP Log Tracking**: The Pro panel displays all PHP logs with file paths and line numbers
+- **Cross-Language Debugging**: Switch seamlessly between JavaScript, TypeScript, and PHP logs in one unified view
+- **Selective Management**: Filter, hide, or batch-manage PHP logs directly from the tree panel
+
+👉 [Upgrade to Turbo Pro](https://www.turboconsolelog.io/pro) to unlock PHP support and supercharge your full-stack debugging workflow.
+
 ## [3.9.7] - 2025-11-12
 
 ### 🔧 Infrastructure & Quality Improvements

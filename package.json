@@ -1,8 +1,8 @@
 {
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
-  "description": "Insert, manage, and clean log messages automatically in JavaScript and TypeScript — with AST-powered precision and full support for console log or custom log functions.",
-  "version": "3.9.7",
+  "description": "Automated logging for JavaScript, TypeScript, and PHP. Insert, manage, and clean log messages with AST-powered precision.",
+  "version": "3.10.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.94.0"
@@ -16,18 +16,24 @@
   ],
   "keywords": [
     "console log",
-    "insert log",
     "debug",
     "javascript",
     "typescript",
+    "php",
     "debugging",
-    "log snippet",
+    "var_dump",
+    "print_r",
+    "error_log",
+    "log management",
     "productivity",
     "log panel",
     "developer tools",
-    "tool",
-    "log management",
-    "log manager"
+    "multi-language",
+    "laravel",
+    "wordpress",
+    "vue",
+    "nodejs",
+    "ast parser"
   ],
   "activationEvents": [
     "onStartupFinished",
@@ -419,6 +425,7 @@
     "acorn": "^8.15.0",
     "axios": "^1.9.0",
     "ignore": "^7.0.5",
-    "p-limit": "^6.2.0"
+    "p-limit": "^6.2.0",
+    "php-parser": "^3.2.5"
   }
 }

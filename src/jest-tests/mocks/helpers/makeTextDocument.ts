@@ -3,10 +3,12 @@ import { TextDocument, Range, Position, Uri } from 'vscode';
 export const makeTextDocument = (
   lines: string[],
   fileName: string = 'mockDocument.ts',
+  languageId: string = 'typescript',
 ): TextDocument =>
   ({
     fileName,
     uri: { fsPath: fileName } as Uri,
+    languageId,
     lineCount: lines.length,
     getText: (range?: Range) => {
       if (!range) return lines.join('\n');

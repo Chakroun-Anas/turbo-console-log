@@ -38,26 +38,4 @@ export function checkPendingNotifications(
     // Show the notification with version info
     showNotification(NotificationEvent.EXTENSION_TEN_INSERTS, version, context);
   }
-
-  // Check for pending PHP workspace notification
-  const hasPendingPhpWorkspaceNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
-  );
-
-  if (hasPendingPhpWorkspaceNotification) {
-    // Clear the pending flag
-    writeToGlobalState(
-      context,
-      GlobalStateKey.PENDING_PHP_WORKSPACE_NOTIFICATION,
-      false,
-    );
-
-    // Show the notification with version info
-    showNotification(
-      NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-      version,
-      context,
-    );
-  }
 }

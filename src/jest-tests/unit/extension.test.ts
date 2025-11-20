@@ -463,4 +463,22 @@ describe('activate - command registration', () => {
     expect(proUtilities.runProBundle).not.toHaveBeenCalled();
     expect(proUtilities.updateProBundle).not.toHaveBeenCalled();
   });
+
+  it('should call showReleaseWebView during activation', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.10.0' },
+    } as vscode.Extension<never>);
+
+    // Mock freemium state
+    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    await activate(fakeContext);
+
+    expect(helpers.showReleaseWebView).toHaveBeenCalledWith(fakeContext);
+  });
 });

@@ -1,7 +1,11 @@
 import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
-import { trackLogInsertions } from '../helpers';
+import {
+  trackLogInsertions,
+  canInsertLogInDocument,
+  loadPhpDebugMessage,
+} from '../helpers';
 
 export function insertConsoleInfoCommand(): Command {
   return {
@@ -14,6 +18,33 @@ export function insertConsoleInfoCommand(): Command {
       }
       const tabSize: number | string = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
+
+      // Get extension version
+      const version = vscode.extensions.getExtension(
+        'ChakrounAnas.turbo-console-log',
+      )?.packageJSON.version;
+
+      // Check if log insertion is allowed (PHP requires Pro)
+      const canInsert = canInsertLogInDocument(context, document, version);
+      if (!canInsert) {
+        return;
+      }
+
+      // For PHP files, load PHP debug message from Pro bundle
+      let activeDebugMessage = debugMessage;
+      let logType = 'info';
+
+      if (document.languageId === 'php') {
+        const phpDebugMessage = await loadPhpDebugMessage(context);
+        if (!phpDebugMessage) {
+          vscode.window.showErrorMessage(
+            'Failed to load PHP support from Pro bundle.',
+          );
+          return;
+        }
+        activeDebugMessage = phpDebugMessage;
+        logType = 'print_r';
+      }
       for (let index = 0; index < editor.selections.length; index++) {
         const selection: vscode.Selection = editor.selections[index];
         let wordUnderCursor = '';
@@ -28,14 +59,14 @@ export function insertConsoleInfoCommand(): Command {
         const lineOfSelectedVar: number = selection.active.line;
         if (selectedVar.trim().length !== 0) {
           await editor.edit((editBuilder) => {
-            debugMessage.msg(
+            activeDebugMessage.msg(
               editBuilder,
               document,
               selectedVar,
               lineOfSelectedVar,
               tabSize,
               extensionProperties,
-              'info',
+              logType,
             );
           });
         }

@@ -1,173 +1,143 @@
-# Turbo Console Log 🚀
+# Turbo Console Log
 
-[Official Website](https://www.turboconsolelog.io) 🎨  
-[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log) 📝
-
----
-
-## 💡 What is Turbo Console Log?
-
-**Turbo Console Log is the standard tool for automated logging in JavaScript and TypeScript.**
-
-It helps you insert, manage, and clean log statements across your code — whether you're using `console.log`, `debug`, `warn`, `table`, or even a fully custom logging function.
-
-Powered by a full **AST engine**, Turbo understands your code structure and adds logs precisely where they belong — making debugging faster, smarter, and less repetitive.
-
-Used by nearly **2 million developers**, Turbo removes friction from your dev flow and keeps your codebase clean.
+**[Official Website](https://www.turboconsolelog.io)**  
+**[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)**
 
 ---
 
-## 🚀 Features at a Glance
+## What is Turbo Console Log?
 
-✔️ **Insert Meaningful Log Messages** – Quickly generate console logs with helpful context  
-✔️ **Comment, Uncomment, or Delete Logs** – Manage logs with a simple shortcut  
-✔️ **Multi-Cursor Support** – Debug multiple variables simultaneously  
-✔️ **Customizable Log Format** – Personalize how logs appear in your code  
-✔️ **7 Console Methods** – Dedicated commands for log, info, debug, warn, error, table, and custom  
-✔️ **Individual Keyboard Shortcuts** – Each console method has its own ⌘K combination
+**Turbo Console Log automates the tedious parts of debugging in JavaScript and TypeScript.** With the Pro bundle, PHP support is now available, bringing intelligent logging to multiple languages in VS Code.
 
-### 🔥 Pro Features
+It helps you insert, manage, and clean log statements across your code, whether you're using `console.log`, `console.error`, `console.warn`, and more in JavaScript, or `var_dump`, `print_r`, `error_log` in PHP, or even a fully custom logging function.
 
-✔️ **Native TreeView Panel** – Visual log panel integrated into VS Code  
-✔️ **Real-Time Sync** – Workspace logs updated automatically  
-✔️ **Color-Coded Console Methods** – Instant visual recognition (🟦 log, 🟩 info, 🟪 debug, 🟨 warn, 🟥 error, 📊 table)  
-✔️ **Contextual Actions** – Right-click to comment, delete, or correct logs from the tree  
-✔️ **Smart Auto-Correction** – Line numbers and file names stay accurate after refactoring  
-✔️ **Vue/Svelte/Astro Support** – Full support for modern frontend frameworks
-
-📖 **Full Documentation**: [Turbo Console Log Docs](https://www.turboconsolelog.io/documentation)
+Powered by a full AST engine, Turbo understands your code structure and adds logs precisely where they belong, making debugging faster and less repetitive. No more manually typing variable names or hunting down scattered console statements.
 
 ---
 
-## 🔧 Configuration & Customization
+## Features at a Glance
 
-Want to customize your logs? Turbo Console Log allows you to adjust:
+- **Insert Meaningful Log Messages** – Quickly generate logs with helpful context for JavaScript, TypeScript, and PHP
+- **Comment, Uncomment, or Delete Logs** – Manage logs across your entire codebase with simple shortcuts
+- **Multi-Cursor Support** – Debug multiple variables simultaneously
+- **Customizable Log Format** – Personalize how logs appear in your code
+- **Several Console Methods** – Dedicated commands for different logging levels and custom functions
+- **Individual Keyboard Shortcuts** – Each logging method has its own ⌘K combination
 
-✅ Prefixes & Suffixes  
-✅ Release Notification Timing (Morning, Afternoon, Evening, Night)  
-✅ Quote Type (`'`, `"`, or ``)  
-✅ Filename & Line Number Inclusion
+### Pro Features
 
-📖 **Explore Settings**: [Settings Documentation](https://www.turboconsolelog.io/documentation/settings/custom-prefix)
+- **PHP Support** – Full logging capabilities for PHP alongside JavaScript and TypeScript
+- **Native TreeView Panel** – Visual log panel with real-time sync
+- **Hide Logs** – Temporarily mute logs by pattern, file, or folder
+- **Auto-Correction** – Automatically fix line numbers and file names after refactoring
 
----
-
-## 🚀 What's New in v3.8.0? – Hide Logs + Major Performance Boost
-
-**The most requested feature has arrived!** This release introduces **Hide Logs** for Pro users and a complete engine upgrade that makes Turbo **96% lighter and 89% faster**.
-
-### 🎭 New Pro Feature: Hide Logs
-
-Managing dozens of log statements becomes overwhelming fast. The new **Hide Logs** feature lets you temporarily mute specific entries—by pattern, file, or one-click—without deleting them:
-
-- **Hide file logs**: Hide all logs in specific files
-- **Hide folder logs**: Hide all logs in a specific folder
-- **Toggle visibility**: Reveal all hidden logs with a single action
-
-Hide everything that's not relevant to your current task, then reveal it all with a single toggle. Your debugging panel stays clean; your workflow stays focused.
-
-### 🧠 Major Engine Upgrade: TypeScript AST → Acorn AST
-
-We've completely rebuilt the parsing engine, swapping the heavy TypeScript compiler layer for the lightweight Acorn parser. You get the same AST-powered precision with a leaner, faster engine:
-
-#### � Performance Improvements
-
-- **96% Smaller Package:** 2.6MB → ~108KB
-- **~85% Smaller Bundle:** 3.7MB → ~560KB
-- **~89% Faster Activation:** 860ms → ~96ms
-
-Your extension now loads almost instantly with a dramatically smaller footprint.
-
-#### 🛠️ Enhanced Parsing Patterns
-
-The migration to Acorn fixed several edge-case parsing patterns. Log insertion now works correctly in complex real-world code:
-
-✅ **Variables within return statements** – Correct placement for callback parameters and inline expressions  
-✅ **JSX and React patterns** – Full support for hooks, fragments, and conditional rendering  
-✅ **Computed property destructuring** – Dynamic `[id]` syntax handling  
-✅ **Multi-line object literals** – Complex objects with type annotations and deep nesting  
-✅ **Binary expressions with optional chaining** – Proper `!==` with `?.` operator parsing  
-✅ **Async destructuring assignments** – Multi-line destructuring from async calls  
-✅ **Nested default parameters** – Arrow functions with complex parameter lists  
-✅ **Class method decorators** – NestJS and Angular pattern support
-
-### 📌 Temporary Limitation
-
-Vue 3 Composition API in separate `.js`/`.ts` files is fully supported. However, Single-File Components (`.vue` with `<script>` blocks) aren't parsed yet. Workaround: isolate your `<script>` logic in a standalone file while we add first-class SFC support. [Track progress here](https://github.com/Chakroun-Anas/turbo-console-log/issues/292).
-
-### 🔮 What's Next: v3.9.0
-
-The next iteration focuses on broader AST engine strengthening—refining edge-case handling, improving parsing resilience, and expanding framework coverage. Vue Single-File Component support is part of this roadmap.
-
-👉 [Read the Full v3.8.0 Release Article](https://www.turboconsolelog.io/articles/release-380)  
-👉 [Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)  
-👉 [Subscribe to Newsletter](https://www.turboconsolelog.io/join)
+**Full Documentation**: **[Turbo Console Log Docs](https://www.turboconsolelog.io/documentation)**
 
 ---
 
-## 💼 Upgrade to Turbo Pro — One-Time Payment, Lifetime Access
+## Configuration & Customization
 
-Want more power, more control, and a smoother workflow?
+Turbo Console Log allows you to customize:
 
-**Turbo Pro** gives you a native side panel, real-time log synchronization, and smart log actions — all built on top of the new AST engine.
+- **Log Message Format** - Custom prefixes, suffixes, and delimiters
+- **Quote Style** - Choose between single quotes, double quotes, or backticks
+- **Context Information** - Include/exclude filename, line numbers, enclosing class, and function names
+- **Spacing & Formatting** - Add empty lines before/after logs, wrap messages, add semicolons
+- **Custom Log Functions** - Use your own logging function instead of console methods
 
-### 🔥 Pro Features at a Glance
-
-- 🧭 **Native Log Panel:** Explore all logs in your current folder/workspace via VSCode Tree View
-- 🔁 **Real-Time Sync:** Log updates appear instantly in the panel
-- 🧠 **Contextual File Actions:** Right-click to comment, delete, or correct logs directly from the tree
-- 🧹 **Auto-Correction:** Automatically fix line numbers and file names after log movements
-- 🚀 **Fast & Lightweight:** Fully native to VS Code, no external dependencies
-
-👉 [Get Turbo Pro — Lifetime License](https://www.turboconsolelog.io/pro)
+**Explore Settings**: **[Settings Documentation](https://www.turboconsolelog.io/documentation/settings/custom-prefix)**
 
 ---
 
-## ✉️ Stay in the Loop – Join the Newsletter
+## Upgrade to Turbo Pro
 
-🚀 **Get early access to new features, exclusive updates, and behind-the-scenes insights!**  
-Be the first to know about **Turbo Console Log improvements, releases, and launch news**.
+Turbo Pro unlocks the full potential of intelligent logging with advanced features designed for professional developers.
 
-📩 **Join the newsletter** → [https://www.turboconsolelog.io/join](https://www.turboconsolelog.io/join)
+### Pro Features at a Glance
 
----
+- **PHP Support** – Full logging capabilities for PHP alongside JavaScript and TypeScript
+- **Native Log Panel** – Explore all logs in your current folder/workspace via VSCode Tree View
+- **Real-Time Sync** – Log updates appear instantly in the panel
+- **Color-Coded Methods** – Instant visual recognition by method type
+- **Contextual Actions** – Right-click to comment, delete, or correct logs directly from the tree
+- **Auto-Correction** – Automatically fix line numbers and file names after log movements
+- **Hide Logs** – Temporarily mute specific logs by pattern, file, or folder
 
-## 💙 Support Turbo Console Log
+**One-time payment. Lifetime access. No subscriptions.**
 
-Turbo Console Log is **free & open-source**, maintained with passion by developers like you.
-
-If you’ve found value in it, you can help keep it growing:
-
-🔗 **[Visit the Sponsorship Page](https://www.turboconsolelog.io/sponsorship)**
-
-Your support fuels **bug fixes, improvements, and new features**, ensuring Turbo Console Log continues evolving for **millions of developers—including YOU!**
-
-Whether you contribute or not, we’re happy to have you as part of this journey. 🚀
+**[Get Turbo Pro](https://www.turboconsolelog.io/pro)**
 
 ---
 
-## 📧 Contact
+## What's New in v3.10.0 – PHP Support is Here!
 
-📩 **Support:** [support@turboconsolelog.io](mailto:support@turboconsolelog.io)  
-📩 **Feedback:** [feedback@turboconsolelog.io](mailto:feedback@turboconsolelog.io)  
-📩 **Sponsorship:** [sponsorship@turboconsolelog.io](mailto:sponsorship@turboconsolelog.io)
+<p align="center">
+  <img src="https://www.turboconsolelog.io/assets/turbo-pro-php-illustration.png" alt="Turbo Console Log PHP Support" width="400">
+</p>
+
+**Turbo Console Log is expanding beyond JavaScript.** For the first time, Pro users can now use the same intelligent logging workflow in PHP projects.
+
+This release brings full AST-powered logging to PHP, with the same precision and context awareness you're used to in JavaScript and TypeScript. Whether you're working on Laravel applications, WordPress plugins, or standalone PHP projects, Turbo now understands your code structure and inserts logs exactly where they belong.
+
+### PHP Support Features
+
+- **Smart Variable Detection** – Automatically captures variable names and context
+- **Multiple Logging Methods** – Support for `var_dump`, `print_r`, and `error_log`
+- **AST-Powered Placement** – Logs appear in the right place, even in complex code structures
+- **Unified Workflow** – Same keyboard shortcuts and commands you already know
+- **Full TreeView Integration** – PHP logs appear alongside JavaScript logs in the native panel
+
+### Why PHP?
+
+With millions of PHP developers worldwide and countless legacy and modern PHP projects in active development, bringing intelligent logging to PHP was a natural next step. More languages are on the roadmap.
+
+**[Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)** | **[Subscribe to Newsletter](https://www.turboconsolelog.io/join)**
 
 ---
 
-## 🎯 Contribute
+## Stay in the Loop – Join the Newsletter
 
-Turbo Console Log is **open for contributions!**  
+**Get early access to new features, exclusive updates, and behind-the-scenes insights!**  
+Be the first to know about Turbo Console Log improvements, releases, and launch news.
+
+**Join the newsletter** → **[https://www.turboconsolelog.io/join](https://www.turboconsolelog.io/join)**
+
+---
+
+## Support Turbo Console Log
+
+Turbo Console Log is free and open-source, built and maintained by developers who care about making debugging better for everyone.
+
+If this tool has saved you time and frustration, consider supporting its continued development:
+
+**[Visit the Sponsorship Page](https://www.turboconsolelog.io/sponsorship)**
+
+Your support helps fund bug fixes, new features, and ongoing maintenance. It keeps the project alive and growing for the community that depends on it.
+
+---
+
+## Contact
+
+**Support:** **[support@turboconsolelog.io](mailto:support@turboconsolelog.io)**  
+**Feedback:** **[feedback@turboconsolelog.io](mailto:feedback@turboconsolelog.io)**  
+**Sponsorship:** **[sponsorship@turboconsolelog.io](mailto:sponsorship@turboconsolelog.io)**
+
+---
+
+## Contribute
+
+Turbo Console Log is open for contributions!  
 Want to improve it? Report issues, suggest features, or submit pull requests:
 
-👉 **[Contribute on GitHub](https://github.com/Chakroun-Anas/turbo-console-log)**
+**[Contribute on GitHub](https://github.com/Chakroun-Anas/turbo-console-log)**
 
 ---
 
-## 📜 License
+## License
 
 The Turbo Console Log repository is released under the **Turbo Unicorn Custom License**.  
 It allows free personal and non-commercial use of the open-source core.
 
 Commercial use, redistribution, and use of the brand, logo, or Turbo Pro features are strictly protected.
 
-See the full [LICENSE](./LICENSE.txt) for details.
+See the full **[LICENSE](./LICENSE.txt)** for details.

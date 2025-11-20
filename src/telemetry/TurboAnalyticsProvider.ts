@@ -54,6 +54,16 @@ export interface TurboAnalyticsProvider {
   ): Promise<void>;
 
   /**
+   * Reports webview interactions (shown, clicked) for A/B testing with Thompson Sampling
+   * Only sends data if both VS Code telemetry and custom telemetry are enabled
+   */
+  reportWebviewInteraction(
+    version: string,
+    variant: string,
+    interactionType: 'shown' | 'clicked',
+  ): Promise<void>;
+
+  /**
    * Dispose of any resources and event listeners
    * Should be called when the extension is deactivated
    */
