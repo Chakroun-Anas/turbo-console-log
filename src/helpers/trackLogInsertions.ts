@@ -41,14 +41,15 @@ export async function trackLogInsertions(
   );
 
   if (!hasShownTenInsertsMilestoneNotification && commandUsageCount === 10) {
-    // Schedule notification for next activation (v3.9.5+)
-    // Instead of showing immediately, set a flag to show on next extension activation
-    // Note: We mark as "shown" in checkPendingNotifications when actually displayed
+    // Mark that notification has been shown
     writeToGlobalState(
       context,
-      GlobalStateKey.PENDING_TEN_INSERTS_NOTIFICATION,
+      GlobalStateKey.HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION,
       true,
     );
+
+    // Show ten inserts milestone notification (non-blocking) with version info
+    showNotification(NotificationEvent.EXTENSION_TEN_INSERTS, version, context);
   }
 
   // Check if user has reached the 50 inserts milestone

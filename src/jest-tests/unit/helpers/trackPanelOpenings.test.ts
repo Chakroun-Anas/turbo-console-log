@@ -287,7 +287,7 @@ describe('trackPanelOpenings', () => {
       expect(mockShowNotification).not.toHaveBeenCalled();
     });
 
-    it('should not show notification at 15 openings', () => {
+    it('should show notification at 15 openings', () => {
       mockReadFromGlobalState.mockImplementation((ctx, key) => {
         if (key === GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER) {
           return false;
@@ -300,7 +300,7 @@ describe('trackPanelOpenings', () => {
 
       trackPanelOpenings(context);
 
-      expect(mockShowNotification).not.toHaveBeenCalled();
+      expect(mockShowNotification).toHaveBeenCalled();
     });
 
     it('should pass context to showNotification', () => {
@@ -440,8 +440,8 @@ describe('trackPanelOpenings', () => {
         trackPanelOpenings(context);
       }
 
-      // Notification should be shown at 10th opening
-      expect(mockShowNotification).toHaveBeenCalledTimes(1);
+      // Notifications should be shown at 5th and 10th opening
+      expect(mockShowNotification).toHaveBeenCalledTimes(2);
 
       // User subscribes (sets flag to true)
       // Further openings should not show notification
@@ -454,11 +454,11 @@ describe('trackPanelOpenings', () => {
 
       trackPanelOpenings(context);
 
-      // Still only 1 notification shown
-      expect(mockShowNotification).toHaveBeenCalledTimes(1);
+      // Still only 2 notifications shown (before subscribing)
+      expect(mockShowNotification).toHaveBeenCalledTimes(2);
     });
 
-    it('should continue showing notifications every 10 opens if user has not subscribed', () => {
+    it('should continue showing notifications every 5 opens if user has not subscribed', () => {
       const notifications: number[] = [];
 
       for (let i = 0; i < 35; i++) {
@@ -479,9 +479,9 @@ describe('trackPanelOpenings', () => {
         }
       }
 
-      // Should show notifications at 10, 20, 30
-      expect(notifications).toEqual([10, 20, 30]);
-      expect(mockShowNotification).toHaveBeenCalledTimes(3);
+      // Should show notifications at 5, 10, 15, 20, 25, 30, 35
+      expect(notifications).toEqual([5, 10, 15, 20, 25, 30, 35]);
+      expect(mockShowNotification).toHaveBeenCalledTimes(7);
     });
   });
 });

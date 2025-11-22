@@ -464,7 +464,7 @@ describe('activate - command registration', () => {
     expect(proUtilities.updateProBundle).not.toHaveBeenCalled();
   });
 
-  it('should call showReleaseWebView during activation', async () => {
+  it('should call listenToPhpFileOpenings during activation', async () => {
     const fakeContext = {
       subscriptions: [],
     } as unknown as vscode.ExtensionContext;
@@ -479,6 +479,6 @@ describe('activate - command registration', () => {
 
     await activate(fakeContext);
 
-    expect(helpers.showReleaseWebView).toHaveBeenCalledWith(fakeContext);
+    expect(helpers.listenToPhpFileOpenings).toHaveBeenCalledWith(fakeContext);
   });
 });
