@@ -6,7 +6,8 @@ import { NotificationEvent } from '../notifications/NotificationEvent';
 
 /**
  * Tracks panel opening usage
- * Shows frequent panel access notification every 5 openings starting at 5
+ * Shows frequent panel access notification at 5, 15, and 25 openings
+ * Stops showing notifications after reaching 25 (milestone achieved)
  * @param context VS Code extension context
  */
 export function trackPanelOpenings(context: vscode.ExtensionContext): void {
@@ -26,6 +27,18 @@ export function trackPanelOpenings(context: vscode.ExtensionContext): void {
     return;
   }
 
+  // Check if user has reached 25 panel openings milestone
+  const hasShownTwentyFivePanelOpeningsNotification =
+    readFromGlobalState<boolean>(
+      context,
+      GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION,
+    );
+
+  // Skip notification if user has already reached the 25 openings milestone
+  if (hasShownTwentyFivePanelOpeningsNotification) {
+    return;
+  }
+
   // Increment panel opening count
   let panelOpeningCount =
     readFromGlobalState<number>(context, GlobalStateKey.PANEL_OPENING_COUNT) ||
@@ -37,8 +50,21 @@ export function trackPanelOpenings(context: vscode.ExtensionContext): void {
     panelOpeningCount,
   );
 
-  // Show notification every 5 openings (5, 10, 15, 20, etc.)
-  if (panelOpeningCount >= 5 && panelOpeningCount % 5 === 0) {
+  // Show notification at 5, 15, and 25 openings
+  if (
+    panelOpeningCount === 5 ||
+    panelOpeningCount === 15 ||
+    panelOpeningCount === 25
+  ) {
+    // Mark milestone as reached if at 25 openings
+    if (panelOpeningCount === 25) {
+      writeToGlobalState(
+        context,
+        GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION,
+        true,
+      );
+    }
+
     // Show frequent panel access notification (non-blocking) with version info
     showNotification(
       NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,

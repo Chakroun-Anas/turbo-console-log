@@ -1,7 +1,11 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Command, Message } from '../entities';
-import { loadPhpDebugMessage, canInsertLogInDocument } from '../helpers';
+import {
+  loadPhpDebugMessage,
+  canInsertLogInDocument,
+  trackLogManagementCommands,
+} from '../helpers';
 
 export function deleteAllLogMessagesCommand(): Command {
   return {
@@ -90,6 +94,8 @@ export function deleteAllLogMessagesCommand(): Command {
         .then(async (applied) => {
           if (applied) {
             await document.save();
+            // Track log management command usage
+            trackLogManagementCommands(context);
           }
         });
     },
