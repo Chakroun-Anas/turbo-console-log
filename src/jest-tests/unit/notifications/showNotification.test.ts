@@ -214,14 +214,14 @@ describe('showNotification', () => {
       );
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        "Welcome to Turbo Console Log! Let's boost your debugging speed 🚀",
-        'Motivation',
+        '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        'Get Started',
         'Maybe Later',
       );
     });
 
     it('should track fallback notification click and open motivation page', async () => {
-      mockShowInformationMessage.mockResolvedValue('Motivation');
+      mockShowInformationMessage.mockResolvedValue('Get Started');
 
       await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
 
@@ -272,7 +272,7 @@ describe('showNotification', () => {
     });
 
     it('should include event and variant query parameters in fallback URL', async () => {
-      mockShowInformationMessage.mockResolvedValue('Motivation');
+      mockShowInformationMessage.mockResolvedValue('Get Started');
 
       await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
 
@@ -324,8 +324,8 @@ describe('showNotification', () => {
       );
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        "Welcome to Turbo Console Log! Let's boost your debugging speed 🚀",
-        'Motivation',
+        '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        'Get Started',
         'Maybe Later',
       );
     });
@@ -343,8 +343,8 @@ describe('showNotification', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalled();
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        "Welcome to Turbo Console Log! Let's boost your debugging speed 🚀",
-        'Motivation',
+        '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        'Get Started',
         'Maybe Later',
       );
     });
@@ -356,8 +356,8 @@ describe('showNotification', () => {
       await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        "Welcome to Turbo Console Log! Let's boost your debugging speed 🚀",
-        'Motivation',
+        '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        'Get Started',
         'Maybe Later',
       );
     });
@@ -528,7 +528,7 @@ describe('showNotification', () => {
 
     it('should handle telemetry failures in fallback flow', async () => {
       mockFetch.mockRejectedValue(new Error('API error'));
-      mockShowInformationMessage.mockResolvedValue('Motivation');
+      mockShowInformationMessage.mockResolvedValue('Get Started');
       mockTelemetryService.reportNotificationInteraction.mockRejectedValue(
         new Error('Telemetry service unavailable'),
       );
@@ -732,8 +732,8 @@ describe('showNotification', () => {
         );
 
         expect(mockShowInformationMessage).toHaveBeenCalledWith(
-          '🎯 You love the panel! Join our newsletter for exclusive tips and updates.',
-          'Subscribe',
+          '\ud83d\udc8e Like the panel? Turbo PRO adds smarter log detection, faster navigation and cleanup tools.',
+          'Take a look',
           'I already did',
           'Maybe Later',
         );
@@ -787,7 +787,7 @@ describe('showNotification', () => {
       });
 
       it('should open fallback CTA URL with correct parameters', async () => {
-        mockShowInformationMessage.mockResolvedValue('Subscribe');
+        mockShowInformationMessage.mockResolvedValue('Take a look');
 
         const mockContext = {
           subscriptions: [],
@@ -804,7 +804,7 @@ describe('showNotification', () => {
         );
 
         expect(mockOpenExternal).toHaveBeenCalledWith(
-          'https://www.turboconsolelog.io/join?event=extensionPanelFrequentAccess&variant=fallback',
+          'https://www.turboconsolelog.io/pro?event=extensionPanelFrequentAccess&variant=fallback',
         );
       });
     });

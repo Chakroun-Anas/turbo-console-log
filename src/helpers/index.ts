@@ -8,6 +8,7 @@ import { activateRepairMode } from './activateRepairMode';
 import { activateProMode } from './activateProMode';
 import { deactivateRepairMode } from './deactivateRepairMode';
 import { trackLogInsertions } from './trackLogInsertions';
+import { trackLogManagementCommands } from './trackLogManagementCommands';
 import { isProUser } from './isProUser';
 import { isPhpFile } from './isPhpFile';
 import { canInsertLogInDocument } from './canInsertLogInDocument';
@@ -28,6 +29,7 @@ export {
   activateRepairMode,
   deactivateRepairMode,
   trackLogInsertions,
+  trackLogManagementCommands,
   isProUser,
   isPhpFile,
   canInsertLogInDocument,

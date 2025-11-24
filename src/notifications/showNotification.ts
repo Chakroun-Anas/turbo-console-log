@@ -118,39 +118,44 @@ export async function showNotification(
       { message: string; ctaText: string; ctaUrl: string }
     > = {
       [NotificationEvent.EXTENSION_FRESH_INSTALL]: {
-        message:
-          "Welcome to Turbo Console Log! Let's boost your debugging speed 🚀",
-        ctaText: 'Motivation',
+        message: '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        ctaText: 'Get Started',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/overview/motivation`,
       },
       [NotificationEvent.EXTENSION_TEN_INSERTS]: {
         message:
-          '🎓 10 logs already! Did you know you can comment or delete them all at once?',
-        ctaText: 'Learn How',
+          '⚡ 10 logs and counting! Want to learn more powerful Turbo commands?',
+        ctaText: 'Discover Features',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/comment-inserted-log-messages`,
       },
       [NotificationEvent.EXTENSION_FIFTY_INSERTS]: {
         message:
-          "🎉 50 Turbo logs inserted! You're on fire! Unlock Pro features to boost productivity 🚀",
-        ctaText: 'See Pro Benefits',
+          '💪 50 logs! Most users unlock the central log panel at this point. Curious why?',
+        ctaText: 'Show Me',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
       [NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS]: {
         message:
-          '🎯 You love the panel! Join our newsletter for exclusive tips and updates.',
-        ctaText: 'Subscribe',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/join`,
+          '💎 Like the panel? Turbo PRO adds smarter log detection, faster navigation and cleanup tools.',
+        ctaText: 'Take a look',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
       [NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED]: {
         message:
-          '🎉 PHP support is now live in Turbo Console Log! Upgrade to Pro for intelligent PHP logging.',
-        ctaText: 'Get Pro',
+          '🚀 Debug PHP with the speed you love! Turbo Pro now supports PHP logging.',
+        ctaText: 'Upgrade Now',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
       [NotificationEvent.EXTENSION_PHP_PRO_ONLY]: {
         message:
-          '💎 PHP logging is a Pro feature! Upgrade to use Turbo with PHP projects.',
-        ctaText: 'Get Pro',
+          '💡 Want to debug PHP with Turbo? This feature is available in Pro.',
+        ctaText: 'Upgrade Now',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+      [NotificationEvent.EXTENSION_FIVE_LOG_MANAGEMENT_COMMANDS]: {
+        message:
+          '🔥 Managing logs manually? Turbo PRO lets you clean them in bulk directly from the panel.',
+        ctaText: 'See It In Action',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
     };
