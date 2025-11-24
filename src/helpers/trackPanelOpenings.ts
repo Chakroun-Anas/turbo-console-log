@@ -6,7 +6,7 @@ import { NotificationEvent } from '../notifications/NotificationEvent';
 
 /**
  * Tracks panel opening usage
- * Shows frequent panel access notification every 10 openings starting at 10
+ * Shows frequent panel access notification every 5 openings starting at 5
  * @param context VS Code extension context
  */
 export function trackPanelOpenings(context: vscode.ExtensionContext): void {
@@ -37,8 +37,8 @@ export function trackPanelOpenings(context: vscode.ExtensionContext): void {
     panelOpeningCount,
   );
 
-  // Show notification every 10 openings (10, 20, 30, etc.)
-  if (panelOpeningCount >= 10 && panelOpeningCount % 10 === 0) {
+  // Show notification every 5 openings (5, 10, 15, 20, etc.)
+  if (panelOpeningCount >= 5 && panelOpeningCount % 5 === 0) {
     // Show frequent panel access notification (non-blocking) with version info
     showNotification(
       NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,

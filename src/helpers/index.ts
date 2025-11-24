@@ -13,7 +13,7 @@ import { isPhpFile } from './isPhpFile';
 import { canInsertLogInDocument } from './canInsertLogInDocument';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
-import { checkPendingNotifications } from './checkPendingNotifications';
+
 import { listenToPhpFileOpenings } from './listenToPhpFileOpenings';
 import { loadPhpDebugMessage } from './loadPhpDebugMessage';
 import { showReleaseWebView } from './showReleaseWebView';
@@ -33,7 +33,6 @@ export {
   canInsertLogInDocument,
   traceExtensionVersionHistory,
   isFreshInstall,
-  checkPendingNotifications,
   listenToPhpFileOpenings,
   loadPhpDebugMessage,
   showReleaseWebView,

@@ -8,9 +8,7 @@ import {
   activateRepairMode,
   activateFreemiumLauncherMode,
   traceExtensionVersionHistory,
-  checkPendingNotifications,
   listenToPhpFileOpenings,
-  showReleaseWebView,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -75,12 +73,6 @@ export async function activate(
   // Trace version history and handle fresh install welcome
   // (creates or updates version array in global state + shows welcome for new users)
   traceExtensionVersionHistory(context, version);
-
-  // Check for any pending notifications scheduled for this activation
-  checkPendingNotifications(context, version);
-
-  // Show v3.10.0 release webview on first activation after update
-  showReleaseWebView(context);
 
   // Listen to PHP file openings and show announcement immediately (v3.10.0 strategy)
   listenToPhpFileOpenings(context);
