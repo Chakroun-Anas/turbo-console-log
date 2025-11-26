@@ -158,6 +158,12 @@ export async function showNotification(
         ctaText: 'See It In Action',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
+      [NotificationEvent.EXTENSION_BULK_DELETE_PRE_LAUNCH]: {
+        message:
+          '🔥 Workspace-wide Log Cleanup! Select which log functions to remove and obliterate them workspace-wide.',
+        ctaText: "See What's Coming",
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
     };
 
     const fallback = fallbackMessages[notificationEvent];

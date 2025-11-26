@@ -34,13 +34,37 @@ export async function trackLogInsertions(
     return;
   }
 
+  // Check for bulk delete pre-launch notification (show to free users only, once)
+  const hasShownBulkDeletePreLaunchNotification = readFromGlobalState<boolean>(
+    context,
+    GlobalStateKey.HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION,
+  );
+
+  if (!hasShownBulkDeletePreLaunchNotification && commandUsageCount >= 1) {
+    // Mark that notification has been shown
+    writeToGlobalState(
+      context,
+      GlobalStateKey.HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION,
+      true,
+    );
+
+    // Show bulk delete pre-launch notification (non-blocking) with version info
+    showNotification(
+      NotificationEvent.EXTENSION_BULK_DELETE_PRE_LAUNCH,
+      version,
+      context,
+    );
+    // Return early to avoid showing multiple notifications at once
+    return;
+  }
+
   // Check if user has reached the 10 inserts milestone (educational)
   const hasShownTenInsertsMilestoneNotification = readFromGlobalState<boolean>(
     context,
     GlobalStateKey.HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION,
   );
 
-  if (!hasShownTenInsertsMilestoneNotification && commandUsageCount === 10) {
+  if (!hasShownTenInsertsMilestoneNotification && commandUsageCount >= 10) {
     // Mark that notification has been shown
     writeToGlobalState(
       context,
@@ -59,7 +83,7 @@ export async function trackLogInsertions(
       GlobalStateKey.HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION,
     );
 
-  if (!hasShownFiftyInsertsMilestoneNotification && commandUsageCount === 50) {
+  if (!hasShownFiftyInsertsMilestoneNotification && commandUsageCount >= 50) {
     // Mark that notification has been shown
     writeToGlobalState(
       context,

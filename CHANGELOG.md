@@ -2,6 +2,30 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.10.3] - 2025-11-26
+
+### 🔥 Coming Monday: Workspace-wide Log Cleanup
+
+**Releases December 1st, 2025** - Delete logs 100x faster with the new **Workspace-wide Log Cleanup** feature! Select which log functions to remove (`console.log`, `console.warn`, `console.error`, or all) and obliterate them across your entire workspace in seconds.
+
+#### What's Coming
+
+- **Selective Log Deletion**: Choose specific log types to remove or clean them all at once
+- **Workspace-wide Scope**: Process all files in your project with one click
+- **Total Control**: Precision targeting of log statements by type
+- **Lightning Fast**: Delete hundreds of logs in seconds instead of manually hunting them down
+
+#### How It Will Work
+
+1. Open the Turbo Pro panel
+2. Click "Delete Logs by Type"
+3. Select which log functions to remove
+4. Watch as logs disappear across your entire workspace
+
+This feature will be included in your Turbo Pro license at no extra charge.
+
+👉 [Watch the demo and learn more](https://www.turboconsolelog.io/pro) - Available Monday, December 1st, 2025!
+
 ## [3.10.2] - 2025-11-24
 
 ### 🔧 Infrastructure & Quality Improvements
