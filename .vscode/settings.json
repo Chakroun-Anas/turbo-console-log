@@ -13,5 +13,6 @@
     },
     "workbench.editor.enablePreviewFromQuickOpen": true,
     "workbench.editor.highlightModifiedTabs": true,
-    "workbench.editor.limit.perEditorGroup": true
+    "workbench.editor.limit.perEditorGroup": true,
+    "workbench.editor.wrapTabs": true
 }
