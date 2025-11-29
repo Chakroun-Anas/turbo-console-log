@@ -24,6 +24,7 @@ export function contentByType(
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     };
   }
 
@@ -63,5 +64,6 @@ export function contentByType(
     surveyHtml: '', // No longer separated - included in topContentHtml
     tableHtml: '', // No longer separated - included in topContentHtml
     mediaShowcaseCTAHtml: '', // No longer separated - included in topContentHtml
+    videoHtml: '', // No longer separated - included in topContentHtml
   };
 }

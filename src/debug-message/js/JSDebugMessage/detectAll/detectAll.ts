@@ -12,15 +12,13 @@ function escapeRegex(str: string): string {
 
 /**
  * Fast detection using pure regex on source code without opening document or parsing AST.
- * Only returns true if potential Turbo logs are found.
+ * Returns true if ANY log function calls are found (both Turbo and regular logs).
  * This is Stage 1 - used internally for quick filtering before expensive operations.
  * @internal
  */
-function hasTurboLogs(
+function hasLogs(
   sourceCode: string,
   customLogFunction: ExtensionProperties['logFunction'],
-  logMessagePrefix: ExtensionProperties['logMessagePrefix'],
-  delimiterInsideMessage: ExtensionProperties['delimiterInsideMessage'],
 ): boolean {
   const knownLogFunctions = [
     'console.log',
@@ -32,27 +30,26 @@ function hasTurboLogs(
     customLogFunction,
   ];
 
-  // Build regex pattern to match any log function call
+  // Build regex pattern to match any log function call (active or commented)
   const logFunctionPattern = knownLogFunctions
     .map((fn) => escapeRegex(fn))
     .join('|');
 
-  // Match both active and commented logs that contain prefix and delimiter
-  // Matches: console.log(...) or // console.log(...)
-  const turboLogPattern = new RegExp(
-    `(?://\\s*)?(${logFunctionPattern})\\s*\\([^)]*${logMessagePrefix}[^)]*${delimiterInsideMessage}[^)]*\\)`,
+  // Match both active and commented logs: console.log(...) or // console.log(...)
+  const logPattern = new RegExp(
+    `(?://\\s*)?(${logFunctionPattern})\\s*\\(`,
     'g',
   );
 
-  return turboLogPattern.test(sourceCode);
+  return logPattern.test(sourceCode);
 }
 
 /**
- * Detects all Turbo-inserted log messages from a file.
+ * Detects all log messages from a file (both Turbo-inserted and regular logs).
  * Uses two-stage optimization:
  * 1. Fast regex prefilter on raw file content (fs.readFile - cheap)
  * 2. Opens VS Code document ONLY if logs are found (expensive operation)
- * This avoids expensive openTextDocument calls for files without logs.
+ * Marks each log message with isTurboConsoleLog flag to distinguish Turbo logs from regular ones.
  */
 export async function detectAll(
   fs: typeof import('fs'),
@@ -66,14 +63,7 @@ export async function detectAll(
     // Stage 1: Fast prefilter - read raw file content with fs (cheap)
     const sourceCode = await fs.promises.readFile(filePath, 'utf8');
 
-    if (
-      !hasTurboLogs(
-        sourceCode,
-        customLogFunction,
-        logMessagePrefix,
-        delimiterInsideMessage,
-      )
-    ) {
+    if (!hasLogs(sourceCode, customLogFunction)) {
       return []; // No logs found - avoid expensive openTextDocument call!
     }
 
@@ -113,8 +103,9 @@ export async function detectAll(
 }
 
 /**
- * Detects all log messages (both active and commented) using regex pattern matching.
+ * Detects all log messages (both active and commented, Turbo and regular) using regex pattern matching.
  * Much faster than AST parsing for this use case.
+ * Marks each message with isTurboConsoleLog flag to distinguish Turbo logs from regular ones.
  */
 function detectLogMessages(
   document: TextDocument,
@@ -135,8 +126,8 @@ function detectLogMessages(
     `^\\s*//\\s*(${knownLogFunctions.map(escapeRegex).join('|')})\\b`,
   );
 
-  const prefixRegex = new RegExp(logMessagePrefix);
-  const delimiterRegex = new RegExp(delimiterInsideMessage);
+  const prefixRegex = new RegExp(escapeRegex(logMessagePrefix));
+  const delimiterRegex = new RegExp(escapeRegex(delimiterInsideMessage));
 
   for (let i = 0; i < documentNbrOfLines; i++) {
     const line = document.lineAt(i);
@@ -147,6 +138,15 @@ function detectLogMessages(
     const isActive = !isCommented && activeLogPattern.test(lineText);
 
     if (!isCommented && !isActive) continue;
+
+    // Extract the log function name (e.g., 'console.log', 'console.warn')
+    let logFunctionMatch = null;
+    if (isCommented) {
+      logFunctionMatch = lineText.match(commentedLogPattern);
+    } else {
+      logFunctionMatch = lineText.match(activeLogPattern);
+    }
+    const logFunction = logFunctionMatch ? logFunctionMatch[1] : undefined;
 
     // Find the closing parenthesis for the log call
     const closedParenthesisLine = closingContextLine(
@@ -165,14 +165,16 @@ function detectLogMessages(
 
     // Single-line log statement
     if (closedParenthesisLine === i) {
-      if (prefixRegex.test(lineText) && delimiterRegex.test(lineText)) {
-        const spaces = spacesBeforeLogMsg(document, i, closedParenthesisLine);
-        messages.push({
-          spaces,
-          lines: [line.rangeIncludingLineBreak],
-          ...(isCommented && { isCommented: true }),
-        });
-      }
+      const hasTurboMarkers =
+        prefixRegex.test(lineText) && delimiterRegex.test(lineText);
+      const spaces = spacesBeforeLogMsg(document, i, closedParenthesisLine);
+      messages.push({
+        spaces,
+        lines: [line.rangeIncludingLineBreak],
+        ...(isCommented && { isCommented: true }),
+        ...(logFunction && { logFunction }),
+        isTurboConsoleLog: hasTurboMarkers,
+      });
       continue;
     }
 
@@ -181,6 +183,7 @@ function detectLogMessages(
       spaces: spacesBeforeLogMsg(document, i, closedParenthesisLine),
       lines: [],
       ...(isCommented && { isCommented: true }),
+      ...(logFunction && { logFunction }),
     };
 
     let msg = '';
@@ -189,9 +192,10 @@ function detectLogMessages(
       logMessage.lines.push(document.lineAt(j).rangeIncludingLineBreak);
     }
 
-    if (prefixRegex.test(msg) && delimiterRegex.test(msg)) {
-      messages.push(logMessage);
-    }
+    const hasTurboMarkers = prefixRegex.test(msg) && delimiterRegex.test(msg);
+    logMessage.isTurboConsoleLog = hasTurboMarkers;
+
+    messages.push(logMessage);
   }
 
   return messages;

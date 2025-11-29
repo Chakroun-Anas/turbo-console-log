@@ -66,5 +66,28 @@ export function getJavaScript(): string {
         
         // Initial update
         updateCountdowns();
+        
+        // Video play tracking (once per video)
+        const videoPlayTracked = new Set();
+        
+        function setupVideoTracking() {
+          const videos = document.querySelectorAll('.video-player');
+          
+          videos.forEach(video => {
+            video.addEventListener('play', function() {
+              const videoId = this.dataset.videoId;
+              const videoCaption = this.dataset.videoCaption;
+              
+              // Track only once per video
+              if (videoId && !videoPlayTracked.has(videoId)) {
+                videoPlayTracked.add(videoId);
+                trackCtaClick('video', videoCaption || 'Video played', videoId);
+              }
+            });
+          });
+        }
+        
+        // Initialize video tracking after DOM loads
+        setupVideoTracking();
     `;
 }

@@ -2,6 +2,55 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.11.0] - 2025-12-01
+
+### 🚀 Turbo Pro: Ultimate Workspace Log Manager
+
+The wait is over. Turbo Pro is now the **ultimate workspace log manager** you've been asking for. This isn't just an update, it's a complete transformation of how you debug at scale.
+
+#### 🌲 What Makes This Release Different
+
+Remember when you had to hunt down logs across dozens of files? Delete them one by one before a commit? Wonder where that authentication log went three days ago? **Those days are over.**
+
+Turbo Pro now gives you **total visibility and control** over every log in your workspace, whether you wrote them yesterday or months ago, whether they're Turbo logs or plain console statements.
+
+#### ✨ Four Game-Changing Features
+
+**1. Workspace Log Explorer** 🌳  
+How many logs does your project actually have? Turbo Pro answers in one second flat. See all 600+ logs across 100+ files in a native VS Code tree view. Click any log to jump straight to the source line. No more guessing, no more searching—just instant navigation.
+
+**2. Mass Cleanup Operations** 🧹  
+About to push? Need to wipe logs across your entire codebase? Select the log types you want gone (console.log, console.error, all of them, or just Turbo's), choose your scope (workspace, folder, or file), and watch them disappear in seconds. We've tested this with 400+ logs—deleted instantly, reliably, every time.
+
+**3. Real-Time Filtering** 🎯  
+Your workspace has hundreds of logs but you only care about errors right now. Toggle log types (log, error, warn, info, debug, table) and the tree updates instantly—no re-scan, no waiting, just pure control over the noise.
+
+**4. Instant Search** 🔍  
+Remember that "user authentication" log from last week? Type the keyword, see matching logs instantly, click to jump to the exact line. Find any log by content in seconds—no grep, no scrolling through files, no memory required.
+
+#### 🎨 Enhanced Experience
+
+- **Multi-Language Support**: JavaScript, TypeScript, and PHP logs all in one unified view
+- **Smart Detection**: Pro recognizes console.log, console.error, console.warn, console.info, console.debug, console.table, and your custom log functions
+- **Color-Coded Tree**: Each log type shows in its unique color (🟦 log, 🟥 error, 🟨 warn, 🟩 info, 🟪 debug, 📊 table)
+- **Context Actions**: Right-click any log for instant comment, delete, or correction—no keyboard shortcuts needed
+
+#### 🎁 Your Pro License Still Includes
+
+- ✅ **Lifetime access**: pay once, own it permanently
+- ✅ **Use on up to 5 machines**: laptop, desktop, work
+- ✅ **All future updates included**: every enhancement, no additional cost
+- ✅ **Priority email support** at support@turboconsolelog.io
+
+#### 🔥 Why This Matters
+
+Previous releases gave you a tree panel. **This release gives you total workspace mastery.** This is the debugging experience large codebases deserve—fast, visual, comprehensive, and built to scale with your project.
+
+Whether you're managing 100 logs or 1000, whether you're debugging a feature or cleaning up before release, Turbo Pro makes it effortless.
+
+→ [See all four features in action](https://www.turboconsolelog.io/pro#see-it-in-action)  
+→ [Upgrade to Turbo Pro](https://www.turboconsolelog.io/pro)
+
 ## [3.10.3] - 2025-11-26
 
 ### 🔥 Coming Monday: Workspace-wide Log Cleanup

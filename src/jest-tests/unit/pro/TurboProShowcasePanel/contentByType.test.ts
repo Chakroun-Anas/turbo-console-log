@@ -34,6 +34,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 
@@ -52,6 +53,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 
@@ -69,6 +71,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 
@@ -97,6 +100,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 
@@ -126,6 +130,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 
@@ -154,6 +159,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 
@@ -182,6 +188,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 
@@ -211,6 +218,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 
@@ -244,6 +252,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 
@@ -297,6 +306,7 @@ describe('contentByType', () => {
       surveyHtml: '',
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
+      videoHtml: '',
     });
   });
 

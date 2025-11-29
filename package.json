@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automated logging for JavaScript, TypeScript, and PHP. Insert, manage, and clean log messages with AST-powered precision.",
-  "version": "3.10.3",
+  "version": "3.11.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.94.0"
@@ -207,6 +207,26 @@
       {
         "command": "turboConsoleLogPro.showLogs",
         "title": "Turbo Console Log Pro: Show Logs"
+      },
+      {
+        "command": "turboConsoleLogPro.logCleanupFromConfig",
+        "title": "Turbo Console Log Pro: Delete Logs From Config"
+      },
+      {
+        "command": "turboConsoleLogPro.commentLogsFromConfig",
+        "title": "Turbo Console Log Pro: Comment Logs From Config"
+      },
+      {
+        "command": "turboConsoleLogPro.uncommentLogsFromConfig",
+        "title": "Turbo Console Log Pro: Uncomment Logs From Config"
+      },
+      {
+        "command": "turboConsoleLogPro.toggleExpand",
+        "title": "Turbo Console Log Pro: Toggle Expand"
+      },
+      {
+        "command": "turboConsoleLogPro.searchLogs",
+        "title": "Turbo Console Log Pro: Search Logs"
       }
     ],
     "keybindings": [
@@ -307,6 +327,18 @@
           "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro"
         },
         {
+          "id": "turboConsoleLogLogFiltersView",
+          "name": "Log Filters",
+          "icon": "images/icon.png",
+          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro"
+        },
+        {
+          "id": "turboConsoleLogLogCleanupConfigView",
+          "name": "Log Cleanup Config",
+          "icon": "images/icon.png",
+          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro"
+        },
+        {
           "id": "turboConsoleLogFreemiumLauncher",
           "name": "Become Pro",
           "icon": "images/icon.png",
@@ -329,36 +361,39 @@
       ]
     },
     "menus": {
+      "view/title": [
+        {
+          "command": "turboConsoleLogPro.searchLogs",
+          "when": "view == turboConsoleLogProView",
+          "group": "navigation",
+          "icon": "$(search)"
+        }
+      ],
       "view/item/context": [
-        {
-          "command": "turboConsoleLog.commentAllLogMessages",
-          "when": "viewItem == fileLogsNode",
-          "group": "turbo"
-        },
-        {
-          "command": "turboConsoleLog.uncommentAllLogMessages",
-          "when": "viewItem == fileLogsNode",
-          "group": "turbo"
-        },
-        {
-          "command": "turboConsoleLog.deleteAllLogMessages",
-          "when": "viewItem == fileLogsNode",
-          "group": "turbo"
-        },
-        {
-          "command": "turboConsoleLog.correctAllLogMessages",
-          "when": "viewItem == fileLogsNode",
-          "group": "turbo"
-        },
         {
           "command": "turboConsoleLogPro.hideLogs",
           "when": "viewItem == fileLogsNode",
-          "group": "turbo"
+          "group": "turbo@0"
         },
         {
           "command": "turboConsoleLogPro.showLogs",
           "when": "viewItem == hiddenFileLogsNode",
-          "group": "turbo"
+          "group": "turbo@0"
+        },
+        {
+          "command": "turboConsoleLogPro.commentLogsFromConfig",
+          "when": "viewItem == fileLogsNode",
+          "group": "turbo@1"
+        },
+        {
+          "command": "turboConsoleLogPro.uncommentLogsFromConfig",
+          "when": "viewItem == fileLogsNode",
+          "group": "turbo@2"
+        },
+        {
+          "command": "turboConsoleLogPro.logCleanupFromConfig",
+          "when": "viewItem == fileLogsNode",
+          "group": "turbo@3"
         }
       ]
     }

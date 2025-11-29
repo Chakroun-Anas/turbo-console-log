@@ -54,18 +54,24 @@ export function uncommentAllLogMessagesCommand(): Command {
       );
       editor
         .edit((editBuilder) => {
-          logMessages.forEach(({ spaces, lines, isCommented }) => {
-            if (!isCommented) {
-              return; // Skip uncommenting if the message is not commented
-            }
-            lines.forEach((line: vscode.Range) => {
-              editBuilder.delete(line);
-              editBuilder.insert(
-                new vscode.Position(line.start.line, 0),
-                `${spaces}${document.getText(line).replace(/\/\//, '').trim()}\n`,
-              );
-            });
-          });
+          logMessages.forEach(
+            ({ spaces, lines, isCommented, isTurboConsoleLog }) => {
+              // Only process Turbo Console Log messages
+              if (!isTurboConsoleLog) {
+                return;
+              }
+              if (!isCommented) {
+                return; // Skip uncommenting if the message is not commented
+              }
+              lines.forEach((line: vscode.Range) => {
+                editBuilder.delete(line);
+                editBuilder.insert(
+                  new vscode.Position(line.start.line, 0),
+                  `${spaces}${document.getText(line).replace(/\/\//, '').trim()}\n`,
+                );
+              });
+            },
+          );
         })
         .then(async (applied) => {
           if (applied) {

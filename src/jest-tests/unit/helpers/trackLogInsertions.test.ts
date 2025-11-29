@@ -87,34 +87,32 @@ describe('trackLogInsertions', () => {
       mockIsProUser.mockReturnValue(false);
     });
 
-    describe('bulk delete pre-launch notification', () => {
+    describe('v3.11.0 launch notification', () => {
       it('should show notification on first insert (count >= 1)', async () => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 0; // Will become 1
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return false;
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return false;
           return undefined;
         });
 
         await trackLogInsertions(mockContext);
 
         expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_BULK_DELETE_PRE_LAUNCH,
+          NotificationEvent.EXTENSION_V3_11_0_LAUNCH,
           '3.0.0',
           mockContext,
         );
         expect(mockWriteToGlobalState).toHaveBeenCalledWith(
           mockContext,
-          'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION',
+          'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION',
           true,
         );
       });
 
-      it('should return early after showing bulk delete notification', async () => {
+      it('should return early after showing v3.11.0 launch notification', async () => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 9; // Will become 10 (milestone)
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return false;
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return false;
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return false;
           return undefined;
@@ -122,9 +120,9 @@ describe('trackLogInsertions', () => {
 
         await trackLogInsertions(mockContext);
 
-        // Should show bulk delete notification
+        // Should show v3.11.0 launch notification
         expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_BULK_DELETE_PRE_LAUNCH,
+          NotificationEvent.EXTENSION_V3_11_0_LAUNCH,
           '3.0.0',
           mockContext,
         );
@@ -139,8 +137,7 @@ describe('trackLogInsertions', () => {
       it('should not show notification if already shown', async () => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 5;
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return true; // Already shown
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return false;
           return undefined;
@@ -149,7 +146,7 @@ describe('trackLogInsertions', () => {
         await trackLogInsertions(mockContext);
 
         expect(mockShowNotification).not.toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_BULK_DELETE_PRE_LAUNCH,
+          NotificationEvent.EXTENSION_V3_11_0_LAUNCH,
           expect.any(String),
           mockContext,
         );
@@ -159,8 +156,7 @@ describe('trackLogInsertions', () => {
         mockIsProUser.mockReturnValue(true);
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 0; // Will become 1
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return false;
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return false;
           return undefined;
         });
 
@@ -170,7 +166,7 @@ describe('trackLogInsertions', () => {
         // Should not even mark as shown since Pro users skip notification logic
         expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
           mockContext,
-          'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION',
+          'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION',
           true,
         );
       });
@@ -178,15 +174,14 @@ describe('trackLogInsertions', () => {
       it('should show notification on any insert count >= 1', async () => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 24; // Will become 25
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return false;
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return false;
           return undefined;
         });
 
         await trackLogInsertions(mockContext);
 
         expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_BULK_DELETE_PRE_LAUNCH,
+          NotificationEvent.EXTENSION_V3_11_0_LAUNCH,
           '3.0.0',
           mockContext,
         );
@@ -196,8 +191,7 @@ describe('trackLogInsertions', () => {
     it('should increment command usage count', async () => {
       mockReadFromGlobalState.mockImplementation((context, key) => {
         if (key === 'COMMAND_USAGE_COUNT') return 5;
-        if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-          return true; // Already shown to avoid early return
+        if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown to avoid early return
         if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')
           return false;
         return undefined;
@@ -215,8 +209,7 @@ describe('trackLogInsertions', () => {
     it('should handle undefined command usage count as 0', async () => {
       mockReadFromGlobalState.mockImplementation((context, key) => {
         if (key === 'COMMAND_USAGE_COUNT') return undefined;
-        if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-          return false;
+        if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return false;
         if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')
           return false;
         return undefined;
@@ -231,11 +224,10 @@ describe('trackLogInsertions', () => {
       );
     });
 
-    it('should not show milestone notifications when count is less than 10 (but bulk delete already shown)', async () => {
+    it('should not show milestone notifications when count is less than 10 (but v3.11.0 launch already shown)', async () => {
       mockReadFromGlobalState.mockImplementation((context, key) => {
         if (key === 'COMMAND_USAGE_COUNT') return 5;
-        if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-          return true; // Already shown
+        if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown
         if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
           return false;
         if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')
@@ -251,8 +243,7 @@ describe('trackLogInsertions', () => {
     it('should not show milestone notifications when count is between milestones', async () => {
       mockReadFromGlobalState.mockImplementation((context, key) => {
         if (key === 'COMMAND_USAGE_COUNT') return 30;
-        if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-          return true; // Already shown
+        if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown
         if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION') return true;
         if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')
           return false;
@@ -268,8 +259,7 @@ describe('trackLogInsertions', () => {
       beforeEach(() => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 9; // Will become 10 after increment
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return true; // Already shown to avoid early return
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown to avoid early return
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return false;
           if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')
@@ -291,8 +281,7 @@ describe('trackLogInsertions', () => {
       it('should show ten inserts notification even if milestone was missed', async () => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 14; // Will become 15, missed 10
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return true; // Already shown
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return false;
           if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')
@@ -341,8 +330,7 @@ describe('trackLogInsertions', () => {
       beforeEach(() => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 20;
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return true; // Already shown
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return true;
           if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')
@@ -367,8 +355,7 @@ describe('trackLogInsertions', () => {
       beforeEach(() => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 49; // Will become 50 after increment
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return true; // Already shown
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return true; // Already shown at 10
           if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')
@@ -390,8 +377,7 @@ describe('trackLogInsertions', () => {
       it('should show fifty inserts notification even if milestone was missed', async () => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 54; // Will become 55, missed 50
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return true; // Already shown
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return true;
           if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')
@@ -440,8 +426,7 @@ describe('trackLogInsertions', () => {
       beforeEach(() => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 60;
-          if (key === 'HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION')
-            return true; // Already shown
+          if (key === 'HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION') return true; // Already shown
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return true; // Already shown
           if (key === 'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION')

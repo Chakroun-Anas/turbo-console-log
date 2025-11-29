@@ -6,6 +6,7 @@ import {
   SurveyPanelComponent,
   TablePanelComponent,
   MediaShowcaseCTAPanelComponent,
+  VideoPanelComponent,
 } from '../types';
 import { renderParagraphComponent } from './renderParagraphComponent';
 import { renderArticleComponent } from './renderArticleComponent';
@@ -13,6 +14,7 @@ import { renderCountDownComponent } from './renderCountDownComponent';
 import { renderSurveyComponent } from './renderSurveyComponent';
 import { renderTableComponent } from './renderTableComponent';
 import { renderMediaShowcaseCTAComponent } from './renderMediaShowcaseCTAComponent';
+import { renderVideoComponent } from './renderVideoComponent';
 
 /**
  * Render a single content item based on its type
@@ -45,6 +47,8 @@ export function renderContentItem(
       return renderMediaShowcaseCTAComponent(
         contentItem.component as MediaShowcaseCTAPanelComponent,
       );
+    case 'video':
+      return renderVideoComponent(contentItem.component as VideoPanelComponent);
     default:
       // Future content types can be added here
       return '';

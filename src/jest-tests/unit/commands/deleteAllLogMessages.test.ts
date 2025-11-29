@@ -88,6 +88,7 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -137,10 +138,12 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange1],
+            isTurboConsoleLog: true,
           },
           {
             spaces: '    ',
             lines: [mockRange2],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -201,6 +204,7 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange1, mockRange2, mockRange3, mockRange4],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -256,6 +260,7 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -308,6 +313,7 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -364,6 +370,7 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -411,6 +418,7 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -536,14 +544,17 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '      ',
             lines: [mockRange1],
+            isTurboConsoleLog: true,
           },
           {
             spaces: '      ',
             lines: [mockRange2],
+            isTurboConsoleLog: true,
           },
           {
             spaces: '    ',
             lines: [mockRange3],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -643,6 +654,7 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -685,6 +697,7 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange],
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -727,6 +740,7 @@ describe('deleteAllLogMessagesCommand', () => {
           {
             spaces: '    ',
             lines: [mockRange],
+            isTurboConsoleLog: true,
           },
         ]);
 

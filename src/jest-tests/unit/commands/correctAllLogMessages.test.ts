@@ -82,6 +82,7 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange],
           },
         ]);
@@ -126,6 +127,7 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange],
           },
         ]);
@@ -169,6 +171,7 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange],
           },
         ]);
@@ -211,6 +214,7 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange],
           },
         ]);
@@ -256,6 +260,7 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange],
           },
         ]);
@@ -305,10 +310,12 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange1],
           },
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange2],
           },
         ]);
@@ -359,6 +366,7 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange],
           },
         ]);
@@ -408,10 +416,12 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange1],
           },
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange2],
           },
         ]);
@@ -456,6 +466,7 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange],
           },
         ]);
@@ -497,6 +508,7 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange],
           },
         ]);
@@ -540,6 +552,7 @@ describe('correctAllLogMessagesCommand', () => {
         mockDebugMessage.detectAll = jest.fn().mockResolvedValue([
           {
             spaces: '    ',
+            isTurboConsoleLog: true,
             lines: [mockRange],
           },
         ]);

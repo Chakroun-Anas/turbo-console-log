@@ -164,6 +164,12 @@ export async function showNotification(
         ctaText: "See What's Coming",
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
+      [NotificationEvent.EXTENSION_V3_11_0_LAUNCH]: {
+        message:
+          '🚀 Turbo Pro v3.11.0 is here! Ultimate Workspace Log Manager with 4 game-changing features.',
+        ctaText: "See What's New",
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
     };
 
     const fallback = fallbackMessages[notificationEvent];
