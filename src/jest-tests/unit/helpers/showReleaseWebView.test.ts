@@ -4,7 +4,7 @@ import { showReleaseWebView } from '@/helpers/showReleaseWebView';
 import * as helpers from '@/helpers';
 import { createTelemetryService } from '@/telemetry/telemetryService';
 import { GlobalStateKey } from '@/entities';
-import { WEBVIEW_FALLBACK_VARIANTS } from '@/releases/3100';
+import { WEBVIEW_FALLBACK_VARIANTS } from '@/releases/3120';
 
 // Mock axios
 jest.mock('axios');
@@ -20,7 +20,7 @@ jest.mock('@/telemetry/telemetryService', () => ({
   createTelemetryService: jest.fn(),
 }));
 
-jest.mock('@/releases/3100', () => ({
+jest.mock('@/releases/3120', () => ({
   WEBVIEW_FALLBACK_VARIANTS: {
     A: {
       title: 'Test Variant A',
@@ -104,7 +104,7 @@ describe('showReleaseWebView', () => {
     mockedAxios.get.mockResolvedValue({
       data: {
         variant: 'A',
-        version: '3.10.0',
+        version: '3.12.0',
         title: 'PHP Support Released!',
         htmlContent: '<html><body>Test Content</body></html>',
       },
@@ -143,7 +143,7 @@ describe('showReleaseWebView', () => {
 
       expect(helpers.readFromGlobalState).toHaveBeenCalledWith(
         mockContext,
-        `${GlobalStateKey.HAS_SHOWN_RELEASE_WEBVIEW}3.10.0`,
+        `${GlobalStateKey.HAS_SHOWN_RELEASE_WEBVIEW}3.12.0`,
       );
     });
 
@@ -154,7 +154,7 @@ describe('showReleaseWebView', () => {
 
       expect(helpers.writeToGlobalState).toHaveBeenCalledWith(
         mockContext,
-        `${GlobalStateKey.HAS_SHOWN_RELEASE_WEBVIEW}3.10.0`,
+        `${GlobalStateKey.HAS_SHOWN_RELEASE_WEBVIEW}3.12.0`,
         true,
       );
     });
@@ -165,7 +165,7 @@ describe('showReleaseWebView', () => {
       await showReleaseWebView(mockContext);
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        'https://www.turboconsolelog.io/api/webviewVariant?version=3.10.0',
+        'https://www.turboconsolelog.io/api/webviewVariant?version=3.12.0',
         {
           headers: {
             'Content-Type': 'application/json',
@@ -177,7 +177,7 @@ describe('showReleaseWebView', () => {
     it('should create webview with API-provided content', async () => {
       const apiResponse = {
         variant: 'B',
-        version: '3.10.0',
+        version: '3.12.0',
         title: 'API Title',
         htmlContent: '<html><body>API Content</body></html>',
       };
@@ -205,7 +205,7 @@ describe('showReleaseWebView', () => {
       mockedAxios.get.mockResolvedValue({
         data: {
           variant: 'C',
-          version: '3.10.0',
+          version: '3.12.0',
           title: 'Test',
           htmlContent: '<html></html>',
         },
@@ -218,7 +218,7 @@ describe('showReleaseWebView', () => {
 
       expect(
         mockTelemetryService.reportWebviewInteraction,
-      ).toHaveBeenCalledWith('3.10.0', 'C', 'shown');
+      ).toHaveBeenCalledWith('3.12.0', 'C', 'shown');
     });
 
     it('should handle API error with 404 status', async () => {
@@ -317,7 +317,7 @@ describe('showReleaseWebView', () => {
 
       expect(
         mockTelemetryService.reportWebviewInteraction,
-      ).toHaveBeenCalledWith('3.10.0', 'A', 'shown');
+      ).toHaveBeenCalledWith('3.12.0', 'A', 'shown');
     });
 
     it('should handle telemetry errors gracefully', async () => {
@@ -353,7 +353,7 @@ describe('showReleaseWebView', () => {
 
       expect(
         mockTelemetryService.reportWebviewInteraction,
-      ).toHaveBeenCalledWith('3.10.0', 'A', 'clicked');
+      ).toHaveBeenCalledWith('3.12.0', 'A', 'clicked');
     });
 
     it('should not crash if telemetry service fails on click', async () => {
@@ -517,32 +517,32 @@ describe('showReleaseWebView', () => {
   });
 
   describe('version-specific behavior', () => {
-    it('should use version 3.10.0 for API request', async () => {
+    it('should use version 3.12.0 for API request', async () => {
       await showReleaseWebView(mockContext);
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
-        expect.stringContaining('version=3.10.0'),
+        expect.stringContaining('version=3.12.0'),
         expect.any(Object),
       );
     });
 
-    it('should use version 3.10.0 for state key', async () => {
+    it('should use version 3.12.0 for state key', async () => {
       await showReleaseWebView(mockContext);
 
       expect(helpers.readFromGlobalState).toHaveBeenCalledWith(
         mockContext,
-        expect.stringContaining('3.10.0'),
+        expect.stringContaining('3.12.0'),
       );
     });
 
-    it('should pass version 3.10.0 to telemetry', async () => {
+    it('should pass version 3.12.0 to telemetry', async () => {
       await showReleaseWebView(mockContext);
 
       await new Promise(process.nextTick);
 
       expect(
         mockTelemetryService.reportWebviewInteraction,
-      ).toHaveBeenCalledWith('3.10.0', expect.any(String), expect.any(String));
+      ).toHaveBeenCalledWith('3.12.0', expect.any(String), expect.any(String));
     });
   });
 });

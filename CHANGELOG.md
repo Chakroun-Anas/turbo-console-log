@@ -2,6 +2,33 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.12.0] - 2025-12-10
+
+### 🎯 Introducing the New Shape of Turbo Pro
+
+This release announces a major evolution in how Turbo Pro works. We're introducing a completely new experience that makes workspace-scale debugging more powerful and intuitive than ever before.
+
+#### What's New
+
+The new Turbo Pro delivers four breakthrough capabilities that fundamentally change how you manage logs:
+
+1. **Workspace Log Explorer** - See every log in your entire codebase in one unified tree view. Click any log to jump to its exact location.
+
+2. **Mass Cleanup Operations** - Delete hundreds of logs across your workspace in seconds. Choose specific log types (console.log, console.error, etc.) or remove them all at once.
+
+3. **Real-Time Filtering** - Toggle log types on and off to focus on what matters. The tree updates instantly without rescanning.
+
+4. **Instant Search** - Find any log by content in milliseconds. No more manual searching through files.
+
+These features work seamlessly across JavaScript, TypeScript, and PHP files, giving you total control over debugging at any scale.
+
+#### Why This Matters
+
+Previous versions helped you insert logs quickly. **This version helps you manage them at scale.** Whether you have 100 logs or 1000, whether you're debugging or cleaning up before a commit, Turbo Pro now makes it effortless.
+
+→ [See all features in action](https://www.turboconsolelog.io/pro#see-it-in-action)  
+→ [Learn more about Turbo Pro](https://www.turboconsolelog.io/pro)
+
 ## [3.11.0] - 2025-12-01
 
 ### 🚀 Turbo Pro: Ultimate Workspace Log Manager

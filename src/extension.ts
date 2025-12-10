@@ -9,6 +9,7 @@ import {
   activateFreemiumLauncherMode,
   traceExtensionVersionHistory,
   listenToPhpFileOpenings,
+  showReleaseWebView,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -82,6 +83,12 @@ export async function activate(
   const proBundle = readFromGlobalState<string>(context, 'pro-bundle');
   const proBundleVersion = readFromGlobalState<string>(context, 'version');
   const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
+
+  // Show v3.12.0 release webview announcing new Turbo Pro shape
+  // Only shown to non-Pro users
+  if (!isProUser) {
+    showReleaseWebView(context);
+  }
   if (isProUser) {
     if (
       releaseNotes[version]?.isPro &&

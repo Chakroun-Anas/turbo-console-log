@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automated logging for JavaScript, TypeScript, and PHP. Insert, manage, and clean log messages with AST-powered precision.",
-  "version": "3.11.0",
+  "version": "3.12.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.94.0"
