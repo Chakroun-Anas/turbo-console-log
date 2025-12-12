@@ -7,4 +7,5 @@ export enum NotificationEvent {
   EXTENSION_PHP_PRO_ONLY = 'extensionPhpProOnly',
   EXTENSION_FIVE_LOG_MANAGEMENT_COMMANDS = 'extensionFiveLogManagementCommands',
   EXTENSION_BULK_DELETE_PRE_LAUNCH = 'extensionBulkDeletePreLaunch',
+  EXTENSION_V3_11_0_LAUNCH = 'extensionV3110Launch',
 }

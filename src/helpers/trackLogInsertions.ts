@@ -34,23 +34,23 @@ export async function trackLogInsertions(
     return;
   }
 
-  // Check for bulk delete pre-launch notification (show to free users only, once)
-  const hasShownBulkDeletePreLaunchNotification = readFromGlobalState<boolean>(
+  // Check for v3.11.0 launch notification (show to free users only, once)
+  const hasShownV3110LaunchNotification = readFromGlobalState<boolean>(
     context,
-    GlobalStateKey.HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION,
+    GlobalStateKey.HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION,
   );
 
-  if (!hasShownBulkDeletePreLaunchNotification && commandUsageCount >= 1) {
+  if (!hasShownV3110LaunchNotification && commandUsageCount >= 1) {
     // Mark that notification has been shown
     writeToGlobalState(
       context,
-      GlobalStateKey.HAS_SHOWN_BULK_DELETE_PRE_LAUNCH_NOTIFICATION,
+      GlobalStateKey.HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION,
       true,
     );
 
-    // Show bulk delete pre-launch notification (non-blocking) with version info
+    // Show v3.11.0 launch notification (non-blocking) with version info
     showNotification(
-      NotificationEvent.EXTENSION_BULK_DELETE_PRE_LAUNCH,
+      NotificationEvent.EXTENSION_V3_11_0_LAUNCH,
       version,
       context,
     );

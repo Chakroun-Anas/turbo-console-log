@@ -69,6 +69,7 @@ describe('commentAllLogMessagesCommand', () => {
       {
         spaces: '    ',
         lines: [mockRange],
+        isTurboConsoleLog: true,
       },
     ]);
 
@@ -124,6 +125,7 @@ describe('commentAllLogMessagesCommand', () => {
       {
         spaces: '    ',
         lines: [mockRange],
+        isTurboConsoleLog: true,
         isCommented: true, // This is what detectAll returns for commented logs
       },
     ]);
@@ -185,11 +187,13 @@ describe('commentAllLogMessagesCommand', () => {
       {
         spaces: '',
         lines: [mockRange1],
+        isTurboConsoleLog: true,
         isCommented: false, // Uncommented log
       },
       {
         spaces: '',
         lines: [mockRange2],
+        isTurboConsoleLog: true,
         isCommented: true, // Commented log
       },
     ]);
@@ -238,6 +242,7 @@ describe('commentAllLogMessagesCommand', () => {
         {
           spaces: '',
           lines: [mockRange],
+          isTurboConsoleLog: true,
           isCommented: false,
         },
       ]);

@@ -1,0 +1,23 @@
+export default {
+  name: 'JSX with nested ternary operators in .js file',
+  sourceCode: [
+    "import React from 'react';",
+    '',
+    'function StatusBadge({ status, count }) {',
+    '  const color = status === "success" ? "green" : status === "error" ? "red" : "gray";',
+    '  return (',
+    '    <div className={`badge badge-${color}`}>',
+    '      {status === "success" ? (',
+    '        <span>✓ Success</span>',
+    '      ) : status === "error" ? (',
+    '        <span>✗ Error</span>',
+    '      ) : (',
+    '        <span>- Pending</span>',
+    '      )}',
+    '    </div>',
+    '  );',
+    '}',
+  ],
+  fileExtension: '.js',
+  selectionLine: 3,
+};

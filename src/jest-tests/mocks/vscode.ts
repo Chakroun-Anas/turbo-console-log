@@ -2,11 +2,24 @@ export const window = {
   showInformationMessage: jest.fn(),
   registerWebviewViewProvider: jest.fn(),
   registerTreeDataProvider: jest.fn(),
-  createTreeView: jest.fn(),
+  registerFileDecorationProvider: jest.fn(),
   showErrorMessage: jest.fn(),
   showInputBox: jest.fn(),
   showWarningMessage: jest.fn(),
   withProgress: jest.fn((_opts, cb) => cb({ report: jest.fn() })),
+  createTreeView: jest.fn(() => ({
+    visible: false,
+    onDidChangeVisibility: jest.fn(),
+    onDidChangeCheckboxState: jest.fn(),
+  })),
+  createStatusBarItem: jest.fn(() => ({
+    text: '',
+    tooltip: '',
+    command: '',
+    backgroundColor: null,
+    show: jest.fn(),
+    hide: jest.fn(),
+  })),
 };
 
 export const ProgressLocation = {

@@ -140,7 +140,7 @@ describe('detectAll', () => {
   });
 
   describe('Message validation', () => {
-    it('should not include log message without required prefix', async () => {
+    it('should include log message without required prefix but mark as non-Turbo', async () => {
       const document = makeTextDocument([
         'console.log("missing prefix ~", x);',
       ]);
@@ -158,10 +158,11 @@ describe('detectAll', () => {
         defaultExtensionProperties.delimiterInsideMessage,
       );
 
-      expect(result).toHaveLength(0);
+      expect(result).toHaveLength(1);
+      expect(result[0].isTurboConsoleLog).toBe(false);
     });
 
-    it('should not include log message without required delimiter', async () => {
+    it('should include log message without required delimiter but mark as non-Turbo', async () => {
       const document = makeTextDocument([
         'console.log("🚀 x missing delimiter", x);',
       ]);
@@ -179,7 +180,8 @@ describe('detectAll', () => {
         defaultExtensionProperties.delimiterInsideMessage,
       );
 
-      expect(result).toHaveLength(0);
+      expect(result).toHaveLength(1);
+      expect(result[0].isTurboConsoleLog).toBe(false);
     });
   });
 
@@ -389,16 +391,27 @@ describe('detectAll', () => {
         defaultExtensionProperties.delimiterInsideMessage,
       );
 
-      expect(result).toHaveLength(2); // Only lines 0 and 3 should be detected
+      expect(result).toHaveLength(4); // All 4 logs detected
 
-      // Check that only the valid log messages are included
+      // Lines 0 and 3 are Turbo logs (have both prefix and delimiter)
       expect(result[0].spaces).toBe('');
       expect(result[0].lines).toHaveLength(1);
-      expect(result[0].lines[0].start.line).toBe(0); // First valid log message
+      expect(result[0].lines[0].start.line).toBe(0);
+      expect(result[0].isTurboConsoleLog).toBe(true);
 
-      expect(result[1].spaces).toBe('');
-      expect(result[1].lines).toHaveLength(1);
-      expect(result[1].lines[0].start.line).toBe(3); // Second valid log message
+      // Line 1 is not a Turbo log (missing prefix)
+      expect(result[1].lines[0].start.line).toBe(1);
+      expect(result[1].isTurboConsoleLog).toBe(false);
+
+      // Line 2 is not a Turbo log (missing delimiter)
+      expect(result[2].lines[0].start.line).toBe(2);
+      expect(result[2].isTurboConsoleLog).toBe(false);
+
+      // Line 3 is a Turbo log
+      expect(result[3].spaces).toBe('');
+      expect(result[3].lines).toHaveLength(1);
+      expect(result[3].lines[0].start.line).toBe(3);
+      expect(result[3].isTurboConsoleLog).toBe(true);
     });
   });
 
@@ -646,56 +659,72 @@ describe('detectAll', () => {
         defaultExtensionProperties.delimiterInsideMessage,
       );
 
-      // Should detect ALL log messages that match Turbo pattern (console.* + myLogger):
-      // Line 4: console.log("🚀 ~ data:", data);
-      // Line 5: console.warn("🚀 ~ data warning ~ line:", data);
-      // Line 6: console.error("🚀 ~ data error ~ processData:", data);
-      // Line 7: myLogger("🚀 ~ custom log ~ processData:", data);
-      // Line 26: console.table("🚀 ~ tableData ~ processData:", data);
-      // Line 27: console.debug("🚀 ~ debugInfo ~ line 21:", { step: "final" });
-      // Lines 30-34: Multi-line console.log with Turbo pattern
-      // Lines 43-46: Multi-line myLogger with Turbo pattern
-      // Line 49: console.log("~ 🚀 wrong order:", data); - DETECTED because includes() finds both prefix and delimiter
-      // Line 50: myLogger("~ 🚀 custom wrong order:", data); - DETECTED for same reason
-      // Line 53: console.log("🚀 ~ finalResult ~ processData ~ line 45:", data);
+      // Should detect ALL log messages (22 total: 11 Turbo logs + 11 non-Turbo logs)
+      // Turbo logs (isTurboConsoleLog: true) have both 🚀 prefix and ~ delimiter
+      // Non-Turbo logs (isTurboConsoleLog: false) are missing either prefix or delimiter or both
 
-      expect(result).toHaveLength(11);
+      expect(result).toHaveLength(22);
 
-      // Verify some key detections (in order of appearance):
-      // First console.log
-      expect(result[0].spaces).toBe('  ');
-      expect(result[0].lines).toHaveLength(1);
-      expect(result[0].lines[0].start.line).toBe(4);
+      // Count Turbo vs non-Turbo logs
+      const turboLogs = result.filter((msg) => msg.isTurboConsoleLog === true);
+      const nonTurboLogs = result.filter(
+        (msg) => msg.isTurboConsoleLog === false,
+      );
+      expect(turboLogs).toHaveLength(11);
+      expect(nonTurboLogs).toHaveLength(11);
 
-      // console.warn
-      expect(result[1].lines[0].start.line).toBe(5);
+      // Verify some key Turbo log detections by line number
+      // First Turbo log: console.log at line 4
+      const firstTurboLog = turboLogs.find(
+        (log) => log.lines[0].start.line === 4,
+      );
+      expect(firstTurboLog).toBeDefined();
+      expect(firstTurboLog!.spaces).toBe('  ');
+      expect(firstTurboLog!.lines).toHaveLength(1);
 
-      // console.error
-      expect(result[2].lines[0].start.line).toBe(6);
+      // console.warn at line 5
+      expect(
+        turboLogs.find((log) => log.lines[0].start.line === 5),
+      ).toBeDefined();
 
-      // Custom myLogger
-      expect(result[3].lines[0].start.line).toBe(7);
+      // console.error at line 6
+      expect(
+        turboLogs.find((log) => log.lines[0].start.line === 6),
+      ).toBeDefined();
 
-      // console.table
-      expect(result[4].lines[0].start.line).toBe(26);
+      // Custom myLogger at line 7
+      expect(
+        turboLogs.find((log) => log.lines[0].start.line === 7),
+      ).toBeDefined();
 
-      // console.debug
-      expect(result[5].lines[0].start.line).toBe(27);
+      // console.table at line 26
+      expect(
+        turboLogs.find((log) => log.lines[0].start.line === 26),
+      ).toBeDefined();
 
-      // Multi-line console.log
-      expect(result[6].lines).toHaveLength(5);
-      expect(result[6].lines[0].start.line).toBe(30);
+      // console.debug at line 27
+      expect(
+        turboLogs.find((log) => log.lines[0].start.line === 27),
+      ).toBeDefined();
 
-      // Multi-line myLogger
-      expect(result[7].lines).toHaveLength(4);
-      expect(result[7].lines[0].start.line).toBe(43);
+      // Multi-line console.log starting at line 30
+      const multiLineLog = turboLogs.find(
+        (log) => log.lines[0].start.line === 30,
+      );
+      expect(multiLineLog).toBeDefined();
+      expect(multiLineLog!.lines).toHaveLength(5);
 
-      // "Wrong order" logs (detected due to includes() logic)
-      expect(result[8].lines[0].start.line).toBe(49);
-      expect(result[9].lines[0].start.line).toBe(50);
+      // Multi-line myLogger starting at line 43
+      const multiLineMyLogger = turboLogs.find(
+        (log) => log.lines[0].start.line === 43,
+      );
+      expect(multiLineMyLogger).toBeDefined();
+      expect(multiLineMyLogger!.lines).toHaveLength(4);
 
-      // Final console.log
-      expect(result[10].lines[0].start.line).toBe(53);
+      // Final console.log at line 53
+      expect(
+        turboLogs.find((log) => log.lines[0].start.line === 53),
+      ).toBeDefined();
     });
 
     it('should detect Turbo logs in useEffect with mixed manual logs', async () => {
@@ -721,22 +750,27 @@ describe('detectAll', () => {
         defaultExtensionProperties.delimiterInsideMessage,
       );
 
-      // Should detect only the 2 Turbo-generated logs (lines 2 and 3)
-      // Line 4 is a manual log without Turbo pattern (missing prefix and delimiter)
-      expect(result).toHaveLength(2);
+      // Should detect all 3 logs: 2 Turbo logs (lines 2, 3) + 1 manual log (line 4)
+      expect(result).toHaveLength(3);
 
       // First Turbo log: console.log with Turbo pattern
       expect(result[0].spaces).toBe('    ');
       expect(result[0].lines).toHaveLength(1);
       expect(result[0].lines[0].start.line).toBe(2);
+      expect(result[0].isTurboConsoleLog).toBe(true);
 
       // Second Turbo log: console.error with Turbo pattern
       expect(result[1].spaces).toBe('    ');
       expect(result[1].lines).toHaveLength(1);
       expect(result[1].lines[0].start.line).toBe(3);
+      expect(result[1].isTurboConsoleLog).toBe(true);
+
+      // Third is a manual log without Turbo pattern
+      expect(result[2].lines[0].start.line).toBe(4);
+      expect(result[2].isTurboConsoleLog).toBe(false);
 
       // Verify that spacesBeforeLogMsg was called for each detected log
-      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledTimes(2);
+      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -804,7 +838,7 @@ describe('detectAll', () => {
       expect(result[4].lines[0].start.line).toBe(6); // console.info (uncommented)
     });
 
-    it('should NOT detect commented logs without Turbo pattern', async () => {
+    it('should detect all commented logs including those without Turbo pattern', async () => {
       const document = makeTextDocument([
         'const x = 5;',
         '// console.log("missing prefix ~", x);', // Missing prefix
@@ -826,10 +860,19 @@ describe('detectAll', () => {
         defaultExtensionProperties.delimiterInsideMessage,
       );
 
-      expect(result).toHaveLength(1);
+      expect(result).toHaveLength(4); // 3 commented + 1 uncommented
 
-      // Only the valid uncommented log should be detected
-      expect(result[0].lines[0].start.line).toBe(4);
+      // Commented logs without Turbo pattern
+      expect(result[0].lines[0].start.line).toBe(1);
+      expect(result[0].isTurboConsoleLog).toBe(false);
+      expect(result[1].lines[0].start.line).toBe(2);
+      expect(result[1].isTurboConsoleLog).toBe(false);
+      expect(result[2].lines[0].start.line).toBe(3);
+      expect(result[2].isTurboConsoleLog).toBe(false);
+
+      // Valid uncommented Turbo log
+      expect(result[3].lines[0].start.line).toBe(4);
+      expect(result[3].isTurboConsoleLog).toBe(true);
     });
 
     it('should detect commented custom log functions with Turbo pattern', async () => {

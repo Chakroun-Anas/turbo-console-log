@@ -31,8 +31,9 @@ export function parseCode(
   const isAstroFile = fileExtension?.toLowerCase() === '.astro';
 
   // Determine if JSX should be enabled based on file extension
-  // JSX is only needed for .jsx and .tsx files
+  // JSX is explicitly needed for .jsx and .tsx files
   // Vue, Svelte, and Astro script blocks contain pure TS/JS, not JSX
+  // Note: .js files may contain JSX (React projects), handled via fallback parsing
   const needsJsx =
     fileExtension?.toLowerCase() === '.jsx' ||
     fileExtension?.toLowerCase() === '.tsx';
@@ -113,6 +114,32 @@ export function parseCode(
 
     return ast;
   } catch (error) {
+    // If parsing failed and JSX wasn't enabled, try again with JSX enabled
+    // This handles .js files that contain JSX syntax (common in React projects)
+    if (!needsJsx) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const jsxParser = acorn.Parser.extend(tsPlugin({ jsx: true })) as any;
+        let ast = jsxParser.parse(codeToParse, {
+          ecmaVersion: 'latest',
+          sourceType: 'module',
+          locations: true,
+        }) as AcornNode;
+
+        // Adjust AST locations if we extracted from Vue SFC, HTML, Svelte, or Astro file
+        if (lineOffset > 0 || byteOffset > 0) {
+          ast = adjustASTLocations(ast, lineOffset, byteOffset);
+        }
+
+        return ast;
+      } catch {
+        // If it still fails with JSX enabled, throw the original error
+        throw new Error(
+          `Failed to parse source code: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+      }
+    }
+
     throw new Error(
       `Failed to parse source code: ${error instanceof Error ? error.message : 'Unknown error'}`,
     );

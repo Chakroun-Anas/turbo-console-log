@@ -2,6 +2,110 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.12.1] - 2025-12-12
+
+### 🔧 Bug Fixes & Improvements
+
+#### Enhanced JSX Support in .js Files
+
+Fixes [#316](https://github.com/Chakroun-Anas/turbo-console-log/issues/316)
+
+- **Automatic JSX Detection**: The parser now automatically detects and handles JSX syntax in `.js` files without requiring explicit configuration
+- **Intelligent Fallback Mechanism**: When parsing fails in `.js` files, the engine automatically retries with JSX support enabled, seamlessly handling React projects that use JSX in `.js` files
+- **No Performance Impact**: Regular `.js` files without JSX parse efficiently on the first attempt; the fallback only activates when needed
+- **Improved Developer Experience**: React developers can now use Turbo Console Log in `.js` files with JSX syntax without any workarounds or file extension changes
+
+#### Test Coverage Expansion
+
+- **9 New Test Cases**: Added comprehensive test coverage for JSX patterns in `.js` files:
+  - React functional components with hooks
+  - JSX fragments and spread operators
+  - Nested ternary operators in JSX
+  - Self-closing tags and spread props
+  - Array methods with JSX mapping
+  - Arrow functions with implicit JSX returns
+  - Complex conditional rendering patterns
+  - Mixed files with both JSX and regular JavaScript
+- **Error Handling**: Maintains strict error detection for actual syntax errors while supporting valid JSX patterns
+
+This update resolves parsing issues for React projects using `.js` files with JSX syntax, a common pattern in many React codebases, especially those created with older versions of Create React App or custom configurations.
+
+## [3.12.0] - 2025-12-10
+
+### 🎯 Introducing the New Shape of Turbo Pro
+
+This release announces a major evolution in how Turbo Pro works. We're introducing a completely new experience that makes workspace-scale debugging more powerful and intuitive than ever before.
+
+#### What's New
+
+The new Turbo Pro delivers four breakthrough capabilities that fundamentally change how you manage logs:
+
+1. **Workspace Log Explorer** - See every log in your entire codebase in one unified tree view. Click any log to jump to its exact location.
+
+2. **Mass Cleanup Operations** - Delete hundreds of logs across your workspace in seconds. Choose specific log types (console.log, console.error, etc.) or remove them all at once.
+
+3. **Real-Time Filtering** - Toggle log types on and off to focus on what matters. The tree updates instantly without rescanning.
+
+4. **Instant Search** - Find any log by content in milliseconds. No more manual searching through files.
+
+These features work seamlessly across JavaScript, TypeScript, and PHP files, giving you total control over debugging at any scale.
+
+#### Why This Matters
+
+Previous versions helped you insert logs quickly. **This version helps you manage them at scale.** Whether you have 100 logs or 1000, whether you're debugging or cleaning up before a commit, Turbo Pro now makes it effortless.
+
+→ [See all features in action](https://www.turboconsolelog.io/pro#see-it-in-action)  
+→ [Learn more about Turbo Pro](https://www.turboconsolelog.io/pro)
+
+## [3.11.0] - 2025-12-01
+
+### 🚀 Turbo Pro: Ultimate Workspace Log Manager
+
+The wait is over. Turbo Pro is now the **ultimate workspace log manager** you've been asking for. This isn't just an update, it's a complete transformation of how you debug at scale.
+
+#### 🌲 What Makes This Release Different
+
+Remember when you had to hunt down logs across dozens of files? Delete them one by one before a commit? Wonder where that authentication log went three days ago? **Those days are over.**
+
+Turbo Pro now gives you **total visibility and control** over every log in your workspace, whether you wrote them yesterday or months ago, whether they're Turbo logs or plain console statements.
+
+#### ✨ Four Game-Changing Features
+
+**1. Workspace Log Explorer** 🌳  
+How many logs does your project actually have? Turbo Pro answers in one second flat. See all 600+ logs across 100+ files in a native VS Code tree view. Click any log to jump straight to the source line. No more guessing, no more searching—just instant navigation.
+
+**2. Mass Cleanup Operations** 🧹  
+About to push? Need to wipe logs across your entire codebase? Select the log types you want gone (console.log, console.error, all of them, or just Turbo's), choose your scope (workspace, folder, or file), and watch them disappear in seconds. We've tested this with 400+ logs—deleted instantly, reliably, every time.
+
+**3. Real-Time Filtering** 🎯  
+Your workspace has hundreds of logs but you only care about errors right now. Toggle log types (log, error, warn, info, debug, table) and the tree updates instantly—no re-scan, no waiting, just pure control over the noise.
+
+**4. Instant Search** 🔍  
+Remember that "user authentication" log from last week? Type the keyword, see matching logs instantly, click to jump to the exact line. Find any log by content in seconds—no grep, no scrolling through files, no memory required.
+
+#### 🎨 Enhanced Experience
+
+- **Multi-Language Support**: JavaScript, TypeScript, and PHP logs all in one unified view
+- **Smart Detection**: Pro recognizes console.log, console.error, console.warn, console.info, console.debug, console.table, and your custom log functions
+- **Color-Coded Tree**: Each log type shows in its unique color (🟦 log, 🟥 error, 🟨 warn, 🟩 info, 🟪 debug, 📊 table)
+- **Context Actions**: Right-click any log for instant comment, delete, or correction—no keyboard shortcuts needed
+
+#### 🎁 Your Pro License Still Includes
+
+- ✅ **Lifetime access**: pay once, own it permanently
+- ✅ **Use on up to 5 machines**: laptop, desktop, work
+- ✅ **All future updates included**: every enhancement, no additional cost
+- ✅ **Priority email support** at support@turboconsolelog.io
+
+#### 🔥 Why This Matters
+
+Previous releases gave you a tree panel. **This release gives you total workspace mastery.** This is the debugging experience large codebases deserve—fast, visual, comprehensive, and built to scale with your project.
+
+Whether you're managing 100 logs or 1000, whether you're debugging a feature or cleaning up before release, Turbo Pro makes it effortless.
+
+→ [See all four features in action](https://www.turboconsolelog.io/pro#see-it-in-action)  
+→ [Upgrade to Turbo Pro](https://www.turboconsolelog.io/pro)
+
 ## [3.10.3] - 2025-11-26
 
 ### 🔥 Coming Monday: Workspace-wide Log Cleanup

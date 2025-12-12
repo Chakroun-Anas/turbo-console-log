@@ -43,7 +43,11 @@ export function correctAllLogMessagesCommand(): Command {
 
       return editor
         .edit((editBuilder) => {
-          logMessages.forEach(({ lines }) => {
+          logMessages.forEach(({ lines, isTurboConsoleLog }) => {
+            // Only process Turbo Console Log messages
+            if (!isTurboConsoleLog) {
+              return;
+            }
             lines.forEach((line: vscode.Range) => {
               const lineText = document.getText(line);
 

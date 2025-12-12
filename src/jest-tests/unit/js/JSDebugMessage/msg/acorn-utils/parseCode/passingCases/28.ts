@@ -1,0 +1,22 @@
+export default {
+  name: 'JSX with fragments in .js file',
+  sourceCode: [
+    "import React from 'react';",
+    '',
+    'function List({ items }) {',
+    '  const listItems = items.map(item => item.name);',
+    '  return (',
+    '    <>',
+    '      <h2>Items</h2>',
+    '      <ul>',
+    '        {items.map(item => (',
+    '          <li key={item.id}>{item.name}</li>',
+    '        ))}',
+    '      </ul>',
+    '    </>',
+    '  );',
+    '}',
+  ],
+  fileExtension: '.js',
+  selectionLine: 3,
+};

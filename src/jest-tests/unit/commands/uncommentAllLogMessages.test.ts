@@ -89,6 +89,7 @@ describe('uncommentAllLogMessagesCommand', () => {
             spaces: '    ',
             lines: [mockRange],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -143,11 +144,13 @@ describe('uncommentAllLogMessagesCommand', () => {
             spaces: '    ',
             lines: [mockRange1],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
           {
             spaces: '    ',
             lines: [mockRange2],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -218,6 +221,7 @@ describe('uncommentAllLogMessagesCommand', () => {
             spaces: '    ',
             lines: [mockRange1, mockRange2, mockRange3, mockRange4],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -314,6 +318,7 @@ describe('uncommentAllLogMessagesCommand', () => {
             spaces: '',
             lines: [mockRange],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -361,6 +366,7 @@ describe('uncommentAllLogMessagesCommand', () => {
             spaces: '',
             lines: [mockRange],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -408,6 +414,7 @@ describe('uncommentAllLogMessagesCommand', () => {
             spaces: '',
             lines: [mockRange],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
         ]);
 
@@ -507,16 +514,19 @@ describe('uncommentAllLogMessagesCommand', () => {
             spaces: '      ',
             lines: [mockRange1],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
           {
             spaces: '      ',
             lines: [mockRange2],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
           {
             spaces: '    ',
             lines: [mockRange3],
             isCommented: true,
+            isTurboConsoleLog: true,
           },
         ]);
 

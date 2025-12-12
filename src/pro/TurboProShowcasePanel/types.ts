@@ -45,13 +45,22 @@ export interface MediaShowcaseCTAPanelComponent {
   };
 }
 
+export interface VideoPanelComponent {
+  videoSrc: string;
+  caption: string;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+}
+
 export type FreemiumPanelComponent =
   | ParagraphPanelComponent
   | ArticlePanelComponent
   | CountDownPanelComponent
   | SurveyPanelComponent
   | TablePanelComponent
-  | MediaShowcaseCTAPanelComponent;
+  | MediaShowcaseCTAPanelComponent
+  | VideoPanelComponent;
 
 export type DynamicFreemiumPanelContentType =
   | 'paragraph'
@@ -59,7 +68,8 @@ export type DynamicFreemiumPanelContentType =
   | 'countdown'
   | 'survey'
   | 'table'
-  | 'media-showcase-cta';
+  | 'media-showcase-cta'
+  | 'video';
 
 export interface DynamicFreemiumPanelContent {
   type: DynamicFreemiumPanelContentType;
@@ -79,4 +89,5 @@ export interface SeparatedContent {
   surveyHtml: string;
   tableHtml: string;
   mediaShowcaseCTAHtml: string;
+  videoHtml: string;
 }

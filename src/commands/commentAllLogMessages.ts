@@ -54,18 +54,24 @@ export function commentAllLogMessagesCommand(): Command {
       );
       editor
         .edit((editBuilder) => {
-          logMessages.forEach(({ spaces, lines, isCommented }) => {
-            if (isCommented) {
-              return; // Skip commenting if the message is already commented
-            }
-            lines.forEach((line: vscode.Range) => {
-              editBuilder.delete(line);
-              editBuilder.insert(
-                new vscode.Position(line.start.line, 0),
-                `${spaces}// ${document.getText(line).trim()}\n`,
-              );
-            });
-          });
+          logMessages.forEach(
+            ({ spaces, lines, isCommented, isTurboConsoleLog }) => {
+              // Only process Turbo Console Log messages
+              if (!isTurboConsoleLog) {
+                return;
+              }
+              if (isCommented) {
+                return; // Skip commenting if the message is already commented
+              }
+              lines.forEach((line: vscode.Range) => {
+                editBuilder.delete(line);
+                editBuilder.insert(
+                  new vscode.Position(line.start.line, 0),
+                  `${spaces}// ${document.getText(line).trim()}\n`,
+                );
+              });
+            },
+          );
         })
         .then(async (applied) => {
           if (applied) {

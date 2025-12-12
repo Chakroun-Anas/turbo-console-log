@@ -303,6 +303,34 @@ export function getCommonStyles(): string {
           box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
         }
 
+        /* Video Component Styles */
+        .video-component {
+          margin: 16px 0;
+          padding: 16px;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          border: 1px solid rgba(72, 191, 227, 0.2);
+          margin-left: auto;
+          margin-right: auto;
+        }
+        
+        .video-player {
+          width: 100%;
+          height: auto;
+          border-radius: 6px;
+          display: block;
+          background: #000000;
+        }
+        
+        .video-caption {
+          margin-top: 12px;
+          font-size: 13px;
+          color: #CCCCCC;
+          text-align: center;
+          line-height: 1.5;
+          padding: 0 8px;
+        }
+
         .footer {
           text-align: center;
           margin-top: 16px;

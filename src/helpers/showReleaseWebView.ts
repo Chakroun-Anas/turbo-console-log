@@ -4,22 +4,23 @@ import { readFromGlobalState, writeToGlobalState } from '@/helpers';
 import { GlobalStateKey } from '@/entities';
 import { createTelemetryService } from '../telemetry/telemetryService';
 import { WebviewVariantResponse } from '@/entities/WebviewVariant';
-import { WEBVIEW_FALLBACK_VARIANTS } from '../releases/3100';
+import { WEBVIEW_FALLBACK_VARIANTS } from '../releases/3120';
 
 const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
 // const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
 
 /**
- * Shows v3.10.0 release webview announcing PHP support using Thompson Sampling
+ * Shows v3.12.0 release webview announcing new Turbo Pro shape using Thompson Sampling
  * Only shows once using global state tracking
  * Tracks shown/clicked events for A/B testing
+ * Note: Caller should ensure this is only called for non-Pro users
  * @param context VS Code extension context
  */
 export async function showReleaseWebView(
   context: vscode.ExtensionContext,
 ): Promise<void> {
   // Check if webview has already been shown
-  const version = '3.10.0';
+  const version = '3.12.0';
   const stateKey = `${GlobalStateKey.HAS_SHOWN_RELEASE_WEBVIEW}${version}`;
   const hasShownWebView = readFromGlobalState<boolean>(context, stateKey);
 
@@ -28,7 +29,6 @@ export async function showReleaseWebView(
   const telemetryService = createTelemetryService();
 
   try {
-    // Fetch variant using Thompson Sampling (includes fallback to variant A)
     const variantData = await fetchWebviewVariant(version);
     const variant = variantData.variant;
     const title = variantData.title;

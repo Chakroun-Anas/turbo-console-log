@@ -54,7 +54,11 @@ export function deleteAllLogMessagesCommand(): Command {
       );
       editor
         .edit((editBuilder) => {
-          logMessages.forEach(({ lines }) => {
+          logMessages.forEach(({ lines, isTurboConsoleLog }) => {
+            // Only process Turbo Console Log messages
+            if (!isTurboConsoleLog) {
+              return;
+            }
             const firstLine = lines[0];
             const lastLine = lines[lines.length - 1];
 

@@ -1,0 +1,20 @@
+export default {
+  name: 'JSX in .js file (React component)',
+  sourceCode: [
+    "import React from 'react';",
+    '',
+    'function MyComponent({ name }) {',
+    '  const greeting = `Hello, ${name}`;',
+    '  return (',
+    '    <div className="container">',
+    '      <h1>{greeting}</h1>',
+    '      <p>Welcome to our app!</p>',
+    '    </div>',
+    '  );',
+    '}',
+    '',
+    'export default MyComponent;',
+  ],
+  fileExtension: '.js',
+  selectionLine: 3,
+};

@@ -1,118 +1,160 @@
 # Turbo Console Log
 
-**[Official Website](https://www.turboconsolelog.io)**  
-**[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)**
+**[Official Website](https://www.turboconsolelog.io)** | **[Turbo Pro](https://www.turboconsolelog.io/pro)** | **[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)**
 
 ---
 
-## What is Turbo Console Log?
+## 🚀 From Automated Logging to Total Workspace Mastery
 
-**Turbo Console Log automates the tedious parts of debugging in JavaScript and TypeScript.** With the Pro bundle, PHP support is now available, bringing intelligent logging to multiple languages in VS Code.
+**Turbo Console Log transforms debugging in JavaScript, TypeScript, and PHP.** It's built for developers who refuse to waste time manually typing log statements or hunting them down across dozens of files.
 
-It helps you insert, manage, and clean log statements across your code, whether you're using `console.log`, `console.error`, `console.warn`, and more in JavaScript, or `var_dump`, `print_r`, `error_log` in PHP, or even a fully custom logging function.
+### **Two Versions. One Mission.**
 
-Powered by a full AST engine, Turbo understands your code structure and adds logs precisely where they belong, making debugging faster and less repetitive. No more manually typing variable names or hunting down scattered console statements.
+**🆓 Turbo Console Log (Free)**  
+Perfect for everyday debugging in your **active editor**. Insert, comment, uncomment, and delete logs with keyboard shortcuts. Powered by a full AST engine that understands your code structure.
+
+**💎 Turbo Console Log Pro**  
+The **ultimate workspace log manager**. See every log across your entire codebase in a matter of seconds, no matter how large. Delete logs by type across your entire workspace. Filter, search, and navigate logs instantly. This is debugging at scale.
 
 ---
 
-## Features at a Glance
+## 🆓 What You Get for Free
 
-- **Insert Meaningful Log Messages** – Quickly generate logs with helpful context for JavaScript, TypeScript, and PHP
-- **Comment, Uncomment, or Delete Logs** – Manage logs across your entire codebase with simple shortcuts
+The free version gives you intelligent log insertion right where you need it:
+
+### ✨ Smart Log Insertion
+
+- **AST-Powered Precision** – Logs appear exactly where they belong, even in complex code
+- **7 Console Methods** – Dedicated commands for `console.log`, `console.info`, `console.debug`, `console.warn`, `console.error`, `console.table`, and a custom log method from the settings
+- **Individual Shortcuts** – Each method has its own ⌘K combination for instant access
 - **Multi-Cursor Support** – Debug multiple variables simultaneously
-- **Customizable Log Format** – Personalize how logs appear in your code
-- **Several Console Methods** – Dedicated commands for different logging levels and custom functions
-- **Individual Keyboard Shortcuts** – Each logging method has its own ⌘K combination
+- **Customizable Format** – Control prefixes, quotes, spacing, and context information
 
-### Pro Features
+### 🛠️ Log Management (Active Editor Only)
 
-- **PHP Support** – Full logging capabilities for PHP alongside JavaScript and TypeScript
-- **Native TreeView Panel** – Visual log panel with real-time sync
-- **Hide Logs** – Temporarily mute logs by pattern, file, or folder
-- **Auto-Correction** – Automatically fix line numbers and file names after refactoring
+- **Comment All Logs** – Mute all logs in your current file
+- **Uncomment All Logs** – Restore commented logs
+- **Delete All Logs** – Remove all logs from current file
+- **Correct Log Messages** – Auto-update file names and line numbers after refactoring
 
-**Full Documentation**: **[Turbo Console Log Docs](https://www.turboconsolelog.io/documentation)**
+**Great for:** Solo files, small projects, everyday debugging tasks
 
----
-
-## Configuration & Customization
-
-Turbo Console Log allows you to customize:
-
-- **Log Message Format** - Custom prefixes, suffixes, and delimiters
-- **Quote Style** - Choose between single quotes, double quotes, or backticks
-- **Context Information** - Include/exclude filename, line numbers, enclosing class, and function names
-- **Spacing & Formatting** - Add empty lines before/after logs, wrap messages, add semicolons
-- **Custom Log Functions** - Use your own logging function instead of console methods
-
-**Explore Settings**: **[Settings Documentation](https://www.turboconsolelog.io/documentation/settings/custom-prefix)**
+**Full Documentation:** **[Turbo Console Log Docs](https://www.turboconsolelog.io/documentation)**
 
 ---
 
-## Upgrade to Turbo Pro
-
-Turbo Pro unlocks the full potential of intelligent logging with advanced features designed for professional developers.
-
-### Pro Features at a Glance
-
-- **PHP Support** – Full logging capabilities for PHP alongside JavaScript and TypeScript
-- **Native Log Panel** – Explore all logs in your current folder/workspace via VSCode Tree View
-- **Real-Time Sync** – Log updates appear instantly in the panel
-- **Color-Coded Methods** – Instant visual recognition by method type
-- **Contextual Actions** – Right-click to comment, delete, or correct logs directly from the tree
-- **Auto-Correction** – Automatically fix line numbers and file names after log movements
-- **Hide Logs** – Temporarily mute specific logs by pattern, file, or folder
-
-**One-time payment. Lifetime access. No subscriptions.**
-
-**[Get Turbo Pro](https://www.turboconsolelog.io/pro)**
-
----
-
-## What's New in v3.10.0 – PHP Support is Here!
+## 💎 Turbo Console Log Pro – Total Workspace Mastery
 
 <p align="center">
-  <img src="https://www.turboconsolelog.io/assets/turbo-pro-php-illustration.png" alt="Turbo Console Log PHP Support" width="400">
+  <img src="https://www.turboconsolelog.io/assets/turbo-pro-illustration.png" alt="Turbo Console Log Pro" width="400">
 </p>
 
-**Turbo Console Log is expanding beyond JavaScript.** For the first time, Pro users can now use the same intelligent logging workflow in PHP projects.
+**When your codebase grows, freemium doesn't scale.** Pro transforms Turbo into the ultimate workspace log manager with total visibility and control.
 
-This release brings full AST-powered logging to PHP, with the same precision and context awareness you're used to in JavaScript and TypeScript. Whether you're working on Laravel applications, WordPress plugins, or standalone PHP projects, Turbo now understands your code structure and inserts logs exactly where they belong.
+### 🌲 Workspace Log Explorer
 
-### PHP Support Features
+**How many logs does your project actually have?** Pro answers in a matter of seconds.
 
-- **Smart Variable Detection** – Automatically captures variable names and context
-- **Multiple Logging Methods** – Support for `var_dump`, `print_r`, and `error_log`
-- **AST-Powered Placement** – Logs appear in the right place, even in complex code structures
-- **Unified Workflow** – Same keyboard shortcuts and commands you already know
-- **Full TreeView Integration** – PHP logs appear alongside JavaScript logs in the native panel
+- See every log across your entire codebase in a native VS Code tree view, no matter how many files
+- Click any log to jump straight to the source line
+- No more guessing, no more searching—just instant navigation
 
-### Why PHP?
+### 🧹 Mass Cleanup Operations
 
-With millions of PHP developers worldwide and countless legacy and modern PHP projects in active development, bringing intelligent logging to PHP was a natural next step. More languages are on the roadmap.
+**About to push?** Select the log types you want gone and watch them disappear across your entire workspace.
 
-**[Learn more about Turbo PRO](https://www.turboconsolelog.io/pro)** | **[Subscribe to Newsletter](https://www.turboconsolelog.io/join)**
+- Choose specific log types: `console.log`, `console.error`, `console.warn`, or all of them
+- Pick your scope: workspace, folder, or file
+- Handles large codebases with hundreds of logs—deleted instantly, reliably, every time
+
+### 🎯 Real-Time Filtering
+
+**Hundreds of logs but only care about errors?** Toggle log types and the tree updates instantly.
+
+- Filter by: log, error, warn, info, debug, table
+- No re-scan, no waiting, just pure control over the noise
+- Color-coded for instant visual recognition (🟦 log, 🟥 error, 🟨 warn, 🟩 info, 🟪 debug, 📊 table)
+
+### 🔍 Instant Search
+
+**Find any log by content in seconds.** Type the keyword, see matching logs instantly, click to jump to the exact line.
+
+- No grep, no scrolling through files, no memory required
+- Search across your entire workspace
+- Results update as you type
+
+### 🌍 Multi-Language Support
+
+Pro recognizes **JavaScript, TypeScript, and PHP** logs in one unified view:
+
+- **JavaScript/TypeScript:** All console methods and a custom log method from the settings
+- **PHP:** `var_dump()`, `print_r()`, `error_log()`, and a custom log method from the settings
+- **Custom Functions:** Your own logging functions, any language
+
+### ✨ Enhanced Experience
+
+- **Context Actions:** Right-click any log for instant comment, delete, or correction
+- **Auto-Correction:** Keeps file names and line numbers synchronized after refactoring
+- **Hide Logs:** Temporarily mute logs by pattern, file, or folder
+- **Smart Detection:** Recognizes Turbo logs and plain console statements
+
+### 🎁 Your Pro License Includes
+
+- ✅ **Lifetime access** – Pay once, own it permanently
+- ✅ **Use on up to 5 machines** – Laptop, desktop, work computer
+- ✅ **All future updates included** – Every enhancement, no additional cost
+- ✅ **Priority email support** – Direct help at support@turboconsolelog.io
+
+**One-time payment. No subscriptions. Yours forever.**
+
+**[See Pro in Action](https://www.turboconsolelog.io/pro#see-it-in-action)** | **[Upgrade to Pro](https://www.turboconsolelog.io/pro)**
 
 ---
 
-## Stay in the Loop – Join the Newsletter
+## ⚙️ Configuration & Customization
 
-**Get early access to new features, exclusive updates, and behind-the-scenes insights!**  
-Be the first to know about Turbo Console Log improvements, releases, and launch news.
+Turbo Console Log (free and Pro) is fully customizable:
 
-**Join the newsletter** → **[https://www.turboconsolelog.io/join](https://www.turboconsolelog.io/join)**
+- **Log Message Format** – Custom prefixes, suffixes, and delimiters
+- **Quote Style** – Single quotes, double quotes, or backticks
+- **Context Information** – Include/exclude filename, line numbers, class, and function names
+- **Spacing & Formatting** – Empty lines before/after logs, wrap messages, semicolons
+- **Custom Log Functions** – Use your own logging function instead of console methods
+
+**Explore Settings:** **[Settings Documentation](https://www.turboconsolelog.io/documentation/settings/custom-prefix)**
 
 ---
 
-## Support Turbo Console Log
+## 🔥 Why Developers Choose Turbo Pro
 
-Turbo Console Log is free and open-source, built and maintained by developers who care about making debugging better for everyone.
+**"Before Pro, I spent hours hunting down logs before commits. Now I delete 50+ logs in 1 second."**
 
-If this tool has saved you time and frustration, consider supporting its continued development:
+**"The workspace explorer saved my sanity. I can finally see what's actually in my codebase."**
 
-**[Visit the Sponsorship Page](https://www.turboconsolelog.io/sponsorship)**
+**"One-time payment for lifetime access? No-brainer. Best $49 I've spent on a dev tool."**
 
-Your support helps fund bug fixes, new features, and ongoing maintenance. It keeps the project alive and growing for the community that depends on it.
+Whether you're managing dozens or hundreds of logs, whether you're debugging a feature or cleaning up before release, **Turbo Pro makes it effortless.**
+
+**[Upgrade to Pro](https://www.turboconsolelog.io/pro)**
+
+---
+
+## ✉️ Stay Updated
+
+**Get early access to new features, exclusive updates, and behind-the-scenes insights.**  
+Be the first to know about improvements, releases, and Pro feature launches.
+
+**[Join the Newsletter](https://www.turboconsolelog.io/join)** | **[Subscribe for 30% Pro Discount](https://www.turboconsolelog.io/join)**
+
+---
+
+## 💚 Support Turbo Console Log
+
+The free version of Turbo Console Log is open-source and will always remain free. If this tool has saved you time and frustration, consider supporting its continued development:
+
+**[Sponsor the Project](https://www.turboconsolelog.io/sponsorship)**
+
+Your support keeps the project alive, funds new features, and helps us build tools developers actually love.
 
 ---
 
