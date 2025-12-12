@@ -2,6 +2,34 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.12.1] - 2025-12-12
+
+### 🔧 Bug Fixes & Improvements
+
+#### Enhanced JSX Support in .js Files
+
+Fixes [#316](https://github.com/Chakroun-Anas/turbo-console-log/issues/316)
+
+- **Automatic JSX Detection**: The parser now automatically detects and handles JSX syntax in `.js` files without requiring explicit configuration
+- **Intelligent Fallback Mechanism**: When parsing fails in `.js` files, the engine automatically retries with JSX support enabled, seamlessly handling React projects that use JSX in `.js` files
+- **No Performance Impact**: Regular `.js` files without JSX parse efficiently on the first attempt; the fallback only activates when needed
+- **Improved Developer Experience**: React developers can now use Turbo Console Log in `.js` files with JSX syntax without any workarounds or file extension changes
+
+#### Test Coverage Expansion
+
+- **9 New Test Cases**: Added comprehensive test coverage for JSX patterns in `.js` files:
+  - React functional components with hooks
+  - JSX fragments and spread operators
+  - Nested ternary operators in JSX
+  - Self-closing tags and spread props
+  - Array methods with JSX mapping
+  - Arrow functions with implicit JSX returns
+  - Complex conditional rendering patterns
+  - Mixed files with both JSX and regular JavaScript
+- **Error Handling**: Maintains strict error detection for actual syntax errors while supporting valid JSX patterns
+
+This update resolves parsing issues for React projects using `.js` files with JSX syntax, a common pattern in many React codebases, especially those created with older versions of Create React App or custom configurations.
+
 ## [3.12.0] - 2025-12-10
 
 ### 🎯 Introducing the New Shape of Turbo Pro
