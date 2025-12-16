@@ -182,4 +182,4 @@ It allows free personal and non-commercial use of the open-source core.
 
 Commercial use, redistribution, and use of the brand, logo, or Turbo Pro features are strictly protected.
 
-See the full **[LICENSE](./LICENSE.txt)** for details.
+See the full **[LICENSE](./LICENSE.TXT.** for details.
