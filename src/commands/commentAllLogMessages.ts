@@ -77,7 +77,7 @@ export function commentAllLogMessagesCommand(): Command {
           if (applied) {
             await document.save();
             // Track log management command usage
-            trackLogManagementCommands(context);
+            trackLogManagementCommands(context, 'comment');
           }
         });
     },

@@ -214,7 +214,7 @@ describe('showNotification', () => {
       );
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        '🎉 Turbo Console Log installed! Want to see it in action?',
         'Get Started',
         'Maybe Later',
       );
@@ -324,7 +324,7 @@ describe('showNotification', () => {
       );
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        '🎉 Turbo Console Log installed! Want to see it in action?',
         'Get Started',
         'Maybe Later',
       );
@@ -343,7 +343,7 @@ describe('showNotification', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalled();
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        '🎉 Turbo Console Log installed! Want to see it in action?',
         'Get Started',
         'Maybe Later',
       );
@@ -356,7 +356,7 @@ describe('showNotification', () => {
       await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
-        '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        '🎉 Turbo Console Log installed! Want to see it in action?',
         'Get Started',
         'Maybe Later',
       );
@@ -732,8 +732,8 @@ describe('showNotification', () => {
         );
 
         expect(mockShowInformationMessage).toHaveBeenCalledWith(
-          '\ud83d\udc8e Like the panel? Turbo PRO adds smarter log detection, faster navigation and cleanup tools.',
-          'Take a look',
+          "🔥 You're exploring the panel a lot. Turbo PRO shows ALL logs from ALL files instantly.",
+          'See It In Action',
           'I already did',
           'Maybe Later',
         );
@@ -787,7 +787,7 @@ describe('showNotification', () => {
       });
 
       it('should open fallback CTA URL with correct parameters', async () => {
-        mockShowInformationMessage.mockResolvedValue('Take a look');
+        mockShowInformationMessage.mockResolvedValue('See It In Action');
 
         const mockContext = {
           subscriptions: [],
