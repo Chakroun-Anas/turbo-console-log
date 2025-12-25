@@ -77,7 +77,7 @@ export function uncommentAllLogMessagesCommand(): Command {
           if (applied) {
             await document.save();
             // Track log management command usage
-            trackLogManagementCommands(context);
+            trackLogManagementCommands(context, 'uncomment');
           }
         });
     },

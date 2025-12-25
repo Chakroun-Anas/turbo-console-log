@@ -34,30 +34,6 @@ export async function trackLogInsertions(
     return;
   }
 
-  // Check for v3.11.0 launch notification (show to free users only, once)
-  const hasShownV3110LaunchNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION,
-  );
-
-  if (!hasShownV3110LaunchNotification && commandUsageCount >= 1) {
-    // Mark that notification has been shown
-    writeToGlobalState(
-      context,
-      GlobalStateKey.HAS_SHOWN_V3_11_0_LAUNCH_NOTIFICATION,
-      true,
-    );
-
-    // Show v3.11.0 launch notification (non-blocking) with version info
-    showNotification(
-      NotificationEvent.EXTENSION_V3_11_0_LAUNCH,
-      version,
-      context,
-    );
-    // Return early to avoid showing multiple notifications at once
-    return;
-  }
-
   // Check if user has reached the 10 inserts milestone (educational)
   const hasShownTenInsertsMilestoneNotification = readFromGlobalState<boolean>(
     context,

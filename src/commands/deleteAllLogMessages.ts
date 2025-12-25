@@ -99,7 +99,7 @@ export function deleteAllLogMessagesCommand(): Command {
           if (applied) {
             await document.save();
             // Track log management command usage
-            trackLogManagementCommands(context);
+            trackLogManagementCommands(context, 'delete');
           }
         });
     },

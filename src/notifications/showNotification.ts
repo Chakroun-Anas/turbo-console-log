@@ -118,13 +118,13 @@ export async function showNotification(
       { message: string; ctaText: string; ctaUrl: string }
     > = {
       [NotificationEvent.EXTENSION_FRESH_INSTALL]: {
-        message: '🎉 Turbo Console Log installed! Ready to debug like a pro?',
+        message: '🎉 Turbo Console Log installed! Want to see it in action?',
         ctaText: 'Get Started',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/overview/motivation`,
       },
       [NotificationEvent.EXTENSION_TEN_INSERTS]: {
         message:
-          '⚡ 10 logs and counting! Want to learn more powerful Turbo commands?',
+          '🎓 10 logs already! Did you know you can comment or delete them all at once?',
         ctaText: 'Discover Features',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/comment-inserted-log-messages`,
       },
@@ -136,8 +136,8 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS]: {
         message:
-          '💎 Like the panel? Turbo PRO adds smarter log detection, faster navigation and cleanup tools.',
-        ctaText: 'Take a look',
+          "🔥 You're exploring the panel a lot. Turbo PRO shows ALL logs from ALL files instantly.",
+        ctaText: 'See It In Action',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
       [NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED]: {
@@ -158,16 +158,28 @@ export async function showNotification(
         ctaText: 'See It In Action',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
-      [NotificationEvent.EXTENSION_BULK_DELETE_PRE_LAUNCH]: {
+      [NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS]: {
         message:
-          '🔥 Workspace-wide Log Cleanup! Select which log functions to remove and obliterate them workspace-wide.',
-        ctaText: "See What's Coming",
+          '🔥 Commenting logs manually? Turbo PRO lets you manage them in bulk directly from the panel.',
+        ctaText: 'See It In Action',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
-      [NotificationEvent.EXTENSION_V3_11_0_LAUNCH]: {
+      [NotificationEvent.EXTENSION_FIVE_UNCOMMENTS_COMMANDS]: {
         message:
-          '🚀 Turbo Pro v3.11.0 is here! Ultimate Workspace Log Manager with 4 game-changing features.',
-        ctaText: "See What's New",
+          '🔥 Uncommenting logs manually? Turbo PRO lets you manage them in bulk directly from the panel.',
+        ctaText: 'See It In Action',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+      [NotificationEvent.EXTENSION_FIVE_CORRECTIONS_COMMANDS]: {
+        message:
+          '🔥 Correcting logs manually? Turbo PRO lets you manage them in bulk directly from the panel.',
+        ctaText: 'See It In Action',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+      [NotificationEvent.EXTENSION_FIVE_DELETE_COMMANDS]: {
+        message:
+          '🔥 Deleting logs manually? Turbo PRO lets you clean them in bulk directly from the panel.',
+        ctaText: 'See It In Action',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
     };
