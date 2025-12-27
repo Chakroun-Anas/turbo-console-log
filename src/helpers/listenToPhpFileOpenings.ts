@@ -50,19 +50,21 @@ export function listenToPhpFileOpenings(
 
       // Check if it's a PHP file
       if (isPhpFile(document)) {
-        // Mark as shown immediately to avoid duplicate notifications
-        writeToGlobalState(
-          context,
-          GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
-          true,
-        );
-
         // Show notification immediately (v3.10.0 strategy)
-        await showNotification(
+        const wasShown = await showNotification(
           NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
           version,
           context,
         );
+
+        // Only mark as shown if it was actually displayed (not blocked by cooldown)
+        if (wasShown) {
+          writeToGlobalState(
+            context,
+            GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
+            true,
+          );
+        }
       }
     },
   );

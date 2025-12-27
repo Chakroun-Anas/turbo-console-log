@@ -33,7 +33,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(false);
       mockIsProUser.mockReturnValue(false);
 
-      const result = await canInsertLogInDocument(context, document, version);
+      const result = canInsertLogInDocument(context, document, version);
 
       expect(result).toBe(true);
       expect(mockShowNotification).not.toHaveBeenCalled();
@@ -44,7 +44,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(false);
       mockIsProUser.mockReturnValue(false);
 
-      const result = await canInsertLogInDocument(context, document, version);
+      const result = canInsertLogInDocument(context, document, version);
 
       expect(result).toBe(true);
       expect(mockShowNotification).not.toHaveBeenCalled();
@@ -55,7 +55,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(false);
       mockIsProUser.mockReturnValue(true);
 
-      const result = await canInsertLogInDocument(context, document, version);
+      const result = canInsertLogInDocument(context, document, version);
 
       expect(result).toBe(true);
       expect(mockShowNotification).not.toHaveBeenCalled();
@@ -68,7 +68,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(true);
       mockIsProUser.mockReturnValue(false);
 
-      const result = await canInsertLogInDocument(context, document, version);
+      const result = canInsertLogInDocument(context, document, version);
 
       expect(result).toBe(false);
     });
@@ -78,7 +78,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(true);
       mockIsProUser.mockReturnValue(false);
 
-      await canInsertLogInDocument(context, document, version);
+      canInsertLogInDocument(context, document, version);
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_PHP_PRO_ONLY,
@@ -94,7 +94,7 @@ describe('canInsertLogInDocument', () => {
       mockIsProUser.mockReturnValue(false);
       const customVersion = '3.9.7';
 
-      await canInsertLogInDocument(context, document, customVersion);
+      canInsertLogInDocument(context, document, customVersion);
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_PHP_PRO_ONLY,
@@ -108,12 +108,12 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(true);
       mockIsProUser.mockReturnValue(false);
 
-      const result = await canInsertLogInDocument(context, document);
+      const result = canInsertLogInDocument(context, document, version);
 
       expect(result).toBe(false);
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_PHP_PRO_ONLY,
-        undefined,
+        version,
         context,
       );
     });
@@ -125,7 +125,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(true);
       mockIsProUser.mockReturnValue(true);
 
-      const result = await canInsertLogInDocument(context, document, version);
+      const result = canInsertLogInDocument(context, document, version);
 
       expect(result).toBe(true);
     });
@@ -135,7 +135,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(true);
       mockIsProUser.mockReturnValue(true);
 
-      await canInsertLogInDocument(context, document, version);
+      canInsertLogInDocument(context, document, version);
 
       expect(mockShowNotification).not.toHaveBeenCalled();
     });
@@ -147,7 +147,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(true);
       mockIsProUser.mockReturnValue(false);
 
-      await canInsertLogInDocument(context, document, version);
+      canInsertLogInDocument(context, document, version);
 
       expect(mockIsPhpFile).toHaveBeenCalledWith(document);
       expect(mockIsPhpFile).toHaveBeenCalledTimes(1);
@@ -158,7 +158,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(true);
       mockIsProUser.mockReturnValue(false);
 
-      await canInsertLogInDocument(context, document, version);
+      canInsertLogInDocument(context, document, version);
 
       expect(mockIsProUser).toHaveBeenCalledWith(context);
       expect(mockIsProUser).toHaveBeenCalledTimes(1);
@@ -169,7 +169,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(false);
       mockIsProUser.mockReturnValue(false);
 
-      const result = await canInsertLogInDocument(context, document, version);
+      const result = canInsertLogInDocument(context, document, version);
 
       expect(result).toBe(true);
       expect(mockIsPhpFile).toHaveBeenCalled();
@@ -182,7 +182,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(true);
       mockIsProUser.mockReturnValue(true);
 
-      await canInsertLogInDocument(context, document, version);
+      canInsertLogInDocument(context, document, version);
 
       expect(mockIsPhpFile).toHaveBeenCalled();
       expect(mockIsProUser).toHaveBeenCalled();
@@ -195,7 +195,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(true);
       mockIsProUser.mockReturnValue(false);
 
-      const result = await canInsertLogInDocument(context, document, version);
+      const result = canInsertLogInDocument(context, document, version);
 
       expect(result).toBe(false);
       expect(mockShowNotification).toHaveBeenCalled();
@@ -206,7 +206,7 @@ describe('canInsertLogInDocument', () => {
       mockIsPhpFile.mockReturnValue(false);
       mockIsProUser.mockReturnValue(false);
 
-      const result = await canInsertLogInDocument(context, document, version);
+      const result = canInsertLogInDocument(context, document, version);
 
       expect(result).toBe(true);
       expect(mockShowNotification).not.toHaveBeenCalled();

@@ -2,9 +2,15 @@ import * as vscode from 'vscode';
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
 import { createTelemetryService } from '@/telemetry/telemetryService';
+import { makeExtensionContext } from '@/jest-tests/mocks/helpers/makeExtensionContext';
+import {
+  shouldShowNotification,
+  recordNotificationShown,
+} from '@/notifications/notificationCooldown';
 
 // Mock dependencies
 jest.mock('@/telemetry/telemetryService');
+jest.mock('@/notifications/notificationCooldown');
 jest.mock('vscode', () => ({
   window: {
     showInformationMessage: jest.fn(),
@@ -28,12 +34,33 @@ describe('showNotification', () => {
   let mockShowInformationMessage: jest.Mock;
   let mockOpenExternal: jest.Mock;
   let mockFetch: jest.Mock;
+  let mockShouldShowNotification: jest.MockedFunction<
+    typeof shouldShowNotification
+  >;
+  let mockRecordNotificationShown: jest.MockedFunction<
+    typeof recordNotificationShown
+  >;
   let consoleErrorSpy: jest.SpyInstance;
   let consoleLogSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;
+  let mockContext: vscode.ExtensionContext;
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Create mock context
+    mockContext = makeExtensionContext();
+
+    // Mock cooldown functions - default to allowing notifications
+    mockShouldShowNotification = shouldShowNotification as jest.MockedFunction<
+      typeof shouldShowNotification
+    >;
+    mockRecordNotificationShown =
+      recordNotificationShown as jest.MockedFunction<
+        typeof recordNotificationShown
+      >;
+    mockShouldShowNotification.mockReturnValue(true); // Default: allow notifications
+    mockRecordNotificationShown.mockReturnValue(undefined);
 
     // Mock telemetry service with resolved promises
     mockTelemetryService = {
@@ -82,6 +109,7 @@ describe('showNotification', () => {
       await showNotification(
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         '3.9.0',
+        mockContext,
       );
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -98,7 +126,11 @@ describe('showNotification', () => {
     it('should track notification shown event', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(
         mockTelemetryService.reportNotificationInteraction,
@@ -112,7 +144,11 @@ describe('showNotification', () => {
     it('should show notification with correct message and buttons', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
         'Test notification message',
@@ -124,7 +160,11 @@ describe('showNotification', () => {
     it('should track clicked event and open URL when CTA is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('Get Started');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(
         mockTelemetryService.reportNotificationInteraction,
@@ -138,12 +178,18 @@ describe('showNotification', () => {
       expect(mockOpenExternal).toHaveBeenCalledWith(
         mockNotificationData.ctaUrl,
       );
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
     });
 
     it('should track dismissed event when "Maybe Later" is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(
         mockTelemetryService.reportNotificationInteraction,
@@ -155,12 +201,18 @@ describe('showNotification', () => {
       );
 
       expect(mockOpenExternal).not.toHaveBeenCalled();
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
     });
 
     it('should track dismissed event when notification is closed without action', async () => {
       mockShowInformationMessage.mockResolvedValue(undefined);
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(
         mockTelemetryService.reportNotificationInteraction,
@@ -170,6 +222,8 @@ describe('showNotification', () => {
         'A',
         expect.any(Number),
       );
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
     });
 
     it('should cap reaction time at 60 seconds', async () => {
@@ -183,7 +237,11 @@ describe('showNotification', () => {
 
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(
         mockTelemetryService.reportNotificationInteraction,
@@ -206,7 +264,11 @@ describe('showNotification', () => {
     it('should log error and show fallback notification', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Failed to show notification:',
@@ -223,7 +285,11 @@ describe('showNotification', () => {
     it('should track fallback notification click and open motivation page', async () => {
       mockShowInformationMessage.mockResolvedValue('Get Started');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(
         mockTelemetryService.reportNotificationInteraction,
@@ -237,12 +303,18 @@ describe('showNotification', () => {
       expect(mockOpenExternal).toHaveBeenCalledWith(
         'https://www.turboconsolelog.io/documentation/overview/motivation?event=extensionFreshInstall&variant=fallback',
       );
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
     });
 
     it('should track fallback notification dismissal when "Maybe Later" is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(
         mockTelemetryService.reportNotificationInteraction,
@@ -254,12 +326,18 @@ describe('showNotification', () => {
       );
 
       expect(mockOpenExternal).not.toHaveBeenCalled();
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
     });
 
     it('should track fallback notification dismissal when closed without action', async () => {
       mockShowInformationMessage.mockResolvedValue(undefined);
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(
         mockTelemetryService.reportNotificationInteraction,
@@ -269,12 +347,18 @@ describe('showNotification', () => {
         'fallback',
         expect.any(Number),
       );
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
     });
 
     it('should include event and variant query parameters in fallback URL', async () => {
       mockShowInformationMessage.mockResolvedValue('Get Started');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       const expectedUrl =
         'https://www.turboconsolelog.io/documentation/overview/motivation?event=extensionFreshInstall&variant=fallback';
@@ -292,7 +376,11 @@ describe('showNotification', () => {
 
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(
         mockTelemetryService.reportNotificationInteraction,
@@ -316,7 +404,11 @@ describe('showNotification', () => {
       });
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Failed to show notification:',
@@ -339,7 +431,11 @@ describe('showNotification', () => {
       });
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(consoleErrorSpy).toHaveBeenCalled();
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
@@ -353,7 +449,11 @@ describe('showNotification', () => {
       mockFetch.mockRejectedValue(new Error('Network timeout'));
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(mockShowInformationMessage).toHaveBeenCalledWith(
         '🎉 Turbo Console Log installed! Want to see it in action?',
@@ -381,6 +481,7 @@ describe('showNotification', () => {
       await showNotification(
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         '3.9.1',
+        mockContext,
       );
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -389,11 +490,15 @@ describe('showNotification', () => {
       );
     });
 
-    it('should not include version parameter when not provided', async () => {
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+    it('should include version parameter in URL', async () => {
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://www.turboconsolelog.io/api/extensionNotification?notificationEvent=extensionFreshInstall',
+        'https://www.turboconsolelog.io/api/extensionNotification?notificationEvent=extensionFreshInstall&version=3.9.0',
         expect.any(Object),
       );
     });
@@ -417,7 +522,11 @@ describe('showNotification', () => {
     it('should create telemetry service once', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       expect(createTelemetryService).toHaveBeenCalledTimes(1);
     });
@@ -438,13 +547,21 @@ describe('showNotification', () => {
         return Promise.resolve('Maybe Later');
       });
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
     });
 
     it('should always include reaction time for click and dismiss events', async () => {
       mockShowInformationMessage.mockResolvedValue('Test CTA');
 
-      await showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL);
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
 
       const clickCall =
         mockTelemetryService.reportNotificationInteraction.mock.calls.find(
@@ -479,7 +596,11 @@ describe('showNotification', () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
       await expect(
-        showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL),
+        showNotification(
+          NotificationEvent.EXTENSION_FRESH_INSTALL,
+          '3.9.0',
+          mockContext,
+        ),
       ).resolves.not.toThrow();
     });
 
@@ -490,7 +611,11 @@ describe('showNotification', () => {
         .mockRejectedValueOnce(new Error('Telemetry service unavailable')); // click event fails
 
       await expect(
-        showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL),
+        showNotification(
+          NotificationEvent.EXTENSION_FRESH_INSTALL,
+          '3.9.0',
+          mockContext,
+        ),
       ).resolves.not.toThrow();
 
       expect(mockOpenExternal).toHaveBeenCalledWith(
@@ -505,7 +630,11 @@ describe('showNotification', () => {
         .mockRejectedValueOnce(new Error('Telemetry service unavailable')); // dismiss event fails
 
       await expect(
-        showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL),
+        showNotification(
+          NotificationEvent.EXTENSION_FRESH_INSTALL,
+          '3.9.0',
+          mockContext,
+        ),
       ).resolves.not.toThrow();
     });
 
@@ -517,7 +646,11 @@ describe('showNotification', () => {
 
       // Should still show notification despite telemetry failure
       await expect(
-        showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL),
+        showNotification(
+          NotificationEvent.EXTENSION_FRESH_INSTALL,
+          '3.9.0',
+          mockContext,
+        ),
       ).rejects.toThrow();
 
       // Restore for other tests
@@ -534,7 +667,11 @@ describe('showNotification', () => {
       );
 
       await expect(
-        showNotification(NotificationEvent.EXTENSION_FRESH_INSTALL),
+        showNotification(
+          NotificationEvent.EXTENSION_FRESH_INSTALL,
+          '3.9.0',
+          mockContext,
+        ),
       ).resolves.not.toThrow();
 
       expect(mockOpenExternal).toHaveBeenCalledWith(
@@ -562,17 +699,9 @@ describe('showNotification', () => {
     it('should show notification with 3 buttons including "I already did"', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      const mockContext = {
-        subscriptions: [],
-        globalState: {
-          get: jest.fn(),
-          update: jest.fn(),
-        },
-      } as unknown as vscode.ExtensionContext;
-
       await showNotification(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.9.0',
         mockContext,
       );
 
@@ -587,17 +716,9 @@ describe('showNotification', () => {
     it('should not track telemetry when "I already did" is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('I already did');
 
-      const mockContext = {
-        subscriptions: [],
-        globalState: {
-          get: jest.fn(),
-          update: jest.fn(),
-        },
-      } as unknown as vscode.ExtensionContext;
-
       await showNotification(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.9.0',
         mockContext,
       );
 
@@ -617,17 +738,9 @@ describe('showNotification', () => {
     it('should update global state when "I already did" is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('I already did');
 
-      const mockContext = {
-        subscriptions: [],
-        globalState: {
-          get: jest.fn(),
-          update: jest.fn(),
-        },
-      } as unknown as vscode.ExtensionContext;
-
       await showNotification(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.9.0',
         mockContext,
       );
 
@@ -642,8 +755,8 @@ describe('showNotification', () => {
 
       await showNotification(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
-        undefined,
+        '3.9.0',
+        mockContext,
       );
 
       // Should not throw error
@@ -655,17 +768,9 @@ describe('showNotification', () => {
     it('should open CTA URL when main button is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('Subscribe');
 
-      const mockContext = {
-        subscriptions: [],
-        globalState: {
-          get: jest.fn(),
-          update: jest.fn(),
-        },
-      } as unknown as vscode.ExtensionContext;
-
       await showNotification(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.9.0',
         mockContext,
       );
 
@@ -680,22 +785,16 @@ describe('showNotification', () => {
         'A',
         expect.any(Number),
       );
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
     });
 
     it('should track dismissal when "Maybe Later" is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-      const mockContext = {
-        subscriptions: [],
-        globalState: {
-          get: jest.fn(),
-          update: jest.fn(),
-        },
-      } as unknown as vscode.ExtensionContext;
-
       await showNotification(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        undefined,
+        '3.9.0',
         mockContext,
       );
 
@@ -707,6 +806,8 @@ describe('showNotification', () => {
         'A',
         expect.any(Number),
       );
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
     });
 
     describe('fallback flow for EXTENSION_PANEL_FREQUENT_ACCESS', () => {
@@ -717,17 +818,9 @@ describe('showNotification', () => {
       it('should show fallback notification with 3 buttons', async () => {
         mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
-        const mockContext = {
-          subscriptions: [],
-          globalState: {
-            get: jest.fn(),
-            update: jest.fn(),
-          },
-        } as unknown as vscode.ExtensionContext;
-
         await showNotification(
           NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-          undefined,
+          '3.9.0',
           mockContext,
         );
 
@@ -742,17 +835,9 @@ describe('showNotification', () => {
       it('should update global state on fallback "I already did" click', async () => {
         mockShowInformationMessage.mockResolvedValue('I already did');
 
-        const mockContext = {
-          subscriptions: [],
-          globalState: {
-            get: jest.fn(),
-            update: jest.fn(),
-          },
-        } as unknown as vscode.ExtensionContext;
-
         await showNotification(
           NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-          undefined,
+          '3.9.0',
           mockContext,
         );
 
@@ -765,17 +850,9 @@ describe('showNotification', () => {
       it('should not track telemetry for fallback "I already did" click', async () => {
         mockShowInformationMessage.mockResolvedValue('I already did');
 
-        const mockContext = {
-          subscriptions: [],
-          globalState: {
-            get: jest.fn(),
-            update: jest.fn(),
-          },
-        } as unknown as vscode.ExtensionContext;
-
         await showNotification(
           NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-          undefined,
+          '3.9.0',
           mockContext,
         );
 
@@ -789,17 +866,9 @@ describe('showNotification', () => {
       it('should open fallback CTA URL with correct parameters', async () => {
         mockShowInformationMessage.mockResolvedValue('See It In Action');
 
-        const mockContext = {
-          subscriptions: [],
-          globalState: {
-            get: jest.fn(),
-            update: jest.fn(),
-          },
-        } as unknown as vscode.ExtensionContext;
-
         await showNotification(
           NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-          undefined,
+          '3.9.0',
           mockContext,
         );
 
@@ -807,6 +876,154 @@ describe('showNotification', () => {
           'https://www.turboconsolelog.io/pro?event=extensionPanelFrequentAccess&variant=fallback',
         );
       });
+    });
+  });
+
+  describe('Cooldown Integration', () => {
+    const mockNotificationData = {
+      message: 'Test notification',
+      ctaText: 'Test CTA',
+      ctaUrl: 'https://test.com',
+      variant: 'A',
+    };
+
+    beforeEach(() => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => mockNotificationData,
+      });
+      mockShowInformationMessage.mockResolvedValue('Maybe Later');
+    });
+
+    it('should check cooldown before showing notification', async () => {
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(mockShouldShowNotification).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+    });
+
+    it('should return false and not show notification when cooldown blocks', async () => {
+      mockShouldShowNotification.mockReturnValue(false);
+
+      const result = await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(result).toBe(false);
+      expect(mockFetch).not.toHaveBeenCalled();
+      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+      expect(mockRecordNotificationShown).not.toHaveBeenCalled();
+    });
+
+    it('should return true when notification is shown successfully', async () => {
+      mockShouldShowNotification.mockReturnValue(true);
+
+      const result = await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(result).toBe(true);
+      expect(mockShowInformationMessage).toHaveBeenCalled();
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+    });
+
+    it('should record notification shown after successful display', async () => {
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledTimes(1);
+    });
+
+    it('should record notification shown at the end of the flow', async () => {
+      let fetchCalled = false;
+      let messageCalled = false;
+
+      mockFetch.mockImplementation(async () => {
+        fetchCalled = true;
+        expect(mockRecordNotificationShown).not.toHaveBeenCalled();
+        return {
+          ok: true,
+          json: async () => mockNotificationData,
+        };
+      });
+
+      mockShowInformationMessage.mockImplementation(async () => {
+        messageCalled = true;
+        expect(mockRecordNotificationShown).not.toHaveBeenCalled();
+        return 'Maybe Later';
+      });
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(fetchCalled).toBe(true);
+      expect(messageCalled).toBe(true);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+    });
+
+    it('should return true even when API fails but fallback is shown', async () => {
+      mockFetch.mockRejectedValue(new Error('API error'));
+
+      const result = await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(result).toBe(true);
+      expect(mockShowInformationMessage).toHaveBeenCalled();
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+    });
+
+    it('should not record notification for IGNORE events when blocked by cooldown', async () => {
+      const ignoreEvents = [
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        NotificationEvent.EXTENSION_FIVE_UNCOMMENTS_COMMANDS,
+        NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
+      ];
+
+      for (const event of ignoreEvents) {
+        jest.clearAllMocks();
+        mockShouldShowNotification.mockReturnValue(false);
+
+        const result = await showNotification(event, '3.9.0', mockContext);
+
+        expect(result).toBe(false);
+        expect(mockShouldShowNotification).toHaveBeenCalledWith(
+          mockContext,
+          event,
+        );
+        expect(mockRecordNotificationShown).not.toHaveBeenCalled();
+      }
+    });
+
+    it('should record notification shown even in fallback flow', async () => {
+      mockFetch.mockRejectedValue(new Error('Network error'));
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
     });
   });
 });

@@ -6,11 +6,14 @@ import { NotificationEvent } from '../notifications/NotificationEvent';
 
 /**
  * Tracks panel opening usage
- * Shows frequent panel access notification at 5, 15, and 25 openings
- * Stops showing notifications after reaching 25 (milestone achieved)
+ * Shows frequent panel access notification at 15 openings (sweet spot for engagement)
+ * Uses >= check to handle cooldown blocking gracefully
+ * Note: Uses IGNORE priority, so may be blocked by cooldown
  * @param context VS Code extension context
  */
-export function trackPanelOpenings(context: vscode.ExtensionContext): void {
+export async function trackPanelOpenings(
+  context: vscode.ExtensionContext,
+): Promise<void> {
   // Get extension version
   const version = vscode.extensions.getExtension(
     'ChakrounAnas.turbo-console-log',
@@ -27,15 +30,14 @@ export function trackPanelOpenings(context: vscode.ExtensionContext): void {
     return;
   }
 
-  // Check if user has reached 25 panel openings milestone
-  const hasShownTwentyFivePanelOpeningsNotification =
-    readFromGlobalState<boolean>(
-      context,
-      GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION,
-    );
+  // Check if notification already shown
+  const hasShownNotification = readFromGlobalState<boolean>(
+    context,
+    GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION,
+  );
 
-  // Skip notification if user has already reached the 25 openings milestone
-  if (hasShownTwentyFivePanelOpeningsNotification) {
+  // Skip if notification already shown
+  if (hasShownNotification) {
     return;
   }
 
@@ -50,26 +52,20 @@ export function trackPanelOpenings(context: vscode.ExtensionContext): void {
     panelOpeningCount,
   );
 
-  // Show notification at 5, 15, and 25 openings
-  if (
-    panelOpeningCount === 5 ||
-    panelOpeningCount === 15 ||
-    panelOpeningCount === 25
-  ) {
-    // Mark milestone as reached if at 25 openings
-    if (panelOpeningCount === 25) {
+  // Show notification at 15 panel openings (optimal engagement point)
+  if (panelOpeningCount >= 15) {
+    const wasShown = await showNotification(
+      NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+      version,
+      context,
+    );
+
+    if (wasShown) {
       writeToGlobalState(
         context,
         GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION,
         true,
       );
     }
-
-    // Show frequent panel access notification (non-blocking) with version info
-    showNotification(
-      NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-      version,
-      context,
-    );
   }
 }

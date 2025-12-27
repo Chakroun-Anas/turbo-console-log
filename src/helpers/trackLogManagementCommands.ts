@@ -16,10 +16,10 @@ export type LogManagementCommandType =
  * @param context VS Code extension context
  * @param commandType Type of command being tracked
  */
-export function trackLogManagementCommands(
+export async function trackLogManagementCommands(
   context: vscode.ExtensionContext,
   commandType: LogManagementCommandType,
-): void {
+): Promise<void> {
   // Get extension version
   const version = vscode.extensions.getExtension(
     'ChakrounAnas.turbo-console-log',
@@ -49,19 +49,21 @@ export function trackLogManagementCommands(
     logManagementCommandUsageCount >= 5 &&
     !isProUser(context)
   ) {
-    // Mark that notification has been shown
-    writeToGlobalState(
-      context,
-      GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION,
-      true,
-    );
-
     // Show five log management commands notification (non-blocking) with version info
-    showNotification(
+    const wasShown = await showNotification(
       NotificationEvent.EXTENSION_FIVE_LOG_MANAGEMENT_COMMANDS,
       version,
       context,
     );
+
+    // Only mark as shown if it was actually displayed (not blocked by cooldown)
+    if (wasShown) {
+      writeToGlobalState(
+        context,
+        GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION,
+        true,
+      );
+    }
     return;
   }
 
@@ -110,11 +112,13 @@ export function trackLogManagementCommands(
   );
 
   if (!hasShownSpecificNotification && commandTypeCount >= 5) {
-    // Mark that specific notification has been shown
-    writeToGlobalState(context, mapping.notificationShownKey, true);
-
     // Show specific command notification
-    showNotification(mapping.event, version, context);
+    const wasShown = await showNotification(mapping.event, version, context);
+
+    // Only mark as shown if it was actually displayed (not blocked by cooldown)
+    if (wasShown) {
+      writeToGlobalState(context, mapping.notificationShownKey, true);
+    }
     return;
   }
 }
