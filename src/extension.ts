@@ -9,7 +9,8 @@ import {
   activateFreemiumLauncherMode,
   traceExtensionVersionHistory,
   listenToPhpFileOpenings,
-  showReleaseWebView,
+  updateUserActivityStatus,
+  listenToManualConsoleLogs,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -75,8 +76,14 @@ export async function activate(
   // (creates or updates version array in global state + shows welcome for new users)
   traceExtensionVersionHistory(context, version);
 
+  // Update user activity status (ACTIVE/INACTIVE based on 7-day window)
+  updateUserActivityStatus(context);
+
   // Listen to PHP file openings and show announcement immediately (v3.10.0 strategy)
   listenToPhpFileOpenings(context);
+
+  // Listen to manual console.log typing for INACTIVE users (re-engagement strategy)
+  listenToManualConsoleLogs(context);
 
   // Handle Pro user logic
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');
@@ -84,11 +91,6 @@ export async function activate(
   const proBundleVersion = readFromGlobalState<string>(context, 'version');
   const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
 
-  // Show v3.12.0 release webview announcing new Turbo Pro shape
-  // Only shown to non-Pro users
-  if (!isProUser) {
-    showReleaseWebView(context);
-  }
   if (isProUser) {
     if (
       releaseNotes[version]?.isPro &&

@@ -8,6 +8,7 @@ import { activateRepairMode } from './activateRepairMode';
 import { activateProMode } from './activateProMode';
 import { deactivateRepairMode } from './deactivateRepairMode';
 import { trackLogInsertions } from './trackLogInsertions';
+import { trackStreakDays } from './trackStreakDays';
 import { trackLogManagementCommands } from './trackLogManagementCommands';
 import { isProUser } from './isProUser';
 import { isPhpFile } from './isPhpFile';
@@ -18,6 +19,9 @@ import { isFreshInstall } from './isFreshInstall';
 import { listenToPhpFileOpenings } from './listenToPhpFileOpenings';
 import { loadPhpDebugMessage } from './loadPhpDebugMessage';
 import { showReleaseWebView } from './showReleaseWebView';
+import { updateUserActivityStatus } from './updateUserActivityStatus';
+import { getUserActivityStatus } from './getUserActivityStatus';
+import { listenToManualConsoleLogs } from './listenToManualConsoleLogs';
 export {
   readFromGlobalState,
   writeToGlobalState,
@@ -29,6 +33,7 @@ export {
   activateRepairMode,
   deactivateRepairMode,
   trackLogInsertions,
+  trackStreakDays,
   trackLogManagementCommands,
   isProUser,
   isPhpFile,
@@ -38,4 +43,7 @@ export {
   listenToPhpFileOpenings,
   loadPhpDebugMessage,
   showReleaseWebView,
+  updateUserActivityStatus,
+  getUserActivityStatus,
+  listenToManualConsoleLogs,
 };

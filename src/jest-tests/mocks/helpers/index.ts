@@ -4,6 +4,7 @@ import { createMockTextEditorEdit } from './createMockTextEditorEdit';
 import { makeTextEditor } from './makeTextEditor';
 import { makeDebugMessage } from './makeDebugMessage';
 import { makeExtensionContext } from './makeExtensionContext';
+import { createMockChangeEvent } from './createMockChangeEvent';
 export {
   makeTextDocument,
   makeTextLine,
@@ -11,4 +12,5 @@ export {
   makeTextEditor,
   makeDebugMessage,
   makeExtensionContext,
+  createMockChangeEvent,
 };
