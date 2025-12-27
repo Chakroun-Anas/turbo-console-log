@@ -41,15 +41,22 @@ export async function trackLogInsertions(
   );
 
   if (!hasShownTenInsertsMilestoneNotification && commandUsageCount >= 10) {
-    // Mark that notification has been shown
-    writeToGlobalState(
+    // Show ten inserts milestone notification (non-blocking) with version info
+    const wasShown = await showNotification(
+      NotificationEvent.EXTENSION_TEN_INSERTS,
+      version,
       context,
-      GlobalStateKey.HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION,
-      true,
     );
 
-    // Show ten inserts milestone notification (non-blocking) with version info
-    showNotification(NotificationEvent.EXTENSION_TEN_INSERTS, version, context);
+    // Only mark as shown if it was actually displayed (not blocked by cooldown)
+    if (wasShown) {
+      writeToGlobalState(
+        context,
+        GlobalStateKey.HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION,
+        true,
+      );
+    }
+    return;
   }
 
   // Check if user has reached the 50 inserts milestone
@@ -60,18 +67,20 @@ export async function trackLogInsertions(
     );
 
   if (!hasShownFiftyInsertsMilestoneNotification && commandUsageCount >= 50) {
-    // Mark that notification has been shown
-    writeToGlobalState(
-      context,
-      GlobalStateKey.HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION,
-      true,
-    );
-
     // Show fifty inserts milestone notification (non-blocking) with version info
-    showNotification(
+    const wasShown = await showNotification(
       NotificationEvent.EXTENSION_FIFTY_INSERTS,
       version,
       context,
     );
+
+    // Only mark as shown if it was actually displayed (not blocked by cooldown)
+    if (wasShown) {
+      writeToGlobalState(
+        context,
+        GlobalStateKey.HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION,
+        true,
+      );
+    }
   }
 }

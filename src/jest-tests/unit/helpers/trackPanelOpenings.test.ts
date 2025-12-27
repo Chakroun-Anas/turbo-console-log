@@ -31,7 +31,7 @@ describe('trackPanelOpenings', () => {
 
     // Default mock implementations
     mockReadFromGlobalState.mockReturnValue(undefined);
-    mockShowNotification.mockResolvedValue(undefined);
+    mockShowNotification.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -201,33 +201,7 @@ describe('trackPanelOpenings', () => {
       });
     });
 
-    it('should show notification at exactly 5 openings', () => {
-      mockReadFromGlobalState.mockImplementation((ctx, key) => {
-        if (key === GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER) {
-          return false;
-        }
-        if (
-          key ===
-          GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.PANEL_OPENING_COUNT) {
-          return 4;
-        }
-        return undefined;
-      });
-
-      trackPanelOpenings(context);
-
-      expect(mockShowNotification).toHaveBeenCalledWith(
-        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        '3.0.0',
-        context,
-      );
-    });
-
-    it('should show notification at 15 openings', () => {
+    it('should show notification at exactly 15 openings', () => {
       mockReadFromGlobalState.mockImplementation((ctx, key) => {
         if (key === GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER) {
           return false;
@@ -253,7 +227,7 @@ describe('trackPanelOpenings', () => {
       );
     });
 
-    it('should show notification at 25 openings and mark milestone', () => {
+    it('should show notification at 15 openings and mark milestone', () => {
       mockReadFromGlobalState.mockImplementation((ctx, key) => {
         if (key === GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER) {
           return false;
@@ -265,7 +239,7 @@ describe('trackPanelOpenings', () => {
           return false;
         }
         if (key === GlobalStateKey.PANEL_OPENING_COUNT) {
-          return 24;
+          return 14;
         }
         return undefined;
       });
@@ -277,11 +251,28 @@ describe('trackPanelOpenings', () => {
         '3.0.0',
         context,
       );
-      expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-        context,
-        GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION,
-        true,
-      );
+    });
+
+    it('should not show notification at 25 openings (flag already set at 15)', () => {
+      mockReadFromGlobalState.mockImplementation((ctx, key) => {
+        if (key === GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER) {
+          return false;
+        }
+        if (
+          key ===
+          GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION
+        ) {
+          return true; // Flag was set at opening 15
+        }
+        if (key === GlobalStateKey.PANEL_OPENING_COUNT) {
+          return 24;
+        }
+        return undefined;
+      });
+
+      trackPanelOpenings(context);
+
+      expect(mockShowNotification).not.toHaveBeenCalled();
     });
 
     it('should not show notification at 4 openings', () => {
@@ -328,7 +319,7 @@ describe('trackPanelOpenings', () => {
       expect(mockShowNotification).not.toHaveBeenCalled();
     });
 
-    it('should not show notification at 20 openings', () => {
+    it('should not show notification at 20 openings (flag already set)', () => {
       mockReadFromGlobalState.mockImplementation((ctx, key) => {
         if (key === GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER) {
           return false;
@@ -337,7 +328,7 @@ describe('trackPanelOpenings', () => {
           key ===
           GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION
         ) {
-          return false;
+          return true; // Flag was set at opening 15
         }
         if (key === GlobalStateKey.PANEL_OPENING_COUNT) {
           return 19;
@@ -385,7 +376,7 @@ describe('trackPanelOpenings', () => {
           return false;
         }
         if (key === GlobalStateKey.PANEL_OPENING_COUNT) {
-          return 4;
+          return 14;
         }
         return undefined;
       });
@@ -510,8 +501,8 @@ describe('trackPanelOpenings', () => {
 
   describe('Complete User Journey Scenarios', () => {
     it('should handle user who opens panel, gets notified, and subscribes', () => {
-      // First 10 openings - user hasn't subscribed yet
-      for (let i = 0; i < 10; i++) {
+      // First 20 openings - user hasn't subscribed yet
+      for (let i = 0; i < 20; i++) {
         mockReadFromGlobalState.mockImplementation((ctx, key) => {
           if (key === GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER) {
             return false;
@@ -520,7 +511,7 @@ describe('trackPanelOpenings', () => {
             key ===
             GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION
           ) {
-            return false;
+            return i >= 15; // Flag set at opening 15
           }
           if (key === GlobalStateKey.PANEL_OPENING_COUNT) {
             return i;
@@ -531,7 +522,7 @@ describe('trackPanelOpenings', () => {
         trackPanelOpenings(context);
       }
 
-      // Notification should be shown at 5th opening only
+      // Notification should be shown at 15th opening only
       expect(mockShowNotification).toHaveBeenCalledTimes(1);
 
       // User subscribes (sets flag to true)
@@ -549,7 +540,7 @@ describe('trackPanelOpenings', () => {
       expect(mockShowNotification).toHaveBeenCalledTimes(1);
     });
 
-    it('should show notifications at 5, 15, and 25 openings only', () => {
+    it('should show notification at 15 openings only', () => {
       const notifications: number[] = [];
 
       for (let i = 0; i < 30; i++) {
@@ -561,7 +552,7 @@ describe('trackPanelOpenings', () => {
             key ===
             GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION
           ) {
-            return i >= 25; // Milestone flag set at 25
+            return i >= 15; // Milestone flag set at 15
           }
           if (key === GlobalStateKey.PANEL_OPENING_COUNT) {
             return i;
@@ -576,12 +567,12 @@ describe('trackPanelOpenings', () => {
         }
       }
 
-      // Should show notifications only at 5, 15, and 25
-      expect(notifications).toEqual([5, 15, 25]);
-      expect(mockShowNotification).toHaveBeenCalledTimes(3);
+      // Should show notification only at 15
+      expect(notifications).toEqual([15]);
+      expect(mockShowNotification).toHaveBeenCalledTimes(1);
     });
 
-    it('should not show notifications after 25 milestone is reached', () => {
+    it('should not show notifications after 15 milestone is reached', () => {
       const notifications: number[] = [];
 
       // Simulate opening panel 40 times
@@ -594,7 +585,7 @@ describe('trackPanelOpenings', () => {
             key ===
             GlobalStateKey.HAS_SHOWN_TWENTY_FIVE_PANEL_OPENINGS_NOTIFICATION
           ) {
-            return i >= 25; // Milestone flag set at 25
+            return i >= 15; // Milestone flag set at 15
           }
           if (key === GlobalStateKey.PANEL_OPENING_COUNT) {
             return i;
@@ -609,9 +600,9 @@ describe('trackPanelOpenings', () => {
         }
       }
 
-      // Should only show 3 notifications (at 5, 15, 25)
-      expect(notifications).toEqual([5, 15, 25]);
-      expect(mockShowNotification).toHaveBeenCalledTimes(3);
+      // Should only show 1 notification (at 15)
+      expect(notifications).toEqual([15]);
+      expect(mockShowNotification).toHaveBeenCalledTimes(1);
     });
   });
 });

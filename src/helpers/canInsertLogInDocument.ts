@@ -14,7 +14,7 @@ import { NotificationEvent } from '../notifications/NotificationEvent';
 export function canInsertLogInDocument(
   context: vscode.ExtensionContext,
   document: vscode.TextDocument,
-  version?: string,
+  version: string,
 ): boolean {
   // Check if it's a PHP file and user is not Pro
   if (isPhpFile(document) && !isProUser(context)) {

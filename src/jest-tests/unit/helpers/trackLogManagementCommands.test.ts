@@ -38,7 +38,7 @@ describe('trackLogManagementCommands', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockContext = makeExtensionContext();
-    mockShowNotification.mockResolvedValue(undefined);
+    mockShowNotification.mockResolvedValue(true);
   });
 
   describe('when user is a Pro user', () => {
@@ -176,8 +176,11 @@ describe('trackLogManagementCommands', () => {
         );
       });
 
-      it('should mark notification as shown', () => {
-        trackLogManagementCommands(mockContext, 'delete');
+      it('should mark notification as shown only when actually displayed', async () => {
+        // Mock showNotification to return true (notification was shown)
+        mockShowNotification.mockResolvedValue(true);
+
+        await trackLogManagementCommands(mockContext, 'delete');
 
         expect(mockWriteToGlobalState).toHaveBeenCalledWith(
           mockContext,
@@ -186,24 +189,20 @@ describe('trackLogManagementCommands', () => {
         );
       });
 
-      it('should call writeToGlobalState in correct order', () => {
-        const callOrder: string[] = [];
+      it('should not mark notification as shown when blocked by cooldown', async () => {
+        // Mock showNotification to return false (blocked by cooldown)
+        mockShowNotification.mockResolvedValue(false);
 
-        mockWriteToGlobalState.mockImplementation((_, key) => {
-          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT) {
-            callOrder.push('increment-counter');
-          }
-          if (
-            key ===
-            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
-          ) {
-            callOrder.push('mark-as-shown');
-          }
-        });
+        await trackLogManagementCommands(mockContext, 'comment');
 
-        trackLogManagementCommands(mockContext, 'comment');
-
-        expect(callOrder).toEqual(['increment-counter', 'mark-as-shown']);
+        // Should only have one call (incrementing general counter)
+        // Function returns early when notification is shown/blocked, so specific command counter is not incremented
+        expect(mockWriteToGlobalState).toHaveBeenCalledTimes(1);
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT,
+          5,
+        );
       });
     });
 
@@ -457,8 +456,11 @@ describe('trackLogManagementCommands', () => {
       );
     });
 
-    it('should use GlobalStateKey enum for notification flag', () => {
-      trackLogManagementCommands(mockContext, 'correct');
+    it('should use GlobalStateKey enum for notification flag when shown', async () => {
+      // Mock showNotification to return true
+      mockShowNotification.mockResolvedValue(true);
+
+      await trackLogManagementCommands(mockContext, 'correct');
 
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,
@@ -491,7 +493,7 @@ describe('trackLogManagementCommands', () => {
         );
       });
 
-      it('should show comment-specific notification when reaching 5 uses and general already shown', () => {
+      it('should show comment-specific notification when reaching 5 uses and general already shown', async () => {
         mockReadFromGlobalState.mockImplementation((_, key) => {
           if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
             return 9;
@@ -508,7 +510,7 @@ describe('trackLogManagementCommands', () => {
           return undefined;
         });
 
-        trackLogManagementCommands(mockContext, 'comment');
+        await trackLogManagementCommands(mockContext, 'comment');
 
         expect(mockShowNotification).toHaveBeenCalledWith(
           NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
@@ -522,7 +524,7 @@ describe('trackLogManagementCommands', () => {
         );
       });
 
-      it('should show general notification first when both general and comment reach 5 simultaneously', () => {
+      it('should show general notification first when both general and comment reach 5 simultaneously', async () => {
         mockReadFromGlobalState.mockImplementation((_, key) => {
           if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
             return 4; // Will become 5
@@ -539,7 +541,10 @@ describe('trackLogManagementCommands', () => {
           return undefined;
         });
 
-        trackLogManagementCommands(mockContext, 'comment');
+        // Mock showNotification to return true
+        mockShowNotification.mockResolvedValue(true);
+
+        await trackLogManagementCommands(mockContext, 'comment');
 
         // Should show general notification, not comment-specific
         expect(mockShowNotification).toHaveBeenCalledTimes(1);
@@ -557,7 +562,7 @@ describe('trackLogManagementCommands', () => {
     });
 
     describe('uncomment command tracking', () => {
-      it('should show uncomment-specific notification at 5 uses', () => {
+      it('should show uncomment-specific notification at 5 uses', async () => {
         mockReadFromGlobalState.mockImplementation((_, key) => {
           if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
             return 9;
@@ -575,7 +580,7 @@ describe('trackLogManagementCommands', () => {
           return undefined;
         });
 
-        trackLogManagementCommands(mockContext, 'uncomment');
+        await trackLogManagementCommands(mockContext, 'uncomment');
 
         expect(mockShowNotification).toHaveBeenCalledWith(
           NotificationEvent.EXTENSION_FIVE_UNCOMMENTS_COMMANDS,
@@ -591,7 +596,7 @@ describe('trackLogManagementCommands', () => {
     });
 
     describe('delete command tracking', () => {
-      it('should show delete-specific notification at 5 uses', () => {
+      it('should show delete-specific notification at 5 uses', async () => {
         mockReadFromGlobalState.mockImplementation((_, key) => {
           if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
             return 9;
@@ -608,7 +613,7 @@ describe('trackLogManagementCommands', () => {
           return undefined;
         });
 
-        trackLogManagementCommands(mockContext, 'delete');
+        await trackLogManagementCommands(mockContext, 'delete');
 
         expect(mockShowNotification).toHaveBeenCalledWith(
           NotificationEvent.EXTENSION_FIVE_DELETE_COMMANDS,
@@ -624,7 +629,7 @@ describe('trackLogManagementCommands', () => {
     });
 
     describe('correct command tracking', () => {
-      it('should show correction-specific notification at 5 uses', () => {
+      it('should show correction-specific notification at 5 uses', async () => {
         mockReadFromGlobalState.mockImplementation((_, key) => {
           if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
             return 9;
@@ -642,7 +647,7 @@ describe('trackLogManagementCommands', () => {
           return undefined;
         });
 
-        trackLogManagementCommands(mockContext, 'correct');
+        await trackLogManagementCommands(mockContext, 'correct');
 
         expect(mockShowNotification).toHaveBeenCalledWith(
           NotificationEvent.EXTENSION_FIVE_CORRECTIONS_COMMANDS,
@@ -763,6 +768,361 @@ describe('trackLogManagementCommands', () => {
         expect.any(String),
         mockContext,
       );
+    });
+  });
+
+  describe('Cooldown Period Behavior', () => {
+    beforeEach(() => {
+      mockIsProUser.mockReturnValue(false);
+    });
+
+    describe('when notification is blocked by cooldown', () => {
+      it('should not mark comment notification as shown when showNotification returns false', async () => {
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 9;
+          if (key === GlobalStateKey.COMMENT_COMMAND_USAGE_COUNT) return 4;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return true;
+          if (
+            key === GlobalStateKey.HAS_SHOWN_FIVE_COMMENTS_COMMANDS_NOTIFICATION
+          )
+            return false;
+          return undefined;
+        });
+
+        // Simulate cooldown blocking the notification
+        mockShowNotification.mockResolvedValue(false);
+
+        await trackLogManagementCommands(mockContext, 'comment');
+
+        expect(mockShowNotification).toHaveBeenCalledWith(
+          NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+          '3.0.0',
+          mockContext,
+        );
+        expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_COMMENTS_COMMANDS_NOTIFICATION,
+          true,
+        );
+      });
+
+      it('should not mark uncomment notification as shown when showNotification returns false', async () => {
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 9;
+          if (key === GlobalStateKey.UNCOMMENT_COMMAND_USAGE_COUNT) return 4;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return true;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_UNCOMMENTS_COMMANDS_NOTIFICATION
+          )
+            return false;
+          return undefined;
+        });
+
+        mockShowNotification.mockResolvedValue(false);
+
+        await trackLogManagementCommands(mockContext, 'uncomment');
+
+        expect(mockShowNotification).toHaveBeenCalledWith(
+          NotificationEvent.EXTENSION_FIVE_UNCOMMENTS_COMMANDS,
+          '3.0.0',
+          mockContext,
+        );
+        expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_UNCOMMENTS_COMMANDS_NOTIFICATION,
+          true,
+        );
+      });
+
+      it('should not mark delete notification as shown when showNotification returns false', async () => {
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 9;
+          if (key === GlobalStateKey.DELETE_COMMAND_USAGE_COUNT) return 4;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return true;
+          if (
+            key === GlobalStateKey.HAS_SHOWN_FIVE_DELETE_COMMANDS_NOTIFICATION
+          )
+            return false;
+          return undefined;
+        });
+
+        mockShowNotification.mockResolvedValue(false);
+
+        await trackLogManagementCommands(mockContext, 'delete');
+
+        expect(mockShowNotification).toHaveBeenCalledWith(
+          NotificationEvent.EXTENSION_FIVE_DELETE_COMMANDS,
+          '3.0.0',
+          mockContext,
+        );
+        expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_DELETE_COMMANDS_NOTIFICATION,
+          true,
+        );
+      });
+
+      it('should not mark correction notification as shown when showNotification returns false', async () => {
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 9;
+          if (key === GlobalStateKey.CORRECTION_COMMAND_USAGE_COUNT) return 4;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return true;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_CORRECTIONS_COMMANDS_NOTIFICATION
+          )
+            return false;
+          return undefined;
+        });
+
+        mockShowNotification.mockResolvedValue(false);
+
+        await trackLogManagementCommands(mockContext, 'correct');
+
+        expect(mockShowNotification).toHaveBeenCalledWith(
+          NotificationEvent.EXTENSION_FIVE_CORRECTIONS_COMMANDS,
+          '3.0.0',
+          mockContext,
+        );
+        expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_CORRECTIONS_COMMANDS_NOTIFICATION,
+          true,
+        );
+      });
+    });
+
+    describe('when previously blocked notification can now be shown', () => {
+      it('should show and mark comment notification when cooldown expires', async () => {
+        // First attempt - blocked by cooldown
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 9;
+          if (key === GlobalStateKey.COMMENT_COMMAND_USAGE_COUNT) return 5;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return true;
+          if (
+            key === GlobalStateKey.HAS_SHOWN_FIVE_COMMENTS_COMMANDS_NOTIFICATION
+          )
+            return false; // Not marked as shown yet
+          return undefined;
+        });
+
+        mockShowNotification.mockResolvedValue(false);
+        await trackLogManagementCommands(mockContext, 'comment');
+
+        expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_COMMENTS_COMMANDS_NOTIFICATION,
+          true,
+        );
+
+        // Reset mocks for second attempt
+        jest.clearAllMocks();
+
+        // Second attempt - cooldown expired, should show and mark
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 10;
+          if (key === GlobalStateKey.COMMENT_COMMAND_USAGE_COUNT) return 6;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return true;
+          if (
+            key === GlobalStateKey.HAS_SHOWN_FIVE_COMMENTS_COMMANDS_NOTIFICATION
+          )
+            return false; // Still not marked because first attempt was blocked
+          return undefined;
+        });
+
+        mockShowNotification.mockResolvedValue(true);
+        await trackLogManagementCommands(mockContext, 'comment');
+
+        expect(mockShowNotification).toHaveBeenCalledWith(
+          NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+          '3.0.0',
+          mockContext,
+        );
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_COMMENTS_COMMANDS_NOTIFICATION,
+          true,
+        );
+      });
+
+      it('should show and mark delete notification when cooldown expires', async () => {
+        // First attempt - blocked
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 9;
+          if (key === GlobalStateKey.DELETE_COMMAND_USAGE_COUNT) return 5;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return true;
+          if (
+            key === GlobalStateKey.HAS_SHOWN_FIVE_DELETE_COMMANDS_NOTIFICATION
+          )
+            return false;
+          return undefined;
+        });
+
+        mockShowNotification.mockResolvedValue(false);
+        await trackLogManagementCommands(mockContext, 'delete');
+
+        expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_DELETE_COMMANDS_NOTIFICATION,
+          true,
+        );
+
+        jest.clearAllMocks();
+
+        // Second attempt - cooldown expired
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 10;
+          if (key === GlobalStateKey.DELETE_COMMAND_USAGE_COUNT) return 6;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return true;
+          if (
+            key === GlobalStateKey.HAS_SHOWN_FIVE_DELETE_COMMANDS_NOTIFICATION
+          )
+            return false;
+          return undefined;
+        });
+
+        mockShowNotification.mockResolvedValue(true);
+        await trackLogManagementCommands(mockContext, 'delete');
+
+        expect(mockShowNotification).toHaveBeenCalledWith(
+          NotificationEvent.EXTENSION_FIVE_DELETE_COMMANDS,
+          '3.0.0',
+          mockContext,
+        );
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_DELETE_COMMANDS_NOTIFICATION,
+          true,
+        );
+      });
+
+      it('should continue trying on each command execution until successfully shown', async () => {
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 9;
+          if (key === GlobalStateKey.UNCOMMENT_COMMAND_USAGE_COUNT) return 5;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return true;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_UNCOMMENTS_COMMANDS_NOTIFICATION
+          )
+            return false;
+          return undefined;
+        });
+
+        // First attempt - blocked
+        mockShowNotification.mockResolvedValue(false);
+        await trackLogManagementCommands(mockContext, 'uncomment');
+        expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_UNCOMMENTS_COMMANDS_NOTIFICATION,
+          true,
+        );
+
+        jest.clearAllMocks();
+
+        // Second attempt - still blocked
+        mockShowNotification.mockResolvedValue(false);
+        await trackLogManagementCommands(mockContext, 'uncomment');
+        expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_UNCOMMENTS_COMMANDS_NOTIFICATION,
+          true,
+        );
+
+        jest.clearAllMocks();
+
+        // Third attempt - finally shown
+        mockShowNotification.mockResolvedValue(true);
+        await trackLogManagementCommands(mockContext, 'uncomment');
+        expect(mockShowNotification).toHaveBeenCalledWith(
+          NotificationEvent.EXTENSION_FIVE_UNCOMMENTS_COMMANDS,
+          '3.0.0',
+          mockContext,
+        );
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_UNCOMMENTS_COMMANDS_NOTIFICATION,
+          true,
+        );
+      });
+    });
+
+    describe('BYPASS event behavior (not affected by cooldown)', () => {
+      it('should always mark general notification as shown even during cooldown', async () => {
+        mockReadFromGlobalState.mockImplementation((_, key) => {
+          if (key === GlobalStateKey.LOG_MANAGEMENT_COMMAND_USAGE_COUNT)
+            return 4;
+          if (
+            key ===
+            GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION
+          )
+            return false;
+          return undefined;
+        });
+
+        // Even if showNotification would normally be blocked, BYPASS events always show
+        // So mockShowNotification should return true for BYPASS events
+        mockShowNotification.mockResolvedValue(true);
+
+        await trackLogManagementCommands(mockContext, 'comment');
+
+        expect(mockShowNotification).toHaveBeenCalledWith(
+          NotificationEvent.EXTENSION_FIVE_LOG_MANAGEMENT_COMMANDS,
+          '3.0.0',
+          mockContext,
+        );
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+          mockContext,
+          GlobalStateKey.HAS_SHOWN_FIVE_LOG_MANAGEMENT_COMMANDS_NOTIFICATION,
+          true,
+        );
+      });
     });
   });
 });

@@ -4,15 +4,24 @@ import { ExtensionNotificationResponse } from './ExtensionNotificationResponse';
 import { createTelemetryService } from '../telemetry/telemetryService';
 import { writeToGlobalState } from '../helpers/writeToGlobalState';
 import { GlobalStateKey } from '@/entities';
+import {
+  shouldShowNotification,
+  recordNotificationShown,
+} from './notificationCooldown';
 
 const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
 // const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
 
 export async function showNotification(
   notificationEvent: NotificationEvent,
-  version?: string,
-  context?: vscode.ExtensionContext,
-): Promise<void> {
+  version: string,
+  context: vscode.ExtensionContext,
+): Promise<boolean> {
+  // Check cooldown system
+  if (!shouldShowNotification(context, notificationEvent)) {
+    return false; // Not shown due to cooldown
+  }
+
   const telemetryService = createTelemetryService();
   let notificationData: ExtensionNotificationResponse | null = null;
 
@@ -260,6 +269,10 @@ export async function showNotification(
         );
     }
   }
+
+  // Record that a notification was shown (updates cooldown timestamp)
+  recordNotificationShown(context);
+  return true; // Notification was shown
 }
 
 async function fetchNotificationData(

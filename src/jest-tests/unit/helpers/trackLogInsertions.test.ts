@@ -33,7 +33,6 @@ describe('trackLogInsertions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockContext = makeExtensionContext();
-    mockShowNotification.mockResolvedValue(undefined);
   });
 
   describe('when user is a Pro user', () => {
@@ -191,7 +190,10 @@ describe('trackLogInsertions', () => {
         );
       });
 
-      it('should mark notification as shown', async () => {
+      it('should mark notification as shown only when actually displayed', async () => {
+        // Mock showNotification to return true (notification was shown)
+        mockShowNotification.mockResolvedValue(true);
+
         await trackLogInsertions(mockContext);
 
         expect(mockWriteToGlobalState).toHaveBeenCalledWith(
@@ -201,20 +203,18 @@ describe('trackLogInsertions', () => {
         );
       });
 
-      it('should call writeToGlobalState in correct order', async () => {
+      it('should not mark notification as shown when blocked by cooldown', async () => {
+        // Mock showNotification to return false (blocked by cooldown)
+        mockShowNotification.mockResolvedValue(false);
+
         await trackLogInsertions(mockContext);
 
-        expect(mockWriteToGlobalState).toHaveBeenNthCalledWith(
-          1,
+        // Should only have one call (incrementing counter)
+        expect(mockWriteToGlobalState).toHaveBeenCalledTimes(1);
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
           mockContext,
           'COMMAND_USAGE_COUNT',
           10,
-        );
-        expect(mockWriteToGlobalState).toHaveBeenNthCalledWith(
-          2,
-          mockContext,
-          'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION',
-          true,
         );
       });
     });
@@ -284,7 +284,10 @@ describe('trackLogInsertions', () => {
         );
       });
 
-      it('should mark notification as shown', async () => {
+      it('should mark notification as shown only when actually displayed', async () => {
+        // Mock showNotification to return true (notification was shown)
+        mockShowNotification.mockResolvedValue(true);
+
         await trackLogInsertions(mockContext);
 
         expect(mockWriteToGlobalState).toHaveBeenCalledWith(
@@ -294,20 +297,18 @@ describe('trackLogInsertions', () => {
         );
       });
 
-      it('should call writeToGlobalState in correct order', async () => {
+      it('should not mark notification as shown when blocked by cooldown', async () => {
+        // Mock showNotification to return false (blocked by cooldown)
+        mockShowNotification.mockResolvedValue(false);
+
         await trackLogInsertions(mockContext);
 
-        expect(mockWriteToGlobalState).toHaveBeenNthCalledWith(
-          1,
+        // Should only have one call (incrementing counter)
+        expect(mockWriteToGlobalState).toHaveBeenCalledTimes(1);
+        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
           mockContext,
           'COMMAND_USAGE_COUNT',
           50,
-        );
-        expect(mockWriteToGlobalState).toHaveBeenNthCalledWith(
-          2,
-          mockContext,
-          'HAS_SHOWN_FIFTY_INSERTS_MILESTONE_NOTIFICATION',
-          true,
         );
       });
     });
