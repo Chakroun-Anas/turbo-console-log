@@ -4,7 +4,7 @@ import * as commandsModule from '../../commands';
 import * as helpers from '../../helpers';
 import * as releases from '../../releases';
 import * as proUtilities from '../../pro/utilities';
-import { ExtensionProperties } from '../../entities';
+import { ExtensionProperties, UserActivityStatus } from '../../entities';
 
 jest.mock('../../helpers');
 jest.mock('../../releases');
@@ -92,6 +92,11 @@ describe('activate - command registration', () => {
     }));
 
     (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    // Mock updateUserActivityStatus to return ACTIVE by default
+    (helpers.updateUserActivityStatus as jest.Mock).mockReturnValue(
+      UserActivityStatus.ACTIVE,
+    );
 
     // Reset pro utilities mocks specifically
     (proUtilities.runProBundle as jest.Mock).mockResolvedValue(undefined);
@@ -480,5 +485,43 @@ describe('activate - command registration', () => {
     await activate(fakeContext);
 
     expect(helpers.listenToPhpFileOpenings).toHaveBeenCalledWith(fakeContext);
+  });
+
+  it('should call updateUserActivityStatus during activation', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.12.3' },
+    } as vscode.Extension<never>);
+
+    // Mock freemium state
+    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    await activate(fakeContext);
+
+    expect(helpers.updateUserActivityStatus).toHaveBeenCalledWith(fakeContext);
+    expect(helpers.updateUserActivityStatus).toHaveBeenCalledTimes(1);
+  });
+
+  it('should call listenToManualConsoleLogs during activation', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.12.3' },
+    } as vscode.Extension<never>);
+
+    // Mock freemium state
+    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    await activate(fakeContext);
+
+    expect(helpers.listenToManualConsoleLogs).toHaveBeenCalledWith(fakeContext);
+    expect(helpers.listenToManualConsoleLogs).toHaveBeenCalledTimes(1);
   });
 });

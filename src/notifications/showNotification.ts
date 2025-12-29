@@ -131,16 +131,40 @@ export async function showNotification(
         ctaText: 'Get Started',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/overview/motivation`,
       },
+      [NotificationEvent.EXTENSION_THREE_DAY_STREAK]: {
+        message:
+          "🔥 3-day streak! You're hooked. Ever wonder what power users unlock with Pro?",
+        ctaText: 'Discover More',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+      [NotificationEvent.EXTENSION_MULTI_FILE_LOGS]: {
+        message:
+          "📂 Logs in 3+ files already? See them all in one place with Pro's central panel.",
+        ctaText: 'Learn More',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
+      },
       [NotificationEvent.EXTENSION_TEN_INSERTS]: {
         message:
           '🎓 10 logs already! Did you know you can comment or delete them all at once?',
         ctaText: 'Discover Features',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/comment-inserted-log-messages`,
       },
+      [NotificationEvent.EXTENSION_TWENTY_INSERTS]: {
+        message:
+          '🎉 20 logs and counting! Join our newsletter to stay updated with tips, tricks, and new features.',
+        ctaText: 'Join Community',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/join`,
+      },
       [NotificationEvent.EXTENSION_FIFTY_INSERTS]: {
         message:
           '💪 50 logs! Most users unlock the central log panel at this point. Curious why?',
         ctaText: 'Show Me',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+      [NotificationEvent.EXTENSION_HUNDRED_INSERTS]: {
+        message:
+          "🚀 100 logs! You're a power user. Unlock Pro to manage them all from one central panel.",
+        ctaText: 'Explore Pro',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
       [NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS]: {
@@ -190,6 +214,12 @@ export async function showNotification(
           '🔥 Deleting logs manually? Turbo PRO lets you clean them in bulk directly from the panel.',
         ctaText: 'See It In Action',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+      [NotificationEvent.EXTENSION_INACTIVE_MANUAL_LOG]: {
+        message:
+          '💡 Still typing console.log()? Save time with Turbo! Insert logs 10x faster.',
+        ctaText: 'See How',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
       },
     };
 

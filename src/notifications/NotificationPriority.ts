@@ -22,8 +22,14 @@ export const NOTIFICATION_PRIORITY_MAP: Record<
   [NotificationEvent.EXTENSION_PHP_PRO_ONLY]: NotificationPriority.BYPASS,
 
   // IGNORE: Low-priority notifications that respect cooldown strictly
+  [NotificationEvent.EXTENSION_INACTIVE_MANUAL_LOG]:
+    NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_THREE_DAY_STREAK]: NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_MULTI_FILE_LOGS]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_TEN_INSERTS]: NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_TWENTY_INSERTS]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_FIFTY_INSERTS]: NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_HUNDRED_INSERTS]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_FIVE_LOG_MANAGEMENT_COMMANDS]:
     NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS]:

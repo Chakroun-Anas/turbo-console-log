@@ -13,6 +13,7 @@ import { Command } from './extension/Command';
 import { MultilineContextVariable } from './extension/MultilineContextVariable';
 import { ProgrammingLanguage } from './extension/ProgrammingLanguage';
 import { GlobalStateKey } from './GlobalStateKey';
+import { UserActivityStatus } from './UserActivityStatus';
 export {
   BlockType,
   BracketType,
@@ -26,5 +27,6 @@ export {
   Message,
   MultilineContextVariable,
   ProgrammingLanguage,
+  UserActivityStatus,
   WithinReturnStatementMetadata,
 };

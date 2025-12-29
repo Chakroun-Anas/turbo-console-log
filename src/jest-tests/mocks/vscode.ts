@@ -87,9 +87,26 @@ export class Range {
   start: Position;
   end: Position;
 
-  constructor(start: Position, end: Position) {
-    this.start = start;
-    this.end = end;
+  constructor(
+    start: Position | number,
+    end: Position | number,
+    endLineOrCharacter?: number,
+    endCharacter?: number,
+  ) {
+    if (
+      typeof start === 'number' &&
+      typeof end === 'number' &&
+      endLineOrCharacter !== undefined &&
+      endCharacter !== undefined
+    ) {
+      // Range(startLine, startCharacter, endLine, endCharacter)
+      this.start = new Position(start, end);
+      this.end = new Position(endLineOrCharacter, endCharacter);
+    } else {
+      // Range(startPosition, endPosition)
+      this.start = start as Position;
+      this.end = end as Position;
+    }
   }
 
   isSingleLine(): boolean {
