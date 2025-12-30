@@ -64,6 +64,26 @@ export interface TurboAnalyticsProvider {
   ): Promise<void>;
 
   /**
+   * Reports when monthly notification limit is reached
+   * Only sends data if both VS Code telemetry and custom telemetry are enabled
+   */
+  reportNotificationLimitReached(
+    monthKey: string,
+    currentCount: number,
+    maxLimit: number,
+  ): Promise<void>;
+
+  /**
+   * Reports when notifications are paused due to consecutive dismissals
+   * Only sends data if both VS Code telemetry and custom telemetry are enabled
+   */
+  reportNotificationsPaused(
+    monthKey: string,
+    consecutiveDismissals: number,
+    pausedUntil: number,
+  ): Promise<void>;
+
+  /**
    * Dispose of any resources and event listeners
    * Should be called when the extension is deactivated
    */

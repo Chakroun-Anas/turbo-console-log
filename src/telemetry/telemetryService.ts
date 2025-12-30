@@ -616,6 +616,150 @@ class TelemetryService implements TurboAnalyticsProvider {
     }
   }
 
+  public async reportNotificationLimitReached(
+    monthKey: string,
+    currentCount: number,
+    maxLimit: number,
+  ): Promise<void> {
+    try {
+      // Check if telemetry is enabled before proceeding
+      if (!this.canSendTelemetry()) {
+        return;
+      }
+
+      const developerId = this.generateDeveloperId();
+      const extensionVersion = vscode.extensions.getExtension(
+        'ChakrounAnas.turbo-console-log',
+      )?.packageJSON.version;
+      const vscodeVersion = vscode.version;
+      const platform = process.platform;
+
+      // Get current time and timezone information
+      const now = new Date();
+      const timezoneOffset = now.getTimezoneOffset();
+
+      const analyticsData = {
+        developerId,
+        monthKey,
+        currentCount,
+        maxLimit,
+        timezoneOffset,
+        extensionVersion,
+        vscodeVersion,
+        platform,
+      };
+
+      console.log(
+        '[Turbo Console Log] Sending notification limit reached analytics:',
+        {
+          developerId,
+          monthKey,
+          currentCount,
+          maxLimit,
+          extensionVersion,
+          vscodeVersion,
+          platform,
+          timezoneOffset,
+        },
+      );
+
+      // Send the analytics data to the endpoint
+      await axios.post(
+        `${TURBO_WEBSITE_BASE_URL}/api/reportNotificationLimitReached`,
+        analyticsData,
+        {
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': `turbo-console-log-extension/${extensionVersion}`,
+          },
+        },
+      );
+
+      console.log(
+        '[Turbo Console Log] Notification limit reached report sent successfully',
+      );
+    } catch (error) {
+      // Silently fail to ensure extension functionality is not affected
+      console.warn(
+        '[Turbo Console Log] Failed to send notification limit reached analytics:',
+        error,
+      );
+    }
+  }
+
+  public async reportNotificationsPaused(
+    monthKey: string,
+    consecutiveDismissals: number,
+    pausedUntil: number,
+  ): Promise<void> {
+    try {
+      // Check if telemetry is enabled before proceeding
+      if (!this.canSendTelemetry()) {
+        return;
+      }
+
+      const developerId = this.generateDeveloperId();
+      const extensionVersion = vscode.extensions.getExtension(
+        'ChakrounAnas.turbo-console-log',
+      )?.packageJSON.version;
+      const vscodeVersion = vscode.version;
+      const platform = process.platform;
+
+      // Get current time and timezone information
+      const now = new Date();
+      const timezoneOffset = now.getTimezoneOffset();
+
+      const analyticsData = {
+        developerId,
+        monthKey,
+        consecutiveDismissals,
+        pausedUntil,
+        timezoneOffset,
+        extensionVersion,
+        vscodeVersion,
+        platform,
+      };
+
+      console.log(
+        '[Turbo Console Log] Sending notifications paused analytics:',
+        {
+          developerId,
+          monthKey,
+          consecutiveDismissals,
+          pausedUntilDate: new Date(pausedUntil).toISOString(),
+          extensionVersion,
+          vscodeVersion,
+          platform,
+          timezoneOffset,
+        },
+      );
+
+      // Send the analytics data to the endpoint
+      await axios.post(
+        `${TURBO_WEBSITE_BASE_URL}/api/reportNotificationsPaused`,
+        analyticsData,
+        {
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': `turbo-console-log-extension/${extensionVersion}`,
+          },
+        },
+      );
+
+      console.log(
+        '[Turbo Console Log] Notifications paused report sent successfully',
+      );
+    } catch (error) {
+      // Silently fail to ensure extension functionality is not affected
+      console.warn(
+        '[Turbo Console Log] Failed to send notifications paused analytics:',
+        error,
+      );
+    }
+  }
+
   dispose(): void {
     // No cleanup needed since we removed the event listeners
     // This method is kept for interface compatibility

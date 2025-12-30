@@ -331,6 +331,90 @@ export function getCommonStyles(): string {
           padding: 0 8px;
         }
 
+        /* YouTube Video Card Styles */
+        .youtube-video-component {
+          margin: 16px 0;
+        }
+        
+        .youtube-video-card {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          border: 1px solid rgba(72, 191, 227, 0.2);
+          overflow: hidden;
+          transition: all 0.3s ease;
+        }
+        
+        .youtube-video-card:hover {
+          border-color: rgba(72, 191, 227, 0.5);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(72, 191, 227, 0.2);
+        }
+        
+        .youtube-thumbnail-wrapper {
+          position: relative;
+          padding-bottom: 56.25%; /* 16:9 aspect ratio */
+          background: #000000;
+          overflow: hidden;
+        }
+        
+        .youtube-thumbnail {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        
+        .youtube-play-overlay {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          opacity: 0.9;
+          transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .youtube-video-card:hover .youtube-play-overlay {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .youtube-play-icon {
+          filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+        }
+        
+        .youtube-video-info {
+          padding: 16px;
+        }
+        
+        .youtube-video-title {
+          margin: 0 0 8px 0;
+          font-size: 15px;
+          font-weight: 600;
+          color: #FFFFFF;
+          line-height: 1.4;
+        }
+        
+        .youtube-video-caption {
+          margin: 0 0 12px 0;
+          font-size: 13px;
+          color: #CCCCCC;
+          line-height: 1.5;
+        }
+        
+        .youtube-video-cta {
+          display: inline-block;
+          font-size: 12px;
+          color: #48BFE3;
+          font-weight: 600;
+          transition: color 0.3s ease;
+        }
+        
+        .youtube-video-card:hover .youtube-video-cta {
+          color: #5DCDFA;
+        }
+
         .footer {
           text-align: center;
           margin-top: 16px;

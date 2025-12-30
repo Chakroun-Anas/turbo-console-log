@@ -53,6 +53,16 @@ export interface VideoPanelComponent {
   muted?: boolean;
 }
 
+export interface YouTubeVideoPanelComponent {
+  youtubeVideoId: string;
+  caption: string;
+  title?: string;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  startTime?: number; // Start time in seconds
+}
+
 export type FreemiumPanelComponent =
   | ParagraphPanelComponent
   | ArticlePanelComponent
@@ -60,7 +70,8 @@ export type FreemiumPanelComponent =
   | SurveyPanelComponent
   | TablePanelComponent
   | MediaShowcaseCTAPanelComponent
-  | VideoPanelComponent;
+  | VideoPanelComponent
+  | YouTubeVideoPanelComponent;
 
 export type DynamicFreemiumPanelContentType =
   | 'paragraph'
@@ -69,7 +80,8 @@ export type DynamicFreemiumPanelContentType =
   | 'survey'
   | 'table'
   | 'media-showcase-cta'
-  | 'video';
+  | 'video'
+  | 'youtube-video';
 
 export interface DynamicFreemiumPanelContent {
   type: DynamicFreemiumPanelContentType;
@@ -90,4 +102,5 @@ export interface SeparatedContent {
   tableHtml: string;
   mediaShowcaseCTAHtml: string;
   videoHtml: string;
+  youtubeVideoHtml: string;
 }
