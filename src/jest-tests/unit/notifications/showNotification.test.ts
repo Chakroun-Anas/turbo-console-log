@@ -1007,7 +1007,6 @@ describe('showNotification', () => {
 
       mockShowInformationMessage.mockImplementation(async () => {
         messageCalled = true;
-        expect(mockRecordNotificationShown).not.toHaveBeenCalled();
         return 'Maybe Later';
       });
 

@@ -2,6 +2,18 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.12.6] - 2025-12-31
+
+### 🐛 Critical Bug Fix
+
+#### Fixed Race Condition Causing Duplicate Notifications
+
+- **Issue**: Users were receiving multiple identical notifications (up to 7 duplicates) when rapidly inserting logs or reaching milestones
+- **Root Cause**: Notification cooldown timestamp was updated asynchronously after notification completion, allowing rapid-fire command executions to bypass cooldown checks
+- **Result**: Duplicate notifications are now completely prevented, even when users rapidly execute commands or insert multiple logs in quick succession
+
+We sincerely apologize for any inconvenience caused by duplicate notifications. This hotfix ensures a much better notification experience going forward.
+
 ## [3.12.5] - 2025-12-30
 
 ### 🔧 Infrastructure & Quality Improvements

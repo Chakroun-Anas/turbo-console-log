@@ -24,6 +24,9 @@ export async function showNotification(
     return false; // Not shown due to cooldown
   }
 
+  // Record that a notification was shown (updates cooldown timestamp)
+  recordNotificationShown(context, notificationEvent);
+
   const telemetryService = createTelemetryService();
   let notificationData: ExtensionNotificationResponse | null = null;
 
@@ -320,9 +323,6 @@ export async function showNotification(
         );
     }
   }
-
-  // Record that a notification was shown (updates cooldown timestamp)
-  recordNotificationShown(context, notificationEvent);
   return true; // Notification was shown
 }
 
