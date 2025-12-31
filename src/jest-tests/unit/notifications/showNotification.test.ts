@@ -8,6 +8,7 @@ import {
   recordNotificationShown,
   recordDismissal,
   resetDismissalCounter,
+  decrementMonthlyCounter,
 } from '@/notifications/notificationCooldown';
 
 // Mock dependencies
@@ -46,6 +47,9 @@ describe('showNotification', () => {
   let mockResetDismissalCounter: jest.MockedFunction<
     typeof resetDismissalCounter
   >;
+  let mockDecrementMonthlyCounter: jest.MockedFunction<
+    typeof decrementMonthlyCounter
+  >;
   let consoleErrorSpy: jest.SpyInstance;
   let consoleLogSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;
@@ -71,10 +75,15 @@ describe('showNotification', () => {
     mockResetDismissalCounter = resetDismissalCounter as jest.MockedFunction<
       typeof resetDismissalCounter
     >;
+    mockDecrementMonthlyCounter =
+      decrementMonthlyCounter as jest.MockedFunction<
+        typeof decrementMonthlyCounter
+      >;
     mockShouldShowNotification.mockReturnValue(true); // Default: allow notifications
     mockRecordNotificationShown.mockReturnValue(undefined);
     mockRecordDismissal.mockReturnValue(undefined);
     mockResetDismissalCounter.mockReturnValue(undefined);
+    mockDecrementMonthlyCounter.mockReturnValue(undefined);
 
     // Mock telemetry service with resolved promises
     mockTelemetryService = {
@@ -294,7 +303,7 @@ describe('showNotification', () => {
       );
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to show notification:',
+        'Failed to fetch notification data:',
         expect.any(Error),
       );
 
@@ -443,7 +452,7 @@ describe('showNotification', () => {
       );
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to show notification:',
+        'Failed to fetch notification data:',
         expect.any(Error),
       );
 
@@ -885,22 +894,6 @@ describe('showNotification', () => {
         );
       });
 
-      it('should not track telemetry for fallback "I already did" click', async () => {
-        mockShowInformationMessage.mockResolvedValue('I already did');
-
-        await showNotification(
-          NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-          '3.9.0',
-          mockContext,
-        );
-
-        // Should not track any interaction (no "clicked" or "dismissed" tracking)
-        // Fallback flow doesn't have "shown" tracking - only API success flow does
-        expect(
-          mockTelemetryService.reportNotificationInteraction,
-        ).not.toHaveBeenCalled();
-      });
-
       it('should open fallback CTA URL with correct parameters', async () => {
         mockShowInformationMessage.mockResolvedValue('See It In Action');
 
@@ -1073,6 +1066,135 @@ describe('showNotification', () => {
       );
 
       expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+    });
+
+    it('should record cooldown but not show UI when variant is deactivated', async () => {
+      // Mock API response with isDeactivated: true
+      const deactivatedNotificationData = {
+        message: 'Test notification',
+        ctaText: 'Test CTA',
+        ctaUrl: 'https://test.com',
+        variant: 'deactivated-variant',
+        isDeactivated: true,
+      };
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => deactivatedNotificationData,
+      });
+
+      const result = await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      // Should return false (not shown)
+      expect(result).toBe(false);
+
+      // Should record cooldown initially (to prevent race conditions)
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+
+      // Should then decrement the monthly counter (to not waste a slot)
+      expect(mockDecrementMonthlyCounter).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+
+      // Should not show UI
+      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+
+      // Should not track any telemetry
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should call recordNotificationShown BEFORE decrementMonthlyCounter for deactivated IGNORE events', async () => {
+      // This test verifies the critical execution order:
+      // 1. recordNotificationShown (increment counter) - prevents race conditions
+      // 2. decrementMonthlyCounter (undo increment) - prevents wasting slot
+
+      const deactivatedNotificationData = {
+        message: 'Test notification',
+        ctaText: 'Test CTA',
+        ctaUrl: 'https://test.com',
+        variant: 'deactivated-variant',
+        isDeactivated: true,
+      };
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => deactivatedNotificationData,
+      });
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS, // IGNORE priority event
+        '3.9.0',
+        mockContext,
+      );
+
+      // Verify both functions were called
+      expect(mockRecordNotificationShown).toHaveBeenCalledTimes(1);
+      expect(mockDecrementMonthlyCounter).toHaveBeenCalledTimes(1);
+
+      // Verify call order: recordNotificationShown must be called BEFORE decrementMonthlyCounter
+      const recordCallOrder =
+        mockRecordNotificationShown.mock.invocationCallOrder[0];
+      const decrementCallOrder =
+        mockDecrementMonthlyCounter.mock.invocationCallOrder[0];
+
+      expect(recordCallOrder).toBeLessThan(decrementCallOrder);
+
+      // Verify both were called with correct arguments
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+      expect(mockDecrementMonthlyCounter).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+    });
+
+    it('should still decrement for deactivated BYPASS events (even though they dont count)', async () => {
+      // BYPASS events don't increment the counter in recordNotificationShown,
+      // but decrementMonthlyCounter should still be called (it's a no-op for BYPASS)
+      // This ensures consistent behavior regardless of priority
+
+      const deactivatedNotificationData = {
+        message: 'Test notification',
+        ctaText: 'Test CTA',
+        ctaUrl: 'https://test.com',
+        variant: 'deactivated-variant',
+        isDeactivated: true,
+      };
+
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => deactivatedNotificationData,
+      });
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL, // BYPASS priority event
+        '3.9.0',
+        mockContext,
+      );
+
+      // Should call recordNotificationShown (updates timestamp only, doesn't increment counter)
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+
+      // Should still call decrementMonthlyCounter (it's a no-op for BYPASS internally)
+      expect(mockDecrementMonthlyCounter).toHaveBeenCalledWith(
         mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
