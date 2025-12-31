@@ -119,6 +119,13 @@ export function shouldShowNotification(
     );
 
     if (lastReportedMonth !== currentMonthKey) {
+      // Mark that we've reported for this month BEFORE async call to prevent race condition
+      writeToGlobalState(
+        context,
+        GlobalStateKey.MONTHLY_LIMIT_REPORTED_FOR_MONTH,
+        currentMonthKey,
+      );
+
       const telemetryService = createTelemetryService();
       telemetryService
         .reportNotificationLimitReached(
@@ -126,14 +133,6 @@ export function shouldShowNotification(
           monthlyCount,
           MAX_NOTIFICATIONS_PER_MONTH,
         )
-        .then(() => {
-          // Mark that we've reported for this month
-          writeToGlobalState(
-            context,
-            GlobalStateKey.MONTHLY_LIMIT_REPORTED_FOR_MONTH,
-            currentMonthKey,
-          );
-        })
         .catch((err) =>
           console.warn('Failed to report notification limit reached:', err),
         );
@@ -260,17 +259,16 @@ export function recordDismissal(context: vscode.ExtensionContext): void {
     );
 
     if (lastReportedMonth !== currentMonthKey) {
+      // Mark that we've reported for this month BEFORE async call to prevent race condition
+      writeToGlobalState(
+        context,
+        GlobalStateKey.PAUSE_REPORTED_FOR_MONTH,
+        currentMonthKey,
+      );
+
       const telemetryService = createTelemetryService();
       telemetryService
         .reportNotificationsPaused(currentMonthKey, newCount, pauseUntil)
-        .then(() => {
-          // Mark that we've reported for this month
-          writeToGlobalState(
-            context,
-            GlobalStateKey.PAUSE_REPORTED_FOR_MONTH,
-            currentMonthKey,
-          );
-        })
         .catch((err) =>
           console.warn('Failed to report notifications paused:', err),
         );
@@ -287,4 +285,45 @@ export function recordDismissal(context: vscode.ExtensionContext): void {
  */
 export function resetDismissalCounter(context: vscode.ExtensionContext): void {
   writeToGlobalState(context, GlobalStateKey.CONSECUTIVE_DISMISSALS_COUNT, 0);
+}
+
+/**
+ * Decrements the monthly notification counter (called when a variant is deactivated)
+ * This allows us to "undo" the cooldown consumption for deactivated A/B test variants
+ * Note: The timestamp remains set to prevent rapid re-attempts
+ */
+export function decrementMonthlyCounter(
+  context: vscode.ExtensionContext,
+  notificationEvent: NotificationEvent,
+): void {
+  const priority = NOTIFICATION_PRIORITY_MAP[notificationEvent];
+
+  // BYPASS notifications don't count against monthly limit, nothing to decrement
+  if (priority === NotificationPriority.BYPASS) {
+    return;
+  }
+
+  const currentMonthKey = getCurrentMonthKey();
+  const storedMonthKey = readFromGlobalState<string>(
+    context,
+    GlobalStateKey.MONTHLY_NOTIFICATION_MONTH_KEY,
+  );
+
+  // Only decrement if we're in the same month
+  if (storedMonthKey === currentMonthKey) {
+    const monthlyCount =
+      readFromGlobalState<number>(
+        context,
+        GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
+      ) ?? 0;
+
+    // Prevent going negative
+    if (monthlyCount > 0) {
+      writeToGlobalState(
+        context,
+        GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
+        monthlyCount - 1,
+      );
+    }
+  }
 }

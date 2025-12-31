@@ -2,15 +2,42 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.12.7] - 2025-12-31
+
+### 🐛 Bug Fix: Follow-up to v3.12.6
+
+**Fixed Milestone Flag Persistence:**
+
+- Milestone flags (e.g., "shown 100 inserts notification") now persist even if VS Code reloads before you interact with notifications
+- Previously, ignoring a notification then reloading VS Code could cause the same notification to appear again after the cooldown period
+
+**Technical Details:**
+
+- Refactored notification flow to fire-and-forget pattern
+- Milestone flags written immediately, immune to extension lifecycle abandonment
+
+### 📊 About the Notification System
+
+Turbo uses a respectful cooldown system to avoid overwhelming you:
+
+- **2-day cooldown** between milestone notifications
+- **4 notifications/month max** for milestones and tips
+- **~2 release notes/month** (don't count toward the limit)
+- **Total: ~6-7 notifications/month maximum**
+
+Thank you for your patience and feedback! 🙏
+
+Wishing you all a fantastic new year 2026 🚀 🎉
+
 ## [3.12.6] - 2025-12-31
 
 ### 🐛 Critical Bug Fix
 
 #### Fixed Race Condition Causing Duplicate Notifications
 
-- **Issue**: Users were receiving multiple identical notifications (up to 7 duplicates) when rapidly inserting logs or reaching milestones
+- **Issue**: Users were receiving multiple identical notifications when reaching some milestones
 - **Root Cause**: Notification cooldown timestamp was updated asynchronously after notification completion, allowing rapid-fire command executions to bypass cooldown checks
-- **Result**: Duplicate notifications are now completely prevented, even when users rapidly execute commands or insert multiple logs in quick succession
+- **Result**: Duplicate notifications are now completely prevented, even when the conditions of an event are met multiple times
 
 We sincerely apologize for any inconvenience caused by duplicate notifications. This hotfix ensures a much better notification experience going forward.
 

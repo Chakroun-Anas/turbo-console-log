@@ -9,7 +9,9 @@ import {
   recordNotificationShown,
   recordDismissal,
   resetDismissalCounter,
+  decrementMonthlyCounter,
 } from './notificationCooldown';
+import { TurboAnalyticsProvider } from '@/telemetry';
 
 const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
 // const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
@@ -24,126 +26,17 @@ export async function showNotification(
     return false; // Not shown due to cooldown
   }
 
-  // Record that a notification was shown (updates cooldown timestamp)
+  // Record that a notification will be shown (updates cooldown timestamp)
+  // This must happen IMMEDIATELY after cooldown check to prevent race conditions
+  // If variant turns out to be deactivated, we'll decrement the monthly counter below
   recordNotificationShown(context, notificationEvent);
 
-  const telemetryService = createTelemetryService();
+  // Fetch notification
   let notificationData: ExtensionNotificationResponse | null = null;
-
-  // Cap reaction time to exclude stale time when users are away
-  const MAX_MEANINGFUL_REACTION_TIME_MS = 60 * 1000; // 60 seconds
-
   try {
-    // Fetch notification data from the endpoint
     notificationData = await fetchNotificationData(notificationEvent, version);
-
-    // Check if notification is deactivated server-side
-    if (notificationData.isDeactivated) {
-      console.log(
-        `[Turbo Console Log] Notification ${notificationEvent} is deactivated server-side`,
-      );
-      return false; // Don't show deactivated notifications
-    }
-
-    // Track that notification was shown (fire-and-forget with error handling)
-    telemetryService
-      .reportNotificationInteraction(
-        notificationEvent,
-        'shown',
-        notificationData.variant,
-      )
-      .catch((err) =>
-        console.warn('Failed to report notification shown event:', err),
-      );
-
-    // Record start time for reaction time measurement
-    const startTime = Date.now();
-
-    // Show notification with CTA
-    // For panel frequent access, add "I already did" option
-    const action =
-      notificationEvent === NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS
-        ? await vscode.window.showInformationMessage(
-            notificationData.message,
-            notificationData.ctaText,
-            'I already did',
-            'Maybe Later',
-          )
-        : await vscode.window.showInformationMessage(
-            notificationData.message,
-            notificationData.ctaText,
-            'Maybe Later',
-          );
-
-    // Calculate reaction time (cap at 60 seconds to exclude stale time)
-    const rawReactionTimeMs = Date.now() - startTime;
-    const reactionTimeMs = Math.min(
-      rawReactionTimeMs,
-      MAX_MEANINGFUL_REACTION_TIME_MS,
-    );
-
-    if (action === notificationData.ctaText) {
-      // Track CTA click with reaction time (fire-and-forget with error handling)
-      telemetryService
-        .reportNotificationInteraction(
-          notificationEvent,
-          'clicked',
-          notificationData.variant,
-          reactionTimeMs,
-        )
-        .catch((err) =>
-          console.warn('Failed to report notification click event:', err),
-        );
-
-      // Reset dismissal counter on CTA click
-      resetDismissalCounter(context);
-
-      // Open the CTA URL in external browser
-      await vscode.env.openExternal(vscode.Uri.parse(notificationData.ctaUrl));
-    } else if (action === 'I already did') {
-      // User indicated they already subscribed - no need to track as dismissal
-      if (context) {
-        writeToGlobalState(
-          context,
-          GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER,
-          true,
-        );
-      }
-      // Reset dismissal counter since user took action
-      resetDismissalCounter(context);
-    } else if (action === 'Maybe Later') {
-      // Track explicit dismissal with reaction time (fire-and-forget with error handling)
-      telemetryService
-        .reportNotificationInteraction(
-          notificationEvent,
-          'dismissed',
-          notificationData.variant,
-          reactionTimeMs,
-        )
-        .catch((err) =>
-          console.warn('Failed to report notification dismiss event:', err),
-        );
-
-      // Record dismissal (increments counter and may pause notifications)
-      recordDismissal(context);
-    } else {
-      // Track notification closed without clicking any button (fire-and-forget with error handling)
-      telemetryService
-        .reportNotificationInteraction(
-          notificationEvent,
-          'dismissed',
-          notificationData.variant,
-          reactionTimeMs,
-        )
-        .catch((err) =>
-          console.warn('Failed to report notification dismiss event:', err),
-        );
-
-      // Record dismissal (increments counter and may pause notifications)
-      recordDismissal(context);
-    }
   } catch (error) {
-    console.error('Failed to show notification:', error);
+    console.error('Failed to fetch notification data:', error);
 
     // Define fallback messages per event type
     const fallbackMessages: Record<
@@ -248,81 +141,40 @@ export async function showNotification(
     };
 
     const fallback = fallbackMessages[notificationEvent];
-    const fallbackStartTime = Date.now();
-    const fallbackAction =
-      notificationEvent === NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS
-        ? await vscode.window.showInformationMessage(
-            fallback.message,
-            fallback.ctaText,
-            'I already did',
-            'Maybe Later',
-          )
-        : await vscode.window.showInformationMessage(
-            fallback.message,
-            fallback.ctaText,
-            'Maybe Later',
-          );
-    const rawFallbackReactionTimeMs = Date.now() - fallbackStartTime;
-    const fallbackReactionTimeMs = Math.min(
-      rawFallbackReactionTimeMs,
-      MAX_MEANINGFUL_REACTION_TIME_MS,
-    );
-
-    // Track fallback notification interaction with default variant
-    const defaultVariant = 'fallback';
-    if (fallbackAction === fallback.ctaText) {
-      telemetryService
-        .reportNotificationInteraction(
-          notificationEvent,
-          'clicked',
-          defaultVariant,
-          fallbackReactionTimeMs,
-        )
-        .catch((err) =>
-          console.warn('Failed to report fallback click event:', err),
-        );
-
-      // Open the CTA URL in external browser
-      await vscode.env.openExternal(
-        vscode.Uri.parse(
-          `${fallback.ctaUrl}?event=${notificationEvent}&variant=${defaultVariant}`,
-        ),
-      );
-    } else if (fallbackAction === 'I already did') {
-      // User indicated they already subscribed - no need to track as dismissal
-      if (context) {
-        writeToGlobalState(
-          context,
-          GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER,
-          true,
-        );
-      }
-    } else if (fallbackAction === 'Maybe Later') {
-      // Track explicit dismissal with reaction time (fire-and-forget with error handling)
-      telemetryService
-        .reportNotificationInteraction(
-          notificationEvent,
-          'dismissed',
-          defaultVariant,
-          fallbackReactionTimeMs,
-        )
-        .catch((err) =>
-          console.warn('Failed to report fallback dismiss event:', err),
-        );
-    } else {
-      // Track notification closed without clicking any button (fire-and-forget with error handling)
-      telemetryService
-        .reportNotificationInteraction(
-          notificationEvent,
-          'dismissed',
-          defaultVariant,
-          fallbackReactionTimeMs,
-        )
-        .catch((err) =>
-          console.warn('Failed to report fallback dismiss event:', err),
-        );
-    }
+    notificationData = {
+      ...fallback,
+      variant: 'fallback',
+      isDeactivated: false,
+    };
   }
+
+  if (notificationData.isDeactivated) {
+    // Variant is deactivated, don't show notification
+    // Decrement the monthly counter to avoid wasting a notification slot
+    // (timestamp remains set to prevent rapid re-attempts)
+    decrementMonthlyCounter(context, notificationEvent);
+    return false;
+  }
+
+  const telemetryService = createTelemetryService();
+  telemetryService
+    .reportNotificationInteraction(
+      notificationEvent,
+      'shown',
+      notificationData.variant,
+    )
+    .catch((err) =>
+      console.warn('Failed to report notification shown event:', err),
+    );
+  fireNotificationInBackground(
+    context,
+    telemetryService,
+    notificationEvent,
+    notificationData,
+  ).catch((err) =>
+    console.error('Error in fireNotificationInBackground:', err),
+  );
+
   return true; // Notification was shown
 }
 
@@ -354,4 +206,110 @@ async function fetchNotificationData(
   }
 
   return await response.json();
+}
+
+async function fireNotificationInBackground(
+  context: vscode.ExtensionContext,
+  telemetryService: TurboAnalyticsProvider,
+  notificationEvent: NotificationEvent,
+  notificationData: ExtensionNotificationResponse,
+): Promise<void> {
+  // Cap reaction time to exclude stale time when users are away
+  const MAX_MEANINGFUL_REACTION_TIME_MS = 60 * 1000; // 60 seconds
+  try {
+    // Record start time for reaction time measurement
+    const startTime = Date.now();
+
+    // Show notification with CTA
+    // For panel frequent access, add "I already did" option
+    const action =
+      notificationEvent === NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS
+        ? await vscode.window.showInformationMessage(
+            notificationData.message,
+            notificationData.ctaText,
+            'I already did',
+            'Maybe Later',
+          )
+        : await vscode.window.showInformationMessage(
+            notificationData.message,
+            notificationData.ctaText,
+            'Maybe Later',
+          );
+
+    // Calculate reaction time (cap at 60 seconds to exclude stale time)
+    const rawReactionTimeMs = Date.now() - startTime;
+    const reactionTimeMs = Math.min(
+      rawReactionTimeMs,
+      MAX_MEANINGFUL_REACTION_TIME_MS,
+    );
+
+    if (action === notificationData.ctaText) {
+      // Track CTA click with reaction time (fire-and-forget with error handling)
+      telemetryService
+        .reportNotificationInteraction(
+          notificationEvent,
+          'clicked',
+          notificationData.variant,
+          reactionTimeMs,
+        )
+        .catch((err) =>
+          console.warn('Failed to report notification click event:', err),
+        );
+
+      // Reset dismissal counter on CTA click
+      resetDismissalCounter(context);
+
+      // Open the CTA URL in external browser
+      await vscode.env.openExternal(
+        vscode.Uri.parse(
+          notificationData.variant !== 'fallback'
+            ? notificationData.ctaUrl
+            : `${notificationData.ctaUrl}?event=${notificationEvent}&variant=fallback`,
+        ),
+      );
+    } else if (action === 'I already did') {
+      // User indicated they already subscribed - no need to track as dismissal
+      if (context) {
+        writeToGlobalState(
+          context,
+          GlobalStateKey.HAS_SUBSCRIBED_TO_NEWSLETTER,
+          true,
+        );
+      }
+      // Reset dismissal counter since user took action
+      resetDismissalCounter(context);
+    } else if (action === 'Maybe Later') {
+      // Track explicit dismissal with reaction time (fire-and-forget with error handling)
+      telemetryService
+        .reportNotificationInteraction(
+          notificationEvent,
+          'dismissed',
+          notificationData.variant,
+          reactionTimeMs,
+        )
+        .catch((err) =>
+          console.warn('Failed to report notification dismiss event:', err),
+        );
+
+      // Record dismissal (increments counter and may pause notifications)
+      recordDismissal(context);
+    } else {
+      // Track notification closed without clicking any button (fire-and-forget with error handling)
+      telemetryService
+        .reportNotificationInteraction(
+          notificationEvent,
+          'dismissed',
+          notificationData.variant,
+          reactionTimeMs,
+        )
+        .catch((err) =>
+          console.warn('Failed to report notification dismiss event:', err),
+        );
+
+      // Record dismissal (increments counter and may pause notifications)
+      recordDismissal(context);
+    }
+  } catch (error) {
+    console.error('Error showing notification:', error);
+  }
 }

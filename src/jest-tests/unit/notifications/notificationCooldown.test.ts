@@ -3,6 +3,7 @@ import {
   recordNotificationShown,
   recordDismissal,
   resetDismissalCounter,
+  decrementMonthlyCounter,
 } from '@/notifications/notificationCooldown';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
 import { GlobalStateKey } from '@/entities';
@@ -628,6 +629,226 @@ describe('notificationCooldown', () => {
           globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
         ).toBe(1);
       });
+    });
+  });
+
+  describe('decrementMonthlyCounter', () => {
+    it('should decrement counter for IGNORE priority events', () => {
+      // Setup: Create a counter that has been incremented
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      globalStateStore.set(
+        GlobalStateKey.MONTHLY_NOTIFICATION_MONTH_KEY,
+        currentMonthKey,
+      );
+      globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 3);
+
+      // Act: Decrement for an IGNORE event
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+
+      // Assert: Counter should be decremented to 2
+      const monthlyCount = globalStateStore.get(
+        GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
+      );
+      expect(monthlyCount).toBe(2);
+    });
+
+    it('should NOT decrement counter for BYPASS priority events', () => {
+      // Setup: Create a counter
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      globalStateStore.set(
+        GlobalStateKey.MONTHLY_NOTIFICATION_MONTH_KEY,
+        currentMonthKey,
+      );
+      globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 3);
+
+      // Act: Try to decrement for a BYPASS event
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+
+      // Assert: Counter should remain unchanged (BYPASS events don't count)
+      const monthlyCount = globalStateStore.get(
+        GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
+      );
+      expect(monthlyCount).toBe(3);
+    });
+
+    it('should prevent negative counters (stop at 0)', () => {
+      // Setup: Counter at 0
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      globalStateStore.set(
+        GlobalStateKey.MONTHLY_NOTIFICATION_MONTH_KEY,
+        currentMonthKey,
+      );
+      globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 0);
+
+      // Act: Try to decrement below 0
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+
+      // Assert: Counter should remain at 0
+      const monthlyCount = globalStateStore.get(
+        GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
+      );
+      expect(monthlyCount).toBe(0);
+    });
+
+    it('should handle case when counter is undefined', () => {
+      // Setup: No counter exists
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      globalStateStore.set(
+        GlobalStateKey.MONTHLY_NOTIFICATION_MONTH_KEY,
+        currentMonthKey,
+      );
+      // Intentionally don't set MONTHLY_NOTIFICATION_COUNT
+
+      // Act: Try to decrement
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+
+      // Assert: Counter should remain undefined (treated as 0, not decremented)
+      const monthlyCount = globalStateStore.get(
+        GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
+      );
+      expect(monthlyCount).toBeUndefined();
+    });
+
+    it('should NOT decrement when month key does not match current month', () => {
+      // Setup: Counter from previous month
+      const previousMonthKey = '2024-12';
+      globalStateStore.set(
+        GlobalStateKey.MONTHLY_NOTIFICATION_MONTH_KEY,
+        previousMonthKey,
+      );
+      globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 3);
+
+      // Act: Try to decrement in current month (different from stored month)
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+
+      // Assert: Counter should remain unchanged (different month)
+      const monthlyCount = globalStateStore.get(
+        GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
+      );
+      expect(monthlyCount).toBe(3);
+    });
+
+    it('should NOT decrement when no month key exists', () => {
+      // Setup: Counter exists but no month key
+      globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 3);
+      // Intentionally don't set MONTHLY_NOTIFICATION_MONTH_KEY
+
+      // Act: Try to decrement
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+
+      // Assert: Counter should remain unchanged (no month key)
+      const monthlyCount = globalStateStore.get(
+        GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
+      );
+      expect(monthlyCount).toBe(3);
+    });
+
+    it('should handle multiple decrements correctly', () => {
+      // Setup: Counter at 4
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      globalStateStore.set(
+        GlobalStateKey.MONTHLY_NOTIFICATION_MONTH_KEY,
+        currentMonthKey,
+      );
+      globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 4);
+
+      // Act: Decrement multiple times
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+      expect(
+        globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
+      ).toBe(3);
+
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_DELETE_COMMANDS,
+      );
+      expect(
+        globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
+      ).toBe(2);
+
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_UNCOMMENTS_COMMANDS,
+      );
+      expect(
+        globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
+      ).toBe(1);
+
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_CORRECTIONS_COMMANDS,
+      );
+      expect(
+        globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
+      ).toBe(0);
+
+      // Fifth decrement should not go below 0
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+      expect(
+        globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
+      ).toBe(0);
+    });
+
+    it('should work in the deactivated variant scenario', () => {
+      // Setup: Simulate the exact scenario from showNotification
+      // 1. Counter starts at 2
+      const now = new Date();
+      const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      globalStateStore.set(
+        GlobalStateKey.MONTHLY_NOTIFICATION_MONTH_KEY,
+        currentMonthKey,
+      );
+      globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 2);
+
+      // 2. recordNotificationShown increments to 3
+      recordNotificationShown(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+      expect(
+        globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
+      ).toBe(3);
+
+      // 3. Variant is deactivated, so decrement back to 2
+      decrementMonthlyCounter(
+        mockContext,
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+      );
+
+      // Assert: Counter should be back to 2 (cooldown slot not wasted)
+      const monthlyCount = globalStateStore.get(
+        GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
+      );
+      expect(monthlyCount).toBe(2);
     });
   });
 
