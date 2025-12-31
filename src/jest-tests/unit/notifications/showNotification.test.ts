@@ -6,6 +6,8 @@ import { makeExtensionContext } from '@/jest-tests/mocks/helpers/makeExtensionCo
 import {
   shouldShowNotification,
   recordNotificationShown,
+  recordDismissal,
+  resetDismissalCounter,
 } from '@/notifications/notificationCooldown';
 
 // Mock dependencies
@@ -40,6 +42,10 @@ describe('showNotification', () => {
   let mockRecordNotificationShown: jest.MockedFunction<
     typeof recordNotificationShown
   >;
+  let mockRecordDismissal: jest.MockedFunction<typeof recordDismissal>;
+  let mockResetDismissalCounter: jest.MockedFunction<
+    typeof resetDismissalCounter
+  >;
   let consoleErrorSpy: jest.SpyInstance;
   let consoleLogSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;
@@ -59,8 +65,16 @@ describe('showNotification', () => {
       recordNotificationShown as jest.MockedFunction<
         typeof recordNotificationShown
       >;
+    mockRecordDismissal = recordDismissal as jest.MockedFunction<
+      typeof recordDismissal
+    >;
+    mockResetDismissalCounter = resetDismissalCounter as jest.MockedFunction<
+      typeof resetDismissalCounter
+    >;
     mockShouldShowNotification.mockReturnValue(true); // Default: allow notifications
     mockRecordNotificationShown.mockReturnValue(undefined);
+    mockRecordDismissal.mockReturnValue(undefined);
+    mockResetDismissalCounter.mockReturnValue(undefined);
 
     // Mock telemetry service with resolved promises
     mockTelemetryService = {
@@ -179,7 +193,10 @@ describe('showNotification', () => {
         mockNotificationData.ctaUrl,
       );
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
     });
 
     it('should track dismissed event when "Maybe Later" is clicked', async () => {
@@ -202,7 +219,10 @@ describe('showNotification', () => {
 
       expect(mockOpenExternal).not.toHaveBeenCalled();
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
     });
 
     it('should track dismissed event when notification is closed without action', async () => {
@@ -223,7 +243,10 @@ describe('showNotification', () => {
         expect.any(Number),
       );
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
     });
 
     it('should cap reaction time at 60 seconds', async () => {
@@ -304,7 +327,10 @@ describe('showNotification', () => {
         'https://www.turboconsolelog.io/documentation/overview/motivation?event=extensionFreshInstall&variant=fallback',
       );
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
     });
 
     it('should track fallback notification dismissal when "Maybe Later" is clicked', async () => {
@@ -327,7 +353,10 @@ describe('showNotification', () => {
 
       expect(mockOpenExternal).not.toHaveBeenCalled();
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
     });
 
     it('should track fallback notification dismissal when closed without action', async () => {
@@ -348,7 +377,10 @@ describe('showNotification', () => {
         expect.any(Number),
       );
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
     });
 
     it('should include event and variant query parameters in fallback URL', async () => {
@@ -786,7 +818,10 @@ describe('showNotification', () => {
         expect.any(Number),
       );
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+      );
     });
 
     it('should track dismissal when "Maybe Later" is clicked', async () => {
@@ -807,7 +842,10 @@ describe('showNotification', () => {
         expect.any(Number),
       );
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+      );
     });
 
     describe('fallback flow for EXTENSION_PANEL_FREQUENT_ACCESS', () => {
@@ -934,7 +972,10 @@ describe('showNotification', () => {
 
       expect(result).toBe(true);
       expect(mockShowInformationMessage).toHaveBeenCalled();
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
     });
 
     it('should record notification shown after successful display', async () => {
@@ -944,7 +985,10 @@ describe('showNotification', () => {
         mockContext,
       );
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
       expect(mockRecordNotificationShown).toHaveBeenCalledTimes(1);
     });
 
@@ -975,7 +1019,10 @@ describe('showNotification', () => {
 
       expect(fetchCalled).toBe(true);
       expect(messageCalled).toBe(true);
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
     });
 
     it('should return true even when API fails but fallback is shown', async () => {
@@ -989,7 +1036,10 @@ describe('showNotification', () => {
 
       expect(result).toBe(true);
       expect(mockShowInformationMessage).toHaveBeenCalled();
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
     });
 
     it('should not record notification for IGNORE events when blocked by cooldown', async () => {
@@ -1023,7 +1073,168 @@ describe('showNotification', () => {
         mockContext,
       );
 
-      expect(mockRecordNotificationShown).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+    });
+  });
+
+  describe('dismissal tracking integration', () => {
+    const mockNotificationData = {
+      message: 'Test notification message',
+      ctaText: 'Get Started',
+      ctaUrl:
+        'https://www.turboconsolelog.io/documentation?event=extensionFreshInstall&variant=A',
+      variant: 'A',
+    };
+
+    beforeEach(() => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: jest.fn().mockResolvedValue(mockNotificationData),
+      });
+    });
+
+    it('should call recordDismissal when user clicks Maybe Later', async () => {
+      mockShowInformationMessage.mockResolvedValue('Maybe Later');
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(mockRecordDismissal).toHaveBeenCalledWith(mockContext);
+      expect(mockResetDismissalCounter).not.toHaveBeenCalled();
+    });
+
+    it('should call recordDismissal when user clicks X (undefined)', async () => {
+      mockShowInformationMessage.mockResolvedValue(undefined);
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(mockRecordDismissal).toHaveBeenCalledWith(mockContext);
+      expect(mockResetDismissalCounter).not.toHaveBeenCalled();
+    });
+
+    it('should call resetDismissalCounter when user clicks CTA', async () => {
+      mockShowInformationMessage.mockResolvedValue('Get Started');
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(mockResetDismissalCounter).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordDismissal).not.toHaveBeenCalled();
+    });
+
+    it('should call resetDismissalCounter when user clicks I already did', async () => {
+      mockShowInformationMessage.mockResolvedValue('I already did');
+
+      await showNotification(
+        NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(mockResetDismissalCounter).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordDismissal).not.toHaveBeenCalled();
+    });
+
+    it('should track dismissal when Maybe Later is clicked', async () => {
+      mockShowInformationMessage.mockResolvedValue('Maybe Later');
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        '3.9.0',
+        mockContext,
+      );
+
+      // Verify telemetry was sent
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        'dismissed',
+        'A',
+        expect.any(Number),
+      );
+
+      // Verify dismissal was recorded
+      expect(mockRecordDismissal).toHaveBeenCalledWith(mockContext);
+    });
+
+    it('should track dismissal when X button is clicked', async () => {
+      mockShowInformationMessage.mockResolvedValue(undefined);
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        '3.9.0',
+        mockContext,
+      );
+
+      // Verify telemetry was sent
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        'dismissed',
+        'A',
+        expect.any(Number),
+      );
+
+      // Verify dismissal was recorded
+      expect(mockRecordDismissal).toHaveBeenCalledWith(mockContext);
+    });
+
+    it('should reset counter and track click when CTA is clicked', async () => {
+      mockShowInformationMessage.mockResolvedValue('Get Started');
+
+      await showNotification(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        '3.9.0',
+        mockContext,
+      );
+
+      // Verify telemetry was sent
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        'clicked',
+        'A',
+        expect.any(Number),
+      );
+
+      // Verify counter was reset
+      expect(mockResetDismissalCounter).toHaveBeenCalledWith(mockContext);
+
+      // Verify CTA was opened
+      expect(mockOpenExternal).toHaveBeenCalledWith(
+        mockNotificationData.ctaUrl,
+      );
+    });
+
+    it('should not call dismissal functions if notification not shown due to cooldown', async () => {
+      mockShouldShowNotification.mockReturnValue(false);
+
+      const result = await showNotification(
+        NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(result).toBe(false);
+      expect(mockRecordDismissal).not.toHaveBeenCalled();
+      expect(mockResetDismissalCounter).not.toHaveBeenCalled();
+      expect(mockShowInformationMessage).not.toHaveBeenCalled();
     });
   });
 });

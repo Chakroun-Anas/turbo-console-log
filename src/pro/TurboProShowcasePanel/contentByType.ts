@@ -25,6 +25,7 @@ export function contentByType(
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     };
   }
 
@@ -65,5 +66,6 @@ export function contentByType(
     tableHtml: '', // No longer separated - included in topContentHtml
     mediaShowcaseCTAHtml: '', // No longer separated - included in topContentHtml
     videoHtml: '', // No longer separated - included in topContentHtml
+    youtubeVideoHtml: '', // No longer separated - included in topContentHtml
   };
 }

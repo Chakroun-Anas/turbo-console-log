@@ -42,6 +42,8 @@ describe('traceExtensionVersionHistory', () => {
       dispose: jest.fn(),
       reportNotificationInteraction: jest.fn(),
       reportWebviewInteraction: jest.fn(),
+      reportNotificationLimitReached: jest.fn(),
+      reportNotificationsPaused: jest.fn(),
     } as ReturnType<typeof createTelemetryService>);
   });
 
@@ -292,6 +294,8 @@ describe('traceExtensionVersionHistory', () => {
         dispose: jest.fn(),
         reportNotificationInteraction: jest.fn(),
         reportWebviewInteraction: jest.fn(),
+        reportNotificationLimitReached: jest.fn(),
+        reportNotificationsPaused: jest.fn(),
       } as ReturnType<typeof createTelemetryService>);
 
       const consoleWarnSpy = jest

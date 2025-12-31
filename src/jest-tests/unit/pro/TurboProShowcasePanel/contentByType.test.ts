@@ -35,6 +35,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 
@@ -54,6 +55,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 
@@ -72,6 +74,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 
@@ -101,6 +104,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 
@@ -131,6 +135,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 
@@ -160,6 +165,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 
@@ -189,6 +195,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 
@@ -219,6 +226,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 
@@ -253,6 +261,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 
@@ -307,6 +316,7 @@ describe('contentByType', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
   });
 

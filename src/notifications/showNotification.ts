@@ -7,6 +7,8 @@ import { GlobalStateKey } from '@/entities';
 import {
   shouldShowNotification,
   recordNotificationShown,
+  recordDismissal,
+  resetDismissalCounter,
 } from './notificationCooldown';
 
 const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
@@ -31,6 +33,14 @@ export async function showNotification(
   try {
     // Fetch notification data from the endpoint
     notificationData = await fetchNotificationData(notificationEvent, version);
+
+    // Check if notification is deactivated server-side
+    if (notificationData.isDeactivated) {
+      console.log(
+        `[Turbo Console Log] Notification ${notificationEvent} is deactivated server-side`,
+      );
+      return false; // Don't show deactivated notifications
+    }
 
     // Track that notification was shown (fire-and-forget with error handling)
     telemetryService
@@ -82,6 +92,9 @@ export async function showNotification(
           console.warn('Failed to report notification click event:', err),
         );
 
+      // Reset dismissal counter on CTA click
+      resetDismissalCounter(context);
+
       // Open the CTA URL in external browser
       await vscode.env.openExternal(vscode.Uri.parse(notificationData.ctaUrl));
     } else if (action === 'I already did') {
@@ -93,6 +106,8 @@ export async function showNotification(
           true,
         );
       }
+      // Reset dismissal counter since user took action
+      resetDismissalCounter(context);
     } else if (action === 'Maybe Later') {
       // Track explicit dismissal with reaction time (fire-and-forget with error handling)
       telemetryService
@@ -105,6 +120,9 @@ export async function showNotification(
         .catch((err) =>
           console.warn('Failed to report notification dismiss event:', err),
         );
+
+      // Record dismissal (increments counter and may pause notifications)
+      recordDismissal(context);
     } else {
       // Track notification closed without clicking any button (fire-and-forget with error handling)
       telemetryService
@@ -117,6 +135,9 @@ export async function showNotification(
         .catch((err) =>
           console.warn('Failed to report notification dismiss event:', err),
         );
+
+      // Record dismissal (increments counter and may pause notifications)
+      recordDismissal(context);
     }
   } catch (error) {
     console.error('Failed to show notification:', error);
@@ -301,7 +322,7 @@ export async function showNotification(
   }
 
   // Record that a notification was shown (updates cooldown timestamp)
-  recordNotificationShown(context);
+  recordNotificationShown(context, notificationEvent);
   return true; // Notification was shown
 }
 

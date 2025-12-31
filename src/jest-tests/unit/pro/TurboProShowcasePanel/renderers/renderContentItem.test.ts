@@ -7,6 +7,8 @@ import {
   SurveyPanelComponent,
   TablePanelComponent,
   MediaShowcaseCTAPanelComponent,
+  VideoPanelComponent,
+  YouTubeVideoPanelComponent,
 } from '@/pro/TurboProShowcasePanel/types';
 
 // Mock all the renderer functions to focus on the dispatch logic
@@ -43,6 +45,15 @@ jest.mock(
     renderMediaShowcaseCTAComponent: jest.fn(),
   }),
 );
+jest.mock('@/pro/TurboProShowcasePanel/renderers/renderVideoComponent', () => ({
+  renderVideoComponent: jest.fn(),
+}));
+jest.mock(
+  '@/pro/TurboProShowcasePanel/renderers/renderYouTubeVideoComponent',
+  () => ({
+    renderYouTubeVideoComponent: jest.fn(),
+  }),
+);
 
 import { renderParagraphComponent } from '@/pro/TurboProShowcasePanel/renderers/renderParagraphComponent';
 import { renderArticleComponent } from '@/pro/TurboProShowcasePanel/renderers/renderArticleComponent';
@@ -50,6 +61,8 @@ import { renderCountDownComponent } from '@/pro/TurboProShowcasePanel/renderers/
 import { renderSurveyComponent } from '@/pro/TurboProShowcasePanel/renderers/renderSurveyComponent';
 import { renderTableComponent } from '@/pro/TurboProShowcasePanel/renderers/renderTableComponent';
 import { renderMediaShowcaseCTAComponent } from '@/pro/TurboProShowcasePanel/renderers/renderMediaShowcaseCTAComponent';
+import { renderVideoComponent } from '@/pro/TurboProShowcasePanel/renderers/renderVideoComponent';
+import { renderYouTubeVideoComponent } from '@/pro/TurboProShowcasePanel/renderers/renderYouTubeVideoComponent';
 
 const mockRenderParagraphComponent =
   renderParagraphComponent as jest.MockedFunction<
@@ -70,6 +83,13 @@ const mockRenderTableComponent = renderTableComponent as jest.MockedFunction<
 const mockRenderMediaShowcaseCTAComponent =
   renderMediaShowcaseCTAComponent as jest.MockedFunction<
     typeof renderMediaShowcaseCTAComponent
+  >;
+const mockRenderVideoComponent = renderVideoComponent as jest.MockedFunction<
+  typeof renderVideoComponent
+>;
+const mockRenderYouTubeVideoComponent =
+  renderYouTubeVideoComponent as jest.MockedFunction<
+    typeof renderYouTubeVideoComponent
   >;
 
 describe('renderContentItem', () => {
@@ -199,6 +219,44 @@ describe('renderContentItem', () => {
     expect(result).toBe('<div>Media Showcase</div>');
   });
 
+  it('should render video component', () => {
+    const component: VideoPanelComponent = {
+      videoSrc: 'https://example.com/video.mp4',
+      caption: 'Demo video',
+      autoplay: true,
+    };
+    const content: DynamicFreemiumPanelContent = {
+      type: 'video',
+      component,
+    };
+
+    mockRenderVideoComponent.mockReturnValue('<video>Demo</video>');
+
+    const result = renderContentItem(content);
+
+    expect(mockRenderVideoComponent).toHaveBeenCalledWith(component);
+    expect(result).toBe('<video>Demo</video>');
+  });
+
+  it('should render YouTube video component', () => {
+    const component: YouTubeVideoPanelComponent = {
+      youtubeVideoId: 'dQw4w9WgXcQ',
+      caption: 'YouTube demo',
+      title: 'Demo Title',
+    };
+    const content: DynamicFreemiumPanelContent = {
+      type: 'youtube-video',
+      component,
+    };
+
+    mockRenderYouTubeVideoComponent.mockReturnValue('<iframe>YouTube</iframe>');
+
+    const result = renderContentItem(content);
+
+    expect(mockRenderYouTubeVideoComponent).toHaveBeenCalledWith(component);
+    expect(result).toBe('<iframe>YouTube</iframe>');
+  });
+
   it('should handle unknown content type gracefully', () => {
     const unknownContent = {
       type: 'unknown',
@@ -225,5 +283,7 @@ describe('renderContentItem', () => {
     expect(mockRenderSurveyComponent).not.toHaveBeenCalled();
     expect(mockRenderTableComponent).not.toHaveBeenCalled();
     expect(mockRenderMediaShowcaseCTAComponent).not.toHaveBeenCalled();
+    expect(mockRenderVideoComponent).not.toHaveBeenCalled();
+    expect(mockRenderYouTubeVideoComponent).not.toHaveBeenCalled();
   });
 });

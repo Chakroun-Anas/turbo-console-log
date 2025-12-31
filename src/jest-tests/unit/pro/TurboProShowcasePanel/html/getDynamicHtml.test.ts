@@ -59,6 +59,7 @@ describe('getDynamicHtml', () => {
       tableHtml: '<div class="table">Table</div>',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
     mockGetCommonStyles.mockReturnValue('.container { margin: 0; }');
     mockGetJavaScript.mockReturnValue(
@@ -152,6 +153,7 @@ describe('getDynamicHtml', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
 
     const dynamicContent = createMockDynamicPanel();
@@ -189,6 +191,7 @@ describe('getDynamicHtml', () => {
       tableHtml: '',
       mediaShowcaseCTAHtml: '',
       videoHtml: '',
+      youtubeVideoHtml: '',
     });
 
     const dynamicContent = createMockDynamicPanel({

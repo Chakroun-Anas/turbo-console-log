@@ -1866,6 +1866,589 @@ describe('TelemetryService', () => {
     });
   });
 
+  describe('reportNotificationLimitReached', () => {
+    beforeEach(() => {
+      // Reset singleton and mocks for each test
+      resetTelemetryService();
+      jest.clearAllMocks();
+
+      // Setup axios mock as resolved by default
+      mockedAxios.post.mockResolvedValue({ status: 200 });
+
+      // Reset env mock values to enabled state
+      mockVscodeEnv.isTelemetryEnabled = true;
+
+      // Reset workspace mock to enabled state
+      const mockWorkspace = vscode.workspace as jest.Mocked<
+        typeof vscode.workspace
+      >;
+      mockWorkspace.getConfiguration.mockReturnValue({
+        get: jest.fn().mockReturnValue(true),
+      } as unknown as vscode.WorkspaceConfiguration);
+
+      // Reset extension mock
+      const mockExtensions = vscode.extensions as jest.Mocked<
+        typeof vscode.extensions
+      >;
+      mockExtensions.getExtension.mockReturnValue({
+        packageJSON: { version: '3.5.0' },
+      } as vscode.Extension<unknown>);
+    });
+
+    it('should send notification limit reached analytics when telemetry is enabled', async () => {
+      const mockDate = new Date('2025-12-30T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportNotificationLimitReached('2025-12', 5, 4);
+
+      expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.objectContaining({
+          developerId: 'dev_abcd1234567890ef',
+          monthKey: '2025-12',
+          currentCount: 5,
+          maxLimit: 4,
+          timezoneOffset: mockDate.getTimezoneOffset(),
+          extensionVersion: '3.5.0',
+          vscodeVersion: '1.85.0',
+          platform: expect.any(String),
+        }),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/3.5.0',
+          },
+        }),
+      );
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notification limit reached report sent successfully',
+      );
+    });
+
+    it('should handle different month keys correctly', async () => {
+      const service = createTelemetryService();
+
+      // Test current month
+      await service.reportNotificationLimitReached('2025-12', 4, 4);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.objectContaining({
+          monthKey: '2025-12',
+        }),
+        expect.any(Object),
+      );
+
+      jest.clearAllMocks();
+
+      // Test previous month
+      await service.reportNotificationLimitReached('2025-11', 5, 4);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.objectContaining({
+          monthKey: '2025-11',
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should handle different count values correctly', async () => {
+      const service = createTelemetryService();
+
+      // At limit
+      await service.reportNotificationLimitReached('2025-12', 4, 4);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.objectContaining({
+          currentCount: 4,
+          maxLimit: 4,
+        }),
+        expect.any(Object),
+      );
+
+      jest.clearAllMocks();
+
+      // Exceeding limit
+      await service.reportNotificationLimitReached('2025-12', 10, 4);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.objectContaining({
+          currentCount: 10,
+          maxLimit: 4,
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should skip analytics when VS Code telemetry is disabled', async () => {
+      mockVscodeEnv.isTelemetryEnabled = false;
+      const disabledService = createTelemetryService();
+
+      await disabledService.reportNotificationLimitReached('2025-12', 5, 4);
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+      expect(mockConsoleLog).not.toHaveBeenCalledWith(
+        expect.stringContaining('Sending notification limit reached'),
+      );
+    });
+
+    it('should skip analytics when custom telemetry is disabled', async () => {
+      const mockWorkspace = vscode.workspace as jest.Mocked<
+        typeof vscode.workspace
+      >;
+      mockWorkspace.getConfiguration.mockReturnValue({
+        get: jest.fn().mockReturnValue(false),
+      } as unknown as vscode.WorkspaceConfiguration);
+
+      const disabledService = createTelemetryService();
+      await disabledService.reportNotificationLimitReached('2025-12', 5, 4);
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+      expect(mockConsoleLog).not.toHaveBeenCalledWith(
+        expect.stringContaining('Sending notification limit reached'),
+      );
+    });
+
+    it('should handle axios errors gracefully', async () => {
+      const error = new Error('Network error');
+      mockedAxios.post.mockRejectedValue(error);
+
+      const service = createTelemetryService();
+      await service.reportNotificationLimitReached('2025-12', 5, 4);
+
+      expect(mockConsoleWarn).toHaveBeenCalledWith(
+        '[Turbo Console Log] Failed to send notification limit reached analytics:',
+        error,
+      );
+    });
+
+    it('should generate consistent analytics payload structure', async () => {
+      const mockDate = new Date('2025-12-30T15:30:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportNotificationLimitReached('2025-12', 6, 4);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        {
+          developerId: 'dev_abcd1234567890ef',
+          monthKey: '2025-12',
+          currentCount: 6,
+          maxLimit: 4,
+          timezoneOffset: mockDate.getTimezoneOffset(),
+          extensionVersion: '3.5.0',
+          vscodeVersion: '1.85.0',
+          platform: expect.any(String),
+        },
+        expect.any(Object),
+      );
+    });
+
+    it('should use correct API endpoint and headers', async () => {
+      const service = createTelemetryService();
+      await service.reportNotificationLimitReached('2025-12', 5, 4);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.any(Object),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/3.5.0',
+          },
+        }),
+      );
+    });
+
+    it('should handle missing extension version gracefully', async () => {
+      const mockExtensions = vscode.extensions as jest.Mocked<
+        typeof vscode.extensions
+      >;
+      mockExtensions.getExtension.mockReturnValue(undefined);
+
+      const service = createTelemetryService();
+      await service.reportNotificationLimitReached('2025-12', 5, 4);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.objectContaining({
+          extensionVersion: undefined,
+        }),
+        expect.objectContaining({
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/undefined',
+          },
+        }),
+      );
+    });
+
+    it('should log appropriate console messages', async () => {
+      const service = createTelemetryService();
+      await service.reportNotificationLimitReached('2025-12', 5, 4);
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Sending notification limit reached analytics:',
+        expect.objectContaining({
+          developerId: 'dev_abcd1234567890ef',
+          monthKey: '2025-12',
+          currentCount: 5,
+          maxLimit: 4,
+          extensionVersion: '3.5.0',
+          vscodeVersion: '1.85.0',
+          platform: expect.any(String),
+          timezoneOffset: expect.any(Number),
+        }),
+      );
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notification limit reached report sent successfully',
+      );
+    });
+
+    it('should include timezone offset from current date', async () => {
+      const mockDate = new Date('2025-12-30T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportNotificationLimitReached('2025-12', 5, 4);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.objectContaining({
+          timezoneOffset: mockDate.getTimezoneOffset(),
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should handle edge case with zero currentCount', async () => {
+      const service = createTelemetryService();
+      await service.reportNotificationLimitReached('2025-12', 0, 4);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.objectContaining({
+          currentCount: 0,
+          maxLimit: 4,
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should handle very large count values', async () => {
+      const service = createTelemetryService();
+      await service.reportNotificationLimitReached('2025-12', 9999, 4);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationLimitReached',
+        expect.objectContaining({
+          currentCount: 9999,
+          maxLimit: 4,
+        }),
+        expect.any(Object),
+      );
+    });
+  });
+
+  describe('reportNotificationsPaused', () => {
+    beforeEach(() => {
+      // Reset singleton and mocks for each test
+      resetTelemetryService();
+      jest.clearAllMocks();
+
+      // Setup axios mock as resolved by default
+      mockedAxios.post.mockResolvedValue({ status: 200 });
+
+      // Reset env mock values to enabled state
+      mockVscodeEnv.isTelemetryEnabled = true;
+
+      // Reset workspace mock to enabled state
+      const mockWorkspace = vscode.workspace as jest.Mocked<
+        typeof vscode.workspace
+      >;
+      mockWorkspace.getConfiguration.mockReturnValue({
+        get: jest.fn().mockReturnValue(true),
+      } as unknown as vscode.WorkspaceConfiguration);
+
+      // Reset extension mock
+      const mockExtensions = vscode.extensions as jest.Mocked<
+        typeof vscode.extensions
+      >;
+      mockExtensions.getExtension.mockReturnValue({
+        packageJSON: { version: '3.5.0' },
+      } as vscode.Extension<unknown>);
+    });
+
+    it('should send notifications paused analytics when telemetry is enabled', async () => {
+      const mockDate = new Date('2025-12-30T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationsPaused',
+        expect.objectContaining({
+          developerId: 'dev_abcd1234567890ef',
+          monthKey: '2025-12',
+          consecutiveDismissals: 3,
+          pausedUntil: 1735689600000,
+          timezoneOffset: mockDate.getTimezoneOffset(),
+          extensionVersion: '3.5.0',
+          vscodeVersion: '1.85.0',
+          platform: 'darwin',
+        }),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/3.5.0',
+          },
+        }),
+      );
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notifications paused report sent successfully',
+      );
+    });
+
+    it('should handle different month keys correctly', async () => {
+      const service = createTelemetryService();
+
+      await service.reportNotificationsPaused('2025-01', 3, 1735689600000);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ monthKey: '2025-01' }),
+        expect.any(Object),
+      );
+
+      await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ monthKey: '2025-12' }),
+        expect.any(Object),
+      );
+    });
+
+    it('should handle different consecutive dismissal counts correctly', async () => {
+      const service = createTelemetryService();
+
+      // Test with 3 dismissals
+      await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ consecutiveDismissals: 3 }),
+        expect.any(Object),
+      );
+
+      // Test with 5 dismissals
+      await service.reportNotificationsPaused('2025-12', 5, 1735689600000);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ consecutiveDismissals: 5 }),
+        expect.any(Object),
+      );
+    });
+
+    it('should handle different pausedUntil timestamps correctly', async () => {
+      const service = createTelemetryService();
+
+      const timestamp1 = 1735689600000; // Jan 1, 2025
+      await service.reportNotificationsPaused('2025-12', 3, timestamp1);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ pausedUntil: timestamp1 }),
+        expect.any(Object),
+      );
+
+      const timestamp2 = 1738368000000; // Feb 1, 2025
+      await service.reportNotificationsPaused('2025-12', 3, timestamp2);
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ pausedUntil: timestamp2 }),
+        expect.any(Object),
+      );
+    });
+
+    it('should skip analytics when VS Code telemetry is disabled', async () => {
+      mockVscodeEnv.isTelemetryEnabled = false;
+      const disabledService = createTelemetryService();
+
+      await disabledService.reportNotificationsPaused(
+        '2025-12',
+        3,
+        1735689600000,
+      );
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+    });
+
+    it('should skip analytics when custom telemetry is disabled', async () => {
+      const mockWorkspace = vscode.workspace as jest.Mocked<
+        typeof vscode.workspace
+      >;
+      mockWorkspace.getConfiguration.mockReturnValue({
+        get: jest.fn().mockReturnValue(false),
+      } as unknown as vscode.WorkspaceConfiguration);
+
+      const disabledService = createTelemetryService();
+      await disabledService.reportNotificationsPaused(
+        '2025-12',
+        3,
+        1735689600000,
+      );
+
+      expect(mockedAxios.post).not.toHaveBeenCalled();
+    });
+
+    it('should handle axios errors gracefully', async () => {
+      const error = new Error('Network error');
+      mockedAxios.post.mockRejectedValue(error);
+
+      const service = createTelemetryService();
+      await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
+
+      expect(mockConsoleWarn).toHaveBeenCalledWith(
+        '[Turbo Console Log] Failed to send notifications paused analytics:',
+        error,
+      );
+    });
+
+    it('should generate consistent analytics payload structure', async () => {
+      const service = createTelemetryService();
+      await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationsPaused',
+        {
+          developerId: expect.stringMatching(/^dev_/),
+          monthKey: expect.any(String),
+          consecutiveDismissals: expect.any(Number),
+          pausedUntil: expect.any(Number),
+          timezoneOffset: expect.any(Number),
+          extensionVersion: expect.any(String),
+          vscodeVersion: expect.any(String),
+          platform: expect.any(String),
+        },
+        expect.any(Object),
+      );
+    });
+
+    it('should use correct API endpoint and headers', async () => {
+      const service = createTelemetryService();
+      await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationsPaused',
+        expect.any(Object),
+        expect.objectContaining({
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/3.5.0',
+          },
+        }),
+      );
+    });
+
+    it('should handle missing extension version gracefully', async () => {
+      const mockExtensions = vscode.extensions as jest.Mocked<
+        typeof vscode.extensions
+      >;
+      mockExtensions.getExtension.mockReturnValue(undefined);
+
+      const service = createTelemetryService();
+      await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        'https://www.turboconsolelog.io/api/reportNotificationsPaused',
+        expect.objectContaining({
+          extensionVersion: undefined,
+        }),
+        expect.objectContaining({
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'turbo-console-log-extension/undefined',
+          },
+        }),
+      );
+    });
+
+    it('should log appropriate console messages', async () => {
+      const service = createTelemetryService();
+      await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Sending notifications paused analytics:',
+        expect.objectContaining({
+          developerId: expect.stringMatching(/^dev_/),
+          monthKey: '2025-12',
+          consecutiveDismissals: 3,
+          pausedUntilDate: expect.any(String),
+          extensionVersion: '3.5.0',
+          vscodeVersion: '1.85.0',
+          platform: 'darwin',
+          timezoneOffset: expect.any(Number),
+        }),
+      );
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Notifications paused report sent successfully',
+      );
+    });
+
+    it('should include timezone offset from current date', async () => {
+      const mockDate = new Date('2025-12-30T10:00:00.000Z');
+      jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
+      const service = createTelemetryService();
+      await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          timezoneOffset: mockDate.getTimezoneOffset(),
+        }),
+        expect.any(Object),
+      );
+    });
+
+    it('should format pausedUntil timestamp as ISO date in logs', async () => {
+      const service = createTelemetryService();
+      const pausedUntil = 1735689600000; // Jan 1, 2025 00:00:00 UTC
+
+      await service.reportNotificationsPaused('2025-12', 3, pausedUntil);
+
+      expect(mockConsoleLog).toHaveBeenCalledWith(
+        '[Turbo Console Log] Sending notifications paused analytics:',
+        expect.objectContaining({
+          pausedUntilDate: new Date(pausedUntil).toISOString(),
+        }),
+      );
+    });
+
+    it('should handle edge case with very large pausedUntil timestamp', async () => {
+      const service = createTelemetryService();
+      const largeTimestamp = 9999999999999;
+
+      await service.reportNotificationsPaused('2025-12', 3, largeTimestamp);
+
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          pausedUntil: largeTimestamp,
+        }),
+        expect.any(Object),
+      );
+    });
+  });
+
   describe('dispose', () => {
     it('should dispose without errors', () => {
       expect(() => telemetryService.dispose()).not.toThrow();

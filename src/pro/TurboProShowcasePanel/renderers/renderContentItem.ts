@@ -7,6 +7,7 @@ import {
   TablePanelComponent,
   MediaShowcaseCTAPanelComponent,
   VideoPanelComponent,
+  YouTubeVideoPanelComponent,
 } from '../types';
 import { renderParagraphComponent } from './renderParagraphComponent';
 import { renderArticleComponent } from './renderArticleComponent';
@@ -15,6 +16,7 @@ import { renderSurveyComponent } from './renderSurveyComponent';
 import { renderTableComponent } from './renderTableComponent';
 import { renderMediaShowcaseCTAComponent } from './renderMediaShowcaseCTAComponent';
 import { renderVideoComponent } from './renderVideoComponent';
+import { renderYouTubeVideoComponent } from './renderYouTubeVideoComponent';
 
 /**
  * Render a single content item based on its type
@@ -49,6 +51,10 @@ export function renderContentItem(
       );
     case 'video':
       return renderVideoComponent(contentItem.component as VideoPanelComponent);
+    case 'youtube-video':
+      return renderYouTubeVideoComponent(
+        contentItem.component as YouTubeVideoPanelComponent,
+      );
     default:
       // Future content types can be added here
       return '';
