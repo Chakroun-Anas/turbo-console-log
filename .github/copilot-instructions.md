@@ -95,7 +95,22 @@ it('calls debugMessage.msg when inserting a log', async () => {
 });
 ```
 
-**Integration test note** — mocha integration tests use `vscode-test` and `src/mocha-tests/runTests.ts` sets `platform` (default: `darwin-arm64`) and `vscodeVersion`. Update those for your CI/local environment.
+**Integration test note** — mocha integration tests use `vscode-test`. `src/mocha-tests/runTests.ts` now respects environment variables to make CI easier:
+
+- `VSCODE_TEST_PLATFORM` (e.g., `darwin-x64`, `darwin-arm64`, `linux-x64`)
+- `VSCODE_TEST_VERSION` (e.g., `stable`)
+
+Run integration tests locally or in CI with:
+
+```bash
+export VSCODE_TEST_PLATFORM=linux-x64
+export VSCODE_TEST_VERSION=stable
+npm run test:compile && node ./out/mocha-tests/runTests.js
+```
+
+CI workflow example is provided in `.github/workflows/ci.yml` and runs lint+unit tests on Linux, and integration tests on macOS & Linux (sets platform via env).
+
+**Sample mock file** — see `src/jest-tests/mocks/axios.ts` for a jest-style `axios` mock (exported as default). Use `jest.mock('axios')` in tests or import this mock directly when needed.
 
 See `src/jest-tests/unit/js/JSDebugMessage/detectAll/detectAll.test.ts` for extensive test patterns and mocking examples.
 
