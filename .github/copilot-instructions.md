@@ -66,6 +66,37 @@ test('detectAll returns empty when no logs are present', async () => {
 });
 ```
 
+**Command handler (unit test) example** — mock `vscode.window.activeTextEditor` and assert that `debugMessage.msg` is called for each selection.
+
+```ts
+import * as vscode from 'vscode';
+import { insertConsoleLogCommand } from '@/commands/insertConsoleLog';
+
+jest.mock('@/helpers', () => ({
+  canInsertLogInDocument: jest.fn().mockReturnValue(true),
+  trackLogInsertions: jest.fn(),
+  loadPhpDebugMessage: jest.fn(),
+}));
+
+it('calls debugMessage.msg when inserting a log', async () => {
+  const command = insertConsoleLogCommand();
+  const fakeEditor = {
+    selections: [new vscode.Selection(new vscode.Position(0, 0), new vscode.Position(0, 0))],
+    document: { languageId: 'javascript', getText: () => '' } as any,
+    edit: jest.fn((fn) => Promise.resolve(true)),
+  } as unknown as vscode.TextEditor;
+
+  jest.spyOn(vscode.window, 'activeTextEditor', 'get').mockReturnValue(fakeEditor);
+
+  const handler = command.handler as any;
+  await handler({ extensionProperties: { logFunction: 'log' }, debugMessage: { msg: jest.fn(), detectAll: jest.fn() } as any, context: {} });
+
+  expect(fakeEditor.edit).toHaveBeenCalled();
+});
+```
+
+**Integration test note** — mocha integration tests use `vscode-test` and `src/mocha-tests/runTests.ts` sets `platform` (default: `darwin-arm64`) and `vscodeVersion`. Update those for your CI/local environment.
+
 See `src/jest-tests/unit/js/JSDebugMessage/detectAll/detectAll.test.ts` for extensive test patterns and mocking examples.
 
 ---
