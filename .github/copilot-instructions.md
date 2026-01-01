@@ -112,6 +112,19 @@ CI workflow example is provided in `.github/workflows/ci.yml` and runs lint+unit
 
 **Coverage** — run Jest coverage locally with `npm run test:jest:coverage` (produces `coverage/lcov.info`). The CI uploads this file to Codecov using `codecov/codecov-action@v4`; after the first successful run the Codecov badge in the `README` will reflect coverage.
 
+Open the generated HTML coverage report locally (choose one):
+
+- macOS: `npm run test:jest:coverage && open ./coverage/lcov-report/index.html`
+- Linux: `npm run test:jest:coverage && xdg-open ./coverage/lcov-report/index.html`
+- Windows (PowerShell): `npm run test:jest:coverage; Start-Process ./coverage/lcov-report/index.html`
+
+If you don't have a system opener, serve it on a local port:
+
+```bash
+npm run test:jest:coverage && npx http-server ./coverage/lcov-report -p 8080
+# then open http://localhost:8080 in your browser
+```
+
 **Sample mock file** — see `src/jest-tests/mocks/axios.ts` for a jest-style `axios` mock (exported as default). Use `jest.mock('axios')` in tests or import this mock directly when needed.
 
 See `src/jest-tests/unit/js/JSDebugMessage/detectAll/detectAll.test.ts` for extensive test patterns and mocking examples.
