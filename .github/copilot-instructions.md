@@ -110,6 +110,8 @@ npm run test:compile && node ./out/mocha-tests/runTests.js
 
 CI workflow example is provided in `.github/workflows/ci.yml` and runs lint+unit tests on Linux, and integration tests on macOS & Linux (sets platform via env).
 
+**Coverage** — run Jest coverage locally with `npm run test:jest:coverage` (produces `coverage/lcov.info`). The CI uploads this file to Codecov using `codecov/codecov-action@v4`; after the first successful run the Codecov badge in the `README` will reflect coverage.
+
 **Sample mock file** — see `src/jest-tests/mocks/axios.ts` for a jest-style `axios` mock (exported as default). Use `jest.mock('axios')` in tests or import this mock directly when needed.
 
 See `src/jest-tests/unit/js/JSDebugMessage/detectAll/detectAll.test.ts` for extensive test patterns and mocking examples.
