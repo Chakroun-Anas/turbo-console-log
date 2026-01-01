@@ -1,6 +1,6 @@
 # Turbo Console Log
 
-[![CI](https://github.com/Chakroun-Anas/turbo-console-log/actions/workflows/ci.yml/badge.svg)](https://github.com/Chakroun-Anas/turbo-console-log/actions/workflows/ci.yml)
+[![CI](https://github.com/Chakroun-Anas/turbo-console-log/actions/workflows/ci.yml/badge.svg)](https://github.com/Chakroun-Anas/turbo-console-log/actions/workflows/ci.yml) [![Coverage Status](https://codecov.io/gh/Chakroun-Anas/turbo-console-log/branch/master/graph/badge.svg)](https://codecov.io/gh/Chakroun-Anas/turbo-console-log)
 
 **[Official Website](https://www.turboconsolelog.io)** | **[Turbo Pro](https://www.turboconsolelog.io/pro)** | **[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)**
 
