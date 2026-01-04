@@ -8,7 +8,7 @@ import {
   recordNotificationShown,
   recordDismissal,
   resetDismissalCounter,
-  decrementMonthlyCounter,
+  undoNotificationRecording,
 } from '@/notifications/notificationCooldown';
 
 // Mock dependencies
@@ -47,8 +47,8 @@ describe('showNotification', () => {
   let mockResetDismissalCounter: jest.MockedFunction<
     typeof resetDismissalCounter
   >;
-  let mockDecrementMonthlyCounter: jest.MockedFunction<
-    typeof decrementMonthlyCounter
+  let mockUndoNotificationRecording: jest.MockedFunction<
+    typeof undoNotificationRecording
   >;
   let consoleErrorSpy: jest.SpyInstance;
   let consoleLogSpy: jest.SpyInstance;
@@ -75,15 +75,15 @@ describe('showNotification', () => {
     mockResetDismissalCounter = resetDismissalCounter as jest.MockedFunction<
       typeof resetDismissalCounter
     >;
-    mockDecrementMonthlyCounter =
-      decrementMonthlyCounter as jest.MockedFunction<
-        typeof decrementMonthlyCounter
+    mockUndoNotificationRecording =
+      undoNotificationRecording as jest.MockedFunction<
+        typeof undoNotificationRecording
       >;
     mockShouldShowNotification.mockReturnValue(true); // Default: allow notifications
     mockRecordNotificationShown.mockReturnValue(undefined);
     mockRecordDismissal.mockReturnValue(undefined);
     mockResetDismissalCounter.mockReturnValue(undefined);
-    mockDecrementMonthlyCounter.mockReturnValue(undefined);
+    mockUndoNotificationRecording.mockReturnValue(undefined);
 
     // Mock telemetry service with resolved promises
     mockTelemetryService = {
@@ -1071,7 +1071,7 @@ describe('showNotification', () => {
       );
     });
 
-    it('should record cooldown but not show UI when variant is deactivated', async () => {
+    it('should undo recording and not show UI when variant is deactivated', async () => {
       // Mock API response with isDeactivated: true
       const deactivatedNotificationData = {
         message: 'Test notification',
@@ -1101,8 +1101,8 @@ describe('showNotification', () => {
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
 
-      // Should then decrement the monthly counter (to not waste a slot)
-      expect(mockDecrementMonthlyCounter).toHaveBeenCalledWith(
+      // Should undo notification recording (resets timestamp AND decrements counter)
+      expect(mockUndoNotificationRecording).toHaveBeenCalledWith(
         mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
@@ -1116,10 +1116,10 @@ describe('showNotification', () => {
       ).not.toHaveBeenCalled();
     });
 
-    it('should call recordNotificationShown BEFORE decrementMonthlyCounter for deactivated IGNORE events', async () => {
+    it('should call recordNotificationShown BEFORE undoNotificationRecording for deactivated IGNORE events', async () => {
       // This test verifies the critical execution order:
-      // 1. recordNotificationShown (increment counter) - prevents race conditions
-      // 2. decrementMonthlyCounter (undo increment) - prevents wasting slot
+      // 1. recordNotificationShown (increment counter + set timestamp) - prevents race conditions
+      // 2. undoNotificationRecording (undo both) - prevents wasting slot and cooldown
 
       const deactivatedNotificationData = {
         message: 'Test notification',
@@ -1142,30 +1142,30 @@ describe('showNotification', () => {
 
       // Verify both functions were called
       expect(mockRecordNotificationShown).toHaveBeenCalledTimes(1);
-      expect(mockDecrementMonthlyCounter).toHaveBeenCalledTimes(1);
+      expect(mockUndoNotificationRecording).toHaveBeenCalledTimes(1);
 
-      // Verify call order: recordNotificationShown must be called BEFORE decrementMonthlyCounter
+      // Verify call order: recordNotificationShown must be called BEFORE undoNotificationRecording
       const recordCallOrder =
         mockRecordNotificationShown.mock.invocationCallOrder[0];
-      const decrementCallOrder =
-        mockDecrementMonthlyCounter.mock.invocationCallOrder[0];
+      const undoCallOrder =
+        mockUndoNotificationRecording.mock.invocationCallOrder[0];
 
-      expect(recordCallOrder).toBeLessThan(decrementCallOrder);
+      expect(recordCallOrder).toBeLessThan(undoCallOrder);
 
       // Verify both were called with correct arguments
       expect(mockRecordNotificationShown).toHaveBeenCalledWith(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
-      expect(mockDecrementMonthlyCounter).toHaveBeenCalledWith(
+      expect(mockUndoNotificationRecording).toHaveBeenCalledWith(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
     });
 
-    it('should still decrement for deactivated BYPASS events (even though they dont count)', async () => {
+    it('should still undo for deactivated BYPASS events (even though they dont count against limit)', async () => {
       // BYPASS events don't increment the counter in recordNotificationShown,
-      // but decrementMonthlyCounter should still be called (it's a no-op for BYPASS)
+      // but undoNotificationRecording should still be called (resets timestamp, counter no-op)
       // This ensures consistent behavior regardless of priority
 
       const deactivatedNotificationData = {
@@ -1193,8 +1193,8 @@ describe('showNotification', () => {
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
 
-      // Should still call decrementMonthlyCounter (it's a no-op for BYPASS internally)
-      expect(mockDecrementMonthlyCounter).toHaveBeenCalledWith(
+      // Should still call undoNotificationRecording (resets timestamp, counter decrement is no-op)
+      expect(mockUndoNotificationRecording).toHaveBeenCalledWith(
         mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );

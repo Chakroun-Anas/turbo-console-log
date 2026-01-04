@@ -288,14 +288,17 @@ export function resetDismissalCounter(context: vscode.ExtensionContext): void {
 }
 
 /**
- * Decrements the monthly notification counter (called when a variant is deactivated)
- * This allows us to "undo" the cooldown consumption for deactivated A/B test variants
- * Note: The timestamp remains set to prevent rapid re-attempts
+ * Undoes a notification recording when a variant is deactivated
+ * Resets both the cooldown timestamp and monthly counter to allow next notification
+ * This fully reverses the recordNotificationShown() call
  */
-export function decrementMonthlyCounter(
+export function undoNotificationRecording(
   context: vscode.ExtensionContext,
   notificationEvent: NotificationEvent,
 ): void {
+  // Reset the cooldown timestamp to allow immediate next notification
+  writeToGlobalState(context, GlobalStateKey.LAST_SHOWN_NOTIFICATION, 0);
+
   const priority = NOTIFICATION_PRIORITY_MAP[notificationEvent];
 
   // BYPASS notifications don't count against monthly limit, nothing to decrement

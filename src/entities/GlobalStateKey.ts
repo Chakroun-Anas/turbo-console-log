@@ -10,6 +10,7 @@ export enum GlobalStateKey {
   // Release notification tracking
   IS_NOTIFICATION_SHOWN_PREFIX = 'IS_NOTIFICATION_SHOWN_',
   HAS_SHOWN_RELEASE_WEBVIEW = 'HAS_SHOWN_RELEASE_WEBVIEW_',
+  HAS_SHOWN_RELEASE_NOTIFICATION = 'HAS_SHOWN_RELEASE_NOTIFICATION_',
 
   // Pro bundle management
   LICENSE_KEY = 'license-key',

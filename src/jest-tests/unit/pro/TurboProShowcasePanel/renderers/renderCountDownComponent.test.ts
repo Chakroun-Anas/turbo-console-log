@@ -20,7 +20,7 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'New Year Celebration',
       targetDateUTC: '2030-12-31T23:59:59Z', // Far future date
-      illustrationSrc: 'celebration.jpg',
+      illustrationSrc: 'turbo-2026-celebration-wide-no-text.png',
       CTA: {
         text: 'Learn More',
         url: 'https://example.com',
@@ -39,7 +39,9 @@ describe('renderCountDownComponent', () => {
 
     // Verify escaping calls
     expect(mockEscapeHtml).toHaveBeenCalledWith('New Year Celebration');
-    expect(mockEscapeHtml).toHaveBeenCalledWith('celebration.jpg');
+    expect(mockEscapeHtml).toHaveBeenCalledWith(
+      'turbo-2026-celebration-wide-no-text.png',
+    );
     expect(mockEscapeHtml).toHaveBeenCalledWith('Learn More');
     expect(mockEscapeHtml).toHaveBeenCalledWith('https://example.com');
   });
@@ -48,7 +50,8 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'Past Event',
       targetDateUTC: '2020-01-01T00:00:00Z', // Definitely past date
-      illustrationSrc: 'past.jpg',
+      illustrationSrc:
+        'https://www.turboconsolelog.io/assets/turbo-past-event.png',
       CTA: {
         text: 'View Details',
         url: 'https://example.com',
@@ -64,7 +67,7 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'Test Event',
       targetDateUTC: '2030-12-31T00:00:00Z', // Far future
-      illustrationSrc: 'test.jpg',
+      illustrationSrc: 'turbo-test-event.png',
       CTA: {
         text: 'Test CTA',
         url: 'https://test.com',
@@ -85,7 +88,7 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'Event with <script>',
       targetDateUTC: '2030-12-31T23:59:59Z',
-      illustrationSrc: 'image"malicious.jpg',
+      illustrationSrc: 'turbo-"malicious.png',
       CTA: {
         text: 'Click "here"',
         url: 'https://example.com?param=<script>',
@@ -97,14 +100,16 @@ describe('renderCountDownComponent', () => {
     const result = renderCountDownComponent(component);
 
     expect(mockEscapeHtml).toHaveBeenCalledWith('Event with <script>');
-    expect(mockEscapeHtml).toHaveBeenCalledWith('image"malicious.jpg');
+    expect(mockEscapeHtml).toHaveBeenCalledWith('turbo-"malicious.png');
     expect(mockEscapeHtml).toHaveBeenCalledWith('Click "here"');
     expect(mockEscapeHtml).toHaveBeenCalledWith(
       'https://example.com?param=<script>',
     );
 
     expect(result).toContain('escaped:Event with <script>');
-    expect(result).toContain('escaped:image"malicious.jpg');
+    expect(result).toContain(
+      'https://www.turboconsolelog.io/assets/escaped:turbo-"malicious.png',
+    );
     expect(result).toContain('escaped:Click "here"');
   });
 
@@ -112,7 +117,7 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'Test Event',
       targetDateUTC: '2030-12-31T23:59:59Z',
-      illustrationSrc: 'test.jpg',
+      illustrationSrc: 'turbo-test-widget.png',
       CTA: {
         text: 'Test',
         url: 'https://test.com',
@@ -128,7 +133,7 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'CTA Test Event',
       targetDateUTC: '2030-12-31T23:59:59Z',
-      illustrationSrc: 'cta.jpg',
+      illustrationSrc: 'turbo-cta-test.png',
       CTA: {
         text: 'Join Event',
         url: 'https://join.example.com',

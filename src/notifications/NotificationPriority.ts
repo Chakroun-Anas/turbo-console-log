@@ -20,6 +20,8 @@ export const NOTIFICATION_PRIORITY_MAP: Record<
   // BYPASS: Critical notifications that should always show immediately
   [NotificationEvent.EXTENSION_FRESH_INSTALL]: NotificationPriority.BYPASS,
   [NotificationEvent.EXTENSION_PHP_PRO_ONLY]: NotificationPriority.BYPASS,
+  [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]:
+    NotificationPriority.BYPASS,
 
   // IGNORE: Low-priority notifications that respect cooldown strictly
   [NotificationEvent.EXTENSION_INACTIVE_MANUAL_LOG]:

@@ -11,6 +11,7 @@ import {
   listenToPhpFileOpenings,
   updateUserActivityStatus,
   listenToManualConsoleLogs,
+  showReleaseNotification,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -90,6 +91,8 @@ export async function activate(
   const proBundle = readFromGlobalState<string>(context, 'pro-bundle');
   const proBundleVersion = readFromGlobalState<string>(context, 'version');
   const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
+
+  showReleaseNotification(context, version);
 
   if (isProUser) {
     if (

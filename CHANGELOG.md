@@ -2,6 +2,27 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.13.0] - 2026-01-06
+
+### 🎉 Happy New Year 2026 — Celebrating 2025 & Looking Ahead
+
+**2025 Achievements:**
+
+- ✅ Full AST Engine (96% smaller, 89% faster, 86% test coverage)
+- ✅ Turbo PRO launched (workspace log explorer, mass cleanup, filtering, search)
+- ✅ PHP Support added (first multi-language expansion)
+
+**2026 Vision:**
+
+- 🎯 Git Integration for Turbo Pro
+- 🌍 Multi-Language Expansion (Python, Java, C#, Go, Rust, Ruby)
+- 🤖 AI-Powered Code Analysis
+
+**🎁 New Year Offer:** 20% OFF Turbo Pro (January 6-12, 2026)
+
+→ [Read Full Celebration Article](https://www.turboconsolelog.io/articles/release-3130)  
+→ [Learn About Turbo Pro](https://www.turboconsolelog.io/pro)
+
 ## [3.12.7] - 2025-12-31
 
 ### 🐛 Bug Fix: Follow-up to v3.12.6

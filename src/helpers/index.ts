@@ -19,6 +19,7 @@ import { isFreshInstall } from './isFreshInstall';
 import { listenToPhpFileOpenings } from './listenToPhpFileOpenings';
 import { loadPhpDebugMessage } from './loadPhpDebugMessage';
 import { showReleaseWebView } from './showReleaseWebView';
+import { showReleaseNotification } from './showReleaseNotification';
 import { updateUserActivityStatus } from './updateUserActivityStatus';
 import { getUserActivityStatus } from './getUserActivityStatus';
 import { listenToManualConsoleLogs } from './listenToManualConsoleLogs';
@@ -43,6 +44,7 @@ export {
   listenToPhpFileOpenings,
   loadPhpDebugMessage,
   showReleaseWebView,
+  showReleaseNotification,
   updateUserActivityStatus,
   getUserActivityStatus,
   listenToManualConsoleLogs,

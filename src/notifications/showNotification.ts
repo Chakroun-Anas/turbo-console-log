@@ -9,7 +9,7 @@ import {
   recordNotificationShown,
   recordDismissal,
   resetDismissalCounter,
-  decrementMonthlyCounter,
+  undoNotificationRecording,
 } from './notificationCooldown';
 import { TurboAnalyticsProvider } from '@/telemetry';
 
@@ -138,6 +138,11 @@ export async function showNotification(
         ctaText: 'See How',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
       },
+      [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
+        message: 'Cheers to 2025 wins & exciting 2026 possibilities! 🥳',
+        ctaText: 'View Release Notes',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/releases`,
+      },
     };
 
     const fallback = fallbackMessages[notificationEvent];
@@ -150,9 +155,8 @@ export async function showNotification(
 
   if (notificationData.isDeactivated) {
     // Variant is deactivated, don't show notification
-    // Decrement the monthly counter to avoid wasting a notification slot
-    // (timestamp remains set to prevent rapid re-attempts)
-    decrementMonthlyCounter(context, notificationEvent);
+    // Undo the notification recording to free up both timestamp and counter
+    undoNotificationRecording(context, notificationEvent);
     return false;
   }
 
