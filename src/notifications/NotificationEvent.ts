@@ -2,6 +2,7 @@ export enum NotificationEvent {
   // Bypass notifications cooldown period
   EXTENSION_FRESH_INSTALL = 'extensionFreshInstall',
   EXTENSION_PHP_PRO_ONLY = 'extensionPhpProOnly',
+  EXTENSION_RELEASE_ANNOUNCEMENT = 'extensionReleaseAnnouncement',
   // Ignore notifications if in cooldown period
   EXTENSION_THREE_DAY_STREAK = 'extensionThreeDayStreak',
   EXTENSION_MULTI_FILE_LOGS = 'extensionMultiFileLogs',

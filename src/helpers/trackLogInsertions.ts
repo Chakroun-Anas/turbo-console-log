@@ -50,7 +50,11 @@ export async function trackLogInsertions(
     commandUsageCount,
   );
 
-  // Update last insertion date
+  // Track daily usage streak BEFORE updating last insertion date
+  // This allows proper comparison of today vs last insertion date
+  const streakCount = trackStreakDays(context);
+
+  // Update last insertion date AFTER tracking streak
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   writeToGlobalState(
@@ -58,9 +62,6 @@ export async function trackLogInsertions(
     GlobalStateKey.LAST_INSERTION_DATE,
     today.getTime(),
   );
-
-  // Track daily usage streak
-  const streakCount = trackStreakDays(context);
 
   // Don't show Pro upsell notifications to Pro users
   if (isProUser(context)) {

@@ -49,7 +49,7 @@ export function renderCountDownComponent(
             </div>
           </div>
           <div style="text-align: center;">
-            <a class="countdown-cta" onclick="openUrlWithTracking('${escapeHtml(component.CTA.url)}', 'countdown', '${escapeHtml(component.CTA.text)}'); return false;" style="cursor: pointer;">
+            <a class="countdown-cta" onclick="openUrlWithTracking('${escapeHtml(component.CTA.url)}', 'countdown', '${escapeHtml(component.CTA.text)}'); return false;" style="cursor: pointer; text-decoration: none;">
               ${escapeHtml(component.CTA.text)}
             </a>
           </div>

@@ -1,4 +1,7 @@
-import { canInsertLogInDocument } from '@/helpers/canInsertLogInDocument';
+import {
+  canInsertLogInDocument,
+  resetNotificationLock,
+} from '@/helpers/canInsertLogInDocument';
 import { isProUser } from '@/helpers/isProUser';
 import { isPhpFile } from '@/helpers/isPhpFile';
 import { showNotification } from '@/notifications/showNotification';
@@ -24,7 +27,15 @@ describe('canInsertLogInDocument', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
+    resetNotificationLock(); // Reset the lock between tests
     context = makeExtensionContext();
+    // Mock showNotification to return a resolved Promise
+    mockShowNotification.mockResolvedValue(true);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('JavaScript/TypeScript files', () => {
@@ -210,6 +221,64 @@ describe('canInsertLogInDocument', () => {
 
       expect(result).toBe(true);
       expect(mockShowNotification).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('notification lock mechanism', () => {
+    it('prevents duplicate notifications within 2 seconds', () => {
+      const document = makeTextDocument(['<?php', 'echo "test";']);
+      mockIsPhpFile.mockReturnValue(true);
+      mockIsProUser.mockReturnValue(false);
+
+      // First call - should show notification
+      const result1 = canInsertLogInDocument(context, document, version);
+      expect(result1).toBe(false);
+      expect(mockShowNotification).toHaveBeenCalledTimes(1);
+
+      // Second call immediately after - should be blocked
+      const result2 = canInsertLogInDocument(context, document, version);
+      expect(result2).toBe(false);
+      expect(mockShowNotification).toHaveBeenCalledTimes(1); // Still only called once
+
+      // Third call after 1 second - still blocked
+      jest.advanceTimersByTime(1000);
+      const result3 = canInsertLogInDocument(context, document, version);
+      expect(result3).toBe(false);
+      expect(mockShowNotification).toHaveBeenCalledTimes(1);
+
+      // Fourth call after 2.5 seconds total - should show notification again
+      jest.advanceTimersByTime(1500);
+      jest.runAllTimers(); // Run the setTimeout callback that resets the lock
+      const result4 = canInsertLogInDocument(context, document, version);
+      expect(result4).toBe(false);
+      expect(mockShowNotification).toHaveBeenCalledTimes(2);
+    });
+
+    it('lock survives across multiple rapid calls (simulates the bug)', () => {
+      const document = makeTextDocument(['<?php', 'var_dump($x);']);
+      mockIsPhpFile.mockReturnValue(true);
+      mockIsProUser.mockReturnValue(false);
+
+      // Simulate 72 rapid calls like the bug (within 6 seconds window)
+      // Using realistic gaps from the actual data (0.00-0.65s)
+      const results = [];
+      for (let i = 0; i < 72; i++) {
+        results.push(canInsertLogInDocument(context, document, version));
+        // Don't advance time - simulate them happening nearly simultaneously
+        // (the real bug had most gaps under 0.1s)
+      }
+
+      // All should return false
+      expect(results.every((r) => r === false)).toBe(true);
+      expect(mockShowNotification).toHaveBeenCalledTimes(1);
+
+      // Wait for lock to expire and reset
+      jest.advanceTimersByTime(2100);
+      jest.runAllTimers();
+
+      // Second attempt after lock expires
+      canInsertLogInDocument(context, document, version);
+      expect(mockShowNotification).toHaveBeenCalledTimes(2);
     });
   });
 });

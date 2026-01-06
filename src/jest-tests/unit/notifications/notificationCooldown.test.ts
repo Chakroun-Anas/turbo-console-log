@@ -3,7 +3,7 @@ import {
   recordNotificationShown,
   recordDismissal,
   resetDismissalCounter,
-  decrementMonthlyCounter,
+  undoNotificationRecording,
 } from '@/notifications/notificationCooldown';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
 import { GlobalStateKey } from '@/entities';
@@ -348,6 +348,19 @@ describe('notificationCooldown', () => {
 
           expect(result).toBe(true);
         });
+
+        it('should return true when LAST_SHOWN_NOTIFICATION is set to 0 (after undo)', () => {
+          // Simulate undoNotificationRecording setting timestamp to 0
+          globalStateStore.set(GlobalStateKey.LAST_SHOWN_NOTIFICATION, 0);
+
+          const result = shouldShowNotification(
+            mockContext,
+            NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
+          );
+
+          // Should allow notification immediately (now - 0 > COOLDOWN_PERIOD)
+          expect(result).toBe(true);
+        });
       });
 
       describe('edge cases for cooldown boundary', () => {
@@ -632,9 +645,9 @@ describe('notificationCooldown', () => {
     });
   });
 
-  describe('decrementMonthlyCounter', () => {
-    it('should decrement counter for IGNORE priority events', () => {
-      // Setup: Create a counter that has been incremented
+  describe('undoNotificationRecording', () => {
+    it('should reset timestamp and decrement counter for IGNORE priority events', () => {
+      // Setup: Create a counter that has been incremented and timestamp set
       const now = new Date();
       const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       globalStateStore.set(
@@ -642,22 +655,27 @@ describe('notificationCooldown', () => {
         currentMonthKey,
       );
       globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 3);
+      globalStateStore.set(GlobalStateKey.LAST_SHOWN_NOTIFICATION, Date.now());
 
-      // Act: Decrement for an IGNORE event
-      decrementMonthlyCounter(
+      // Act: Undo for an IGNORE event
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
 
-      // Assert: Counter should be decremented to 2
+      // Assert: Counter should be decremented to 2 and timestamp reset to 0
       const monthlyCount = globalStateStore.get(
         GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
       );
+      const timestamp = globalStateStore.get(
+        GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+      );
       expect(monthlyCount).toBe(2);
+      expect(timestamp).toBe(0);
     });
 
-    it('should NOT decrement counter for BYPASS priority events', () => {
-      // Setup: Create a counter
+    it('should reset timestamp but NOT decrement counter for BYPASS priority events', () => {
+      // Setup: Create a counter and timestamp
       const now = new Date();
       const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       globalStateStore.set(
@@ -665,18 +683,23 @@ describe('notificationCooldown', () => {
         currentMonthKey,
       );
       globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 3);
+      globalStateStore.set(GlobalStateKey.LAST_SHOWN_NOTIFICATION, Date.now());
 
-      // Act: Try to decrement for a BYPASS event
-      decrementMonthlyCounter(
+      // Act: Try to undo for a BYPASS event
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
 
-      // Assert: Counter should remain unchanged (BYPASS events don't count)
+      // Assert: Counter should remain unchanged but timestamp should be reset
       const monthlyCount = globalStateStore.get(
         GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
       );
+      const timestamp = globalStateStore.get(
+        GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+      );
       expect(monthlyCount).toBe(3);
+      expect(timestamp).toBe(0);
     });
 
     it('should prevent negative counters (stop at 0)', () => {
@@ -688,44 +711,54 @@ describe('notificationCooldown', () => {
         currentMonthKey,
       );
       globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 0);
+      globalStateStore.set(GlobalStateKey.LAST_SHOWN_NOTIFICATION, Date.now());
 
-      // Act: Try to decrement below 0
-      decrementMonthlyCounter(
+      // Act: Try to undo when counter is 0
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
 
-      // Assert: Counter should remain at 0
+      // Assert: Counter should remain at 0, timestamp reset
       const monthlyCount = globalStateStore.get(
         GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
       );
+      const timestamp = globalStateStore.get(
+        GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+      );
       expect(monthlyCount).toBe(0);
+      expect(timestamp).toBe(0);
     });
 
-    it('should handle case when counter is undefined', () => {
-      // Setup: No counter exists
+    it('should reset timestamp even when counter is undefined', () => {
+      // Setup: No counter exists but timestamp is set
       const now = new Date();
       const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
       globalStateStore.set(
         GlobalStateKey.MONTHLY_NOTIFICATION_MONTH_KEY,
         currentMonthKey,
       );
+      globalStateStore.set(GlobalStateKey.LAST_SHOWN_NOTIFICATION, Date.now());
       // Intentionally don't set MONTHLY_NOTIFICATION_COUNT
 
-      // Act: Try to decrement
-      decrementMonthlyCounter(
+      // Act: Try to undo
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
 
-      // Assert: Counter should remain undefined (treated as 0, not decremented)
+      // Assert: Counter remains undefined, timestamp reset to 0
       const monthlyCount = globalStateStore.get(
         GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
       );
+      const timestamp = globalStateStore.get(
+        GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+      );
       expect(monthlyCount).toBeUndefined();
+      expect(timestamp).toBe(0);
     });
 
-    it('should NOT decrement when month key does not match current month', () => {
+    it('should reset timestamp but NOT decrement counter when month key does not match', () => {
       // Setup: Counter from previous month
       const previousMonthKey = '2024-12';
       globalStateStore.set(
@@ -733,39 +766,49 @@ describe('notificationCooldown', () => {
         previousMonthKey,
       );
       globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 3);
+      globalStateStore.set(GlobalStateKey.LAST_SHOWN_NOTIFICATION, Date.now());
 
-      // Act: Try to decrement in current month (different from stored month)
-      decrementMonthlyCounter(
+      // Act: Try to undo in current month (different from stored month)
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
 
-      // Assert: Counter should remain unchanged (different month)
+      // Assert: Counter unchanged (different month), timestamp reset
       const monthlyCount = globalStateStore.get(
         GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
       );
+      const timestamp = globalStateStore.get(
+        GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+      );
       expect(monthlyCount).toBe(3);
+      expect(timestamp).toBe(0);
     });
 
-    it('should NOT decrement when no month key exists', () => {
+    it('should reset timestamp but NOT decrement when no month key exists', () => {
       // Setup: Counter exists but no month key
       globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 3);
+      globalStateStore.set(GlobalStateKey.LAST_SHOWN_NOTIFICATION, Date.now());
       // Intentionally don't set MONTHLY_NOTIFICATION_MONTH_KEY
 
-      // Act: Try to decrement
-      decrementMonthlyCounter(
+      // Act: Try to undo
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
 
-      // Assert: Counter should remain unchanged (no month key)
+      // Assert: Counter unchanged (no month key), timestamp reset
       const monthlyCount = globalStateStore.get(
         GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
       );
+      const timestamp = globalStateStore.get(
+        GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+      );
       expect(monthlyCount).toBe(3);
+      expect(timestamp).toBe(0);
     });
 
-    it('should handle multiple decrements correctly', () => {
+    it('should handle multiple undos correctly', () => {
       // Setup: Counter at 4
       const now = new Date();
       const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -775,47 +818,62 @@ describe('notificationCooldown', () => {
       );
       globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 4);
 
-      // Act: Decrement multiple times
-      decrementMonthlyCounter(
+      // Act: Undo multiple times (each resets timestamp)
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
       expect(
         globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
       ).toBe(3);
+      expect(globalStateStore.get(GlobalStateKey.LAST_SHOWN_NOTIFICATION)).toBe(
+        0,
+      );
 
-      decrementMonthlyCounter(
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_DELETE_COMMANDS,
       );
       expect(
         globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
       ).toBe(2);
+      expect(globalStateStore.get(GlobalStateKey.LAST_SHOWN_NOTIFICATION)).toBe(
+        0,
+      );
 
-      decrementMonthlyCounter(
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_UNCOMMENTS_COMMANDS,
       );
       expect(
         globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
       ).toBe(1);
+      expect(globalStateStore.get(GlobalStateKey.LAST_SHOWN_NOTIFICATION)).toBe(
+        0,
+      );
 
-      decrementMonthlyCounter(
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_CORRECTIONS_COMMANDS,
       );
       expect(
         globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
       ).toBe(0);
+      expect(globalStateStore.get(GlobalStateKey.LAST_SHOWN_NOTIFICATION)).toBe(
+        0,
+      );
 
-      // Fifth decrement should not go below 0
-      decrementMonthlyCounter(
+      // Fifth undo should not go below 0
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
       expect(
         globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
       ).toBe(0);
+      expect(globalStateStore.get(GlobalStateKey.LAST_SHOWN_NOTIFICATION)).toBe(
+        0,
+      );
     });
 
     it('should work in the deactivated variant scenario', () => {
@@ -829,7 +887,7 @@ describe('notificationCooldown', () => {
       );
       globalStateStore.set(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT, 2);
 
-      // 2. recordNotificationShown increments to 3
+      // 2. recordNotificationShown increments to 3 and sets timestamp
       recordNotificationShown(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
@@ -837,18 +895,25 @@ describe('notificationCooldown', () => {
       expect(
         globalStateStore.get(GlobalStateKey.MONTHLY_NOTIFICATION_COUNT),
       ).toBe(3);
+      expect(
+        globalStateStore.get(GlobalStateKey.LAST_SHOWN_NOTIFICATION),
+      ).toBeGreaterThan(0);
 
-      // 3. Variant is deactivated, so decrement back to 2
-      decrementMonthlyCounter(
+      // 3. Variant is deactivated, so undo (resets timestamp and decrements)
+      undoNotificationRecording(
         mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
       );
 
-      // Assert: Counter should be back to 2 (cooldown slot not wasted)
+      // Assert: Counter back to 2, timestamp reset (no cooldown penalty)
       const monthlyCount = globalStateStore.get(
         GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
       );
+      const timestamp = globalStateStore.get(
+        GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+      );
       expect(monthlyCount).toBe(2);
+      expect(timestamp).toBe(0);
     });
   });
 

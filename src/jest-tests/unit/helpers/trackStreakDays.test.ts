@@ -36,7 +36,7 @@ describe('trackStreakDays', () => {
     it('should initialize streak count to 1', async () => {
       const currentDate = new Date('2025-12-27T10:00:00');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       expect(streakCount).toBe(1);
     });
@@ -44,7 +44,7 @@ describe('trackStreakDays', () => {
     it('should write streak count as 1 to global state', async () => {
       const currentDate = new Date('2025-12-27T10:00:00');
 
-      await trackStreakDays(mockContext, currentDate);
+      trackStreakDays(mockContext, currentDate);
 
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,
@@ -67,7 +67,7 @@ describe('trackStreakDays', () => {
     it('should not change streak count when inserting on same day', async () => {
       const currentDate = new Date('2025-12-27T15:30:00');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       expect(streakCount).toBe(2);
     });
@@ -75,7 +75,7 @@ describe('trackStreakDays', () => {
     it('should not write to global state when inserting on same day', async () => {
       const currentDate = new Date('2025-12-27T15:30:00');
 
-      await trackStreakDays(mockContext, currentDate);
+      trackStreakDays(mockContext, currentDate);
 
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
     });
@@ -94,7 +94,7 @@ describe('trackStreakDays', () => {
     it('should increment streak count when inserting on consecutive day', async () => {
       const currentDate = new Date('2025-12-27T10:00:00');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       expect(streakCount).toBe(3);
     });
@@ -102,7 +102,7 @@ describe('trackStreakDays', () => {
     it('should write incremented streak count to global state', async () => {
       const currentDate = new Date('2025-12-27T10:00:00');
 
-      await trackStreakDays(mockContext, currentDate);
+      trackStreakDays(mockContext, currentDate);
 
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,
@@ -120,7 +120,7 @@ describe('trackStreakDays', () => {
 
       const currentDate = new Date('2025-12-27T10:00:00');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       expect(streakCount).toBe(1);
     });
@@ -139,7 +139,7 @@ describe('trackStreakDays', () => {
     it('should reset streak count to 1 when gap is 2 days', async () => {
       const currentDate = new Date('2025-12-26T10:00:00');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       expect(streakCount).toBe(1);
     });
@@ -147,7 +147,7 @@ describe('trackStreakDays', () => {
     it('should reset streak count to 1 when gap is multiple days', async () => {
       const currentDate = new Date('2025-12-30T10:00:00');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       expect(streakCount).toBe(1);
     });
@@ -155,7 +155,7 @@ describe('trackStreakDays', () => {
     it('should write reset streak count to global state', async () => {
       const currentDate = new Date('2025-12-27T10:00:00');
 
-      await trackStreakDays(mockContext, currentDate);
+      trackStreakDays(mockContext, currentDate);
 
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,
@@ -176,7 +176,7 @@ describe('trackStreakDays', () => {
 
       const currentDate = new Date('2025-12-27T00:00:01');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       // Should recognize as consecutive day despite time difference
       expect(streakCount).toBe(2);
@@ -192,7 +192,7 @@ describe('trackStreakDays', () => {
 
       const currentDate = new Date('2025-12-27T20:00:00');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       // Should not increment - same day
       expect(streakCount).toBe(2);
@@ -211,7 +211,7 @@ describe('trackStreakDays', () => {
 
       const currentDate = new Date('2025-12-27T10:00:00');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       expect(streakCount).toBe(1);
     });
@@ -226,7 +226,7 @@ describe('trackStreakDays', () => {
 
       const currentDate = new Date('2025-01-01T10:00:00');
 
-      const streakCount = await trackStreakDays(mockContext, currentDate);
+      const streakCount = trackStreakDays(mockContext, currentDate);
 
       // Should increment - consecutive day across year boundary
       expect(streakCount).toBe(3);
