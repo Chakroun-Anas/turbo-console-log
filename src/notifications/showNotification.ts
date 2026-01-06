@@ -140,8 +140,8 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
         message: 'Cheers to 2025 wins & exciting 2026 possibilities! 🥳',
-        ctaText: 'View Release Notes',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/releases`,
+        ctaText: 'Cheers!',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3130`,
       },
     };
 
