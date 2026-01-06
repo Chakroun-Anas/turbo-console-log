@@ -2,6 +2,18 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.13.1] - 2026-01-06
+
+### 🐛 Bug Fix
+
+**Fixed Double Notification Issue for Fresh Installs:**
+
+- New users now only see the fresh install welcome notification
+- Release announcements are now shown exclusively to existing users who are updating
+- Prevents the confusing experience of seeing both notifications simultaneously during fresh installation
+
+This ensures a cleaner onboarding experience for new users while maintaining proper release communication for the existing community.
+
 ## [3.13.0] - 2026-01-06
 
 ### 🎉 Happy New Year 2026 — Celebrating 2025 & Looking Ahead

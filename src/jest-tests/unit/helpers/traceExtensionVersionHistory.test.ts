@@ -9,6 +9,7 @@ jest.mock('@/helpers/readFromGlobalState');
 jest.mock('@/helpers/writeToGlobalState');
 jest.mock('@/telemetry');
 jest.mock('@/notifications');
+jest.mock('@/helpers/showReleaseNotification');
 
 describe('traceExtensionVersionHistory', () => {
   let mockContext: ExtensionContext;
@@ -384,6 +385,8 @@ describe('traceExtensionVersionHistory', () => {
 
       traceExtensionVersionHistory(mockContext, currentVersion);
 
+      // Only EXTENSION_VERSION_HISTORY should be written
+      // (showReleaseNotification is mocked and won't write to global state)
       expect(mockWriteToGlobalState).toHaveBeenCalledTimes(1);
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,

@@ -524,28 +524,4 @@ describe('activate - command registration', () => {
     expect(helpers.listenToManualConsoleLogs).toHaveBeenCalledWith(fakeContext);
     expect(helpers.listenToManualConsoleLogs).toHaveBeenCalledTimes(1);
   });
-
-  it('should call showReleaseNotification during activation', async () => {
-    const fakeContext = {
-      subscriptions: [],
-    } as unknown as vscode.ExtensionContext;
-
-    const mockVersion = '3.13.0';
-
-    // Mock version
-    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
-      packageJSON: { version: mockVersion },
-    } as vscode.Extension<never>);
-
-    // Mock freemium state
-    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
-
-    await activate(fakeContext);
-
-    expect(helpers.showReleaseNotification).toHaveBeenCalledWith(
-      fakeContext,
-      mockVersion,
-    );
-    expect(helpers.showReleaseNotification).toHaveBeenCalledTimes(1);
-  });
 });
