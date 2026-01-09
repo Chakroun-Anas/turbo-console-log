@@ -1,5 +1,7 @@
 # Turbo Console Log
 
+[![CI](https://github.com/Chakroun-Anas/turbo-console-log/actions/workflows/ci.yml/badge.svg)](https://github.com/Chakroun-Anas/turbo-console-log/actions/workflows/ci.yml) [![Coverage Status](https://codecov.io/gh/Chakroun-Anas/turbo-console-log/branch/master/graph/badge.svg)](https://codecov.io/gh/Chakroun-Anas/turbo-console-log)
+
 **[Official Website](https://www.turboconsolelog.io)** | **[Turbo Pro](https://www.turboconsolelog.io/pro)** | **[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)**
 
 ---
@@ -163,6 +165,33 @@ Your support keeps the project alive, funds new features, and helps us build too
 **Support:** **[support@turboconsolelog.io](mailto:support@turboconsolelog.io)**  
 **Feedback:** **[feedback@turboconsolelog.io](mailto:feedback@turboconsolelog.io)**  
 **Sponsorship:** **[sponsorship@turboconsolelog.io](mailto:sponsorship@turboconsolelog.io)**
+
+---
+
+## Run CI locally
+
+You can reproduce the CI steps locally with these commands (Node.js 20 recommended):
+
+```bash
+# install deps
+npm ci
+
+# lint and unit tests
+npm run lint
+npm run test:jest
+
+# compile tests for integration runner
+npm run test:compile
+
+# run integration tests (adjust platform/version as needed)
+export VSCODE_TEST_PLATFORM=linux-x64    # or darwin-x64 / darwin-arm64
+export VSCODE_TEST_VERSION=stable
+node ./out/mocha-tests/runTests.js
+```
+
+Notes:
+- Integration tests require VS Code test runner and platform-specific resources; macOS runners may be required for macOS-specific features.
+- Use `VSCODE_TEST_PLATFORM`/`VSCODE_TEST_VERSION` to match your local environment or CI.
 
 ---
 
