@@ -2,6 +2,40 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.14.0] - 2026-01-11
+
+### 🛡️ Enhanced Notification Reliability & Multi VSCode Instances Support
+
+**Fixed Occasional Duplicate Notifications Across Updates:**
+
+- Resolved occasional issue where some users received duplicate milestone notifications
+- **Root Cause**: Global storage state was not consistently persisting across VSCode updates, causing notification flags to not be set properly in certain scenarios
+- **Solution**: Implemented robust migration system that ensures notification history persists reliably across all extension and editor lifecycle events
+
+**Less Spammy Experience:**
+
+- Same user on the same machine can now run multiple VSCode instances without notification conflicts
+- Milestone notifications (e.g., "100 inserts completed") are now properly synchronized across all VSCode windows
+- Each instance respects the global notification state, preventing duplicate celebrations
+
+**Technical Improvements:**
+
+- Enhanced global storage persistence mechanism to survive updates and reinstalls
+- Improved notification deduplication logic to handle edge cases in multi-instance environments
+- Strengthened state synchronization across VSCode windows on the same machine
+
+### 📊 About Turbo's Respectful Notification System
+
+Turbo Console Log is designed with **user experience first** — notifications only appear when truly meaningful:
+
+- **Milestone Celebrations**: Only when you achieve significant usage thresholds (10, 20, 50, 100+ log insertions)
+- **Smart Cooldown**: 2-day minimum gap between milestone notifications to prevent fatigue
+- **Monthly Limit**: Maximum 4 milestone/tip notifications per month
+- **Release Notes**: ~2 per month for major updates (don't count toward the limit)
+- **Total**: ~6-7 notifications/month maximum, all contextual and dismissible
+
+**Why This Fix Matters**: The occasional duplicate bug undermined this careful design by creating unintended notification noise. v3.14.0 ensures the system works exactly as intended — respectful, predictable, and celebrating your actual milestones without repetition.
+
 ## [3.13.1] - 2026-01-06
 
 ### 🐛 Bug Fix

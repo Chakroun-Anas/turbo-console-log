@@ -156,17 +156,22 @@ export function shouldShowNotification(
 /**
  * Records that a notification was shown (updates last shown timestamp and monthly count)
  * Note: BYPASS priority notifications update timestamp but don't increment monthly counter
+ * Exception: EXTENSION_PHP_PRO_ONLY doesn't update timestamp (feature gate, not PLG notification)
  */
 export function recordNotificationShown(
   context: vscode.ExtensionContext,
   notificationEvent: NotificationEvent,
 ): void {
-  // Update timestamp
-  writeToGlobalState(
-    context,
-    GlobalStateKey.LAST_SHOWN_NOTIFICATION,
-    Date.now(),
-  );
+  // Update timestamp for all events EXCEPT PHP_PRO_ONLY
+  // Exception: EXTENSION_PHP_PRO_ONLY is a feature gate triggered by user action,
+  // not a PLG notification. Showing it shouldn't block other notifications via cooldown.
+  if (notificationEvent !== NotificationEvent.EXTENSION_PHP_PRO_ONLY) {
+    writeToGlobalState(
+      context,
+      GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+      Date.now(),
+    );
+  }
 
   const priority = NOTIFICATION_PRIORITY_MAP[notificationEvent];
 

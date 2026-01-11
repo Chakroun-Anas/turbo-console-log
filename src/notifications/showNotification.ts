@@ -2,6 +2,7 @@ import vscode from 'vscode';
 import { NotificationEvent } from './NotificationEvent';
 import { ExtensionNotificationResponse } from './ExtensionNotificationResponse';
 import { createTelemetryService } from '../telemetry/telemetryService';
+import { generateDeveloperId } from '../helpers/generateDeveloperId';
 import { writeToGlobalState } from '../helpers/writeToGlobalState';
 import { GlobalStateKey } from '@/entities';
 import {
@@ -150,7 +151,15 @@ export async function showNotification(
       ...fallback,
       variant: 'fallback',
       isDeactivated: false,
+      isDuplicated: false,
     };
+  }
+
+  // If notification is a duplicate (already shown today), undo recording and return
+  // Since Turbo v3.14.0 - Backend deduplication prevents duplicate notifications
+  if (notificationData.isDuplicated) {
+    undoNotificationRecording(context, notificationEvent);
+    return false; // Not shown due to backend duplicate detection
   }
 
   if (notificationData.isDeactivated) {
@@ -193,6 +202,14 @@ async function fetchNotificationData(
   if (version) {
     params.append('version', version);
   }
+
+  const developerId = generateDeveloperId();
+  params.append('developerId', developerId);
+
+  // Add VS Code metadata for duplicate tracking
+  params.append('vscodeVersion', vscode.version);
+  params.append('platform', process.platform);
+  params.append('timezoneOffset', new Date().getTimezoneOffset().toString());
 
   const url = `${TURBO_WEBSITE_BASE_URL}/api/extensionNotification?${params.toString()}`;
 
@@ -283,22 +300,25 @@ async function fireNotificationInBackground(
       // Reset dismissal counter since user took action
       resetDismissalCounter(context);
     } else if (action === 'Maybe Later') {
-      // Track explicit dismissal with reaction time (fire-and-forget with error handling)
+      // Track deferral with reaction time for analytics (fire-and-forget with error handling)
+      // Note: "Maybe Later" is a polite, engaged deferral - user is interested but not ready now
+      // We track it separately from dismissals to measure soft interest vs hard rejection
       telemetryService
         .reportNotificationInteraction(
           notificationEvent,
-          'dismissed',
+          'deferred',
           notificationData.variant,
           reactionTimeMs,
         )
         .catch((err) =>
-          console.warn('Failed to report notification dismiss event:', err),
+          console.warn('Failed to report notification deferred event:', err),
         );
 
-      // Record dismissal (increments counter and may pause notifications)
-      recordDismissal(context);
+      // "Maybe Later" does NOT record dismissal - it's not a signal of annoyance
+      // Only implicit dismissals (X button) should count toward pause threshold
     } else {
-      // Track notification closed without clicking any button (fire-and-forget with error handling)
+      // Implicit dismissal (X button) - strong annoyance signal
+      // Track with reaction time (fire-and-forget with error handling)
       telemetryService
         .reportNotificationInteraction(
           notificationEvent,
@@ -310,8 +330,15 @@ async function fireNotificationInBackground(
           console.warn('Failed to report notification dismiss event:', err),
         );
 
-      // Record dismissal (increments counter and may pause notifications)
-      recordDismissal(context);
+      // Record dismissal ONLY for engagement notifications
+      // Exception: EXTENSION_PHP_PRO_ONLY is a feature gate triggered by user action,
+      // not a PLG notification. Users might dismiss it multiple times while testing.
+      // Dismissing it shouldn't count toward pause threshold.
+      if (notificationEvent !== NotificationEvent.EXTENSION_PHP_PRO_ONLY) {
+        // Increments consecutive counter and may pause notifications
+        // This protects users from notification fatigue after 3 consecutive X clicks
+        recordDismissal(context);
+      }
     }
   } catch (error) {
     console.error('Error showing notification:', error);

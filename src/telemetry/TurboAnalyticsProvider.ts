@@ -43,12 +43,12 @@ export interface TurboAnalyticsProvider {
   ): Promise<void>;
 
   /**
-   * Reports notification interactions (shown, clicked, dismissed)
+   * Reports notification interactions (shown, clicked, deferred, dismissed)
    * Only sends data if both VS Code telemetry and custom telemetry are enabled
    */
   reportNotificationInteraction(
     notificationEvent: string,
-    interactionType: 'shown' | 'clicked' | 'dismissed',
+    interactionType: 'shown' | 'clicked' | 'deferred' | 'dismissed',
     variant: string,
     reactionTimeMs?: number,
   ): Promise<void>;

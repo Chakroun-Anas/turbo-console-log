@@ -26,7 +26,7 @@ describe('activateTurboProBundleCommand', () => {
 
     // Default mocks
     (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
-      'test-license-key',
+      'TCLP-TESTKEY12345678901234567890AB',
     );
     (isOnline as jest.Mock).mockResolvedValue(true);
     (vscode.extensions.getExtension as jest.Mock).mockReturnValue({
@@ -35,6 +35,52 @@ describe('activateTurboProBundleCommand', () => {
   });
 
   describe('license key input handling', () => {
+    it('should reject license key without TCLP- prefix', async () => {
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'invalid-key-without-prefix',
+      );
+      (vscode.window.showErrorMessage as jest.Mock).mockResolvedValue('Cancel');
+
+      const command = activateTurboProBundleCommand();
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+      });
+
+      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+        '❌ Invalid license key format. License keys start with "TCLP-"',
+        'Try Again',
+        'Cancel',
+      );
+      expect(proUtilities.fetchProBundle).not.toHaveBeenCalled();
+    });
+
+    it('should reject license key with TCLP- prefix and retry', async () => {
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'wrong-prefix-key',
+      );
+      (vscode.window.showErrorMessage as jest.Mock).mockResolvedValue(
+        'Try Again',
+      );
+
+      const command = activateTurboProBundleCommand();
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+      });
+
+      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+        '❌ Invalid license key format. License keys start with "TCLP-"',
+        'Try Again',
+        'Cancel',
+      );
+      expect(vscode.commands.executeCommand).toHaveBeenCalledWith(
+        'turboConsoleLog.activateTurboProBundle',
+      );
+    });
+
     it('should handle empty license key input with cancellation', async () => {
       (vscode.window.showInputBox as jest.Mock).mockResolvedValue('');
       (vscode.window.showWarningMessage as jest.Mock).mockResolvedValue(
@@ -100,7 +146,7 @@ describe('activateTurboProBundleCommand', () => {
     });
 
     it('should trim whitespace from license key', async () => {
-      const licenseKeyWithSpaces = '  test-license-key  ';
+      const licenseKeyWithSpaces = '  TCLP-TESTKEY12345678901234567890AB  ';
       (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
         licenseKeyWithSpaces,
       );
@@ -116,7 +162,7 @@ describe('activateTurboProBundleCommand', () => {
       });
 
       expect(proUtilities.fetchProBundle).toHaveBeenCalledWith(
-        'test-license-key',
+        'TCLP-TESTKEY12345678901234567890AB',
         '3.3.0',
       );
     });
@@ -125,7 +171,7 @@ describe('activateTurboProBundleCommand', () => {
   describe('internet connection handling', () => {
     it('should show error message when offline', async () => {
       (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
-        'test-license-key',
+        'TCLP-TESTKEY12345678901234567890AB',
       );
       (isOnline as jest.Mock).mockResolvedValue(false);
 
@@ -147,7 +193,7 @@ describe('activateTurboProBundleCommand', () => {
     it('should successfully activate pro bundle', async () => {
       const mockBundle = 'mock-pro-bundle';
       (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
-        'test-license-key',
+        'TCLP-TESTKEY12345678901234567890AB',
       );
       (proUtilities.fetchProBundle as jest.Mock).mockResolvedValue(mockBundle);
 
@@ -159,7 +205,7 @@ describe('activateTurboProBundleCommand', () => {
       });
 
       expect(proUtilities.fetchProBundle).toHaveBeenCalledWith(
-        'test-license-key',
+        'TCLP-TESTKEY12345678901234567890AB',
         '3.3.0',
       );
       expect(proUtilities.runProBundle).toHaveBeenCalledWith(
@@ -169,7 +215,7 @@ describe('activateTurboProBundleCommand', () => {
       );
       expect(proUtilities.writeProBundleToCache).toHaveBeenCalledWith(
         mockContext,
-        'test-license-key',
+        'TCLP-TESTKEY12345678901234567890AB',
         mockBundle,
         '3.3.0',
       );
@@ -195,7 +241,7 @@ describe('activateTurboProBundleCommand', () => {
       };
 
       (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
-        'invalid-key',
+        'TCLP-INVALIDKEY1234567890123456789',
       );
       (proUtilities.fetchProBundle as jest.Mock).mockRejectedValue(axiosError);
 
@@ -224,7 +270,7 @@ describe('activateTurboProBundleCommand', () => {
       };
 
       (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
-        'invalid-key',
+        'TCLP-INVALIDKEY1234567890123456789',
       );
       (proUtilities.fetchProBundle as jest.Mock).mockRejectedValue(axiosError);
 
@@ -243,7 +289,9 @@ describe('activateTurboProBundleCommand', () => {
     it('should handle non-AxiosError', async () => {
       const genericError = new Error('Network error');
 
-      (vscode.window.showInputBox as jest.Mock).mockResolvedValue('test-key');
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'TCLP-TESTKEY12345678901234567890AB',
+      );
       (proUtilities.fetchProBundle as jest.Mock).mockRejectedValue(
         genericError,
       );
@@ -268,7 +316,7 @@ describe('activateTurboProBundleCommand', () => {
     it('should handle missing extension', async () => {
       (vscode.extensions.getExtension as jest.Mock).mockReturnValue(undefined);
       (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
-        'test-license-key',
+        'TCLP-TESTKEY12345678901234567890AB',
       );
       (proUtilities.fetchProBundle as jest.Mock).mockResolvedValue(
         'mock-bundle',
@@ -282,7 +330,7 @@ describe('activateTurboProBundleCommand', () => {
       });
 
       expect(proUtilities.fetchProBundle).toHaveBeenCalledWith(
-        'test-license-key',
+        'TCLP-TESTKEY12345678901234567890AB',
         undefined,
       );
     });

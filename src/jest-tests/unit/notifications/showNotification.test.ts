@@ -135,15 +135,28 @@ describe('showNotification', () => {
         mockContext,
       );
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://www.turboconsolelog.io/api/extensionNotification?notificationEvent=extensionFreshInstall&version=3.9.0',
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
+      const fetchCall = mockFetch.mock.calls[0];
+      const fetchUrl = fetchCall[0] as string;
+      const fetchOptions = fetchCall[1];
+
+      // Verify base URL and required parameters
+      expect(fetchUrl).toContain(
+        'https://www.turboconsolelog.io/api/extensionNotification',
       );
+      expect(fetchUrl).toContain('notificationEvent=extensionFreshInstall');
+      expect(fetchUrl).toContain('version=3.9.0');
+      expect(fetchUrl).toContain('developerId=');
+      expect(fetchUrl).toMatch(/developerId=dev_[a-z0-9_]+/);
+      expect(fetchUrl).toContain('vscodeVersion=');
+      expect(fetchUrl).toContain('platform=');
+      expect(fetchUrl).toContain('timezoneOffset=');
+
+      expect(fetchOptions).toEqual({
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
     });
 
     it('should track notification shown event', async () => {
@@ -208,7 +221,7 @@ describe('showNotification', () => {
       );
     });
 
-    it('should track dismissed event when "Maybe Later" is clicked', async () => {
+    it('should track deferred event when "Maybe Later" is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
       await showNotification(
@@ -221,7 +234,7 @@ describe('showNotification', () => {
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_FRESH_INSTALL,
-        'dismissed',
+        'deferred',
         'A',
         expect.any(Number),
       );
@@ -232,6 +245,9 @@ describe('showNotification', () => {
         mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
+
+      // Maybe Later should NOT call recordDismissal
+      expect(mockRecordDismissal).not.toHaveBeenCalled();
     });
 
     it('should track dismissed event when notification is closed without action', async () => {
@@ -279,7 +295,7 @@ describe('showNotification', () => {
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_FRESH_INSTALL,
-        'dismissed',
+        'deferred',
         'A',
         60000, // Capped at 60 seconds
       );
@@ -342,7 +358,7 @@ describe('showNotification', () => {
       );
     });
 
-    it('should track fallback notification dismissal when "Maybe Later" is clicked', async () => {
+    it('should track fallback notification deferral when "Maybe Later" is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
       await showNotification(
@@ -355,7 +371,7 @@ describe('showNotification', () => {
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_FRESH_INSTALL,
-        'dismissed',
+        'deferred',
         'fallback',
         expect.any(Number),
       );
@@ -366,6 +382,9 @@ describe('showNotification', () => {
         mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
+
+      // Maybe Later should NOT call recordDismissal even in fallback
+      expect(mockRecordDismissal).not.toHaveBeenCalled();
     });
 
     it('should track fallback notification dismissal when closed without action', async () => {
@@ -427,7 +446,7 @@ describe('showNotification', () => {
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_FRESH_INSTALL,
-        'dismissed',
+        'deferred',
         'fallback',
         60000, // Capped at 60 seconds
       );
@@ -525,10 +544,9 @@ describe('showNotification', () => {
         mockContext,
       );
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://www.turboconsolelog.io/api/extensionNotification?notificationEvent=extensionFreshInstall&version=3.9.1',
-        expect.any(Object),
-      );
+      const fetchUrl = mockFetch.mock.calls[0][0] as string;
+      expect(fetchUrl).toContain('notificationEvent=extensionFreshInstall');
+      expect(fetchUrl).toContain('version=3.9.1');
     });
 
     it('should include version parameter in URL', async () => {
@@ -538,10 +556,9 @@ describe('showNotification', () => {
         mockContext,
       );
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        'https://www.turboconsolelog.io/api/extensionNotification?notificationEvent=extensionFreshInstall&version=3.9.0',
-        expect.any(Object),
-      );
+      const fetchUrl = mockFetch.mock.calls[0][0] as string;
+      expect(fetchUrl).toContain('notificationEvent=extensionFreshInstall');
+      expect(fetchUrl).toContain('version=3.9.0');
     });
   });
 
@@ -833,7 +850,7 @@ describe('showNotification', () => {
       );
     });
 
-    it('should track dismissal when "Maybe Later" is clicked', async () => {
+    it('should track deferral when "Maybe Later" is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
       await showNotification(
@@ -846,7 +863,7 @@ describe('showNotification', () => {
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
-        'dismissed',
+        'deferred',
         'A',
         expect.any(Number),
       );
@@ -855,6 +872,9 @@ describe('showNotification', () => {
         mockContext,
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
       );
+
+      // Maybe Later should NOT call recordDismissal
+      expect(mockRecordDismissal).not.toHaveBeenCalled();
     });
 
     describe('fallback flow for EXTENSION_PANEL_FREQUENT_ACCESS', () => {
@@ -1217,7 +1237,7 @@ describe('showNotification', () => {
       });
     });
 
-    it('should call recordDismissal when user clicks Maybe Later', async () => {
+    it('should NOT call recordDismissal when user clicks Maybe Later', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
       await showNotification(
@@ -1226,7 +1246,7 @@ describe('showNotification', () => {
         mockContext,
       );
 
-      expect(mockRecordDismissal).toHaveBeenCalledWith(mockContext);
+      expect(mockRecordDismissal).not.toHaveBeenCalled();
       expect(mockResetDismissalCounter).not.toHaveBeenCalled();
     });
 
@@ -1269,7 +1289,30 @@ describe('showNotification', () => {
       expect(mockRecordDismissal).not.toHaveBeenCalled();
     });
 
-    it('should track dismissal when Maybe Later is clicked', async () => {
+    it('should NOT call recordDismissal when user dismisses EXTENSION_PHP_PRO_ONLY', async () => {
+      mockShowInformationMessage.mockResolvedValue(undefined); // X button dismissal
+
+      await showNotification(
+        NotificationEvent.EXTENSION_PHP_PRO_ONLY,
+        '3.9.0',
+        mockContext,
+      );
+
+      // Should track dismissal in analytics for metrics
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_PHP_PRO_ONLY,
+        'dismissed',
+        'A',
+        expect.any(Number),
+      );
+
+      // Should NOT record dismissal (feature gate exception)
+      expect(mockRecordDismissal).not.toHaveBeenCalled();
+    });
+
+    it('should track deferral when Maybe Later is clicked', async () => {
       mockShowInformationMessage.mockResolvedValue('Maybe Later');
 
       await showNotification(
@@ -1278,18 +1321,18 @@ describe('showNotification', () => {
         mockContext,
       );
 
-      // Verify telemetry was sent
+      // Verify telemetry was sent with 'deferred' type
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
-        'dismissed',
+        'deferred',
         'A',
         expect.any(Number),
       );
 
-      // Verify dismissal was recorded
-      expect(mockRecordDismissal).toHaveBeenCalledWith(mockContext);
+      // Verify dismissal was NOT recorded (deferrals don't count toward pause threshold)
+      expect(mockRecordDismissal).not.toHaveBeenCalled();
     });
 
     it('should track dismissal when X button is clicked', async () => {
@@ -1356,6 +1399,121 @@ describe('showNotification', () => {
       expect(mockRecordDismissal).not.toHaveBeenCalled();
       expect(mockResetDismissalCounter).not.toHaveBeenCalled();
       expect(mockShowInformationMessage).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('duplicate notification handling', () => {
+    const mockDuplicateNotificationData = {
+      message: 'Test notification message',
+      ctaText: 'Get Started',
+      ctaUrl:
+        'https://www.turboconsolelog.io/documentation?event=extensionFreshInstall&variant=A',
+      variant: 'A',
+      isDuplicated: true,
+      isDeactivated: false,
+    };
+
+    beforeEach(() => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => mockDuplicateNotificationData,
+      });
+    });
+
+    it('should call undoNotificationRecording when notification is a duplicate', async () => {
+      const result = await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      // Verify undoNotificationRecording was called
+      expect(mockUndoNotificationRecording).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+
+      // Verify notification was not shown
+      expect(result).toBe(false);
+    });
+
+    it('should not call telemetry when notification is a duplicate', async () => {
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      // Verify telemetry was NOT called for shown event
+      expect(
+        mockTelemetryService.reportNotificationInteraction,
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should not fire notification when notification is a duplicate', async () => {
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      // Verify notification dialog was NOT shown
+      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+    });
+
+    it('should return false when notification is a duplicate', async () => {
+      const result = await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      expect(result).toBe(false);
+    });
+
+    it('should still record notification initially before duplicate check', async () => {
+      await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      // recordNotificationShown is called before duplicate check
+      expect(mockRecordNotificationShown).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+
+      // But then undone after duplicate detection
+      expect(mockUndoNotificationRecording).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+    });
+
+    it('should handle duplicate notification with deactivated variant correctly', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          ...mockDuplicateNotificationData,
+          isDuplicated: true,
+          isDeactivated: true,
+        }),
+      });
+
+      const result = await showNotification(
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+        '3.9.0',
+        mockContext,
+      );
+
+      // Should handle duplicate first (before deactivated check)
+      expect(mockUndoNotificationRecording).toHaveBeenCalledWith(
+        mockContext,
+        NotificationEvent.EXTENSION_FRESH_INSTALL,
+      );
+      expect(mockShowInformationMessage).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
   });
 });
