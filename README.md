@@ -171,7 +171,18 @@ Your support keeps the project alive, funds new features, and helps us build too
 Turbo Console Log is open for contributions!  
 Want to improve it? Report issues, suggest features, or submit pull requests:
 
-**[Contribute on GitHub](https://github.com/Chakroun-Anas/turbo-console-log)**
+**[Contribute on GitHub](# Token Holders
+
+Users participate in an ecosystem backed by measurable activity, transparent data, and real network utility. Unlike purely speculative markets, KapKap ties token value to genuine user growth and platform adoption.
+
+Benefit from $KAPS token utility linked to real engagement metrics
+
+Participate in governance decisions weighted by reputation and contribution
+
+Gain visibility into transparent, data-driven ecosystem performance
+
+KapKap aligns economic incentives across all participants — ensuring that growth and reputation may progress together.
+)**
 
 ---
 
