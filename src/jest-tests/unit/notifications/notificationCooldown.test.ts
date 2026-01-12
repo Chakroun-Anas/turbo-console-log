@@ -601,12 +601,12 @@ describe('notificationCooldown', () => {
 
         recordNotificationShown(
           mockContext,
-          NotificationEvent.EXTENSION_PHP_PRO_ONLY,
+          NotificationEvent.EXTENSION_FRESH_INSTALL,
         );
 
         const afterCall = Date.now();
 
-        // Timestamp should be updated
+        // Timestamp should be updated for BYPASS notifications
         const recordedTimestamp = globalStateStore.get(
           GlobalStateKey.LAST_SHOWN_NOTIFICATION,
         ) as number;
@@ -619,6 +619,27 @@ describe('notificationCooldown', () => {
           GlobalStateKey.MONTHLY_NOTIFICATION_COUNT,
         );
         expect(monthlyCount).toBeUndefined();
+      });
+
+      it('should NOT update timestamp for EXTENSION_PHP_PRO_ONLY (feature gate exception)', () => {
+        // First, set an initial timestamp by showing a regular notification
+        const initialTimestamp = Date.now() - 1000; // 1 second ago
+        globalStateStore.set(
+          GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+          initialTimestamp,
+        );
+
+        // Now show PHP_PRO_ONLY notification
+        recordNotificationShown(
+          mockContext,
+          NotificationEvent.EXTENSION_PHP_PRO_ONLY,
+        );
+
+        // Timestamp should NOT be updated (should remain the same)
+        const recordedTimestamp = globalStateStore.get(
+          GlobalStateKey.LAST_SHOWN_NOTIFICATION,
+        ) as number;
+        expect(recordedTimestamp).toBe(initialTimestamp);
       });
 
       it('should not increment counter when BYPASS notification follows IGNORE notification', () => {

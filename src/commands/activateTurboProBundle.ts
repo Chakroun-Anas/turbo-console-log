@@ -36,6 +36,21 @@ export function activateTurboProBundleCommand(): Command {
         return;
       }
 
+      // Validate license key format
+      if (!licenseKey.startsWith('TCLP-')) {
+        const result = await vscode.window.showErrorMessage(
+          '❌ Invalid license key format. License keys start with "TCLP-"',
+          'Try Again',
+          'Cancel',
+        );
+        if (result === 'Try Again') {
+          vscode.commands.executeCommand(
+            'turboConsoleLog.activateTurboProBundle',
+          );
+        }
+        return;
+      }
+
       const isUserConnectedToInternet = await isOnline();
 
       if (!isUserConnectedToInternet) {
