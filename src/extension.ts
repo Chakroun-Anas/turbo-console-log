@@ -11,6 +11,11 @@ import {
   listenToPhpFileOpenings,
   updateUserActivityStatus,
   listenToManualConsoleLogs,
+  listenToJSMessyFileDetection,
+  listenToPhpMessyFileDetection,
+  listenToJSMultiLogTypes,
+  listenToPhpMultiLogTypes,
+  listenToWeekendTurboSundays,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -80,10 +85,25 @@ export async function activate(
   updateUserActivityStatus(context);
 
   // Listen to PHP file openings and show announcement immediately (v3.10.0 strategy)
-  listenToPhpFileOpenings(context);
+  listenToPhpFileOpenings(context, version);
 
   // Listen to manual console.log typing for INACTIVE users (re-engagement strategy)
   listenToManualConsoleLogs(context);
+
+  // Listen to JS/TS messy file detection and show notification
+  listenToJSMessyFileDetection(context, version);
+
+  // Listen to PHP messy file detection and show notification
+  listenToPhpMessyFileDetection(context, version);
+
+  // Listen to JS/TS multi-log-type detection and show notification
+  listenToJSMultiLogTypes(context, version);
+
+  // Listen to PHP multi-log-type detection and show notification
+  listenToPhpMultiLogTypes(context, version);
+
+  // Show weekend Turbo Sundays article notification (if it's weekend)
+  listenToWeekendTurboSundays(context, version);
 
   // Handle Pro user logic
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');

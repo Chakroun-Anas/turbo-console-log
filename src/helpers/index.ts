@@ -12,11 +12,17 @@ import { trackStreakDays } from './trackStreakDays';
 import { trackLogManagementCommands } from './trackLogManagementCommands';
 import { isProUser } from './isProUser';
 import { isPhpFile } from './isPhpFile';
+import { isJavaScriptOrTypeScriptFile } from './isJavaScriptOrTypeScriptFile';
 import { canInsertLogInDocument } from './canInsertLogInDocument';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
 
 import { listenToPhpFileOpenings } from './listenToPhpFileOpenings';
+import { listenToJSMessyFileDetection } from './listenToJSMessyFileDetection';
+import { listenToPhpMessyFileDetection } from './listenToPhpMessyFileDetection';
+import { listenToJSMultiLogTypes } from './listenToJSMultiLogTypes';
+import { listenToPhpMultiLogTypes } from './listenToPhpMultiLogTypes';
+import { listenToWeekendTurboSundays } from './listenToWeekendTurboSundays';
 import { loadPhpDebugMessage } from './loadPhpDebugMessage';
 import { showReleaseWebView } from './showReleaseWebView';
 import { showReleaseNotification } from './showReleaseNotification';
@@ -37,10 +43,16 @@ export {
   trackStreakDays,
   trackLogManagementCommands,
   isProUser,
+  isJavaScriptOrTypeScriptFile,
   isPhpFile,
   canInsertLogInDocument,
   traceExtensionVersionHistory,
   isFreshInstall,
+  listenToJSMessyFileDetection,
+  listenToPhpMessyFileDetection,
+  listenToJSMultiLogTypes,
+  listenToPhpMultiLogTypes,
+  listenToWeekendTurboSundays,
   listenToPhpFileOpenings,
   loadPhpDebugMessage,
   showReleaseWebView,

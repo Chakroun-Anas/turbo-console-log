@@ -18,16 +18,22 @@ import { GlobalStateKey } from '@/entities';
  */
 export function listenToPhpFileOpenings(
   context: vscode.ExtensionContext,
+  version: string,
 ): void {
   // Skip for Pro users - they already have PHP access
   if (isProUser(context)) {
     return;
   }
 
-  // Get extension version
-  const version = vscode.extensions.getExtension(
-    'ChakrounAnas.turbo-console-log',
-  )?.packageJSON.version;
+  // Check if notification has already been shown BEFORE setting up listener
+  const hasShownNotification = readFromGlobalState<boolean>(
+    context,
+    GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
+  );
+
+  if (hasShownNotification) {
+    return; // Already shown, no need to listen
+  }
 
   // Listen to active text editor changes (when user opens/switches files)
   const disposable = vscode.window.onDidChangeActiveTextEditor(
@@ -37,16 +43,6 @@ export function listenToPhpFileOpenings(
       }
 
       const document = editor.document;
-
-      // Check if notification has already been shown
-      const hasShownNotification = readFromGlobalState<boolean>(
-        context,
-        GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
-      );
-
-      if (hasShownNotification) {
-        return; // Already shown, skip
-      }
 
       // Check if it's a PHP file
       if (isPhpFile(document)) {
@@ -64,6 +60,7 @@ export function listenToPhpFileOpenings(
             GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
             true,
           );
+          disposable.dispose(); // Stop listening once notification shown
         }
       }
     },

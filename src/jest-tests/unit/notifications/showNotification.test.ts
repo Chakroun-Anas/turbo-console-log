@@ -1433,8 +1433,8 @@ describe('showNotification', () => {
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
 
-      // Verify notification was not shown
-      expect(result).toBe(false);
+      // Verify notification was shown
+      expect(result).toBe(true);
     });
 
     it('should not call telemetry when notification is a duplicate', async () => {
@@ -1468,7 +1468,7 @@ describe('showNotification', () => {
         mockContext,
       );
 
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
 
     it('should still record notification initially before duplicate check', async () => {
@@ -1513,7 +1513,7 @@ describe('showNotification', () => {
         NotificationEvent.EXTENSION_FRESH_INSTALL,
       );
       expect(mockShowInformationMessage).not.toHaveBeenCalled();
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
   });
 });

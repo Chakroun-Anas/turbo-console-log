@@ -2,6 +2,20 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.14.1] - 2026-01-15
+
+### 🔧 Bug Fixes & Improvements
+
+**Pro Tree Synchronization:**
+
+- Fixed Pro log tree panel not consistently syncing with live file changes
+- Replaced unreliable `createFileSystemWatcher` with `onDidSaveTextDocument` for immediate tree updates on file save
+
+**PLG Notification System:**
+
+- Improved duplicate detection to properly sync local guard keys with backend state
+- Fixed milestone flags not updating when backend identifies duplicates, preventing potential notification loops across sessions
+
 ## [3.14.0] - 2026-01-11
 
 ### 🛡️ Enhanced Notification Reliability & Multi VSCode Instances Support
