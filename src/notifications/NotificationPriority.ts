@@ -46,6 +46,13 @@ export const NOTIFICATION_PRIORITY_MAP: Record<
     NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED]:
     NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_JS_MESSY_FILE]: NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_PHP_MESSY_FILE]: NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_JS_MULTI_LOG_TYPES]: NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_PHP_MULTI_LOG_TYPES]:
+    NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_WEEKEND_TURBO_SUNDAYS]:
+    NotificationPriority.IGNORE,
 };
 
 /**

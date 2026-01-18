@@ -484,7 +484,115 @@ describe('activate - command registration', () => {
 
     await activate(fakeContext);
 
-    expect(helpers.listenToPhpFileOpenings).toHaveBeenCalledWith(fakeContext);
+    expect(helpers.listenToPhpFileOpenings).toHaveBeenCalledWith(
+      fakeContext,
+      '3.10.0',
+    );
+  });
+
+  it('should call listenToJSMessyFileDetection during activation', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.14.1' },
+    } as vscode.Extension<never>);
+
+    // Mock freemium state
+    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    await activate(fakeContext);
+
+    expect(helpers.listenToJSMessyFileDetection).toHaveBeenCalledWith(
+      fakeContext,
+      '3.14.1',
+    );
+  });
+
+  it('should call listenToPhpMessyFileDetection during activation', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.14.1' },
+    } as vscode.Extension<never>);
+
+    // Mock freemium state
+    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    await activate(fakeContext);
+
+    expect(helpers.listenToPhpMessyFileDetection).toHaveBeenCalledWith(
+      fakeContext,
+      '3.14.1',
+    );
+  });
+
+  it('should call listenToJSMultiLogTypes during activation', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.14.1' },
+    } as vscode.Extension<never>);
+
+    // Mock freemium state
+    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    await activate(fakeContext);
+
+    expect(helpers.listenToJSMultiLogTypes).toHaveBeenCalledWith(
+      fakeContext,
+      '3.14.1',
+    );
+  });
+
+  it('should call listenToPhpMultiLogTypes during activation', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.14.1' },
+    } as vscode.Extension<never>);
+
+    // Mock freemium state
+    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    await activate(fakeContext);
+
+    expect(helpers.listenToPhpMultiLogTypes).toHaveBeenCalledWith(
+      fakeContext,
+      '3.14.1',
+    );
+  });
+
+  it('should call listenToWeekendTurboSundays during activation', async () => {
+    const fakeContext = {
+      subscriptions: [],
+    } as unknown as vscode.ExtensionContext;
+
+    // Mock version
+    jest.spyOn(vscode.extensions, 'getExtension').mockReturnValue({
+      packageJSON: { version: '3.14.1' },
+    } as vscode.Extension<never>);
+
+    // Mock freemium state
+    (helpers.readFromGlobalState as jest.Mock).mockReturnValue(undefined);
+
+    await activate(fakeContext);
+
+    expect(helpers.listenToWeekendTurboSundays).toHaveBeenCalledWith(
+      fakeContext,
+      '3.14.1',
+    );
   });
 
   it('should call updateUserActivityStatus during activation', async () => {

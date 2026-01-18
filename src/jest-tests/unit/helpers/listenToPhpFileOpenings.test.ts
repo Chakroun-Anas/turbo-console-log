@@ -45,23 +45,23 @@ describe('listenToPhpFileOpenings', () => {
   const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
 
   let mockOnDidChangeActiveTextEditor: jest.Mock;
+  let mockDisposable: { dispose: jest.Mock };
   let editorChangeCallback: (editor?: vscode.TextEditor) => Promise<void>;
+  const testVersion = '3.10.0';
 
   beforeEach(() => {
     jest.clearAllMocks();
 
+    // Mock disposable with spy
+    mockDisposable = { dispose: jest.fn() };
+
     // Mock vscode.window.onDidChangeActiveTextEditor
     mockOnDidChangeActiveTextEditor = jest.fn((callback) => {
       editorChangeCallback = callback;
-      return { dispose: jest.fn() };
+      return mockDisposable;
     });
     (vscode.window.onDidChangeActiveTextEditor as jest.Mock) =
       mockOnDidChangeActiveTextEditor;
-
-    // Mock extension version
-    (vscode.extensions.getExtension as jest.Mock).mockReturnValue({
-      packageJSON: { version: '3.10.0' },
-    });
 
     // Default: free user, notification not shown yet
     mockIsProUser.mockReturnValue(false);
@@ -72,19 +72,39 @@ describe('listenToPhpFileOpenings', () => {
     const context = makeExtensionContext();
     mockIsProUser.mockReturnValue(true);
 
-    listenToPhpFileOpenings(context);
+    listenToPhpFileOpenings(context, testVersion);
 
     expect(mockIsProUser).toHaveBeenCalledWith(context);
     expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
   });
 
-  it('should register onDidChangeActiveTextEditor listener for free users', () => {
+  it('should not register listener when notification already shown', () => {
     const context = makeExtensionContext();
     mockIsProUser.mockReturnValue(false);
+    mockReadFromGlobalState.mockReturnValue(true); // Already shown
 
-    listenToPhpFileOpenings(context);
+    listenToPhpFileOpenings(context, testVersion);
 
     expect(mockIsProUser).toHaveBeenCalledWith(context);
+    expect(mockReadFromGlobalState).toHaveBeenCalledWith(
+      context,
+      GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
+    );
+    expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
+  });
+
+  it('should register onDidChangeActiveTextEditor listener for free users who have not seen notification', () => {
+    const context = makeExtensionContext();
+    mockIsProUser.mockReturnValue(false);
+    mockReadFromGlobalState.mockReturnValue(false); // Not shown yet
+
+    listenToPhpFileOpenings(context, testVersion);
+
+    expect(mockIsProUser).toHaveBeenCalledWith(context);
+    expect(mockReadFromGlobalState).toHaveBeenCalledWith(
+      context,
+      GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
+    );
     expect(mockOnDidChangeActiveTextEditor).toHaveBeenCalledTimes(1);
     expect(mockOnDidChangeActiveTextEditor).toHaveBeenCalledWith(
       expect.any(Function),
@@ -100,47 +120,38 @@ describe('listenToPhpFileOpenings', () => {
     const mockDocument = { languageId: 'php' } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToPhpFileOpenings(context);
+    listenToPhpFileOpenings(context, testVersion);
 
     // Simulate user opening a PHP file
     await editorChangeCallback(mockEditor);
 
-    expect(mockReadFromGlobalState).toHaveBeenCalledWith(
-      context,
-      GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
-    );
     expect(mockIsPhpFile).toHaveBeenCalledWith(mockDocument);
+    expect(mockShowNotification).toHaveBeenCalledWith(
+      NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
+      testVersion,
+      context,
+    );
     expect(mockWriteToGlobalState).toHaveBeenCalledWith(
       context,
       GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
       true,
     );
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-      '3.10.0',
-      context,
-    );
   });
 
-  it('should not show notification when notification was already shown', async () => {
+  it('should dispose listener after successfully showing notification', async () => {
     const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(true); // Already shown
+    mockReadFromGlobalState.mockReturnValue(false);
     mockIsPhpFile.mockReturnValue(true);
+    mockShowNotification.mockResolvedValue(true);
 
     const mockDocument = { languageId: 'php' } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToPhpFileOpenings(context);
+    listenToPhpFileOpenings(context, testVersion);
 
     await editorChangeCallback(mockEditor);
 
-    expect(mockReadFromGlobalState).toHaveBeenCalledWith(
-      context,
-      GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
-    );
-    expect(mockIsPhpFile).not.toHaveBeenCalled();
-    expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
+    expect(mockDisposable.dispose).toHaveBeenCalledTimes(1);
   });
 
   it('should not show notification when non-PHP file is opened', async () => {
@@ -151,14 +162,10 @@ describe('listenToPhpFileOpenings', () => {
     const mockDocument = { languageId: 'javascript' } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToPhpFileOpenings(context);
+    listenToPhpFileOpenings(context, testVersion);
 
-    editorChangeCallback(mockEditor);
+    await editorChangeCallback(mockEditor);
 
-    expect(mockReadFromGlobalState).toHaveBeenCalledWith(
-      context,
-      GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
-    );
     expect(mockIsPhpFile).toHaveBeenCalledWith(mockDocument);
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
     expect(mockShowNotification).not.toHaveBeenCalled();
@@ -168,11 +175,10 @@ describe('listenToPhpFileOpenings', () => {
     const context = makeExtensionContext();
     mockReadFromGlobalState.mockReturnValue(false);
 
-    listenToPhpFileOpenings(context);
+    listenToPhpFileOpenings(context, testVersion);
 
-    editorChangeCallback(undefined);
+    await editorChangeCallback(undefined);
 
-    expect(mockReadFromGlobalState).not.toHaveBeenCalled();
     expect(mockIsPhpFile).not.toHaveBeenCalled();
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
     expect(mockShowNotification).not.toHaveBeenCalled();
@@ -180,24 +186,18 @@ describe('listenToPhpFileOpenings', () => {
 
   it('should add disposable to context subscriptions', () => {
     const context = makeExtensionContext();
-    const mockDisposable = { dispose: jest.fn() };
     const pushSpy = jest.spyOn(context.subscriptions, 'push');
-    mockOnDidChangeActiveTextEditor.mockReturnValue(mockDisposable);
 
-    listenToPhpFileOpenings(context);
+    listenToPhpFileOpenings(context, testVersion);
 
     expect(pushSpy).toHaveBeenCalledWith(mockDisposable);
   });
 
-  it('should show notification only once even if multiple PHP files are opened', async () => {
+  it('should stop listening after notification is shown (disposal prevents further calls)', async () => {
     const context = makeExtensionContext();
-    let notificationShown = false;
-    mockReadFromGlobalState.mockImplementation(() => notificationShown);
+    mockReadFromGlobalState.mockReturnValue(false);
     mockIsPhpFile.mockReturnValue(true);
     mockShowNotification.mockResolvedValue(true);
-    mockWriteToGlobalState.mockImplementation(() => {
-      notificationShown = true;
-    });
 
     const mockDocument1 = {
       languageId: 'php',
@@ -205,48 +205,19 @@ describe('listenToPhpFileOpenings', () => {
     } as vscode.TextDocument;
     const mockEditor1 = { document: mockDocument1 } as vscode.TextEditor;
 
-    const mockDocument2 = {
-      languageId: 'php',
-      fileName: 'file2.php',
-    } as vscode.TextDocument;
-    const mockEditor2 = { document: mockDocument2 } as vscode.TextEditor;
-
-    listenToPhpFileOpenings(context);
+    listenToPhpFileOpenings(context, testVersion);
 
     // Open first PHP file
     await editorChangeCallback(mockEditor1);
 
     expect(mockShowNotification).toHaveBeenCalledTimes(1);
+    expect(mockDisposable.dispose).toHaveBeenCalledTimes(1);
 
-    // Open second PHP file
-    await editorChangeCallback(mockEditor2);
-
-    // Should still be called only once
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
+    // Listener is disposed, so second call won't happen in real scenario
+    // This test just verifies disposal was called
   });
 
-  it('should handle missing extension version gracefully', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
-    mockIsPhpFile.mockReturnValue(true);
-    mockShowNotification.mockResolvedValue(true);
-    (vscode.extensions.getExtension as jest.Mock).mockReturnValue(undefined);
-
-    const mockDocument = { languageId: 'php' } as vscode.TextDocument;
-    const mockEditor = { document: mockDocument } as vscode.TextEditor;
-
-    listenToPhpFileOpenings(context);
-
-    await editorChangeCallback(mockEditor);
-
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-      undefined,
-      context,
-    );
-  });
-
-  it('should not mark as shown when notification is blocked by cooldown', async () => {
+  it('should not mark as shown or dispose when notification is blocked by cooldown', async () => {
     const context = makeExtensionContext();
     mockReadFromGlobalState.mockReturnValue(false);
     mockIsPhpFile.mockReturnValue(true);
@@ -255,16 +226,18 @@ describe('listenToPhpFileOpenings', () => {
     const mockDocument = { languageId: 'php' } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToPhpFileOpenings(context);
+    listenToPhpFileOpenings(context, testVersion);
 
     await editorChangeCallback(mockEditor);
 
     expect(mockShowNotification).toHaveBeenCalledWith(
       NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-      '3.10.0',
+      testVersion,
       context,
     );
     // Should NOT mark as shown when notification was blocked
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
+    // Should NOT dispose listener (keep trying)
+    expect(mockDisposable.dispose).not.toHaveBeenCalled();
   });
 });

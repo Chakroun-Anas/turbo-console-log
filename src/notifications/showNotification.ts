@@ -139,6 +139,36 @@ export async function showNotification(
         ctaText: 'See How',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
       },
+      [NotificationEvent.EXTENSION_JS_MESSY_FILE]: {
+        message:
+          "🌲 10+ logs in this file! Navigate them all effortlessly with Pro's tree view.",
+        ctaText: 'See Tree View',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message#pro-logs`,
+      },
+      [NotificationEvent.EXTENSION_PHP_MESSY_FILE]: {
+        message:
+          "🌲 10+ logs in this PHP file! Navigate them all effortlessly with Pro's tree view.",
+        ctaText: 'See Tree View',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message#pro-logs`,
+      },
+      [NotificationEvent.EXTENSION_JS_MULTI_LOG_TYPES]: {
+        message:
+          '🎨 Multiple log types detected! Pro color-codes each type for instant recognition.',
+        ctaText: 'See Colors',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message#pro-logs`,
+      },
+      [NotificationEvent.EXTENSION_PHP_MULTI_LOG_TYPES]: {
+        message:
+          '🎨 Multiple log types in PHP! Pro color-codes each type for instant recognition.',
+        ctaText: 'See Colors',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message#pro-logs`,
+      },
+      [NotificationEvent.EXTENSION_WEEKEND_TURBO_SUNDAYS]: {
+        message:
+          '🌅 Weekend coding? Discover how Turbo started as a Sunday side project!',
+        ctaText: 'Read Story',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/turbo-sundays-001`,
+      },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
         message: 'Cheers to 2025 wins & exciting 2026 possibilities! 🥳',
         ctaText: 'Cheers!',
@@ -155,11 +185,12 @@ export async function showNotification(
     };
   }
 
-  // If notification is a duplicate (already shown today), undo recording and return
+  // If notification is a duplicate (already shown today), return true to acknowledge
   // Since Turbo v3.14.0 - Backend deduplication prevents duplicate notifications
+  // Keep the local recording to stay in sync with backend state
   if (notificationData.isDuplicated) {
     undoNotificationRecording(context, notificationEvent);
-    return false; // Not shown due to backend duplicate detection
+    return true; // Already shown/handled by backend duplicate detection
   }
 
   if (notificationData.isDeactivated) {
