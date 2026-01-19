@@ -170,9 +170,10 @@ export async function showNotification(
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/turbo-sundays-001`,
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
-        message: 'Cheers to 2025 wins & exciting 2026 possibilities! 🥳',
-        ctaText: 'Cheers!',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3130`,
+        message:
+          '💎 Pre-commit cleanup just got effortless with real-time Git awareness.',
+        ctaText: 'Explore Feature',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3150`,
       },
     };
 

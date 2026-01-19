@@ -25,6 +25,7 @@ export function showReleaseNotification(
   const releaseAnnouncementVersions = [
     '3.13.0', // New features announcement
     // Add future versions here
+    '3.15.0', // Git integration announcement
   ];
 
   // Only show notification for specific versions
