@@ -2,6 +2,45 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.15.0] - 2026-01-19
+
+### 🔄 Git Integration for Turbo Pro
+
+**Introducing "Changed Files Only" Filter — Never Commit Debugging Logs Again**
+
+The most requested feature is here! Turbo Pro now integrates with VS Code's Git to give you precise control over which logs you see and manage.
+
+#### ✨ What's New
+
+**Git-Aware Filtering:**
+
+- 🎯 **"Changed Files Only" Filter** — See logs exclusively from files you've modified (staged, modified, or untracked)
+- 🔄 **Real-Time Git Awareness** — Panel updates automatically as you stage, modify, or save files
+- 🚀 **Pre-Commit Workflow** — Debug freely, filter to changed files, delete all debugging logs, commit clean code
+
+**How It Works:**
+
+1. **Debug Freely** — Insert logs across your codebase without worry
+2. **Filter Changed Files** — Toggle "Changed Files Only" to see logs from your working changes
+3. **Clean Up** — Delete all logs from changed files with one click
+4. **Commit** — Push clean code without debugging noise
+
+**Smart Git Detection:**
+
+- ✅ Staged changes (files ready for commit)
+- ✅ Modified files (unstaged changes)
+- ✅ Untracked files (new files not yet in Git)
+- ✅ Real-time sync (no manual refresh needed)
+
+#### 🎯 Why This Matters
+
+Previous versions showed all logs in your workspace. **This version shows only the logs you just added.** Whether you're cleaning up before a commit or focusing on your current feature, Git integration makes it effortless.
+
+No more manually hunting through files to remove debugging logs. No more accidentally committing console statements. Just a cleaner, smarter debugging workflow.
+
+→ [Read the full v3.15.0 release article](https://www.turboconsolelog.io/articles/release-3150)  
+→ [Learn more about Turbo Pro](https://www.turboconsolelog.io/pro)
+
 ## [3.14.1] - 2026-01-15
 
 ### 🔧 Bug Fixes & Improvements
