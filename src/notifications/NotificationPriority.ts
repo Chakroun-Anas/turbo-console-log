@@ -53,6 +53,9 @@ export const NOTIFICATION_PRIORITY_MAP: Record<
     NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_WEEKEND_TURBO_SUNDAYS]:
     NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_COMMIT_WITH_LOGS]: NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_CUSTOM_LOG_LIBRARY]: NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE]: NotificationPriority.IGNORE,
 };
 
 /**

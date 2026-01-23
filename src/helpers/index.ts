@@ -23,6 +23,9 @@ import { listenToPhpMessyFileDetection } from './listenToPhpMessyFileDetection';
 import { listenToJSMultiLogTypes } from './listenToJSMultiLogTypes';
 import { listenToPhpMultiLogTypes } from './listenToPhpMultiLogTypes';
 import { listenToWeekendTurboSundays } from './listenToWeekendTurboSundays';
+import { listenToCommitWithLogs } from './listenToCommitWithLogs';
+import { listenToCustomLogLibrary } from './listenToCustomLogLibrary';
+import { listenToLogsInTestFile } from './listenToLogsInTestFile';
 import { loadPhpDebugMessage } from './loadPhpDebugMessage';
 import { showReleaseWebView } from './showReleaseWebView';
 import { showReleaseNotification } from './showReleaseNotification';
@@ -53,6 +56,9 @@ export {
   listenToJSMultiLogTypes,
   listenToPhpMultiLogTypes,
   listenToWeekendTurboSundays,
+  listenToCommitWithLogs,
+  listenToCustomLogLibrary,
+  listenToLogsInTestFile,
   listenToPhpFileOpenings,
   loadPhpDebugMessage,
   showReleaseWebView,

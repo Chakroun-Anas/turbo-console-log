@@ -23,4 +23,7 @@ export enum NotificationEvent {
   EXTENSION_JS_MULTI_LOG_TYPES = 'extensionJSMultiLogTypes',
   EXTENSION_PHP_MULTI_LOG_TYPES = 'extensionPhpMultiLogTypes',
   EXTENSION_WEEKEND_TURBO_SUNDAYS = 'extensionWeekendTurboSundays',
+  EXTENSION_COMMIT_WITH_LOGS = 'extensionCommitWithLogs',
+  EXTENSION_CUSTOM_LOG_LIBRARY = 'extensionCustomLogLibrary',
+  EXTENSION_LOGS_IN_TEST_FILE = 'extensionLogsInTestFile',
 }
