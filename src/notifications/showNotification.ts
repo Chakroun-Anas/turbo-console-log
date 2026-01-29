@@ -175,6 +175,24 @@ export async function showNotification(
         ctaText: 'Explore Feature',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3150`,
       },
+      [NotificationEvent.EXTENSION_COMMIT_WITH_LOGS]: {
+        message:
+          "🌳 Committed with debug logs? See how Pro's Git-aware panel helps clean up before push.",
+        ctaText: 'Learn More',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3150`,
+      },
+      [NotificationEvent.EXTENSION_CUSTOM_LOG_LIBRARY]: {
+        message:
+          '🎯 Using a custom logger? Did you know Turbo supports custom log functions? Configure it now!',
+        ctaText: 'Learn How',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/settings/log-function-name`,
+      },
+      [NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE]: {
+        message:
+          '🧪 Debugging tests? Turbo Pro offers test-file-aware features for cleaner test logs!',
+        ctaText: 'Explore Pro',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
     };
 
     const fallback = fallbackMessages[notificationEvent];

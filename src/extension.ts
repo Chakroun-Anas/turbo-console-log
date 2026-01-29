@@ -16,6 +16,9 @@ import {
   listenToJSMultiLogTypes,
   listenToPhpMultiLogTypes,
   listenToWeekendTurboSundays,
+  listenToCommitWithLogs,
+  listenToCustomLogLibrary,
+  listenToLogsInTestFile,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -101,6 +104,15 @@ export async function activate(
 
   // Listen to PHP multi-log-type detection and show notification
   listenToPhpMultiLogTypes(context, version);
+
+  // Listen to Git commits with logs and show notification
+  listenToCommitWithLogs(context, version);
+
+  // Listen to custom logging library usage and show notification
+  listenToCustomLogLibrary(context, version);
+
+  // Listen to logs in test files and show notification
+  listenToLogsInTestFile(context, version);
 
   // Show weekend Turbo Sundays article notification (if it's weekend)
   listenToWeekendTurboSundays(context, version);

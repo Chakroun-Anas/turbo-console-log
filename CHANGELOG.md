@@ -2,6 +2,12 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.15.1] - 2026-01-25
+
+### 🔧 Infrastructure & Quality Improvements
+
+- Internal improvements to extension infrastructure
+
 ## [3.15.0] - 2026-01-19
 
 ### 🔄 Git Integration for Turbo Pro

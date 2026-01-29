@@ -414,7 +414,7 @@ class TelemetryService implements TurboAnalyticsProvider {
 
   public async reportNotificationInteraction(
     notificationEvent: string,
-    interactionType: 'shown' | 'clicked' | 'dismissed',
+    interactionType: 'shown' | 'clicked' | 'dismissed' | 'deferred',
     variant: string,
     reactionTimeMs?: number,
   ): Promise<void> {
@@ -438,6 +438,74 @@ class TelemetryService implements TurboAnalyticsProvider {
       const now = new Date();
       const timezoneOffset = now.getTimezoneOffset();
 
+      // Collect user context metadata for clicked, dismissed, and deferred events
+      let openEditorsCount: number | undefined;
+      let unsavedFilesCount: number | undefined;
+      let terminalCount: number | undefined;
+      let periodOfDay:
+        | 'morning'
+        | 'afternoon'
+        | 'evening'
+        | 'night'
+        | undefined;
+      let dayOfWeek:
+        | 'MONDAY'
+        | 'TUESDAY'
+        | 'WEDNESDAY'
+        | 'THURSDAY'
+        | 'FRIDAY'
+        | 'SATURDAY'
+        | 'SUNDAY'
+        | undefined;
+
+      if (interactionType !== 'shown') {
+        // Count all open tabs across all tab groups
+        openEditorsCount = vscode.window.tabGroups.all.reduce(
+          (count, group) => count + group.tabs.length,
+          0,
+        );
+
+        // Count unsaved files across all open text documents
+        unsavedFilesCount = vscode.workspace.textDocuments.filter(
+          (doc) => doc.isDirty && doc.uri.scheme === 'file',
+        ).length;
+
+        // Count terminals
+        terminalCount = vscode.window.terminals.length;
+
+        // Calculate period of day based on local time
+        const hour = now.getHours();
+        if (hour >= 5 && hour < 12) {
+          periodOfDay = 'morning';
+        } else if (hour >= 12 && hour < 17) {
+          periodOfDay = 'afternoon';
+        } else if (hour >= 17 && hour < 21) {
+          periodOfDay = 'evening';
+        } else {
+          periodOfDay = 'night';
+        }
+
+        // Get day of week
+        const dayNames: (
+          | 'SUNDAY'
+          | 'MONDAY'
+          | 'TUESDAY'
+          | 'WEDNESDAY'
+          | 'THURSDAY'
+          | 'FRIDAY'
+          | 'SATURDAY'
+        )[] = [
+          'SUNDAY',
+          'MONDAY',
+          'TUESDAY',
+          'WEDNESDAY',
+          'THURSDAY',
+          'FRIDAY',
+          'SATURDAY',
+        ];
+        dayOfWeek = dayNames[now.getDay()];
+      }
+
       const analyticsData = {
         developerId,
         notificationEvent,
@@ -448,6 +516,11 @@ class TelemetryService implements TurboAnalyticsProvider {
         extensionVersion,
         vscodeVersion,
         platform,
+        ...(openEditorsCount !== undefined && { openEditorsCount }),
+        ...(unsavedFilesCount !== undefined && { unsavedFilesCount }),
+        ...(terminalCount !== undefined && { terminalCount }),
+        ...(periodOfDay && { periodOfDay }),
+        ...(dayOfWeek && { dayOfWeek }),
       };
 
       console.log(
@@ -462,6 +535,11 @@ class TelemetryService implements TurboAnalyticsProvider {
           vscodeVersion,
           platform,
           timezoneOffset: timezoneOffset,
+          openEditorsCount,
+          unsavedFilesCount,
+          terminalCount,
+          periodOfDay,
+          dayOfWeek,
         },
       );
 

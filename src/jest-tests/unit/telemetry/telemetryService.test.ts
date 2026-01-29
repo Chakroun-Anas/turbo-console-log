@@ -107,6 +107,37 @@ describe('TelemetryService', () => {
       configurable: true,
     });
 
+    // Setup VS Code window mocks for metadata collection
+    const mockWindow = vscode.window as jest.Mocked<typeof vscode.window>;
+
+    // Mock tabGroups for openEditorsCount
+    Object.defineProperty(mockWindow, 'tabGroups', {
+      value: {
+        all: [{ tabs: [{}, {}] }, { tabs: [{}] }],
+      },
+      writable: true,
+      configurable: true,
+    });
+
+    // Mock terminals for terminalCount
+    Object.defineProperty(mockWindow, 'terminals', {
+      value: [{}, {}, {}],
+      writable: true,
+      configurable: true,
+    });
+
+    // Mock workspace.textDocuments for unsavedFilesCount
+    Object.defineProperty(mockWorkspace, 'textDocuments', {
+      value: [
+        { isDirty: true, uri: { scheme: 'file' } },
+        { isDirty: false, uri: { scheme: 'file' } },
+        { isDirty: true, uri: { scheme: 'file' } },
+        { isDirty: true, uri: { scheme: 'untitled' } }, // Should be excluded
+      ],
+      writable: true,
+      configurable: true,
+    });
+
     // Create service instance
     telemetryService = createTelemetryService();
   });
@@ -1295,6 +1326,13 @@ describe('TelemetryService', () => {
           interactionType: 'clicked',
           variant: 'variant-b',
           reactionTimeMs: 2500,
+          openEditorsCount: 3, // 2 + 1 from tabGroups mock
+          unsavedFilesCount: 2, // 2 dirty files with scheme 'file'
+          terminalCount: 3,
+          periodOfDay: expect.stringMatching(/morning|afternoon|evening|night/),
+          dayOfWeek: expect.stringMatching(
+            /MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY/,
+          ),
         }),
         expect.any(Object),
       );
@@ -1320,6 +1358,13 @@ describe('TelemetryService', () => {
           interactionType: 'dismissed',
           variant: 'variant-c',
           reactionTimeMs: 1200,
+          openEditorsCount: 3,
+          unsavedFilesCount: 2,
+          terminalCount: 3,
+          periodOfDay: expect.stringMatching(/morning|afternoon|evening|night/),
+          dayOfWeek: expect.stringMatching(
+            /MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY/,
+          ),
         }),
         expect.any(Object),
       );
@@ -1332,19 +1377,25 @@ describe('TelemetryService', () => {
     it('should handle all interaction types correctly', async () => {
       const service = createTelemetryService();
 
-      // Test shown
+      // Test shown (should NOT include metadata)
       await service.reportNotificationInteraction(
         'event-1',
         'shown',
         'variant-x',
       );
-      expect(mockedAxios.post).toHaveBeenLastCalledWith(
-        expect.any(String),
-        expect.objectContaining({ interactionType: 'shown' }),
-        expect.any(Object),
-      );
+      const shownPayload = mockedAxios.post.mock.calls[0][1] as Record<
+        string,
+        unknown
+      >;
+      expect(shownPayload.interactionType).toBe('shown');
+      // Should NOT have metadata fields (they should not exist in the object)
+      expect(shownPayload).not.toHaveProperty('openEditorsCount');
+      expect(shownPayload).not.toHaveProperty('unsavedFilesCount');
+      expect(shownPayload).not.toHaveProperty('terminalCount');
+      expect(shownPayload).not.toHaveProperty('periodOfDay');
+      expect(shownPayload).not.toHaveProperty('dayOfWeek');
 
-      // Test clicked
+      // Test clicked (SHOULD include metadata)
       await service.reportNotificationInteraction(
         'event-2',
         'clicked',
@@ -1353,11 +1404,16 @@ describe('TelemetryService', () => {
       );
       expect(mockedAxios.post).toHaveBeenLastCalledWith(
         expect.any(String),
-        expect.objectContaining({ interactionType: 'clicked' }),
+        expect.objectContaining({
+          interactionType: 'clicked',
+          openEditorsCount: 3,
+          unsavedFilesCount: 2,
+          terminalCount: 3,
+        }),
         expect.any(Object),
       );
 
-      // Test dismissed
+      // Test dismissed (SHOULD include metadata)
       await service.reportNotificationInteraction(
         'event-3',
         'dismissed',
@@ -1366,11 +1422,34 @@ describe('TelemetryService', () => {
       );
       expect(mockedAxios.post).toHaveBeenLastCalledWith(
         expect.any(String),
-        expect.objectContaining({ interactionType: 'dismissed' }),
+        expect.objectContaining({
+          interactionType: 'dismissed',
+          openEditorsCount: 3,
+          unsavedFilesCount: 2,
+          terminalCount: 3,
+        }),
         expect.any(Object),
       );
 
-      expect(mockedAxios.post).toHaveBeenCalledTimes(3);
+      // Test deferred (SHOULD include metadata)
+      await service.reportNotificationInteraction(
+        'event-4',
+        'deferred',
+        'variant-w',
+        500,
+      );
+      expect(mockedAxios.post).toHaveBeenLastCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          interactionType: 'deferred',
+          openEditorsCount: 3,
+          unsavedFilesCount: 2,
+          terminalCount: 3,
+        }),
+        expect.any(Object),
+      );
+
+      expect(mockedAxios.post).toHaveBeenCalledTimes(4);
     });
 
     it('should skip analytics when telemetry is disabled globally', async () => {
@@ -1450,6 +1529,11 @@ describe('TelemetryService', () => {
         extensionVersion: string;
         vscodeVersion: string;
         platform: string;
+        openEditorsCount?: number;
+        unsavedFilesCount?: number;
+        terminalCount?: number;
+        periodOfDay?: string;
+        dayOfWeek?: string;
       };
 
       expect(payload.developerId).toBe('dev_abcd1234567890ef');
@@ -1461,6 +1545,14 @@ describe('TelemetryService', () => {
       expect(payload.extensionVersion).toBe('3.5.0');
       expect(payload.vscodeVersion).toBe('1.85.0');
       expect(typeof payload.platform).toBe('string');
+      // Check metadata fields are present for clicked interaction
+      expect(payload.openEditorsCount).toBe(3);
+      expect(payload.unsavedFilesCount).toBe(2);
+      expect(payload.terminalCount).toBe(3);
+      expect(payload.periodOfDay).toMatch(/morning|afternoon|evening|night/);
+      expect(payload.dayOfWeek).toMatch(
+        /MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY/,
+      );
     });
 
     it('should use correct API endpoint and headers', async () => {
@@ -1583,6 +1675,8 @@ describe('TelemetryService', () => {
     it('should log correct console messages for each interaction type', async () => {
       const service = createTelemetryService();
 
+      // Clear mocks before each test
+      mockConsoleLog.mockClear();
       await service.reportNotificationInteraction(
         'event-1',
         'shown',
@@ -1592,6 +1686,7 @@ describe('TelemetryService', () => {
         '[Turbo Console Log] Notification interaction (shown) report sent successfully for variant variant-a',
       );
 
+      mockConsoleLog.mockClear();
       await service.reportNotificationInteraction(
         'event-2',
         'clicked',
@@ -1601,6 +1696,7 @@ describe('TelemetryService', () => {
         '[Turbo Console Log] Notification interaction (clicked) report sent successfully for variant variant-b',
       );
 
+      mockConsoleLog.mockClear();
       await service.reportNotificationInteraction(
         'event-3',
         'dismissed',
