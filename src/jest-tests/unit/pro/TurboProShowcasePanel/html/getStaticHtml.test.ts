@@ -40,7 +40,7 @@ describe('getStaticHtml', () => {
   });
 
   it('should generate complete HTML document with static content', () => {
-    const result = getStaticHtml();
+    const result = getStaticHtml(122);
 
     expect(result).toContain('<html>');
     expect(result).toContain('<head>');
@@ -52,7 +52,7 @@ describe('getStaticHtml', () => {
   });
 
   it('should include common styles in head section', () => {
-    const result = getStaticHtml();
+    const result = getStaticHtml(1);
 
     expect(result).toContain('<style>');
     expect(result).toContain('.container { margin: 0; padding: 20px; }');
@@ -61,7 +61,7 @@ describe('getStaticHtml', () => {
   });
 
   it('should include JavaScript at the end of document', () => {
-    const result = getStaticHtml();
+    const result = getStaticHtml(0);
 
     expect(result).toContain('<script>');
     expect(result).toContain('function openUrl(url) { window.open(url); }');
@@ -70,7 +70,7 @@ describe('getStaticHtml', () => {
   });
 
   it('should contain countdown section only if date is in the future', () => {
-    const result = getStaticHtml();
+    const result = getStaticHtml(49);
 
     // Countdown only shows if the target date hasn't passed
     const hasCountdown = result.includes('class="countdown-widget"');
@@ -85,7 +85,7 @@ describe('getStaticHtml', () => {
   });
 
   it('should include countdown onclick handler with correct URL when countdown is present', () => {
-    const result = getStaticHtml();
+    const result = getStaticHtml(33);
 
     const hasCountdown = result.includes('class="countdown-widget"');
 
@@ -97,7 +97,7 @@ describe('getStaticHtml', () => {
   });
 
   it('should maintain proper HTML structure', () => {
-    const result = getStaticHtml();
+    const result = getStaticHtml(7);
 
     // Check structure order
     expect(result.indexOf('<html>')).toBeLessThan(result.indexOf('<head>'));
@@ -114,7 +114,7 @@ describe('getStaticHtml', () => {
       '.custom { color: red; font-size: 14px; }',
     );
 
-    const result = getStaticHtml();
+    const result = getStaticHtml(12);
 
     expect(result).toContain('.custom { color: red; font-size: 14px; }');
   });
@@ -122,13 +122,13 @@ describe('getStaticHtml', () => {
   it('should handle different JavaScript configurations', () => {
     mockGetJavaScript.mockReturnValue('console.log("Custom JS");');
 
-    const result = getStaticHtml();
+    const result = getStaticHtml(10);
 
     expect(result).toContain('console.log("Custom JS");');
   });
 
   it('should contain proper viewport meta tag', () => {
-    const result = getStaticHtml();
+    const result = getStaticHtml(0);
 
     expect(result).toContain(
       '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
@@ -137,6 +137,6 @@ describe('getStaticHtml', () => {
 
   it('should not require any parameters', () => {
     // This test ensures the function signature doesn't change
-    expect(() => getStaticHtml()).not.toThrow();
+    expect(() => getStaticHtml(1)).not.toThrow();
   });
 });

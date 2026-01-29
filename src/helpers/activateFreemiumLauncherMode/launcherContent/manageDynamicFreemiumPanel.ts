@@ -3,7 +3,6 @@ import axios from 'axios';
 import { readFromGlobalState } from '../../readFromGlobalState';
 import { writeToGlobalState } from '../../writeToGlobalState';
 import { GlobalStateKeys } from '../../GlobalStateKeys';
-import { shouldShowBadge } from './shouldShowBadge';
 
 // const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
 const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
@@ -12,11 +11,9 @@ const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
  * Manages dynamic freemium panel content including caching, API fetching, and badge updates
  * Handles 24-hour cache, user access tracking, and intelligent badge display logic
  * @param context VS Code extension context for global storage
- * @param launcherView Tree view instance to update badge
  */
 export async function manageDynamicFreemiumPanel(
   context: vscode.ExtensionContext,
-  launcherView: vscode.TreeView<string> | undefined,
 ): Promise<void> {
   try {
     // Check if dynamic freemium panel setting is enabled
@@ -48,30 +45,6 @@ export async function manageDynamicFreemiumPanel(
           'Dynamic freemium content cache still valid, skipping API call. Last fetch:',
           lastFetch,
         );
-
-        // Check if user has already seen the current content
-        const existingContent = readFromGlobalState(
-          context,
-          GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_CONTENT,
-        ) as { date?: string; tooltip?: string } | undefined;
-
-        const lastPanelAccess = readFromGlobalState(
-          context,
-          GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_LAST_ACCESS,
-        ) as string | undefined;
-
-        // Only show badge if content exists with valid date and user hasn't seen it yet
-        if (
-          existingContent &&
-          existingContent.date &&
-          launcherView &&
-          shouldShowBadge(existingContent.date, lastPanelAccess)
-        ) {
-          launcherView.badge = {
-            value: 1,
-            tooltip: existingContent.tooltip || 'New content in Turbo panel',
-          };
-        }
         return;
       }
     }
@@ -85,7 +58,7 @@ export async function manageDynamicFreemiumPanel(
       },
     );
 
-    if (response.data && launcherView) {
+    if (response.data) {
       // Get previously stored content to compare dates
       const previousContent = readFromGlobalState(
         context,
@@ -111,12 +84,6 @@ export async function manageDynamicFreemiumPanel(
           'Dynamic freemium content updated with new date:',
           new Date(newContentDate),
         );
-
-        // For genuinely new content, always show badge regardless of last access
-        launcherView.badge = {
-          value: 1,
-          tooltip: response.data.tooltip || 'New content in Turbo panel',
-        };
       } else {
         console.info(
           'Dynamic freemium content unchanged, badge state preserved from previous cycles',

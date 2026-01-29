@@ -4,7 +4,6 @@ export enum NotificationEvent {
   EXTENSION_PHP_PRO_ONLY = 'extensionPhpProOnly',
   EXTENSION_RELEASE_ANNOUNCEMENT = 'extensionReleaseAnnouncement',
   // Ignore notifications if in cooldown period
-  EXTENSION_THREE_DAY_STREAK = 'extensionThreeDayStreak',
   EXTENSION_MULTI_FILE_LOGS = 'extensionMultiFileLogs',
   EXTENSION_TEN_INSERTS = 'extensionTenInserts',
   EXTENSION_TWENTY_INSERTS = 'extensionTwentyInserts',
@@ -26,4 +25,5 @@ export enum NotificationEvent {
   EXTENSION_COMMIT_WITH_LOGS = 'extensionCommitWithLogs',
   EXTENSION_CUSTOM_LOG_LIBRARY = 'extensionCustomLogLibrary',
   EXTENSION_LOGS_IN_TEST_FILE = 'extensionLogsInTestFile',
+  EXTENSION_WORKSPACE_LOG_THRESHOLD = 'extensionWorkspaceLogThreshold',
 }

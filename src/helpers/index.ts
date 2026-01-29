@@ -8,7 +8,6 @@ import { activateRepairMode } from './activateRepairMode';
 import { activateProMode } from './activateProMode';
 import { deactivateRepairMode } from './deactivateRepairMode';
 import { trackLogInsertions } from './trackLogInsertions';
-import { trackStreakDays } from './trackStreakDays';
 import { trackLogManagementCommands } from './trackLogManagementCommands';
 import { isProUser } from './isProUser';
 import { isPhpFile } from './isPhpFile';
@@ -32,6 +31,7 @@ import { showReleaseNotification } from './showReleaseNotification';
 import { updateUserActivityStatus } from './updateUserActivityStatus';
 import { getUserActivityStatus } from './getUserActivityStatus';
 import { listenToManualConsoleLogs } from './listenToManualConsoleLogs';
+import { initialWorkspaceLogsCount } from './initialWorkspaceLogsCount/initialWorkspaceLogsCount';
 export {
   readFromGlobalState,
   writeToGlobalState,
@@ -43,7 +43,6 @@ export {
   activateRepairMode,
   deactivateRepairMode,
   trackLogInsertions,
-  trackStreakDays,
   trackLogManagementCommands,
   isProUser,
   isJavaScriptOrTypeScriptFile,
@@ -66,4 +65,5 @@ export {
   updateUserActivityStatus,
   getUserActivityStatus,
   listenToManualConsoleLogs,
+  initialWorkspaceLogsCount,
 };

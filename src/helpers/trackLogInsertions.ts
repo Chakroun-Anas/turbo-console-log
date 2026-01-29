@@ -1,10 +1,5 @@
 import * as vscode from 'vscode';
-import {
-  readFromGlobalState,
-  writeToGlobalState,
-  isProUser,
-  trackStreakDays,
-} from './index';
+import { readFromGlobalState, writeToGlobalState, isProUser } from './index';
 import { GlobalStateKey } from '@/entities';
 import { showNotification } from '../notifications/showNotification';
 import { NotificationEvent } from '../notifications/NotificationEvent';
@@ -50,10 +45,6 @@ export async function trackLogInsertions(
     commandUsageCount,
   );
 
-  // Track daily usage streak BEFORE updating last insertion date
-  // This allows proper comparison of today vs last insertion date
-  const streakCount = trackStreakDays(context);
-
   // Update last insertion date AFTER tracking streak
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -72,31 +63,6 @@ export async function trackLogInsertions(
   const activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
     filesWithLogsInSession.add(activeEditor.document.uri.toString());
-  }
-
-  // Check if user has reached 3-day streak (curiosity-driven Pro teaser)
-  const hasShownThreeDayStreakNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_THREE_DAY_STREAK_NOTIFICATION,
-  );
-
-  if (!hasShownThreeDayStreakNotification && streakCount >= 3) {
-    // Show three-day streak notification (non-blocking) with version info
-    const wasShown = await showNotification(
-      NotificationEvent.EXTENSION_THREE_DAY_STREAK,
-      version,
-      context,
-    );
-
-    // Only mark as shown if it was actually displayed (not blocked by cooldown)
-    if (wasShown) {
-      writeToGlobalState(
-        context,
-        GlobalStateKey.HAS_SHOWN_THREE_DAY_STREAK_NOTIFICATION,
-        true,
-      );
-    }
-    return;
   }
 
   // Check if user has inserted logs in 3+ files in current session (pain-point driven conversion)

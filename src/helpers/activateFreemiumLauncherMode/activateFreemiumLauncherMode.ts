@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import { activateFreemiumMode } from '../activeFreemiumMode';
-import { TurboFreemiumLauncherPanel } from '../../pro/TurboFreemiumLauncherPanel';
 import { manageDynamicFreemiumPanel } from './launcherContent';
 import { writeToGlobalState } from '../writeToGlobalState';
 import { GlobalStateKeys } from '../GlobalStateKeys';
@@ -9,19 +8,10 @@ import { trackPanelOpenings } from '../trackPanelOpenings';
 
 export function activateFreemiumLauncherMode(
   context: vscode.ExtensionContext,
-  freemiumLauncherProvider: TurboFreemiumLauncherPanel,
+  launcherView: vscode.TreeView<string>,
 ): void {
-  // Create tree view to get badge functionality
-  const launcherView = vscode.window.createTreeView(
-    TurboFreemiumLauncherPanel.viewType,
-    {
-      treeDataProvider: freemiumLauncherProvider,
-    },
-  );
-
   // Initialize badge with 0 and manage dynamic content if setting is enabled
-  launcherView.badge = { value: 0, tooltip: 'New content in Turbo panel' };
-  manageDynamicFreemiumPanel(context, launcherView);
+  manageDynamicFreemiumPanel(context);
 
   const launcherVisibilityDisposable = launcherView.onDidChangeVisibility(
     async (e: vscode.TreeViewVisibilityChangeEvent) => {
@@ -33,11 +23,6 @@ export function activateFreemiumLauncherMode(
 
       // Track panel openings for notification triggers
       trackPanelOpenings(context);
-
-      // remove the badge (user has "seen" it)
-      if (launcherView) {
-        launcherView.badge = undefined;
-      }
 
       // Store the current time as the last panel access date
       // This prevents showing the badge again for the same content

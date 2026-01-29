@@ -3,12 +3,7 @@ import {
   trackLogInsertions,
   clearFilesWithLogsInSession,
 } from '@/helpers/trackLogInsertions';
-import {
-  readFromGlobalState,
-  writeToGlobalState,
-  isProUser,
-  trackStreakDays,
-} from '@/helpers';
+import { readFromGlobalState, writeToGlobalState, isProUser } from '@/helpers';
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
 import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
@@ -18,7 +13,6 @@ jest.mock('@/helpers', () => ({
   readFromGlobalState: jest.fn(),
   writeToGlobalState: jest.fn(),
   isProUser: jest.fn(),
-  trackStreakDays: jest.fn(),
 }));
 
 jest.mock('@/notifications/showNotification', () => ({
@@ -33,9 +27,6 @@ describe('trackLogInsertions', () => {
     typeof writeToGlobalState
   >;
   const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
-  const mockTrackStreakDays = trackStreakDays as jest.MockedFunction<
-    typeof trackStreakDays
-  >;
   const mockShowNotification = showNotification as jest.MockedFunction<
     typeof showNotification
   >;
@@ -45,8 +36,6 @@ describe('trackLogInsertions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockContext = makeExtensionContext();
-    // Default: return streak count of 1 (no special behavior)
-    mockTrackStreakDays.mockReturnValue(1);
     // Default: no active editor (prevents multi-file tracking interference)
     Object.defineProperty(vscode.window, 'activeTextEditor', {
       value: undefined,
@@ -191,128 +180,6 @@ describe('trackLogInsertions', () => {
       expect(mockShowNotification).not.toHaveBeenCalled();
     });
 
-    describe('when reaching 3-day streak', () => {
-      beforeEach(() => {
-        mockReadFromGlobalState.mockImplementation((context, key) => {
-          if (key === 'COMMAND_USAGE_COUNT') return 5;
-          if (key === 'HAS_SHOWN_THREE_DAY_STREAK_NOTIFICATION') return false;
-          return undefined;
-        });
-        // Mock trackStreakDays to return 3
-        mockTrackStreakDays.mockReturnValue(3);
-      });
-
-      it('should show three-day streak notification at exactly 3 days', async () => {
-        await trackLogInsertions(mockContext);
-
-        expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_THREE_DAY_STREAK,
-          '3.0.0',
-          mockContext,
-        );
-      });
-
-      it('should show three-day streak notification even if streak was missed', async () => {
-        // Mock trackStreakDays to return 5 (missed the 3-day mark)
-        mockTrackStreakDays.mockReturnValue(5);
-
-        await trackLogInsertions(mockContext);
-
-        expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_THREE_DAY_STREAK,
-          '3.0.0',
-          mockContext,
-        );
-      });
-
-      it('should mark notification as shown only when actually displayed', async () => {
-        // Mock showNotification to return true (notification was shown)
-        mockShowNotification.mockResolvedValue(true);
-
-        await trackLogInsertions(mockContext);
-
-        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-          mockContext,
-          'HAS_SHOWN_THREE_DAY_STREAK_NOTIFICATION',
-          true,
-        );
-      });
-
-      it('should not mark notification as shown when blocked by cooldown', async () => {
-        // Mock showNotification to return false (blocked by cooldown)
-        mockShowNotification.mockResolvedValue(false);
-
-        await trackLogInsertions(mockContext);
-
-        // Should have two calls: incrementing counter + updating last insertion date
-        expect(mockWriteToGlobalState).toHaveBeenCalledTimes(2);
-        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-          mockContext,
-          'COMMAND_USAGE_COUNT',
-          6,
-        );
-        expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-          mockContext,
-          'LAST_INSERTION_DATE',
-          expect.any(Number),
-        );
-      });
-
-      it('should take priority over milestone notifications', async () => {
-        mockReadFromGlobalState.mockImplementation((context, key) => {
-          if (key === 'COMMAND_USAGE_COUNT') return 9; // Will become 10, milestone eligible
-          if (key === 'HAS_SHOWN_THREE_DAY_STREAK_NOTIFICATION') return false;
-          if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
-            return false;
-          return undefined;
-        });
-        mockTrackStreakDays.mockReturnValue(3);
-        mockShowNotification.mockResolvedValue(true);
-
-        await trackLogInsertions(mockContext);
-
-        // Should show streak notification, not milestone notification
-        expect(mockShowNotification).toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_THREE_DAY_STREAK,
-          '3.0.0',
-          mockContext,
-        );
-        expect(mockShowNotification).not.toHaveBeenCalledWith(
-          NotificationEvent.EXTENSION_TEN_INSERTS,
-          '3.0.0',
-          mockContext,
-        );
-      });
-    });
-
-    describe('when user has already seen three-day streak notification', () => {
-      beforeEach(() => {
-        mockReadFromGlobalState.mockImplementation((context, key) => {
-          if (key === 'COMMAND_USAGE_COUNT') return 5;
-          if (key === 'HAS_SHOWN_THREE_DAY_STREAK_NOTIFICATION') return true;
-          if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
-            return false;
-          return undefined;
-        });
-        // Mock trackStreakDays to return 3 or higher
-        mockTrackStreakDays.mockReturnValue(3);
-      });
-
-      it('should not show three-day streak notification again even with streak >= 3', async () => {
-        await trackLogInsertions(mockContext);
-
-        expect(mockShowNotification).not.toHaveBeenCalled();
-      });
-
-      it('should not show notification even when streak count is higher', async () => {
-        mockTrackStreakDays.mockReturnValue(10);
-
-        await trackLogInsertions(mockContext);
-
-        expect(mockShowNotification).not.toHaveBeenCalled();
-      });
-    });
-
     describe('when reaching 3+ files with logs in session', () => {
       let mockActiveEditor: vscode.TextEditor;
       let mockDocument1: vscode.TextDocument;
@@ -333,13 +200,11 @@ describe('trackLogInsertions', () => {
 
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 5;
-          if (key === 'HAS_SHOWN_THREE_DAY_STREAK_NOTIFICATION') return true;
           if (key === 'HAS_SHOWN_MULTI_FILE_LOGS_NOTIFICATION') return false;
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return false;
           return undefined;
         });
-        mockTrackStreakDays.mockReturnValue(1);
       });
 
       it('should show multi-file logs notification when 3rd file is logged', async () => {
@@ -448,7 +313,6 @@ describe('trackLogInsertions', () => {
 
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return commandCount;
-          if (key === 'HAS_SHOWN_THREE_DAY_STREAK_NOTIFICATION') return true;
           if (key === 'HAS_SHOWN_MULTI_FILE_LOGS_NOTIFICATION')
             return multiFileNotificationShown;
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
@@ -512,7 +376,6 @@ describe('trackLogInsertions', () => {
       beforeEach(() => {
         mockReadFromGlobalState.mockImplementation((context, key) => {
           if (key === 'COMMAND_USAGE_COUNT') return 5;
-          if (key === 'HAS_SHOWN_THREE_DAY_STREAK_NOTIFICATION') return true;
           if (key === 'HAS_SHOWN_MULTI_FILE_LOGS_NOTIFICATION') return true;
           if (key === 'HAS_SHOWN_TEN_INSERTS_MILESTONE_NOTIFICATION')
             return false;

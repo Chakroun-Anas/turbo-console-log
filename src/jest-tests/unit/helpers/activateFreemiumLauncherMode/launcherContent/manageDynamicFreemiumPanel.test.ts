@@ -4,15 +4,11 @@ import axios from 'axios';
 import { readFromGlobalState } from '@/helpers/readFromGlobalState';
 import { writeToGlobalState } from '@/helpers/writeToGlobalState';
 import { GlobalStateKeys } from '@/helpers/GlobalStateKeys';
-import { shouldShowBadge } from '@/helpers/activateFreemiumLauncherMode/launcherContent/shouldShowBadge';
 
 // Mock all dependencies
 jest.mock('axios');
 jest.mock('@/helpers/readFromGlobalState');
 jest.mock('@/helpers/writeToGlobalState');
-jest.mock(
-  '@/helpers/activateFreemiumLauncherMode/launcherContent/shouldShowBadge',
-);
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
@@ -21,16 +17,12 @@ const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
 const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
   typeof writeToGlobalState
 >;
-const mockShouldShowBadge = shouldShowBadge as jest.MockedFunction<
-  typeof shouldShowBadge
->;
 
 describe('manageDynamicFreemiumPanel', () => {
   let consoleSpy: jest.SpyInstance;
   let consoleInfoSpy: jest.SpyInstance;
   let consoleErrorSpy: jest.SpyInstance;
   let mockContext: vscode.ExtensionContext;
-  let mockTreeView: jest.Mocked<vscode.TreeView<string>>;
   let mockConfig: jest.Mocked<vscode.WorkspaceConfiguration>;
 
   beforeEach(() => {
@@ -42,11 +34,6 @@ describe('manageDynamicFreemiumPanel', () => {
 
     // Mock VS Code context
     mockContext = {} as vscode.ExtensionContext;
-
-    // Mock TreeView
-    mockTreeView = {
-      badge: undefined,
-    } as jest.Mocked<vscode.TreeView<string>>;
 
     // Mock VS Code configuration
     mockConfig = {
@@ -61,7 +48,6 @@ describe('manageDynamicFreemiumPanel', () => {
 
     // Default mock values
     mockReadFromGlobalState.mockReturnValue(undefined);
-    mockShouldShowBadge.mockReturnValue(false);
   });
 
   afterEach(() => {
@@ -74,7 +60,7 @@ describe('manageDynamicFreemiumPanel', () => {
     it('should exit early when dynamic freemium panel is disabled', async () => {
       mockConfig.get.mockReturnValue(false);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(mockConfig.get).toHaveBeenCalledWith('dynamicFreemiumPanel', true);
       expect(mockReadFromGlobalState).not.toHaveBeenCalled();
@@ -84,7 +70,7 @@ describe('manageDynamicFreemiumPanel', () => {
     it('should proceed when dynamic freemium panel is enabled', async () => {
       mockConfig.get.mockReturnValue(true);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(mockConfig.get).toHaveBeenCalledWith('dynamicFreemiumPanel', true);
       expect(mockReadFromGlobalState).toHaveBeenCalled();
@@ -101,19 +87,13 @@ describe('manageDynamicFreemiumPanel', () => {
         .mockReturnValueOnce({ date: '2025-09-27', tooltip: 'Cached content' }) // Existing content
         .mockReturnValueOnce('2025-09-26'); // Last panel access
 
-      mockShouldShowBadge.mockReturnValue(true);
-
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(consoleInfoSpy).toHaveBeenCalledWith(
         'Dynamic freemium content cache still valid, skipping API call. Last fetch:',
         recentFetch,
       );
       expect(mockedAxios.get).not.toHaveBeenCalled();
-      expect(mockTreeView.badge).toEqual({
-        value: 1,
-        tooltip: 'Cached content',
-      });
     });
 
     it('should fetch new content when cache is expired', async () => {
@@ -125,14 +105,12 @@ describe('manageDynamicFreemiumPanel', () => {
       const mockResponse = {
         data: {
           date: '2025-09-27',
-          tooltip: 'Fresh content',
           content: [],
         },
       };
       mockedAxios.get.mockResolvedValue(mockResponse);
-      mockShouldShowBadge.mockReturnValue(false);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(consoleInfoSpy).toHaveBeenCalledWith(
         'Fetching dynamic freemium content from API...',
@@ -149,14 +127,12 @@ describe('manageDynamicFreemiumPanel', () => {
       const mockResponse = {
         data: {
           date: '2025-09-27',
-          tooltip: 'First time content',
           content: [],
         },
       };
       mockedAxios.get.mockResolvedValue(mockResponse);
-      mockShouldShowBadge.mockReturnValue(true);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(mockedAxios.get).toHaveBeenCalled();
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
@@ -176,7 +152,7 @@ describe('manageDynamicFreemiumPanel', () => {
       };
       mockedAxios.get.mockResolvedValue(mockResponse);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(mockedAxios.get).toHaveBeenCalledWith(
         'https://www.turboconsolelog.io/api/dynamicFreemiumPanel',
@@ -190,14 +166,13 @@ describe('manageDynamicFreemiumPanel', () => {
       const apiError = new Error('Network timeout');
       mockedAxios.get.mockRejectedValue(apiError);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Failed to fetch dynamic freemium content:',
         apiError,
       );
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-      expect(mockTreeView.badge).toBeUndefined();
     });
   });
 
@@ -210,13 +185,11 @@ describe('manageDynamicFreemiumPanel', () => {
 
       const newContent = {
         date: '2025-09-27',
-        tooltip: 'Updated content',
         content: [],
       };
       mockedAxios.get.mockResolvedValue({ data: newContent });
-      mockShouldShowBadge.mockReturnValue(false);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,
@@ -237,12 +210,11 @@ describe('manageDynamicFreemiumPanel', () => {
 
       const sameContent = {
         date: '2025-09-27',
-        tooltip: 'Same content',
         content: [],
       };
       mockedAxios.get.mockResolvedValue({ data: sameContent });
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
         mockContext,
@@ -255,113 +227,18 @@ describe('manageDynamicFreemiumPanel', () => {
     });
   });
 
-  describe('Badge Management', () => {
-    it('should show badge when shouldShowBadge returns true', async () => {
-      mockReadFromGlobalState.mockReturnValue(undefined);
-
-      const mockResponse = {
-        data: {
-          date: '2025-09-27',
-          tooltip: 'New content available',
-          content: [],
-        },
-      };
-      mockedAxios.get.mockResolvedValue(mockResponse);
-      mockShouldShowBadge.mockReturnValue(true);
-
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
-
-      expect(mockTreeView.badge).toEqual({
-        value: 1,
-        tooltip: 'New content available',
-      });
-    });
-
-    it('should not show badge when content unchanged and shouldShowBadge returns false', async () => {
-      // Mock existing content with same date
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (key === GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_CONTENT) {
-          return { date: '2025-09-27', tooltip: 'Existing content' };
-        }
-        return undefined;
-      });
-
-      const mockResponse = {
-        data: {
-          date: '2025-09-27', // Same date as existing
-          tooltip: 'Already seen content',
-          content: [],
-        },
-      };
-      mockedAxios.get.mockResolvedValue(mockResponse);
-      mockShouldShowBadge.mockReturnValue(false);
-
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
-
-      // Badge should not be set when content is unchanged
-      expect(mockTreeView.badge).toBeUndefined();
-    });
-
-    it('should use default tooltip when none provided', async () => {
-      mockReadFromGlobalState.mockReturnValue(undefined);
-
-      const mockResponse = {
-        data: {
-          date: '2025-09-27',
-          content: [],
-        },
-      };
-      mockedAxios.get.mockResolvedValue(mockResponse);
-      mockShouldShowBadge.mockReturnValue(true);
-
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
-
-      expect(mockTreeView.badge).toEqual({
-        value: 1,
-        tooltip: 'New content in Turbo panel',
-      });
-    });
-
-    it('should handle undefined launcherView gracefully', async () => {
-      mockReadFromGlobalState.mockReturnValue(undefined);
-
-      const mockResponse = {
-        data: { date: '2025-09-27', tooltip: 'Content', content: [] },
-      };
-      mockedAxios.get.mockResolvedValue(mockResponse);
-
-      // Test with undefined launcherView
-      await manageDynamicFreemiumPanel(mockContext, undefined);
-
-      // Should not crash but won't update storage due to launcherView check
-      expect(mockedAxios.get).toHaveBeenCalled();
-      expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    });
-  });
-
   describe('Global State Management', () => {
-    it('should read all required global state keys', async () => {
+    it('should read last fetch date from global state', async () => {
       const now = new Date();
       const recentFetch = new Date(now.getTime() - 12 * 60 * 60 * 1000);
 
-      mockReadFromGlobalState
-        .mockReturnValueOnce(recentFetch.toISOString())
-        .mockReturnValueOnce({ date: '2025-09-27', tooltip: 'Content' })
-        .mockReturnValueOnce('2025-09-26');
+      mockReadFromGlobalState.mockReturnValueOnce(recentFetch.toISOString());
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(mockReadFromGlobalState).toHaveBeenCalledWith(
         mockContext,
         GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_LAST_FETCH,
-      );
-      expect(mockReadFromGlobalState).toHaveBeenCalledWith(
-        mockContext,
-        GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_CONTENT,
-      );
-      expect(mockReadFromGlobalState).toHaveBeenCalledWith(
-        mockContext,
-        GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_LAST_ACCESS,
       );
     });
 
@@ -373,7 +250,7 @@ describe('manageDynamicFreemiumPanel', () => {
       };
       mockedAxios.get.mockResolvedValue(mockResponse);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,
@@ -392,7 +269,7 @@ describe('manageDynamicFreemiumPanel', () => {
       };
       mockedAxios.get.mockResolvedValue(mockResponse);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       // Should proceed to make API call when cache date is invalid
       expect(mockedAxios.get).toHaveBeenCalled();
@@ -404,7 +281,7 @@ describe('manageDynamicFreemiumPanel', () => {
       // API returns empty response
       mockedAxios.get.mockResolvedValue({});
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
         mockContext,
@@ -419,93 +296,12 @@ describe('manageDynamicFreemiumPanel', () => {
       const timeoutError = new Error('timeout of 10000ms exceeded');
       mockedAxios.get.mockRejectedValue(timeoutError);
 
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
+      await manageDynamicFreemiumPanel(mockContext);
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Failed to fetch dynamic freemium content:',
         timeoutError,
       );
-    });
-
-    it('should handle shouldShowBadge function calls correctly', async () => {
-      const now = new Date();
-      const recentFetch = new Date(now.getTime() - 12 * 60 * 60 * 1000);
-      const contentDate = '2025-09-27';
-      const lastAccess = '2025-09-26';
-
-      mockReadFromGlobalState
-        .mockReturnValueOnce(recentFetch.toISOString())
-        .mockReturnValueOnce({ date: contentDate, tooltip: 'Test' })
-        .mockReturnValueOnce(lastAccess);
-
-      mockShouldShowBadge.mockReturnValue(true);
-
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
-
-      expect(mockShouldShowBadge).toHaveBeenCalledWith(contentDate, lastAccess);
-    });
-  });
-
-  describe('Integration Scenarios', () => {
-    it('should handle complete fresh install flow', async () => {
-      // Simulate fresh install - no cache, no previous content
-      mockReadFromGlobalState.mockReturnValue(undefined);
-
-      const freshContent = {
-        date: '2025-09-27',
-        tooltip: 'Welcome to Turbo Console Log Pro!',
-        content: [{ type: 'paragraph', component: { title: 'Welcome' } }],
-      };
-      mockedAxios.get.mockResolvedValue({ data: freshContent });
-      mockShouldShowBadge.mockReturnValue(true);
-
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
-
-      // Should fetch from API
-      expect(mockedAxios.get).toHaveBeenCalled();
-
-      // Should store new content
-      expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-        mockContext,
-        GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_CONTENT,
-        freshContent,
-      );
-
-      // Should update fetch date
-      expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-        mockContext,
-        GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_LAST_FETCH,
-        expect.any(String),
-      );
-
-      // Should show badge
-      expect(mockTreeView.badge).toEqual({
-        value: 1,
-        tooltip: 'Welcome to Turbo Console Log Pro!',
-      });
-    });
-
-    it('should handle returning user with seen content', async () => {
-      // Simulate returning user with recent cache and already seen content
-      const now = new Date();
-      const recentFetch = new Date(now.getTime() - 6 * 60 * 60 * 1000); // 6 hours ago
-      const contentDate = '2025-09-27';
-      const recentAccess = new Date().toISOString(); // Just accessed
-
-      mockReadFromGlobalState
-        .mockReturnValueOnce(recentFetch.toISOString())
-        .mockReturnValueOnce({ date: contentDate, tooltip: 'Existing content' })
-        .mockReturnValueOnce(recentAccess);
-
-      mockShouldShowBadge.mockReturnValue(false); // Already seen
-
-      await manageDynamicFreemiumPanel(mockContext, mockTreeView);
-
-      // Should use cache
-      expect(mockedAxios.get).not.toHaveBeenCalled();
-
-      // Should not show badge
-      expect(mockTreeView.badge).toBeUndefined();
     });
   });
 });

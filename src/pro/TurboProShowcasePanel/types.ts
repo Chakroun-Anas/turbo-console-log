@@ -63,6 +63,12 @@ export interface YouTubeVideoPanelComponent {
   startTime?: number; // Start time in seconds
 }
 
+export interface WorkspaceLogCountComponent {
+  logCount: number;
+  title: string;
+  description: string;
+}
+
 export type FreemiumPanelComponent =
   | ParagraphPanelComponent
   | ArticlePanelComponent
@@ -71,7 +77,8 @@ export type FreemiumPanelComponent =
   | TablePanelComponent
   | MediaShowcaseCTAPanelComponent
   | VideoPanelComponent
-  | YouTubeVideoPanelComponent;
+  | YouTubeVideoPanelComponent
+  | WorkspaceLogCountComponent;
 
 export type DynamicFreemiumPanelContentType =
   | 'paragraph'
@@ -81,7 +88,8 @@ export type DynamicFreemiumPanelContentType =
   | 'table'
   | 'media-showcase-cta'
   | 'video'
-  | 'youtube-video';
+  | 'youtube-video'
+  | 'workspace-log-count';
 
 export interface DynamicFreemiumPanelContent {
   type: DynamicFreemiumPanelContentType;

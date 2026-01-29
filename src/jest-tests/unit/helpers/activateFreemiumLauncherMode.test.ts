@@ -1,7 +1,6 @@
 import { activateFreemiumLauncherMode } from '@/helpers/activateFreemiumLauncherMode';
 import * as vscode from 'vscode';
 import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
-import { TurboFreemiumLauncherPanel } from '@/pro/TurboFreemiumLauncherPanel';
 import { activateFreemiumMode } from '@/helpers/activeFreemiumMode';
 import { manageDynamicFreemiumPanel } from '@/helpers/activateFreemiumLauncherMode/launcherContent/manageDynamicFreemiumPanel';
 import { writeToGlobalState } from '@/helpers/writeToGlobalState';
@@ -48,13 +47,11 @@ mockCreateTelemetryService.mockReturnValue(mockTelemetryService);
 describe('activateFreemiumLauncherMode', () => {
   let consoleSpy: jest.SpyInstance;
   let context: vscode.ExtensionContext;
-  let mockFreemiumLauncherProvider: TurboFreemiumLauncherPanel;
   let mockTreeView: jest.Mocked<vscode.TreeView<string>>;
   let mockVisibilityDisposable: jest.Mocked<vscode.Disposable>;
   let visibilityChangeHandler: (
     e: vscode.TreeViewVisibilityChangeEvent,
   ) => void;
-  let createTreeViewSpy: jest.SpyInstance;
   let executeCommandSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -66,13 +63,6 @@ describe('activateFreemiumLauncherMode', () => {
     mockCreateTelemetryService.mockReturnValue(mockTelemetryService);
 
     context = makeExtensionContext();
-
-    mockFreemiumLauncherProvider = {
-      getTreeItem: jest.fn(),
-      getChildren: jest.fn(),
-      refresh: jest.fn(),
-      onDidChangeTreeData: jest.fn(),
-    } as unknown as TurboFreemiumLauncherPanel;
 
     // Mock visibility change disposable
     mockVisibilityDisposable = {
@@ -105,9 +95,6 @@ describe('activateFreemiumLauncherMode', () => {
     });
 
     // Mock VS Code API calls
-    createTreeViewSpy = jest
-      .spyOn(vscode.window, 'createTreeView')
-      .mockReturnValue(mockTreeView);
     executeCommandSpy = jest
       .spyOn(vscode.commands, 'executeCommand')
       .mockResolvedValue(undefined);
@@ -117,54 +104,38 @@ describe('activateFreemiumLauncherMode', () => {
     consoleSpy.mockRestore();
   });
 
-  describe('Tree View Creation', () => {
-    it('should create tree view with correct view type and provider', () => {
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+  describe('Initialization', () => {
+    it('should not create tree view (receives it as parameter)', () => {
+      activateFreemiumLauncherMode(context, mockTreeView);
 
-      expect(createTreeViewSpy).toHaveBeenCalledWith(
-        TurboFreemiumLauncherPanel.viewType,
-        {
-          treeDataProvider: mockFreemiumLauncherProvider,
-        },
-      );
+      // Function receives tree view, doesn't create it
+      expect(mockTreeView).toBeDefined();
     });
 
-    it('should initialize badge with correct default values', () => {
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+    it('should call manageDynamicFreemiumPanel with context', () => {
+      activateFreemiumLauncherMode(context, mockTreeView);
 
-      expect(mockTreeView.badge).toEqual({
-        value: 0,
-        tooltip: 'New content in Turbo panel',
-      });
+      expect(mockManageDynamicFreemiumPanel).toHaveBeenCalledWith(context);
     });
 
-    it('should call manageDynamicFreemiumPanel with context and tree view', () => {
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+    it('should register visibility change handler', () => {
+      activateFreemiumLauncherMode(context, mockTreeView);
 
-      expect(mockManageDynamicFreemiumPanel).toHaveBeenCalledWith(
-        context,
-        mockTreeView,
+      expect(mockTreeView.onDidChangeVisibility).toHaveBeenCalledWith(
+        expect.any(Function),
       );
     });
   });
 
   describe('Visibility Change Handler', () => {
     beforeEach(() => {
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+      activateFreemiumLauncherMode(context, mockTreeView);
     });
 
     it('should register visibility change event handler', () => {
       expect(mockTreeView.onDidChangeVisibility).toHaveBeenCalledWith(
         expect.any(Function),
       );
-    });
-
-    it('should remove badge when view becomes visible', () => {
-      mockTreeView.badge = { value: 1, tooltip: 'Test content' };
-
-      visibilityChangeHandler({ visible: true });
-
-      expect(mockTreeView.badge).toBeUndefined();
     });
 
     it('should write last access time to global state when view becomes visible', () => {
@@ -197,7 +168,6 @@ describe('activateFreemiumLauncherMode', () => {
     it('should not process visibility change when view is not visible', () => {
       visibilityChangeHandler({ visible: false });
 
-      expect(mockTreeView.badge).not.toBeUndefined();
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
       expect(mockActivateFreemiumMode).not.toHaveBeenCalled();
     });
@@ -270,7 +240,7 @@ describe('activateFreemiumLauncherMode', () => {
 
   describe('Context Variable Management', () => {
     it('should set correct context variables for launcher mode', () => {
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+      activateFreemiumLauncherMode(context, mockTreeView);
 
       expect(executeCommandSpy).toHaveBeenCalledWith(
         'setContext',
@@ -295,7 +265,7 @@ describe('activateFreemiumLauncherMode', () => {
     });
 
     it('should set context variables in correct order', () => {
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+      activateFreemiumLauncherMode(context, mockTreeView);
 
       const calls = executeCommandSpy.mock.calls.filter(
         (call) =>
@@ -326,7 +296,7 @@ describe('activateFreemiumLauncherMode', () => {
     it('should add visibility disposable to context subscriptions', () => {
       const initialSubscriptionsLength = context.subscriptions.length;
 
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+      activateFreemiumLauncherMode(context, mockTreeView);
 
       expect(context.subscriptions.length).toBe(initialSubscriptionsLength + 1);
       expect(context.subscriptions).toContain(mockVisibilityDisposable);
@@ -334,23 +304,13 @@ describe('activateFreemiumLauncherMode', () => {
   });
 
   describe('Error Handling', () => {
-    it('should handle createTreeView errors gracefully', () => {
-      createTreeViewSpy.mockImplementation(() => {
-        throw new Error('Failed to create tree view');
-      });
-
-      expect(() => {
-        activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
-      }).toThrow('Failed to create tree view');
-    });
-
     it('should handle manageDynamicFreemiumPanel errors gracefully', () => {
       mockManageDynamicFreemiumPanel.mockImplementation(() => {
         throw new Error('Dynamic panel error');
       });
 
       expect(() => {
-        activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+        activateFreemiumLauncherMode(context, mockTreeView);
       }).toThrow('Dynamic panel error');
     });
 
@@ -361,25 +321,28 @@ describe('activateFreemiumLauncherMode', () => {
 
       // The function will throw if executeCommand throws
       expect(() => {
-        activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+        activateFreemiumLauncherMode(context, mockTreeView);
       }).toThrow('Command execution failed');
+    });
+
+    it('should handle visibility handler registration errors', () => {
+      mockTreeView.onDidChangeVisibility.mockImplementation(() => {
+        throw new Error('Failed to register visibility handler');
+      });
+
+      expect(() => {
+        activateFreemiumLauncherMode(context, mockTreeView);
+      }).toThrow('Failed to register visibility handler');
     });
   });
 
   describe('Integration Scenarios', () => {
     it('should handle complete activation flow', () => {
       // Activate launcher mode
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+      activateFreemiumLauncherMode(context, mockTreeView);
 
-      // Verify initial state
-      expect(mockTreeView.badge).toEqual({
-        value: 0,
-        tooltip: 'New content in Turbo panel',
-      });
-      expect(mockManageDynamicFreemiumPanel).toHaveBeenCalledWith(
-        context,
-        mockTreeView,
-      );
+      // Verify manageDynamicFreemiumPanel was called
+      expect(mockManageDynamicFreemiumPanel).toHaveBeenCalledWith(context);
 
       // Simulate user viewing the panel
       visibilityChangeHandler({ visible: true });
@@ -395,7 +358,7 @@ describe('activateFreemiumLauncherMode', () => {
     });
 
     it('should handle visibility changes correctly including false values', () => {
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+      activateFreemiumLauncherMode(context, mockTreeView);
 
       // Test that visible: false is ignored
       visibilityChangeHandler({ visible: false });
@@ -410,46 +373,44 @@ describe('activateFreemiumLauncherMode', () => {
 
     it('should handle multiple independent function calls', () => {
       // First call
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
-      expect(createTreeViewSpy).toHaveBeenCalledTimes(1);
+      activateFreemiumLauncherMode(context, mockTreeView);
+      expect(mockTreeView.onDidChangeVisibility).toHaveBeenCalledTimes(1);
 
-      // Second call creates a new tree view (each call is independent)
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
-      expect(createTreeViewSpy).toHaveBeenCalledTimes(2); // Called twice independently
+      // Second call uses same tree view (passed as parameter)
+      activateFreemiumLauncherMode(context, mockTreeView);
+      expect(mockTreeView.onDidChangeVisibility).toHaveBeenCalledTimes(2);
     });
   });
 
-  describe('TurboFreemiumLauncherPanel Integration', () => {
-    it('should use TurboFreemiumLauncherPanel.viewType for tree view creation', () => {
-      // Mock the static property
-      const originalViewType = TurboFreemiumLauncherPanel.viewType;
-      Object.defineProperty(TurboFreemiumLauncherPanel, 'viewType', {
-        value: 'test.turbo.launcher',
-        writable: true,
-        configurable: true,
-      });
+  describe('Context Commands', () => {
+    it('should set isPro context to false', () => {
+      activateFreemiumLauncherMode(context, mockTreeView);
 
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
-
-      expect(createTreeViewSpy).toHaveBeenCalledWith(
-        'test.turbo.launcher',
-        expect.any(Object),
+      expect(executeCommandSpy).toHaveBeenCalledWith(
+        'setContext',
+        'turboConsoleLog:isPro',
+        false,
       );
-
-      // Restore original value
-      Object.defineProperty(TurboFreemiumLauncherPanel, 'viewType', {
-        value: originalViewType,
-        writable: true,
-        configurable: true,
-      });
     });
 
-    it('should pass the provider instance to createTreeView', () => {
-      activateFreemiumLauncherMode(context, mockFreemiumLauncherProvider);
+    it('should set isRepairMode context to false', () => {
+      activateFreemiumLauncherMode(context, mockTreeView);
 
-      expect(createTreeViewSpy).toHaveBeenCalledWith(expect.any(String), {
-        treeDataProvider: mockFreemiumLauncherProvider,
-      });
+      expect(executeCommandSpy).toHaveBeenCalledWith(
+        'setContext',
+        'turboConsoleLog:isRepairMode',
+        false,
+      );
+    });
+
+    it('should set isLauncherMode context to true', () => {
+      activateFreemiumLauncherMode(context, mockTreeView);
+
+      expect(executeCommandSpy).toHaveBeenCalledWith(
+        'setContext',
+        'turboConsoleLog:isLauncherMode',
+        true,
+      );
     });
   });
 });
