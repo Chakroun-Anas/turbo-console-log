@@ -21,6 +21,7 @@ export async function showNotification(
   notificationEvent: NotificationEvent,
   version: string,
   context: vscode.ExtensionContext,
+  logCount?: number,
 ): Promise<boolean> {
   // Check cooldown system
   if (!shouldShowNotification(context, notificationEvent)) {
@@ -35,7 +36,11 @@ export async function showNotification(
   // Fetch notification
   let notificationData: ExtensionNotificationResponse | null = null;
   try {
-    notificationData = await fetchNotificationData(notificationEvent, version);
+    notificationData = await fetchNotificationData(
+      notificationEvent,
+      version,
+      logCount,
+    );
   } catch (error) {
     console.error('Failed to fetch notification data:', error);
 
@@ -48,12 +53,6 @@ export async function showNotification(
         message: '🎉 Turbo Console Log installed! Want to see it in action?',
         ctaText: 'Get Started',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/overview/motivation`,
-      },
-      [NotificationEvent.EXTENSION_THREE_DAY_STREAK]: {
-        message:
-          "🔥 3-day streak! You're hooked. Ever wonder what power users unlock with Pro?",
-        ctaText: 'Discover More',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
       [NotificationEvent.EXTENSION_MULTI_FILE_LOGS]: {
         message:
@@ -193,6 +192,12 @@ export async function showNotification(
         ctaText: 'Explore Pro',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
+      [NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD]: {
+        message:
+          '🚨 Your workspace has 100+ logs! Turbo Pro navigates and manages them all instantly.',
+        ctaText: 'See Pro Features',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
     };
 
     const fallback = fallbackMessages[notificationEvent];
@@ -244,6 +249,7 @@ export async function showNotification(
 async function fetchNotificationData(
   notificationEvent: NotificationEvent,
   version?: string,
+  logCount?: number,
 ): Promise<ExtensionNotificationResponse> {
   const params = new URLSearchParams({
     notificationEvent: notificationEvent,
@@ -251,6 +257,10 @@ async function fetchNotificationData(
 
   if (version) {
     params.append('version', version);
+  }
+
+  if (logCount !== undefined) {
+    params.append('logCount', logCount.toString());
   }
 
   const developerId = generateDeveloperId();

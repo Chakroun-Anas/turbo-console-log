@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import axios from 'axios';
 import { generateDeveloperId } from '../helpers/generateDeveloperId';
+import { getUserActivityStatus } from '../helpers/getUserActivityStatus';
 import {
   TurboAnalyticsProvider,
   FreshInstallAnalyticsData,
@@ -65,9 +66,6 @@ class TelemetryService implements TurboAnalyticsProvider {
     try {
       // Check if telemetry is enabled before proceeding
       if (!this.canSendTelemetry()) {
-        console.log(
-          '[Turbo Console Log] Telemetry is disabled, skipping fresh install reporting',
-        );
         return;
       }
 
@@ -91,15 +89,6 @@ class TelemetryService implements TurboAnalyticsProvider {
         platform,
       };
 
-      console.log('[Turbo Console Log] Sending fresh install analytics data:', {
-        developerId,
-        extensionVersion,
-        vscodeVersion,
-        platform,
-        installedAt: analyticsData.installedAt.toISOString(),
-        timezoneOffset: timezoneOffset,
-      });
-
       // Send the analytics data to the endpoint
       await axios.post(
         `${TURBO_WEBSITE_BASE_URL}/api/reportFreshInstall`,
@@ -112,15 +101,9 @@ class TelemetryService implements TurboAnalyticsProvider {
           },
         },
       );
-
-      console.log('[Turbo Console Log] Fresh install report sent successfully');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Silently fail to ensure extension functionality is not affected
-      // Only log to console for debugging purposes
-      console.warn(
-        '[Turbo Console Log] Failed to send fresh install analytics:',
-        error,
-      );
     }
   }
 
@@ -128,9 +111,6 @@ class TelemetryService implements TurboAnalyticsProvider {
     try {
       // Check if telemetry is enabled before proceeding
       if (!this.canSendTelemetry()) {
-        console.log(
-          '[Turbo Console Log] Telemetry is disabled, skipping update reporting',
-        );
         return;
       }
 
@@ -141,6 +121,7 @@ class TelemetryService implements TurboAnalyticsProvider {
       const vscodeVersion = vscode.version;
       const platform = process.platform;
       const isPro = this.checkProStatus(context);
+      const activityStatus = getUserActivityStatus(context);
 
       // Get current time and timezone information
       const now = new Date();
@@ -151,20 +132,11 @@ class TelemetryService implements TurboAnalyticsProvider {
         updatedAt: now,
         newVersion: newVersion || 'unknown',
         isPro,
+        activityStatus,
         timezoneOffset,
         vscodeVersion,
         platform,
       };
-
-      console.log('[Turbo Console Log] Sending update analytics data:', {
-        developerId,
-        newVersion,
-        isPro,
-        vscodeVersion,
-        platform,
-        updatedAt: analyticsData.updatedAt.toISOString(),
-        timezoneOffset: timezoneOffset,
-      });
 
       // Send the analytics data to the endpoint
       await axios.post(
@@ -178,15 +150,9 @@ class TelemetryService implements TurboAnalyticsProvider {
           },
         },
       );
-
-      console.log('[Turbo Console Log] Update analytics sent successfully');
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Silently fail to ensure extension functionality is not affected
-      // Only log to console for debugging purposes
-      console.warn(
-        '[Turbo Console Log] Failed to send update analytics:',
-        error,
-      );
     }
   }
 
@@ -197,9 +163,6 @@ class TelemetryService implements TurboAnalyticsProvider {
     try {
       // Check if telemetry is enabled before proceeding
       if (!this.canSendTelemetry()) {
-        console.log(
-          '[Turbo Console Log] Telemetry is disabled, skipping commands inserted reporting',
-        );
         return;
       }
 
@@ -225,21 +188,6 @@ class TelemetryService implements TurboAnalyticsProvider {
         platform,
         updatedAt: now,
       };
-
-      console.log(
-        '[Turbo Console Log] Sending commands inserted analytics data:',
-        {
-          developerId,
-          count,
-          isPro,
-          extensionVersion,
-          vscodeVersion,
-          platform,
-          updatedAt: analyticsData.updatedAt.toISOString(),
-          timezoneOffset: timezoneOffset,
-        },
-      );
-
       // Send the analytics data to the endpoint
       await axios.post(
         `${TURBO_WEBSITE_BASE_URL}/api/reportInsertionsCommandsCount`,
@@ -252,17 +200,9 @@ class TelemetryService implements TurboAnalyticsProvider {
           },
         },
       );
-
-      console.log(
-        '[Turbo Console Log] Commands inserted analytics sent successfully',
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Silently fail to ensure extension functionality is not affected
-      // Only log to console for debugging purposes
-      console.warn(
-        '[Turbo Console Log] Failed to send commands inserted analytics:',
-        error,
-      );
     }
   }
 
@@ -270,9 +210,6 @@ class TelemetryService implements TurboAnalyticsProvider {
     try {
       // Check if telemetry is enabled before proceeding
       if (!this.canSendTelemetry()) {
-        console.log(
-          '[Turbo Console Log] Telemetry is disabled, skipping freemium panel opening reporting',
-        );
         return;
       }
 
@@ -296,18 +233,6 @@ class TelemetryService implements TurboAnalyticsProvider {
         platform,
       };
 
-      console.log(
-        '[Turbo Console Log] Sending freemium panel opening analytics data:',
-        {
-          developerId,
-          extensionVersion,
-          vscodeVersion,
-          platform,
-          openedAt: analyticsData.openedAt.toISOString(),
-          timezoneOffset: timezoneOffset,
-        },
-      );
-
       // Send the analytics data to the endpoint
       await axios.post(
         `${TURBO_WEBSITE_BASE_URL}/api/reportFreemiumPanelOpening`,
@@ -320,17 +245,9 @@ class TelemetryService implements TurboAnalyticsProvider {
           },
         },
       );
-
-      console.log(
-        '[Turbo Console Log] Freemium panel opening report sent successfully',
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Silently fail to ensure extension functionality is not affected
-      // Only log to console for debugging purposes
-      console.warn(
-        '[Turbo Console Log] Failed to send freemium panel opening analytics:',
-        error,
-      );
     }
   }
 
@@ -342,9 +259,6 @@ class TelemetryService implements TurboAnalyticsProvider {
     try {
       // Check if telemetry is enabled before proceeding
       if (!this.canSendTelemetry()) {
-        console.log(
-          '[Turbo Console Log] Telemetry is disabled, skipping freemium panel CTA click reporting',
-        );
         return;
       }
 
@@ -371,21 +285,6 @@ class TelemetryService implements TurboAnalyticsProvider {
         platform,
       };
 
-      console.log(
-        '[Turbo Console Log] Sending freemium panel CTA click analytics data:',
-        {
-          developerId,
-          ctaType,
-          ctaText,
-          ctaUrl,
-          extensionVersion,
-          vscodeVersion,
-          platform,
-          clickedAt: analyticsData.clickedAt.toISOString(),
-          timezoneOffset: timezoneOffset,
-        },
-      );
-
       // Send the analytics data to the endpoint
       await axios.post(
         `${TURBO_WEBSITE_BASE_URL}/api/reportFreemiumPanelCtaClick`,
@@ -398,17 +297,9 @@ class TelemetryService implements TurboAnalyticsProvider {
           },
         },
       );
-
-      console.log(
-        '[Turbo Console Log] Freemium panel CTA click report sent successfully',
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Silently fail to ensure extension functionality is not affected
-      // Only log to console for debugging purposes
-      console.warn(
-        '[Turbo Console Log] Failed to send freemium panel CTA click analytics:',
-        error,
-      );
     }
   }
 
@@ -421,9 +312,6 @@ class TelemetryService implements TurboAnalyticsProvider {
     try {
       // Check if telemetry is enabled before proceeding
       if (!this.canSendTelemetry()) {
-        console.log(
-          '[Turbo Console Log] Telemetry is disabled, skipping notification interaction reporting',
-        );
         return;
       }
 
@@ -523,26 +411,6 @@ class TelemetryService implements TurboAnalyticsProvider {
         ...(dayOfWeek && { dayOfWeek }),
       };
 
-      console.log(
-        '[Turbo Console Log] Sending notification interaction analytics data:',
-        {
-          developerId,
-          notificationEvent,
-          interactionType,
-          variant,
-          reactionTimeMs,
-          extensionVersion,
-          vscodeVersion,
-          platform,
-          timezoneOffset: timezoneOffset,
-          openEditorsCount,
-          unsavedFilesCount,
-          terminalCount,
-          periodOfDay,
-          dayOfWeek,
-        },
-      );
-
       // Send the analytics data to the endpoint
       await axios.post(
         `${TURBO_WEBSITE_BASE_URL}/api/reportNotificationInteraction`,
@@ -555,17 +423,9 @@ class TelemetryService implements TurboAnalyticsProvider {
           },
         },
       );
-
-      console.log(
-        `[Turbo Console Log] Notification interaction (${interactionType}) report sent successfully for variant ${variant}`,
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Silently fail to ensure extension functionality is not affected
-      // Only log to console for debugging purposes
-      console.warn(
-        '[Turbo Console Log] Failed to send notification interaction analytics:',
-        error,
-      );
     }
   }
 
@@ -577,9 +437,6 @@ class TelemetryService implements TurboAnalyticsProvider {
     try {
       // Check if telemetry is enabled before proceeding
       if (!this.canSendTelemetry()) {
-        console.log(
-          '[Turbo Console Log] Telemetry is disabled, skipping webview interaction reporting',
-        );
         return;
       }
 
@@ -605,20 +462,6 @@ class TelemetryService implements TurboAnalyticsProvider {
         platform,
       };
 
-      console.log(
-        '[Turbo Console Log] Sending webview interaction analytics data:',
-        {
-          developerId,
-          version,
-          variant,
-          interactionType,
-          extensionVersion,
-          vscodeVersion,
-          platform,
-          timezoneOffset,
-        },
-      );
-
       // Send the analytics data to the endpoint
       await axios.post(
         `${TURBO_WEBSITE_BASE_URL}/api/reportWebviewInteraction`,
@@ -631,17 +474,9 @@ class TelemetryService implements TurboAnalyticsProvider {
           },
         },
       );
-
-      console.log(
-        `[Turbo Console Log] Webview interaction (${interactionType}) report sent successfully for variant ${variant}`,
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Silently fail to ensure extension functionality is not affected
-      // Only log to console for debugging purposes
-      console.warn(
-        '[Turbo Console Log] Failed to send webview interaction analytics:',
-        error,
-      );
     }
   }
 
@@ -678,20 +513,6 @@ class TelemetryService implements TurboAnalyticsProvider {
         platform,
       };
 
-      console.log(
-        '[Turbo Console Log] Sending notification limit reached analytics:',
-        {
-          developerId,
-          monthKey,
-          currentCount,
-          maxLimit,
-          extensionVersion,
-          vscodeVersion,
-          platform,
-          timezoneOffset,
-        },
-      );
-
       // Send the analytics data to the endpoint
       await axios.post(
         `${TURBO_WEBSITE_BASE_URL}/api/reportNotificationLimitReached`,
@@ -704,16 +525,9 @@ class TelemetryService implements TurboAnalyticsProvider {
           },
         },
       );
-
-      console.log(
-        '[Turbo Console Log] Notification limit reached report sent successfully',
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Silently fail to ensure extension functionality is not affected
-      console.warn(
-        '[Turbo Console Log] Failed to send notification limit reached analytics:',
-        error,
-      );
     }
   }
 
@@ -749,21 +563,6 @@ class TelemetryService implements TurboAnalyticsProvider {
         vscodeVersion,
         platform,
       };
-
-      console.log(
-        '[Turbo Console Log] Sending notifications paused analytics:',
-        {
-          developerId,
-          monthKey,
-          consecutiveDismissals,
-          pausedUntilDate: new Date(pausedUntil).toISOString(),
-          extensionVersion,
-          vscodeVersion,
-          platform,
-          timezoneOffset,
-        },
-      );
-
       // Send the analytics data to the endpoint
       await axios.post(
         `${TURBO_WEBSITE_BASE_URL}/api/reportNotificationsPaused`,
@@ -776,16 +575,9 @@ class TelemetryService implements TurboAnalyticsProvider {
           },
         },
       );
-
-      console.log(
-        '[Turbo Console Log] Notifications paused report sent successfully',
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Silently fail to ensure extension functionality is not affected
-      console.warn(
-        '[Turbo Console Log] Failed to send notifications paused analytics:',
-        error,
-      );
     }
   }
 

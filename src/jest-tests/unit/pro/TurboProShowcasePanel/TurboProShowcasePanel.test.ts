@@ -12,10 +12,12 @@ jest.mock('@/pro/TurboProShowcasePanel/html/getStaticHtml', () => ({
   getStaticHtml: jest.fn(),
 }));
 jest.mock('@/telemetry/telemetryService');
+jest.mock('@/helpers/trackPanelOpenings');
 
 import { getDynamicHtml } from '@/pro/TurboProShowcasePanel/html/getDynamicHtml';
 import { getStaticHtml } from '@/pro/TurboProShowcasePanel/html/getStaticHtml';
 import { createTelemetryService } from '@/telemetry/telemetryService';
+import { trackPanelOpenings } from '@/helpers/trackPanelOpenings';
 
 // Mock telemetry service
 const mockTelemetryService = {
@@ -36,6 +38,9 @@ const mockGetDynamicHtml = getDynamicHtml as jest.MockedFunction<
 const mockGetStaticHtml = getStaticHtml as jest.MockedFunction<
   typeof getStaticHtml
 >;
+const mockTrackPanelOpenings = trackPanelOpenings as jest.MockedFunction<
+  typeof trackPanelOpenings
+>;
 
 describe('TurboProShowcasePanel', () => {
   let panel: TurboProShowcasePanel;
@@ -53,7 +58,13 @@ describe('TurboProShowcasePanel', () => {
     mockCreateTelemetryService.mockReturnValue(mockTelemetryService);
 
     context = makeExtensionContext();
-    panel = new TurboProShowcasePanel(context);
+
+    // Create mock launcherView
+    const mockLauncherView = {
+      badge: undefined,
+    } as unknown as vscode.TreeView<string>;
+
+    panel = new TurboProShowcasePanel(context, mockLauncherView);
 
     // Mock webview view
     mockWebviewView = {
@@ -174,7 +185,20 @@ describe('TurboProShowcasePanel', () => {
       expect(context.globalState.get).toHaveBeenCalledWith(
         GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_CONTENT,
       );
-      expect(mockGetDynamicHtml).toHaveBeenCalledWith(validDynamicContent);
+      // Should be called with content that includes workspace-log-count component
+      expect(mockGetDynamicHtml).toHaveBeenCalledWith(
+        expect.objectContaining({
+          content: expect.arrayContaining([
+            expect.objectContaining({
+              type: 'workspace-log-count',
+              order: 0,
+            }),
+            expect.objectContaining({
+              type: 'paragraph',
+            }),
+          ]),
+        }),
+      );
       expect(mockGetStaticHtml).not.toHaveBeenCalled();
     });
   });
@@ -269,6 +293,82 @@ describe('TurboProShowcasePanel', () => {
       expect(
         mockTelemetryService.reportFreemiumPanelOpening,
       ).toHaveBeenCalledTimes(3);
+    });
+
+    it('should call trackPanelOpenings when panel becomes visible', () => {
+      panel.resolveWebviewView(mockWebviewView);
+
+      const visibilityHandler = (
+        mockWebviewView.onDidChangeVisibility as jest.Mock
+      ).mock.calls[0][0];
+
+      visibilityHandler();
+
+      expect(mockTrackPanelOpenings).toHaveBeenCalledWith(context);
+    });
+
+    it('should not call trackPanelOpenings when panel is not visible', () => {
+      // Create webview mock that is not visible
+      const notVisibleWebview = {
+        webview: {
+          options: {},
+          html: '',
+          onDidReceiveMessage: jest.fn(),
+        },
+        visible: false,
+        onDidChangeVisibility: jest
+          .fn()
+          .mockReturnValue({ dispose: jest.fn() }),
+      } as unknown as vscode.WebviewView;
+
+      panel.resolveWebviewView(notVisibleWebview);
+
+      const visibilityHandler = (
+        notVisibleWebview.onDidChangeVisibility as jest.Mock
+      ).mock.calls[0][0];
+
+      visibilityHandler();
+
+      expect(mockTrackPanelOpenings).not.toHaveBeenCalled();
+    });
+
+    it('should handle multiple visibility changes with trackPanelOpenings', () => {
+      // Create a more sophisticated mock that allows toggling visibility
+      let isVisible = true;
+      const toggleableWebview = {
+        webview: {
+          options: {},
+          html: '',
+          onDidReceiveMessage: jest.fn(),
+        },
+        get visible() {
+          return isVisible;
+        },
+        onDidChangeVisibility: jest
+          .fn()
+          .mockReturnValue({ dispose: jest.fn() }),
+      } as unknown as vscode.WebviewView;
+
+      panel.resolveWebviewView(toggleableWebview);
+
+      const visibilityHandler = (
+        toggleableWebview.onDidChangeVisibility as jest.Mock
+      ).mock.calls[0][0];
+
+      // First visibility change (panel is visible)
+      isVisible = true;
+      visibilityHandler();
+      expect(mockTrackPanelOpenings).toHaveBeenCalledTimes(1);
+
+      // Panel becomes hidden
+      isVisible = false;
+      visibilityHandler();
+      expect(mockTrackPanelOpenings).toHaveBeenCalledTimes(1); // Should not call again
+
+      // Panel becomes visible again
+      isVisible = true;
+      visibilityHandler();
+      expect(mockTrackPanelOpenings).toHaveBeenCalledTimes(2); // Should call again
     });
   });
 
@@ -467,6 +567,109 @@ describe('TurboProShowcasePanel', () => {
 
       openExternalSpy.mockRestore();
       uriParseSpy.mockRestore();
+    });
+  });
+
+  describe('Context Injection', () => {
+    it('should store context for later use', () => {
+      // Create a visible webview
+      const visibleWebview = {
+        webview: {
+          options: {},
+          html: '',
+          onDidReceiveMessage: jest.fn(),
+        },
+        visible: true,
+        onDidChangeVisibility: jest
+          .fn()
+          .mockReturnValue({ dispose: jest.fn() }),
+      } as unknown as vscode.WebviewView;
+
+      panel.resolveWebviewView(visibleWebview);
+
+      const visibilityHandler = (
+        visibleWebview.onDidChangeVisibility as jest.Mock
+      ).mock.calls[0][0];
+
+      visibilityHandler();
+
+      // Context should be passed to trackPanelOpenings
+      expect(mockTrackPanelOpenings).toHaveBeenCalledWith(context);
+    });
+
+    it('should use the same context across multiple visibility changes', () => {
+      // Create a visible webview
+      const visibleWebview = {
+        webview: {
+          options: {},
+          html: '',
+          onDidReceiveMessage: jest.fn(),
+        },
+        visible: true,
+        onDidChangeVisibility: jest
+          .fn()
+          .mockReturnValue({ dispose: jest.fn() }),
+      } as unknown as vscode.WebviewView;
+
+      panel.resolveWebviewView(visibleWebview);
+
+      const visibilityHandler = (
+        visibleWebview.onDidChangeVisibility as jest.Mock
+      ).mock.calls[0][0];
+
+      // First visibility
+      visibilityHandler();
+
+      // Second visibility
+      visibilityHandler();
+
+      // Both calls should use the same context instance
+      expect(mockTrackPanelOpenings).toHaveBeenCalledTimes(2);
+      expect(mockTrackPanelOpenings).toHaveBeenNthCalledWith(1, context);
+      expect(mockTrackPanelOpenings).toHaveBeenNthCalledWith(2, context);
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle telemetry service creation failure gracefully', () => {
+      mockCreateTelemetryService.mockImplementation(() => {
+        throw new Error('Telemetry service unavailable');
+      });
+
+      // Should not throw during initialization - errors are handled silently
+      expect(() => {
+        panel.resolveWebviewView(mockWebviewView);
+      }).not.toThrow();
+    });
+
+    it('should handle trackPanelOpenings errors', () => {
+      mockTrackPanelOpenings.mockImplementation(() => {
+        throw new Error('Tracking error');
+      });
+
+      // Create a visible webview
+      const visibleWebview = {
+        webview: {
+          options: {},
+          html: '',
+          onDidReceiveMessage: jest.fn(),
+        },
+        visible: true,
+        onDidChangeVisibility: jest
+          .fn()
+          .mockReturnValue({ dispose: jest.fn() }),
+      } as unknown as vscode.WebviewView;
+
+      panel.resolveWebviewView(visibleWebview);
+
+      const visibilityHandler = (
+        visibleWebview.onDidChangeVisibility as jest.Mock
+      ).mock.calls[0][0];
+
+      // Should throw when visibility changes (errors propagate in test environment)
+      expect(() => {
+        visibilityHandler();
+      }).toThrow('Tracking error');
     });
   });
 });

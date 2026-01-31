@@ -19,6 +19,7 @@ import {
   listenToCommitWithLogs,
   listenToCustomLogLibrary,
   listenToLogsInTestFile,
+  initialWorkspaceLogsCount,
 } from './helpers';
 import {
   TurboFreemiumLauncherPanel,
@@ -53,25 +54,34 @@ export async function activate(
   }
 
   // Register webview panels and tree views
-  const turboProShowCasePanel = new TurboProShowcasePanel(context);
-  const turboProBundleRepairPanel = new TurboProBundleRepairPanel('', 'run');
   const freemiumLauncherProvider = new TurboFreemiumLauncherPanel();
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider(
+      TurboFreemiumLauncherPanel.viewType,
+      freemiumLauncherProvider,
+    ),
+  );
+  const launcherView = vscode.window.createTreeView(
+    TurboFreemiumLauncherPanel.viewType,
+    {
+      treeDataProvider: freemiumLauncherProvider,
+    },
+  );
+  const turboProShowCasePanel = new TurboProShowcasePanel(
+    context,
+    launcherView,
+  );
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       TurboProShowcasePanel.viewType,
       turboProShowCasePanel,
     ),
   );
+  const turboProBundleRepairPanel = new TurboProBundleRepairPanel('', 'run');
   context.subscriptions.push(
     vscode.window.registerWebviewViewProvider(
       TurboProBundleRepairPanel.viewType,
       turboProBundleRepairPanel,
-    ),
-  );
-  context.subscriptions.push(
-    vscode.window.registerTreeDataProvider(
-      TurboFreemiumLauncherPanel.viewType,
-      freemiumLauncherProvider,
     ),
   );
 
@@ -80,12 +90,13 @@ export async function activate(
     'ChakrounAnas.turbo-console-log',
   )?.packageJSON.version;
 
+  // Update user activity status (ACTIVE/INACTIVE based on 7-day window)
+  // Must run before traceExtensionVersionHistory since update reporting relies on this
+  updateUserActivityStatus(context);
+
   // Trace version history and handle fresh install welcome
   // (creates or updates version array in global state + shows welcome for new users)
   traceExtensionVersionHistory(context, version);
-
-  // Update user activity status (ACTIVE/INACTIVE based on 7-day window)
-  updateUserActivityStatus(context);
 
   // Listen to PHP file openings and show announcement immediately (v3.10.0 strategy)
   listenToPhpFileOpenings(context, version);
@@ -169,5 +180,18 @@ export async function activate(
   }
 
   // Activate freemium launcher for non-Pro users
-  activateFreemiumLauncherMode(context, freemiumLauncherProvider);
+  activateFreemiumLauncherMode(context, launcherView);
+
+  // Count initial workspace logs and potentially show notification (with error handling)
+  initialWorkspaceLogsCount(
+    extensionProperties,
+    launcherView,
+    context,
+    version,
+  ).catch((error) => {
+    console.error(
+      '[Extension] Failed to initialize workspace log count:',
+      error,
+    );
+  });
 }

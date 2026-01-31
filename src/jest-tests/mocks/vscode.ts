@@ -174,3 +174,20 @@ export class TreeItem {
     this.label = label;
   }
 }
+
+// Default export for 'import vscode from "vscode"' style imports
+export default {
+  window,
+  commands,
+  workspace,
+  extensions,
+  env,
+  Uri,
+  Position,
+  Range,
+  EventEmitter,
+  ThemeIcon,
+  TreeItem,
+  ProgressLocation,
+  ViewColumn,
+};

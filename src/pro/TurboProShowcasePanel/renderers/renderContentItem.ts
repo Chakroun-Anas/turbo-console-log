@@ -8,6 +8,7 @@ import {
   MediaShowcaseCTAPanelComponent,
   VideoPanelComponent,
   YouTubeVideoPanelComponent,
+  WorkspaceLogCountComponent,
 } from '../types';
 import { renderParagraphComponent } from './renderParagraphComponent';
 import { renderArticleComponent } from './renderArticleComponent';
@@ -17,6 +18,7 @@ import { renderTableComponent } from './renderTableComponent';
 import { renderMediaShowcaseCTAComponent } from './renderMediaShowcaseCTAComponent';
 import { renderVideoComponent } from './renderVideoComponent';
 import { renderYouTubeVideoComponent } from './renderYouTubeVideoComponent';
+import { renderWorkspaceLogCountComponent } from './renderWorkspaceLogCountComponent';
 
 /**
  * Render a single content item based on its type
@@ -54,6 +56,10 @@ export function renderContentItem(
     case 'youtube-video':
       return renderYouTubeVideoComponent(
         contentItem.component as YouTubeVideoPanelComponent,
+      );
+    case 'workspace-log-count':
+      return renderWorkspaceLogCountComponent(
+        contentItem.component as WorkspaceLogCountComponent,
       );
     default:
       // Future content types can be added here

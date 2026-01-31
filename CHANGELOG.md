@@ -2,6 +2,36 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.16.0] - 2026-01-30
+
+### 🎯 Log Count Visibility
+
+**Finally know how many logs you actually have in your workspace.**
+
+This release introduces **instant log count visibility** directly in the VS Code sidebar. Whether you're debugging a small feature or managing hundreds of logs across a large codebase, you now have complete awareness of your debugging footprint.
+
+#### ✨ What's New
+
+**For Freemium Users:**
+
+- 🔢 **Initial Log Count** — See a one-time count of logs in your workspace when you first open the panel
+- 📊 **Basic Awareness** — Know your debugging scale at a glance (e.g., "47 logs detected")
+
+**For Pro Users — The Full Package:**
+
+That's where the real power kicks in. Pro users get **real-time synchronization** and complete workspace control:
+
+- ⚡ **Real-Time Badge Updates** — Count refreshes instantly as you insert, delete, or modify logs across your workspace
+- 🌲 **Navigate Every Log** — Click any of those 347 logs to jump straight to the source line
+- 🎯 **Filter by Type** — Toggle to see only errors, warnings, or specific log types
+- 🔍 **Search Instantly** — Find any log by content across all files in milliseconds
+- 🧹 **Mass Cleanup** — Delete hundreds of logs in seconds before committing
+- 🎨 **Color-Coded Tree** — Each log type displays in unique colors for instant recognition
+- 🔄 **Git Integration** — Filter to "Changed Files Only" to see only logs you just added
+- 🔁 **Auto-Sync** — Panel stays updated as you code, no manual refresh needed
+
+→ [Upgrade to Turbo Pro](https://www.turboconsolelog.io/pro) — See it, navigate it, control it.
+
 ## [3.15.1] - 2026-01-25
 
 ### 🔧 Infrastructure & Quality Improvements

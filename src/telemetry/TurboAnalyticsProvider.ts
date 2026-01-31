@@ -110,6 +110,7 @@ export interface UpdateAnalyticsData {
   updatedAt: Date;
   newVersion: string;
   isPro: boolean;
+  activityStatus?: string;
   timezoneOffset?: number;
   vscodeVersion?: string;
   platform?: string;

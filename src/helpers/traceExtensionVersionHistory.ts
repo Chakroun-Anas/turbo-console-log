@@ -4,7 +4,6 @@ import { readFromGlobalState } from './readFromGlobalState';
 import { writeToGlobalState } from './writeToGlobalState';
 import { createTelemetryService } from '@/telemetry';
 import { showNotification, NotificationEvent } from '@/notifications';
-import { showReleaseNotification } from './showReleaseNotification';
 
 /**
  * Traces extension version history by maintaining an array of versions the user has installed.
@@ -102,10 +101,6 @@ export function traceExtensionVersionHistory(
       'HAS_SHOWN_TEN_COMMANDS_MILESTONE_NOTIFICATION',
       false,
     );
-  }
-
-  if (isUpdate) {
-    showReleaseNotification(context, '3.15.0');
   }
 
   // Report telemetry for fresh installs and updates (decoupled from notifications)

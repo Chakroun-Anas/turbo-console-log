@@ -98,6 +98,11 @@ describe('activate - command registration', () => {
       UserActivityStatus.ACTIVE,
     );
 
+    // Mock initialWorkspaceLogsCount to return a resolved promise
+    (helpers.initialWorkspaceLogsCount as jest.Mock).mockResolvedValue(
+      undefined,
+    );
+
     // Reset pro utilities mocks specifically
     (proUtilities.runProBundle as jest.Mock).mockResolvedValue(undefined);
     (proUtilities.updateProBundle as jest.Mock).mockResolvedValue(undefined);

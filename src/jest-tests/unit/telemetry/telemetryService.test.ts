@@ -10,6 +10,9 @@ import { TurboAnalyticsProvider } from '@/telemetry/TurboAnalyticsProvider';
 // Mock dependencies
 jest.mock('axios');
 jest.mock('crypto');
+jest.mock('@/helpers/getUserActivityStatus', () => ({
+  getUserActivityStatus: jest.fn(() => 'active'),
+}));
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 const mockedCrypto = crypto as jest.Mocked<typeof crypto>;
@@ -229,14 +232,6 @@ describe('TelemetryService', () => {
           },
         }),
       );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Sending fresh install analytics data:',
-        expect.any(Object),
-      );
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Fresh install report sent successfully',
-      );
     });
 
     it('should not send analytics when VS Code telemetry is disabled', async () => {
@@ -248,9 +243,6 @@ describe('TelemetryService', () => {
       await disabledService.reportFreshInstall();
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping fresh install reporting',
-      );
     });
 
     it('should not send analytics when custom telemetry is disabled', async () => {
@@ -268,9 +260,6 @@ describe('TelemetryService', () => {
       await service.reportFreshInstall();
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping fresh install reporting',
-      );
     });
 
     it('should handle axios errors gracefully', async () => {
@@ -278,11 +267,6 @@ describe('TelemetryService', () => {
       mockedAxios.post.mockRejectedValue(error);
 
       await telemetryService.reportFreshInstall();
-
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        '[Turbo Console Log] Failed to send fresh install analytics:',
-        error,
-      );
     });
 
     it('should handle missing extension version gracefully', async () => {
@@ -337,14 +321,6 @@ describe('TelemetryService', () => {
             'User-Agent': 'turbo-console-log-extension/3.5.0',
           },
         }),
-      );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Sending update analytics data:',
-        expect.any(Object),
-      );
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Update analytics sent successfully',
       );
     });
 
@@ -435,9 +411,6 @@ describe('TelemetryService', () => {
       await disabledService.reportUpdate(mockContext);
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping update reporting',
-      );
     });
 
     it('should handle axios errors gracefully', async () => {
@@ -445,11 +418,6 @@ describe('TelemetryService', () => {
       mockedAxios.post.mockRejectedValue(error);
 
       await telemetryService.reportUpdate(mockContext);
-
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        '[Turbo Console Log] Failed to send update analytics:',
-        error,
-      );
     });
   });
 
@@ -488,14 +456,6 @@ describe('TelemetryService', () => {
             'User-Agent': 'turbo-console-log-extension/3.5.0',
           },
         }),
-      );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Sending commands inserted analytics data:',
-        expect.any(Object),
-      );
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Commands inserted analytics sent successfully',
       );
     });
 
@@ -616,9 +576,6 @@ describe('TelemetryService', () => {
       await disabledService.reportCommandsInserted(mockContext, 10);
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping commands inserted reporting',
-      );
     });
 
     it('should not send analytics when custom telemetry is disabled', async () => {
@@ -635,9 +592,6 @@ describe('TelemetryService', () => {
       await disabledService.reportCommandsInserted(mockContext, 10);
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping commands inserted reporting',
-      );
     });
 
     it('should handle axios errors gracefully', async () => {
@@ -645,11 +599,6 @@ describe('TelemetryService', () => {
       mockedAxios.post.mockRejectedValue(error);
 
       await telemetryService.reportCommandsInserted(mockContext, 10);
-
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        '[Turbo Console Log] Failed to send commands inserted analytics:',
-        error,
-      );
     });
 
     it('should handle missing extension version gracefully', async () => {
@@ -750,10 +699,6 @@ describe('TelemetryService', () => {
           },
         }),
       );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Freemium panel opening report sent successfully',
-      );
     });
 
     it('should skip analytics when telemetry is disabled globally', async () => {
@@ -764,9 +709,6 @@ describe('TelemetryService', () => {
       await disabledService.reportFreemiumPanelOpening();
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping freemium panel opening reporting',
-      );
     });
 
     it('should skip analytics when custom telemetry is disabled', async () => {
@@ -782,9 +724,6 @@ describe('TelemetryService', () => {
       await disabledService.reportFreemiumPanelOpening();
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping freemium panel opening reporting',
-      );
     });
 
     it('should handle axios errors gracefully', async () => {
@@ -793,11 +732,6 @@ describe('TelemetryService', () => {
 
       const service = createTelemetryService();
       await service.reportFreemiumPanelOpening();
-
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        '[Turbo Console Log] Failed to send freemium panel opening analytics:',
-        error,
-      );
     });
 
     it('should generate consistent analytics payload structure', async () => {
@@ -1013,10 +947,6 @@ describe('TelemetryService', () => {
           },
         }),
       );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Freemium panel CTA click report sent successfully',
-      );
     });
 
     it('should handle different CTA types correctly', async () => {
@@ -1072,9 +1002,6 @@ describe('TelemetryService', () => {
       );
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping freemium panel CTA click reporting',
-      );
     });
 
     it('should skip analytics when custom telemetry is disabled', async () => {
@@ -1094,9 +1021,6 @@ describe('TelemetryService', () => {
       );
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping freemium panel CTA click reporting',
-      );
     });
 
     it('should handle axios errors gracefully', async () => {
@@ -1108,11 +1032,6 @@ describe('TelemetryService', () => {
         'survey',
         'Test Button',
         'https://example.com',
-      );
-
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        '[Turbo Console Log] Failed to send freemium panel CTA click analytics:',
-        error,
       );
     });
 
@@ -1301,10 +1220,6 @@ describe('TelemetryService', () => {
           },
         }),
       );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notification interaction (shown) report sent successfully for variant variant-a',
-      );
     });
 
     it('should send click interaction with reaction time', async () => {
@@ -1336,10 +1251,6 @@ describe('TelemetryService', () => {
         }),
         expect.any(Object),
       );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notification interaction (clicked) report sent successfully for variant variant-b',
-      );
     });
 
     it('should send dismiss interaction', async () => {
@@ -1367,10 +1278,6 @@ describe('TelemetryService', () => {
           ),
         }),
         expect.any(Object),
-      );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notification interaction (dismissed) report sent successfully for variant variant-c',
       );
     });
 
@@ -1463,9 +1370,6 @@ describe('TelemetryService', () => {
       );
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping notification interaction reporting',
-      );
     });
 
     it('should skip analytics when custom telemetry is disabled', async () => {
@@ -1484,9 +1388,6 @@ describe('TelemetryService', () => {
       );
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping notification interaction reporting',
-      );
     });
 
     it('should handle axios errors gracefully', async () => {
@@ -1498,11 +1399,6 @@ describe('TelemetryService', () => {
         'test-event',
         'shown',
         'test-variant',
-      );
-
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        '[Turbo Console Log] Failed to send notification interaction analytics:',
-        error,
       );
     });
 
@@ -1682,9 +1578,6 @@ describe('TelemetryService', () => {
         'shown',
         'variant-a',
       );
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notification interaction (shown) report sent successfully for variant variant-a',
-      );
 
       mockConsoleLog.mockClear();
       await service.reportNotificationInteraction(
@@ -1692,18 +1585,12 @@ describe('TelemetryService', () => {
         'clicked',
         'variant-b',
       );
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notification interaction (clicked) report sent successfully for variant variant-b',
-      );
 
       mockConsoleLog.mockClear();
       await service.reportNotificationInteraction(
         'event-3',
         'dismissed',
         'variant-c',
-      );
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notification interaction (dismissed) report sent successfully for variant variant-c',
       );
     });
   });
@@ -1794,9 +1681,6 @@ describe('TelemetryService', () => {
       await disabledService.reportWebviewInteraction('3.10.0', 'A', 'shown');
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping webview interaction reporting',
-      );
     });
 
     it('should not send analytics when custom telemetry is disabled', async () => {
@@ -1812,9 +1696,6 @@ describe('TelemetryService', () => {
       await disabledService.reportWebviewInteraction('3.10.0', 'B', 'clicked');
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Telemetry is disabled, skipping webview interaction reporting',
-      );
     });
 
     it('should handle axios errors gracefully', async () => {
@@ -1823,11 +1704,6 @@ describe('TelemetryService', () => {
 
       const service = createTelemetryService();
       await service.reportWebviewInteraction('3.10.0', 'A', 'shown');
-
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        '[Turbo Console Log] Failed to send webview interaction analytics:',
-        error,
-      );
     });
 
     it('should generate consistent analytics payload structure', async () => {
@@ -1936,14 +1812,8 @@ describe('TelemetryService', () => {
       const service = createTelemetryService();
 
       await service.reportWebviewInteraction('3.10.0', 'A', 'shown');
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Webview interaction (shown) report sent successfully for variant A',
-      );
 
       await service.reportWebviewInteraction('3.10.0', 'B', 'clicked');
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Webview interaction (clicked) report sent successfully for variant B',
-      );
     });
 
     it('should include timezone offset from current date', async () => {
@@ -2019,10 +1889,6 @@ describe('TelemetryService', () => {
           },
         }),
       );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notification limit reached report sent successfully',
-      );
     });
 
     it('should handle different month keys correctly', async () => {
@@ -2086,9 +1952,6 @@ describe('TelemetryService', () => {
       await disabledService.reportNotificationLimitReached('2025-12', 5, 4);
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).not.toHaveBeenCalledWith(
-        expect.stringContaining('Sending notification limit reached'),
-      );
     });
 
     it('should skip analytics when custom telemetry is disabled', async () => {
@@ -2103,9 +1966,6 @@ describe('TelemetryService', () => {
       await disabledService.reportNotificationLimitReached('2025-12', 5, 4);
 
       expect(mockedAxios.post).not.toHaveBeenCalled();
-      expect(mockConsoleLog).not.toHaveBeenCalledWith(
-        expect.stringContaining('Sending notification limit reached'),
-      );
     });
 
     it('should handle axios errors gracefully', async () => {
@@ -2114,11 +1974,6 @@ describe('TelemetryService', () => {
 
       const service = createTelemetryService();
       await service.reportNotificationLimitReached('2025-12', 5, 4);
-
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        '[Turbo Console Log] Failed to send notification limit reached analytics:',
-        error,
-      );
     });
 
     it('should generate consistent analytics payload structure', async () => {
@@ -2187,24 +2042,6 @@ describe('TelemetryService', () => {
     it('should log appropriate console messages', async () => {
       const service = createTelemetryService();
       await service.reportNotificationLimitReached('2025-12', 5, 4);
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Sending notification limit reached analytics:',
-        expect.objectContaining({
-          developerId: 'dev_abcd1234567890ef',
-          monthKey: '2025-12',
-          currentCount: 5,
-          maxLimit: 4,
-          extensionVersion: '3.5.0',
-          vscodeVersion: '1.85.0',
-          platform: expect.any(String),
-          timezoneOffset: expect.any(Number),
-        }),
-      );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notification limit reached report sent successfully',
-      );
     });
 
     it('should include timezone offset from current date', async () => {
@@ -2308,10 +2145,6 @@ describe('TelemetryService', () => {
           },
         }),
       );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notifications paused report sent successfully',
-      );
     });
 
     it('should handle different month keys correctly', async () => {
@@ -2409,11 +2242,6 @@ describe('TelemetryService', () => {
 
       const service = createTelemetryService();
       await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
-
-      expect(mockConsoleWarn).toHaveBeenCalledWith(
-        '[Turbo Console Log] Failed to send notifications paused analytics:',
-        error,
-      );
     });
 
     it('should generate consistent analytics payload structure', async () => {
@@ -2479,24 +2307,6 @@ describe('TelemetryService', () => {
     it('should log appropriate console messages', async () => {
       const service = createTelemetryService();
       await service.reportNotificationsPaused('2025-12', 3, 1735689600000);
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Sending notifications paused analytics:',
-        expect.objectContaining({
-          developerId: expect.stringMatching(/^dev_/),
-          monthKey: '2025-12',
-          consecutiveDismissals: 3,
-          pausedUntilDate: expect.any(String),
-          extensionVersion: '3.5.0',
-          vscodeVersion: '1.85.0',
-          platform: 'darwin',
-          timezoneOffset: expect.any(Number),
-        }),
-      );
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Notifications paused report sent successfully',
-      );
     });
 
     it('should include timezone offset from current date', async () => {
@@ -2520,13 +2330,6 @@ describe('TelemetryService', () => {
       const pausedUntil = 1735689600000; // Jan 1, 2025 00:00:00 UTC
 
       await service.reportNotificationsPaused('2025-12', 3, pausedUntil);
-
-      expect(mockConsoleLog).toHaveBeenCalledWith(
-        '[Turbo Console Log] Sending notifications paused analytics:',
-        expect.objectContaining({
-          pausedUntilDate: new Date(pausedUntil).toISOString(),
-        }),
-      );
     });
 
     it('should handle edge case with very large pausedUntil timestamp', async () => {

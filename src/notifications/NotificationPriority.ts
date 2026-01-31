@@ -26,7 +26,6 @@ export const NOTIFICATION_PRIORITY_MAP: Record<
   // IGNORE: Low-priority notifications that respect cooldown strictly
   [NotificationEvent.EXTENSION_INACTIVE_MANUAL_LOG]:
     NotificationPriority.IGNORE,
-  [NotificationEvent.EXTENSION_THREE_DAY_STREAK]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_MULTI_FILE_LOGS]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_TEN_INSERTS]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_TWENTY_INSERTS]: NotificationPriority.IGNORE,
@@ -56,6 +55,8 @@ export const NOTIFICATION_PRIORITY_MAP: Record<
   [NotificationEvent.EXTENSION_COMMIT_WITH_LOGS]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_CUSTOM_LOG_LIBRARY]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE]: NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD]:
+    NotificationPriority.IGNORE,
 };
 
 /**
