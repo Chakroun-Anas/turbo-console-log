@@ -17,6 +17,8 @@ export enum NotificationEvent {
   EXTENSION_FIVE_DELETE_COMMANDS = 'extensionFiveDeleteCommands',
   EXTENSION_PHP_WORKSPACE_DETECTED = 'extensionPhpWorkspaceDetected',
   EXTENSION_INACTIVE_MANUAL_LOG = 'extensionInactiveManualLog',
+  EXTENSION_INACTIVE_TWO_WEEKS_RETURN = 'extensionInactiveTwoWeeksReturn',
+  EXTENSION_INACTIVE_FOUR_WEEKS_SURVEY = 'extensionInactiveFourWeeksSurvey',
   EXTENSION_JS_MESSY_FILE = 'extensionJSMessyFile',
   EXTENSION_PHP_MESSY_FILE = 'extensionPhpMessyFile',
   EXTENSION_JS_MULTI_LOG_TYPES = 'extensionJSMultiLogTypes',

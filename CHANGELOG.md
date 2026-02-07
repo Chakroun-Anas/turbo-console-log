@@ -2,6 +2,24 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.16.1] - 2026-02-08
+
+### 🎉 Log Count Feature — Community Success & Optimized Awareness
+
+**The log count badge feature shipped in v3.16.0 has been a resounding success with the community.** This release focuses on ensuring more users discover this powerful capability while validating its production stability.
+
+#### ✨ What's Working Great
+
+- **📊 Performance Validated** — Real-time badge updates handle workspaces with hundreds of logs without any noticeable performance impact
+- **🛡️ Production Stable** — Zero critical issues reported, auto-sync works flawlessly across diverse project structures
+- **❤️ Community Love** — Users are discovering instant log visibility and workspace control with highly positive feedback
+
+#### 🔧 Infrastructure Improvements
+
+- Backend refinements to notification delivery, cooldown system, and activity tracking
+
+This release strengthens our ability to share powerful features with the community while maintaining the rock-solid stability Turbo is known for.
+
 ## [3.16.0] - 2026-01-30
 
 ### 🎯 Log Count Visibility

@@ -1193,6 +1193,7 @@ describe('TelemetryService', () => {
 
       const service = createTelemetryService();
       await service.reportNotificationInteraction(
+        mockContext,
         'onboarding-tips',
         'shown',
         'variant-a',
@@ -1207,6 +1208,7 @@ describe('TelemetryService', () => {
           interactionType: 'shown',
           variant: 'variant-a',
           reactionTimeMs: undefined,
+          activityStatus: 'active',
           timezoneOffset: mockDate.getTimezoneOffset(),
           extensionVersion: '3.5.0',
           vscodeVersion: '1.85.0',
@@ -1228,6 +1230,7 @@ describe('TelemetryService', () => {
 
       const service = createTelemetryService();
       await service.reportNotificationInteraction(
+        mockContext,
         'pro-features',
         'clicked',
         'variant-b',
@@ -1256,6 +1259,7 @@ describe('TelemetryService', () => {
     it('should send dismiss interaction', async () => {
       const service = createTelemetryService();
       await service.reportNotificationInteraction(
+        mockContext,
         'feature-announcement',
         'dismissed',
         'variant-c',
@@ -1286,6 +1290,7 @@ describe('TelemetryService', () => {
 
       // Test shown (should NOT include metadata)
       await service.reportNotificationInteraction(
+        mockContext,
         'event-1',
         'shown',
         'variant-x',
@@ -1304,6 +1309,7 @@ describe('TelemetryService', () => {
 
       // Test clicked (SHOULD include metadata)
       await service.reportNotificationInteraction(
+        mockContext,
         'event-2',
         'clicked',
         'variant-y',
@@ -1322,6 +1328,7 @@ describe('TelemetryService', () => {
 
       // Test dismissed (SHOULD include metadata)
       await service.reportNotificationInteraction(
+        mockContext,
         'event-3',
         'dismissed',
         'variant-z',
@@ -1340,6 +1347,7 @@ describe('TelemetryService', () => {
 
       // Test deferred (SHOULD include metadata)
       await service.reportNotificationInteraction(
+        mockContext,
         'event-4',
         'deferred',
         'variant-w',
@@ -1364,6 +1372,7 @@ describe('TelemetryService', () => {
       const disabledService = createTelemetryService();
 
       await disabledService.reportNotificationInteraction(
+        mockContext,
         'event',
         'shown',
         'variant',
@@ -1382,6 +1391,7 @@ describe('TelemetryService', () => {
 
       const disabledService = createTelemetryService();
       await disabledService.reportNotificationInteraction(
+        mockContext,
         'event',
         'clicked',
         'variant',
@@ -1396,6 +1406,7 @@ describe('TelemetryService', () => {
 
       const service = createTelemetryService();
       await service.reportNotificationInteraction(
+        mockContext,
         'test-event',
         'shown',
         'test-variant',
@@ -1408,6 +1419,7 @@ describe('TelemetryService', () => {
 
       const service = createTelemetryService();
       await service.reportNotificationInteraction(
+        mockContext,
         'my-event',
         'clicked',
         'my-variant',
@@ -1453,7 +1465,12 @@ describe('TelemetryService', () => {
 
     it('should use correct API endpoint and headers', async () => {
       const service = createTelemetryService();
-      await service.reportNotificationInteraction('event', 'shown', 'variant');
+      await service.reportNotificationInteraction(
+        mockContext,
+        'event',
+        'shown',
+        'variant',
+      );
 
       expect(mockedAxios.post).toHaveBeenCalledWith(
         'https://www.turboconsolelog.io/api/reportNotificationInteraction',
@@ -1476,6 +1493,7 @@ describe('TelemetryService', () => {
 
       const service = createTelemetryService();
       await service.reportNotificationInteraction(
+        mockContext,
         'event',
         'dismissed',
         'variant',
@@ -1507,6 +1525,7 @@ describe('TelemetryService', () => {
 
       for (const testCase of testCases) {
         await service.reportNotificationInteraction(
+          mockContext,
           testCase.event,
           'shown',
           testCase.variant,
@@ -1531,6 +1550,7 @@ describe('TelemetryService', () => {
 
       // Zero reaction time
       await service.reportNotificationInteraction(
+        mockContext,
         'instant-click',
         'clicked',
         'variant',
@@ -1544,6 +1564,7 @@ describe('TelemetryService', () => {
 
       // Very large reaction time
       await service.reportNotificationInteraction(
+        mockContext,
         'slow-click',
         'clicked',
         'variant',
@@ -1557,6 +1578,7 @@ describe('TelemetryService', () => {
 
       // Undefined reaction time (for shown events)
       await service.reportNotificationInteraction(
+        mockContext,
         'shown-only',
         'shown',
         'variant',
@@ -1574,6 +1596,7 @@ describe('TelemetryService', () => {
       // Clear mocks before each test
       mockConsoleLog.mockClear();
       await service.reportNotificationInteraction(
+        mockContext,
         'event-1',
         'shown',
         'variant-a',
@@ -1581,6 +1604,7 @@ describe('TelemetryService', () => {
 
       mockConsoleLog.mockClear();
       await service.reportNotificationInteraction(
+        mockContext,
         'event-2',
         'clicked',
         'variant-b',
@@ -1588,6 +1612,7 @@ describe('TelemetryService', () => {
 
       mockConsoleLog.mockClear();
       await service.reportNotificationInteraction(
+        mockContext,
         'event-3',
         'dismissed',
         'variant-c',

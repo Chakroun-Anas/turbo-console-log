@@ -26,6 +26,10 @@ export const NOTIFICATION_PRIORITY_MAP: Record<
   // IGNORE: Low-priority notifications that respect cooldown strictly
   [NotificationEvent.EXTENSION_INACTIVE_MANUAL_LOG]:
     NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_INACTIVE_TWO_WEEKS_RETURN]:
+    NotificationPriority.IGNORE,
+  [NotificationEvent.EXTENSION_INACTIVE_FOUR_WEEKS_SURVEY]:
+    NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_MULTI_FILE_LOGS]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_TEN_INSERTS]: NotificationPriority.IGNORE,
   [NotificationEvent.EXTENSION_TWENTY_INSERTS]: NotificationPriority.IGNORE,

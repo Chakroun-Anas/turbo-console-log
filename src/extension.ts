@@ -11,6 +11,8 @@ import {
   listenToPhpFileOpenings,
   updateUserActivityStatus,
   listenToManualConsoleLogs,
+  listenToInactiveTwoWeeksReturn,
+  listenToInactiveFourWeeksSurvey,
   listenToJSMessyFileDetection,
   listenToPhpMessyFileDetection,
   listenToJSMultiLogTypes,
@@ -103,6 +105,12 @@ export async function activate(
 
   // Listen to manual console.log typing for INACTIVE users (re-engagement strategy)
   listenToManualConsoleLogs(context);
+
+  // Listen to JS/TS file openings for inactive users (14-28 days)
+  listenToInactiveTwoWeeksReturn(context, version);
+
+  // Listen to JS/TS file openings for long-term inactive users (28+ days) - show survey
+  listenToInactiveFourWeeksSurvey(context, version);
 
   // Listen to JS/TS messy file detection and show notification
   listenToJSMessyFileDetection(context, version);

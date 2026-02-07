@@ -138,6 +138,18 @@ export async function showNotification(
         ctaText: 'See How',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
       },
+      [NotificationEvent.EXTENSION_INACTIVE_TWO_WEEKS_RETURN]: {
+        message:
+          '👋 Welcome back! Speed up debugging with Turbo. Try Ctrl+Alt+L on any variable.',
+        ctaText: 'Quick Refresher',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
+      },
+      [NotificationEvent.EXTENSION_INACTIVE_FOUR_WEEKS_SURVEY]: {
+        message:
+          '💬 We miss you! Help us improve Turbo by sharing why you stopped using it (< 2 min survey).',
+        ctaText: 'Share Feedback',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/inactive-users-survey`,
+      },
       [NotificationEvent.EXTENSION_JS_MESSY_FILE]: {
         message:
           "🌲 10+ logs in this file! Navigate them all effortlessly with Pro's tree view.",
@@ -170,9 +182,9 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
         message:
-          '💎 Pre-commit cleanup just got effortless with real-time Git awareness.',
-        ctaText: 'Explore Feature',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3150`,
+          '🎯 Ever wondered how many logs are in your workspace? Now you know instantly! 🚀',
+        ctaText: 'See How',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3160`,
       },
       [NotificationEvent.EXTENSION_COMMIT_WITH_LOGS]: {
         message:
@@ -227,6 +239,7 @@ export async function showNotification(
   const telemetryService = createTelemetryService();
   telemetryService
     .reportNotificationInteraction(
+      context,
       notificationEvent,
       'shown',
       notificationData.variant,
@@ -328,6 +341,7 @@ async function fireNotificationInBackground(
       // Track CTA click with reaction time (fire-and-forget with error handling)
       telemetryService
         .reportNotificationInteraction(
+          context,
           notificationEvent,
           'clicked',
           notificationData.variant,
@@ -365,6 +379,7 @@ async function fireNotificationInBackground(
       // We track it separately from dismissals to measure soft interest vs hard rejection
       telemetryService
         .reportNotificationInteraction(
+          context,
           notificationEvent,
           'deferred',
           notificationData.variant,
@@ -381,6 +396,7 @@ async function fireNotificationInBackground(
       // Track with reaction time (fire-and-forget with error handling)
       telemetryService
         .reportNotificationInteraction(
+          context,
           notificationEvent,
           'dismissed',
           notificationData.variant,
