@@ -47,6 +47,7 @@ export interface TurboAnalyticsProvider {
    * Only sends data if both VS Code telemetry and custom telemetry are enabled
    */
   reportNotificationInteraction(
+    context: ExtensionContext,
     notificationEvent: string,
     interactionType: 'shown' | 'clicked' | 'deferred' | 'dismissed',
     variant: string,

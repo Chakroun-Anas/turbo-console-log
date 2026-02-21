@@ -171,6 +171,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         'shown',
         'A',
@@ -205,6 +206,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         'clicked',
         'A',
@@ -233,6 +235,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         'deferred',
         'A',
@@ -262,6 +265,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         'dismissed',
         'A',
@@ -294,6 +298,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         'deferred',
         'A',
@@ -342,6 +347,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         'clicked',
         'fallback',
@@ -370,6 +376,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         'deferred',
         'fallback',
@@ -399,6 +406,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         'dismissed',
         'fallback',
@@ -445,6 +453,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FRESH_INSTALL,
         'deferred',
         'fallback',
@@ -592,7 +601,7 @@ describe('showNotification', () => {
     it('should track shown event before showing notification', async () => {
       let shownCalled = false;
       mockTelemetryService.reportNotificationInteraction.mockImplementation(
-        (event, type) => {
+        (context, event, type) => {
           if (type === 'shown') {
             shownCalled = true;
           }
@@ -623,12 +632,12 @@ describe('showNotification', () => {
 
       const clickCall =
         mockTelemetryService.reportNotificationInteraction.mock.calls.find(
-          (call) => call[1] === 'clicked',
+          (call) => call[2] === 'clicked',
         );
 
       expect(clickCall).toBeDefined();
-      expect(clickCall![3]).toBeGreaterThanOrEqual(0);
-      expect(clickCall![3]).toBeLessThanOrEqual(60000);
+      expect(clickCall![4]).toBeGreaterThanOrEqual(0);
+      expect(clickCall![4]).toBeLessThanOrEqual(60000);
     });
   });
 
@@ -787,6 +796,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
         'shown',
         'A',
@@ -838,6 +848,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
         'clicked',
         'A',
@@ -862,6 +873,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS,
         'deferred',
         'A',
@@ -1302,6 +1314,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_PHP_PRO_ONLY,
         'dismissed',
         'A',
@@ -1325,6 +1338,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
         'deferred',
         'A',
@@ -1348,6 +1362,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
         'dismissed',
         'A',
@@ -1371,6 +1386,7 @@ describe('showNotification', () => {
       expect(
         mockTelemetryService.reportNotificationInteraction,
       ).toHaveBeenCalledWith(
+        mockContext,
         NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS,
         'clicked',
         'A',

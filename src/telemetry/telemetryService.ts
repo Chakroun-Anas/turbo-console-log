@@ -304,6 +304,7 @@ class TelemetryService implements TurboAnalyticsProvider {
   }
 
   public async reportNotificationInteraction(
+    context: vscode.ExtensionContext,
     notificationEvent: string,
     interactionType: 'shown' | 'clicked' | 'dismissed' | 'deferred',
     variant: string,
@@ -321,6 +322,7 @@ class TelemetryService implements TurboAnalyticsProvider {
       )?.packageJSON.version;
       const vscodeVersion = vscode.version;
       const platform = process.platform;
+      const activityStatus = getUserActivityStatus(context);
 
       // Get current time and timezone information
       const now = new Date();
@@ -400,6 +402,7 @@ class TelemetryService implements TurboAnalyticsProvider {
         interactionType,
         variant,
         reactionTimeMs,
+        activityStatus,
         timezoneOffset,
         extensionVersion,
         vscodeVersion,
