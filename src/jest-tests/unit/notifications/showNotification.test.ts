@@ -14,6 +14,9 @@ import {
 // Mock dependencies
 jest.mock('@/telemetry/telemetryService');
 jest.mock('@/notifications/notificationCooldown');
+jest.mock('@/notifications/contextualAnalysis', () => ({
+  isRightContext: jest.fn().mockReturnValue(true),
+}));
 jest.mock('vscode', () => ({
   window: {
     showInformationMessage: jest.fn(),

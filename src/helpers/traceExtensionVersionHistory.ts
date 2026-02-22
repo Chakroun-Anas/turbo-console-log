@@ -104,9 +104,7 @@ export function traceExtensionVersionHistory(
     );
   }
 
-  if (isUpdate) {
-    showReleaseNotification(context, '3.16.1');
-  }
+  showReleaseNotification(context, '3.17.0');
 
   // Report telemetry for fresh installs and updates (decoupled from notifications)
   try {

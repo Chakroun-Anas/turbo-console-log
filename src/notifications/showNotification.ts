@@ -5,6 +5,7 @@ import { createTelemetryService } from '../telemetry/telemetryService';
 import { generateDeveloperId } from '../helpers/generateDeveloperId';
 import { writeToGlobalState } from '../helpers/writeToGlobalState';
 import { GlobalStateKey } from '@/entities';
+import { isRightContext } from './contextualAnalysis';
 import {
   shouldShowNotification,
   recordNotificationShown,
@@ -23,6 +24,11 @@ export async function showNotification(
   context: vscode.ExtensionContext,
   logCount?: number,
 ): Promise<boolean> {
+  // Check if we're in the right context for this notification
+  if (!isRightContext(notificationEvent)) {
+    return false; // Not the right context, don't show notification
+  }
+
   // Check cooldown system
   if (!shouldShowNotification(context, notificationEvent)) {
     return false; // Not shown due to cooldown
@@ -150,6 +156,18 @@ export async function showNotification(
         ctaText: 'Share Feedback',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/inactive-users-survey`,
       },
+      [NotificationEvent.EXTENSION_ACTIVATION_DAY_THREE]: {
+        message:
+          '⚡ Try it NOW: Select any variable → Insert a log → See the magic happen!',
+        ctaText: 'Quick Start Guide',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
+      },
+      [NotificationEvent.EXTENSION_ACTIVATION_DAY_SEVEN]: {
+        message:
+          '💡 Ready to try? Select any variable → Insert a log → Experience faster debugging!',
+        ctaText: 'See How It Works',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
+      },
       [NotificationEvent.EXTENSION_JS_MESSY_FILE]: {
         message:
           "🌲 10+ logs in this file! Navigate them all effortlessly with Pro's tree view.",
@@ -182,9 +200,9 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
         message:
-          '🎯 Ever wondered how many logs are in your workspace? Now you know instantly! 🚀',
+          '🧠 v3.17.0: Smarter notification timing based on your usage patterns',
         ctaText: 'See How',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3160`,
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3170`,
       },
       [NotificationEvent.EXTENSION_COMMIT_WITH_LOGS]: {
         message:

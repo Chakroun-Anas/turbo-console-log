@@ -2,6 +2,33 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.17.0] - 2026-02-25
+
+### 🧠 Context-Aware Notification Timing
+
+**Better timing, not more notifications.**
+
+This release introduces intelligent scheduling that considers your workspace state, time of day, and day of week before showing notifications. We're not changing the frequency—same 6 notifications per month maximum—we're just showing them at better moments.
+
+#### ✨ What's New
+
+- **⏰ Smart Timing Analysis** — Notifications now wait for optimal moments based on tens of thousands of user interaction patterns
+- **🎯 Zero Configuration** — The system adapts automatically to your workflow without any settings or preferences
+- **🛡️ Same Protection Guarantees** — All existing safeguards remain: 48-hour cooldown, 6 notifications/month max, three-strike pause system
+- **📊 Data-Driven Decisions** — Scheduling decisions based on real user engagement data, not guesswork
+
+#### 🎭 How It Works
+
+The system considers multiple signals before showing a notification:
+
+- **Workspace Context** — Respects your current focus (open editors, unsaved files, terminal activity)
+- **Time of Day** — Avoids interrupting during high-intensity work periods
+- **Day of Week** — Recognizes patterns like Monday momentum vs. mid-week focus time
+
+This is continuous work. We're committed to building a notification system that respects your workflow while keeping you informed about features and updates that matter.
+
+→ [Read the Full v3.17.0 Release Article](https://www.turboconsolelog.io/articles/release-3170)
+
 ## [3.16.1] - 2026-02-08
 
 ### 🎉 Log Count Feature — Community Success & Optimized Awareness

@@ -13,6 +13,8 @@ import {
   listenToManualConsoleLogs,
   listenToInactiveTwoWeeksReturn,
   listenToInactiveFourWeeksSurvey,
+  listenToActivationDayThree,
+  listenToActivationDaySeven,
   listenToJSMessyFileDetection,
   listenToPhpMessyFileDetection,
   listenToJSMultiLogTypes,
@@ -111,6 +113,12 @@ export async function activate(
 
   // Listen to JS/TS file openings for long-term inactive users (28+ days) - show survey
   listenToInactiveFourWeeksSurvey(context, version);
+
+  // Listen to JS/TS file openings for new users with zero usage (3-7 days activation nudge)
+  listenToActivationDayThree(context, version);
+
+  // Listen to JS/TS file openings for new users with zero usage (7-14 days final activation attempt)
+  listenToActivationDaySeven(context, version);
 
   // Listen to JS/TS messy file detection and show notification
   listenToJSMessyFileDetection(context, version);
