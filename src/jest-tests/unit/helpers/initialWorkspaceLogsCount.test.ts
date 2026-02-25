@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { initialWorkspaceLogsCount } from '@/helpers/initialWorkspaceLogsCount/initialWorkspaceLogsCount';
 import { GitIgnoreMatcher } from '@/helpers/initialWorkspaceLogsCount/GitIgnoreMatcher';
 import { collectFilesWithLogs } from '@/helpers/initialWorkspaceLogsCount/collectFilesWithLogs';
-import { readFromGlobalState, writeToGlobalState, isProUser } from '@/helpers';
+import { readFromGlobalState, writeToGlobalState } from '@/helpers';
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
 import { GlobalStateKey, ExtensionProperties, Message } from '@/entities';
@@ -20,7 +20,6 @@ const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
 const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
   typeof writeToGlobalState
 >;
-const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
 const mockShowNotification = showNotification as jest.MockedFunction<
   typeof showNotification
 >;
@@ -75,7 +74,6 @@ describe('initialWorkspaceLogsCount', () => {
 
     // Default mock implementations
     mockReadFromGlobalState.mockReturnValue(undefined);
-    mockIsProUser.mockReturnValue(false);
     mockShowNotification.mockResolvedValue(true);
     mockCollectFilesWithLogs.mockResolvedValue(new Map());
 
@@ -87,8 +85,26 @@ describe('initialWorkspaceLogsCount', () => {
   });
 
   describe('Early Returns', () => {
-    it('should return early if notification was already shown', async () => {
-      mockReadFromGlobalState.mockReturnValue(true);
+    it('should set badge but not show notification if notification was already shown', async () => {
+      workspaceFolders = [
+        {
+          uri: { fsPath: '/test/workspace' },
+          name: 'test-workspace',
+          index: 0,
+        },
+      ] as vscode.WorkspaceFolder[];
+
+      const mockLogsMap = new Map<string, Message[]>([
+        [
+          '/test/workspace/file.js',
+          Array(120)
+            .fill(null)
+            .map(() => createMockMessage()),
+        ],
+      ]);
+
+      mockCollectFilesWithLogs.mockResolvedValue(mockLogsMap);
+      mockReadFromGlobalState.mockReturnValue(true); // Notification already shown
 
       await initialWorkspaceLogsCount(
         mockConfig,
@@ -97,22 +113,15 @@ describe('initialWorkspaceLogsCount', () => {
         version,
       );
 
-      expect(mockLauncherView.badge).toBeUndefined();
-      expect(mockGitIgnoreMatcher.init).not.toHaveBeenCalled();
-    });
+      // Badge should still be set
+      expect(mockLauncherView.badge).toEqual({
+        value: 120,
+        tooltip: 'Total log statements in workspace',
+      });
 
-    it('should return early if user is Pro', async () => {
-      mockIsProUser.mockReturnValue(true);
-
-      await initialWorkspaceLogsCount(
-        mockConfig,
-        mockLauncherView,
-        context,
-        version,
-      );
-
-      expect(mockLauncherView.badge).toBeUndefined();
-      expect(mockGitIgnoreMatcher.init).not.toHaveBeenCalled();
+      // But notification should not be shown again
+      expect(mockShowNotification).not.toHaveBeenCalled();
+      expect(mockWriteToGlobalState).not.toHaveBeenCalled();
     });
 
     it('should return early if no workspace folders are opened', async () => {

@@ -2,7 +2,7 @@ import vscode from 'vscode';
 import { GitIgnoreMatcher } from './GitIgnoreMatcher';
 import { collectFilesWithLogs } from './collectFilesWithLogs';
 import { ExtensionProperties, Message, GlobalStateKey } from '@/entities';
-import { readFromGlobalState, writeToGlobalState, isProUser } from '@/helpers';
+import { readFromGlobalState, writeToGlobalState } from '@/helpers';
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
 
@@ -17,15 +17,6 @@ export async function initialWorkspaceLogsCount(
   context: vscode.ExtensionContext,
   version: string,
 ): Promise<void> {
-  // Trigger notification if workspace has 100+ logs (one-time, free users only)
-  const hasShownNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_WORKSPACE_LOG_THRESHOLD_NOTIFICATION,
-  );
-  const isPro = isProUser(context);
-  if (hasShownNotification || isPro) {
-    return;
-  }
   if (
     !vscode.workspace.workspaceFolders ||
     vscode.workspace.workspaceFolders.length === 0
@@ -80,10 +71,21 @@ export async function initialWorkspaceLogsCount(
     return;
   }
 
+  // Always set badge regardless of notification status
   launcherView.badge = {
     value: totalLogsCount,
     tooltip: 'Total log statements in workspace',
   };
+
+  // Check if we should trigger notification (one-time only)
+  // Note: This function is only called for non-Pro users (see extension.ts activation)
+  const hasShownNotification = readFromGlobalState<boolean>(
+    context,
+    GlobalStateKey.HAS_SHOWN_WORKSPACE_LOG_THRESHOLD_NOTIFICATION,
+  );
+  if (hasShownNotification) {
+    return;
+  }
 
   if (totalLogsCount >= LOG_COUNT_THRESHOLD) {
     // Show notification with personalized log count

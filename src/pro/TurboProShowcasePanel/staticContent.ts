@@ -1,6 +1,6 @@
 import { DynamicFreemiumPanel, DynamicFreemiumPanelContent } from './types';
 
-// const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
+const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
 // const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
 
 /**
@@ -11,27 +11,31 @@ export function getStaticContent(): DynamicFreemiumPanel {
   const content: DynamicFreemiumPanelContent[] = [
     {
       type: 'paragraph',
-      order: 2,
+      order: 1,
       component: {
-        title: '🚀 New: Turbo Pro Git Integration',
+        title: '🎯 v3.17.0: A Notification System Built on Respect',
         content:
-          "Turbo PRO now tracks your Git changes in real-time. The new 'Changed Files Only' filter shows logs exclusively from files you've staged, modified, or added—no noise from the rest of your workspace.",
+          "We've added context-aware timing to Turbo's notification system. After analyzing tens of thousands of interactions, notifications now consider your workspace state, time of day, and day of week. This joins our existing safeguards: bi-weekly releases, 48-hour cooldown, 6/month maximum, server-side enforcement, and three-strike pause.",
       },
     },
     {
-      type: 'paragraph',
-      order: 3,
+      type: 'media-showcase-cta',
+      order: 2,
       component: {
-        title: '🎯 One-Click Cleanup Before Commit',
-        content:
-          'Enable the filter, clean up all debugging logs from your changed files with one click. See only what matters, clean up confidently, commit production-ready code.',
+        illustrationSrcs: [
+          `${TURBO_WEBSITE_BASE_URL}/assets/turbo-notifications-illustration.png`,
+        ],
+        cta: {
+          text: 'Read Full Article',
+          url: `${TURBO_WEBSITE_BASE_URL}/articles/release-3170`,
+        },
       },
     },
   ];
 
   return {
-    tooltip: 'See Turbo Pro In Action 🚀',
-    date: new Date('2024-12-02T00:00:00.000Z'),
+    tooltip: 'v3.17.0: Context-Aware Notifications 🎯',
+    date: new Date('2026-02-24T20:00:00.000Z'),
     content,
   };
 }

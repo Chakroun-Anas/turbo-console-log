@@ -33,6 +33,8 @@ import { getUserActivityStatus } from './getUserActivityStatus';
 import { listenToManualConsoleLogs } from './listenToManualConsoleLogs';
 import { listenToInactiveTwoWeeksReturn } from './listenToInactiveTwoWeeksReturn';
 import { listenToInactiveFourWeeksSurvey } from './listenToInactiveFourWeeksSurvey';
+import { listenToActivationDayThree } from './listenToActivationDayThree';
+import { listenToActivationDaySeven } from './listenToActivationDaySeven';
 import { initialWorkspaceLogsCount } from './initialWorkspaceLogsCount/initialWorkspaceLogsCount';
 export {
   readFromGlobalState,
@@ -69,5 +71,7 @@ export {
   listenToManualConsoleLogs,
   listenToInactiveTwoWeeksReturn,
   listenToInactiveFourWeeksSurvey,
+  listenToActivationDayThree,
+  listenToActivationDaySeven,
   initialWorkspaceLogsCount,
 };
