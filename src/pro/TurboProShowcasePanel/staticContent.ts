@@ -13,9 +13,9 @@ export function getStaticContent(): DynamicFreemiumPanel {
       type: 'paragraph',
       order: 1,
       component: {
-        title: '🎯 v3.17.0: A Notification System Built on Respect',
+        title: '🔬 v3.18.0: Five Fixes Live. Now Help Us Find the Sixth',
         content:
-          "We've added context-aware timing to Turbo's notification system. After analyzing tens of thousands of interactions, notifications now consider your workspace state, time of day, and day of week. This joins our existing safeguards: bi-weekly releases, 48-hour cooldown, 6/month maximum, server-side enforcement, and three-strike pause.",
+          "v3.18.0 sharpens log placement for five real TypeScript and Angular code patterns found in production. We've also launched a dedicated Edge Cases Reporting page where you can report any pattern Turbo still gets wrong in your codebase. Every edge case you submit becomes a test case that makes the extension smarter for everyone.",
       },
     },
     {
@@ -23,19 +23,19 @@ export function getStaticContent(): DynamicFreemiumPanel {
       order: 2,
       component: {
         illustrationSrcs: [
-          `${TURBO_WEBSITE_BASE_URL}/assets/turbo-notifications-illustration.png`,
+          `${TURBO_WEBSITE_BASE_URL}/assets/report-edge-cases-illustration.png`,
         ],
         cta: {
           text: 'Read Full Article',
-          url: `${TURBO_WEBSITE_BASE_URL}/articles/release-3170`,
+          url: `${TURBO_WEBSITE_BASE_URL}/articles/release-3180`,
         },
       },
     },
   ];
 
   return {
-    tooltip: 'v3.17.0: Context-Aware Notifications 🎯',
-    date: new Date('2026-02-24T20:00:00.000Z'),
+    tooltip: 'v3.18.0: Five Fixes + Edge Cases Reporting 🔬',
+    date: new Date('2026-03-12T20:00:00.000Z'),
     content,
   };
 }

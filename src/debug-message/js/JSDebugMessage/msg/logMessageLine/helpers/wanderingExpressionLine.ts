@@ -4,6 +4,7 @@ import {
   isIdentifier,
   isMemberExpression,
   walk,
+  STATEMENT_TYPES,
 } from '../../acorn-utils';
 
 export function wanderingExpressionLine(
@@ -69,6 +70,7 @@ export function wanderingExpressionLine(
   setParents(ast);
 
   let bestEndOffset = -1;
+  let resultLine = -1;
 
   function isDeclaration(node: AcornNode): boolean {
     const parent = (node as { parent?: AcornNode }).parent;
@@ -131,14 +133,14 @@ export function wanderingExpressionLine(
 
     // If this node contains the variable and isn't a declaration
     if (containsVariableName(node) && !isDeclaration(node)) {
-      // Climb up to the outermost expression if possible
+      // Climb up to the enclosing statement boundary
       let top: AcornNode = node;
       let parent = (top as { parent?: AcornNode }).parent;
       const visited = new Set<AcornNode>();
       let depth = 0;
       const MAX_DEPTH = 1000;
 
-      while (parent && parent.start === node.start && parent.end >= node.end) {
+      while (parent) {
         // Safeguards against infinite loops
         if (depth >= MAX_DEPTH) {
           console.warn(
@@ -154,17 +156,28 @@ export function wanderingExpressionLine(
 
         top = parent;
         parent = (top as { parent?: AcornNode }).parent;
+
+        if (STATEMENT_TYPES.has(top.type)) {
+          break;
+        }
       }
 
-      const topEndOffset = top.end;
-      if (topEndOffset > bestEndOffset) {
-        bestEndOffset = topEndOffset;
+      const topStartLine = document.positionAt(top.start).line;
+      const topEndLine = document.positionAt(top.end).line;
+
+      // For multi-line statements: log before (start line)
+      // For single-line statements: log after (end line + 1)
+      const candidateLine =
+        topStartLine < topEndLine ? topStartLine : topEndLine + 1;
+
+      if (bestEndOffset === -1 || top.end > bestEndOffset) {
+        bestEndOffset = top.end;
+        resultLine = candidateLine;
       }
     }
   });
 
-  if (bestEndOffset === -1) return selectionLine + 1;
+  if (resultLine === -1) return selectionLine + 1;
 
-  const line = document.positionAt(bestEndOffset).line;
-  return line + 1;
+  return resultLine;
 }

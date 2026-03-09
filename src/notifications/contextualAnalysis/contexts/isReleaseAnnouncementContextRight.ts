@@ -60,8 +60,8 @@ export function isReleaseAnnouncementContextRight(): boolean {
     score *= 0.83;
   }
 
-  // Threshold: Accept if score >= 150 (50% above baseline)
-  const THRESHOLD = 150;
+  // Threshold: Accept if score >= 100 (baseline)
+  const THRESHOLD = 100;
 
   return score >= THRESHOLD;
 }

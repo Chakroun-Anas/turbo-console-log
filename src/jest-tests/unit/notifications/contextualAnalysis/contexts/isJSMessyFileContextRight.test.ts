@@ -15,7 +15,7 @@ describe('isJSMessyFileContextRight', () => {
   });
 
   describe('threshold validation', () => {
-    it('should return true when score >= 140', () => {
+    it('should return true when score >= 100', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SATURDAY',
         periodOfDay: 'night',
@@ -27,7 +27,7 @@ describe('isJSMessyFileContextRight', () => {
       expect(isJSMessyFileContextRight()).toBe(true);
     });
 
-    it('should return false when score < 140', () => {
+    it('should return false when score < 100', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'MONDAY',
         periodOfDay: 'morning',
@@ -47,8 +47,8 @@ describe('isJSMessyFileContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 0,
       });
-      // Saturday (1.36) × afternoon (0.92) × 1-2 editors (1.08) × 0 terminals (0.86) = 116 ❌
-      expect(isJSMessyFileContextRight()).toBe(false);
+      // Saturday (1.36) × afternoon (0.92) × 1-2 editors (1.08) × 0 terminals (0.86) = 116 ✅
+      expect(isJSMessyFileContextRight()).toBe(true);
     });
   });
 
@@ -245,8 +245,8 @@ describe('isJSMessyFileContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 1,
       });
-      // Friday (0.89) × night (1.38) × 1-2 editors (1.08) × 1 terminal (0.92) = 122 ❌
-      expect(isJSMessyFileContextRight()).toBe(false);
+      // Friday (0.89) × night (1.38) × 1-2 editors (1.08) × 1 terminal (0.92) = 122 ✅
+      expect(isJSMessyFileContextRight()).toBe(true);
     });
   });
 
@@ -295,8 +295,8 @@ describe('isJSMessyFileContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 1,
       });
-      // Saturday (1.36) × morning (0.91) × 1-2 editors (1.08) × 1 terminal (0.92) = 123 ❌
-      expect(isJSMessyFileContextRight()).toBe(false);
+      // Saturday (1.36) × morning (0.91) × 1-2 editors (1.08) × 1 terminal (0.92) = 123 ✅
+      expect(isJSMessyFileContextRight()).toBe(true);
     });
   });
 
@@ -425,7 +425,7 @@ describe('isJSMessyFileContextRight', () => {
       expect(isJSMessyFileContextRight()).toBe(false);
     });
 
-    it('should handle baseline context (neutral)', () => {
+    it('should handle baseline context with terminals (now passes)', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'TUESDAY',
         periodOfDay: 'afternoon',
@@ -433,8 +433,8 @@ describe('isJSMessyFileContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 2,
       });
-      // Tuesday (0.98) × afternoon (0.92) × 1-2 editors (1.08) = 97 ❌
-      expect(isJSMessyFileContextRight()).toBe(false);
+      // Tuesday (0.98) × afternoon (0.92) × 1-2 editors (1.08) × 2-3 terminals (1.07) = 104 ✅
+      expect(isJSMessyFileContextRight()).toBe(true);
     });
 
     it('should handle single strong multiplier (not enough)', () => {
@@ -463,7 +463,7 @@ describe('isJSMessyFileContextRight', () => {
       expect(isJSMessyFileContextRight()).toBe(true);
     });
 
-    it('should fail just below threshold', () => {
+    it('should pass above threshold', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SATURDAY',
         periodOfDay: 'morning',
@@ -471,8 +471,8 @@ describe('isJSMessyFileContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 1,
       });
-      // Saturday (1.36) × morning (0.91) × 1-2 editors (1.08) × 1 terminal (0.92) = 123 ❌
-      expect(isJSMessyFileContextRight()).toBe(false);
+      // Saturday (1.36) × morning (0.91) × 1-2 editors (1.08) × 1 terminal (0.92) = 123 ✅
+      expect(isJSMessyFileContextRight()).toBe(true);
     });
 
     it('should pass with two strong multipliers', () => {
@@ -610,8 +610,8 @@ describe('isJSMessyFileContextRight', () => {
         dayOfWeek: 'MONDAY' as WorkspaceContext['dayOfWeek'],
       };
       mockCollectWorkspaceContext.mockReturnValue(weekdayContext);
-      // Monday (0.88) × evening (1.08) × 1-2 editors (1.08) = 103 ❌
-      expect(isJSMessyFileContextRight()).toBe(false);
+      // Monday (0.88) × evening (1.08) × 1-2 editors (1.08) = 103 (now passes) ✅
+      expect(isJSMessyFileContextRight()).toBe(true);
     });
 
     it('should prefer active dev (4+ terminals) over browsing (0 terminals)', () => {
@@ -628,8 +628,8 @@ describe('isJSMessyFileContextRight', () => {
 
       const browsingContext = { ...activeContext, terminalCount: 0 };
       mockCollectWorkspaceContext.mockReturnValue(browsingContext);
-      // Wednesday (1.09) × evening (1.08) × 1-2 editors (1.08) × 0 terminals (0.86) = 109 ❌
-      expect(isJSMessyFileContextRight()).toBe(false);
+      // Wednesday (1.09) × evening (1.08) × 1-2 editors (1.08) × 0 terminals (0.86) = 109 (now passes) ✅
+      expect(isJSMessyFileContextRight()).toBe(true);
     });
   });
 });

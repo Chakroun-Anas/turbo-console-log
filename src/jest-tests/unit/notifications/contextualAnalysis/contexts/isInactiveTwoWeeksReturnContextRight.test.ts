@@ -13,7 +13,7 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
     jest.clearAllMocks();
   });
 
-  describe('threshold validation (140)', () => {
+  describe('threshold validation (100)', () => {
     it('should return true for optimal context (Monday night - maximum achievable)', () => {
       // Monday (1.23) × night (1.42) = 174.7 (max achievable)
       mockCollectWorkspaceContext.mockReturnValue({
@@ -28,7 +28,7 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
     });
 
     it('should return true for Sunday night (above threshold)', () => {
-      // Sunday (1.06) × night (1.42) = 150.5 (above 140 threshold)
+      // Sunday (1.06) × night (1.42) = 150.5 (above 100 threshold)
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SUNDAY',
         periodOfDay: 'night',
@@ -40,8 +40,8 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
       expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
 
-    it('should return false for score at exactly threshold boundary', () => {
-      // Monday (1.23) × morning (0.99) = 121.8 (below 140 threshold)
+    it('should return true for score at threshold boundary', () => {
+      // Monday (1.23) × morning (0.99) = 121.8 (above 100 threshold)
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'MONDAY',
         periodOfDay: 'morning',
@@ -50,7 +50,7 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
+      expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
 
     it('should return false for score well below threshold', () => {
@@ -95,7 +95,7 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
     });
 
     it('should return true for Tuesday night (still good night effect)', () => {
-      // Tuesday (0.99) × night (1.42) = 140.6 ✅ (barely passes)
+      // Tuesday (0.99) × night (1.42) = 140.6 ✅ (passes)
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'TUESDAY',
         periodOfDay: 'night',
@@ -108,7 +108,7 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
     });
 
     it('should return true for Thursday night', () => {
-      // Thursday (0.99) × night (1.42) = 140.6 ✅ (barely passes)
+      // Thursday (0.99) × night (1.42) = 140.6 ✅ (passes)
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'THURSDAY',
         periodOfDay: 'night',
@@ -161,8 +161,8 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
       expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
     });
 
-    it('should return false for Monday morning (weak time)', () => {
-      // Monday (1.23) × morning (0.99) = 121.8 ❌ (below threshold)
+    it('should return true for Monday morning (above threshold now)', () => {
+      // Monday (1.23) × morning (0.99) = 121.8 ✅ (above 100 threshold)
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'MONDAY',
         periodOfDay: 'morning',
@@ -171,7 +171,7 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
+      expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
 
     it('should return false for Saturday morning', () => {
@@ -199,8 +199,8 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
         terminalCount: 0,
       });
 
-      // Friday (0.94) × night (1.42) = 133.5 ❌ (just below 140)
-      expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
+      // Friday (0.94) × night (1.42) = 133.5 ✅ (above 100)
+      expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
 
     it('should heavily penalize evening (lowest multiplier: 0.72)', () => {
@@ -226,8 +226,8 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
         terminalCount: 0,
       });
 
-      // Sunday (1.06) × morning (0.99) = 104.9 ❌ (below threshold)
-      expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
+      // Sunday (1.06) × morning (0.99) = 104.9 ✅ (above 100 threshold)
+      expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
 
     it('should treat afternoon as slightly negative (0.97)', () => {
@@ -239,8 +239,8 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
         terminalCount: 0,
       });
 
-      // Monday (1.23) × afternoon (0.97) = 119.3 ❌
-      expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
+      // Monday (1.23) × afternoon (0.97) = 119.3 ✅ (above 100)
+      expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
   });
 
@@ -312,9 +312,8 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
   });
 
   describe('borderline cases', () => {
-    it('should pass when score is exactly at threshold (140)', () => {
-      // Need to hit exactly 140
-      // Tuesday (0.99) × night (1.42) = 140.6 ✅ (just above)
+    it('should pass when score is well above threshold (100)', () => {
+      // Tuesday (0.99) × night (1.42) = 140.6 ✅ (above 100)
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'TUESDAY',
         periodOfDay: 'night',
@@ -326,8 +325,8 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
       expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
 
-    it('should fail when score is just below threshold', () => {
-      // Friday (0.94) × night (1.42) = 133.5 ❌ (just below 140)
+    it('should pass when score is above threshold', () => {
+      // Friday (0.94) × night (1.42) = 133.5 ✅ (above 100)
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'FRIDAY',
         periodOfDay: 'night',
@@ -336,7 +335,7 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
+      expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
 
     it('should ignore irrelevant context metrics (openEditorsCount)', () => {
@@ -440,11 +439,11 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
         terminalCount: 0,
       });
 
-      // Still fails because Saturday is too weak even with night boost
-      expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
+      // Passes with new lower threshold
+      expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
 
-    it('should validate that both night AND good day are needed', () => {
+    it('should validate that both night AND good day provide best results', () => {
       // Best day (Monday) with worst time (evening) = 88.6
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'MONDAY',
@@ -457,9 +456,9 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
       expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
     });
 
-    it('should validate that night alone is insufficient without decent day', () => {
-      // Night (1.42) needs at least 0.99 day multiplier to reach 140 threshold
-      // Friday (0.94) × night (1.42) = 133.5 ❌
+    it('should validate that night boosts all days above threshold now', () => {
+      // Night (1.42) now brings even weaker days above 100 threshold
+      // Friday (0.94) × night (1.42) = 133.5 ✅
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'FRIDAY',
         periodOfDay: 'night',
@@ -468,7 +467,7 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
+      expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
     });
 
     it('should validate Monday-Thursday nights all pass', () => {
@@ -487,10 +486,18 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
       });
     });
 
-    it('should validate Friday/Saturday/Wednesday nights all fail', () => {
-      const failingDays = ['FRIDAY', 'SATURDAY', 'WEDNESDAY'] as const;
+    it('should validate all nights now pass with threshold at 100', () => {
+      const allDays = [
+        'FRIDAY',
+        'SATURDAY',
+        'WEDNESDAY',
+        'MONDAY',
+        'TUESDAY',
+        'THURSDAY',
+        'SUNDAY',
+      ] as const;
 
-      failingDays.forEach((day) => {
+      allDays.forEach((day) => {
         mockCollectWorkspaceContext.mockReturnValue({
           dayOfWeek: day,
           periodOfDay: 'night',
@@ -499,7 +506,7 @@ describe('isInactiveTwoWeeksReturnContextRight', () => {
           terminalCount: 0,
         });
 
-        expect(isInactiveTwoWeeksReturnContextRight()).toBe(false);
+        expect(isInactiveTwoWeeksReturnContextRight()).toBe(true);
       });
     });
   });

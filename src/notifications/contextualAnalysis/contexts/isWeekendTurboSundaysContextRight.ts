@@ -45,9 +45,9 @@ export function isWeekendTurboSundaysContextRight(): boolean {
     score *= 0.9;
   }
 
-  // Threshold: Accept if score >= 130 (30% above baseline)
-  // Targets Sunday morning momentum pattern (max achievable: 134.3)
-  const THRESHOLD = 130;
+  // Threshold: Accept if score >= 100 (baseline)
+  // Targets Sunday morning momentum pattern
+  const THRESHOLD = 100;
 
   return score >= THRESHOLD;
 }

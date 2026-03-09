@@ -8,5 +8,5 @@ export default {
   ],
   selectionLine: 0,
   variableName: 'user.profile.name',
-  expectedLine: 3,
+  expectedLine: 0,
 };

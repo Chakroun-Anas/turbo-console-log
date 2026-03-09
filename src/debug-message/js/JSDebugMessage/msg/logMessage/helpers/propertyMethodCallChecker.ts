@@ -3,6 +3,7 @@ import {
   type AcornNode,
   isCallExpression,
   isMemberExpression,
+  isReturnStatement,
   walk,
 } from '../../acorn-utils';
 
@@ -14,6 +15,45 @@ function getNodeText(node: AcornNode, sourceCode: string): string {
     return sourceCode.substring(node.start, node.end);
   }
   return '';
+}
+
+/**
+ * Build a parent map for the AST so we can walk up the ancestor chain.
+ */
+function buildParentMap(ast: AcornNode): Map<AcornNode, AcornNode> {
+  const parentMap = new Map<AcornNode, AcornNode>();
+  walk(ast, (node: AcornNode) => {
+    for (const key in node) {
+      if (key === 'type' || key === 'start' || key === 'end' || key === 'loc')
+        continue;
+      const value = (node as unknown as Record<string, unknown>)[key];
+      if (Array.isArray(value)) {
+        for (const child of value) {
+          if (child && typeof child === 'object' && 'type' in child) {
+            parentMap.set(child as AcornNode, node);
+          }
+        }
+      } else if (value && typeof value === 'object' && 'type' in value) {
+        parentMap.set(value as AcornNode, node);
+      }
+    }
+  });
+  return parentMap;
+}
+
+/**
+ * Returns true if any ancestor of `node` in the parent map is a ReturnStatement.
+ */
+function isInsideReturnStatement(
+  node: AcornNode,
+  parentMap: Map<AcornNode, AcornNode>,
+): boolean {
+  let current: AcornNode | undefined = parentMap.get(node);
+  while (current) {
+    if (isReturnStatement(current)) return true;
+    current = parentMap.get(current);
+  }
+  return false;
 }
 
 export function propertyMethodCallChecker(
@@ -38,6 +78,8 @@ export function propertyMethodCallChecker(
 
   let isChecked = false;
 
+  const parentMap = buildParentMap(ast);
+
   walk(ast, (node: AcornNode): boolean | void => {
     if (isChecked) return true;
 
@@ -59,7 +101,8 @@ export function propertyMethodCallChecker(
             objectExpr.start !== undefined &&
             objectExpr.end !== undefined &&
             objectExpr.start <= startOffset &&
-            objectExpr.end >= endOffset
+            objectExpr.end >= endOffset &&
+            !isInsideReturnStatement(node, parentMap)
           ) {
             isChecked = true;
             return true; // Found our match, stop recursing

@@ -64,9 +64,9 @@ export function isWorkspaceLogThresholdContextRight(): boolean {
     score *= 0.9;
   }
 
-  // Threshold: Accept if score >= 150 (50% above baseline)
+  // Threshold: Accept if score >= 100 (baseline)
   // Targets weekend/evening exploratory sessions
-  const THRESHOLD = 150;
+  const THRESHOLD = 100;
 
   return score >= THRESHOLD;
 }

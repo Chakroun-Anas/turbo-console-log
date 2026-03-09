@@ -33,6 +33,7 @@ import type {
   ClassMethod,
   Property,
   TSParameterProperty,
+  PropertyDefinition,
 } from './types';
 
 export function isLiteral(node: AcornNode): node is Literal {
@@ -198,3 +199,22 @@ export function isTSParameterProperty(
 ): node is TSParameterProperty {
   return node.type === 'TSParameterProperty';
 }
+
+export function isPropertyDefinition(
+  node: AcornNode,
+): node is PropertyDefinition {
+  return node.type === 'PropertyDefinition';
+}
+
+export const STATEMENT_TYPES = new Set([
+  'VariableDeclaration',
+  'ExpressionStatement',
+  'ReturnStatement',
+  'ThrowStatement',
+  'IfStatement',
+  'ForStatement',
+  'ForInStatement',
+  'ForOfStatement',
+  'WhileStatement',
+  'DoWhileStatement',
+]);

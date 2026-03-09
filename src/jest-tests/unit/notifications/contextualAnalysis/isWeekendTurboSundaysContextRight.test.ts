@@ -15,7 +15,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
     jest.clearAllMocks();
   });
 
-  describe('Threshold validation (130)', () => {
+  describe('Threshold validation (100)', () => {
     it('should return true for optimal context (Sunday morning + 0 editors)', () => {
       // Sunday (1.1) × morning (1.1) × 0 editors (1.11)
       // = 100 × 1.1 × 1.1 × 1.11 ≈ 134.3 (max achievable)
@@ -30,9 +30,9 @@ describe('isWeekendTurboSundaysContextRight', () => {
       expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
-    it('should return false for Sunday morning + 1-2 editors (below threshold)', () => {
+    it('should return true for Sunday morning + 1-2 editors (now passes)', () => {
       // Sunday (1.1) × morning (1.1) × 1-2 editors (0.98)
-      // = 100 × 1.1 × 1.1 × 0.98 ≈ 118.6 (below 130 threshold)
+      // = 100 × 1.1 × 1.1 × 0.98 ≈ 118.6 (above 100 threshold)
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SUNDAY',
         periodOfDay: 'morning',
@@ -41,7 +41,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false);
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
     it('should return false for score below threshold', () => {
@@ -172,7 +172,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         dayOfWeek: 'SATURDAY',
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false); // Below 130
+      expect(isWeekendTurboSundaysContextRight()).toBe(true); // Above 100
     });
 
     it('should apply weekday multiplier (0.5 - event should rarely fire)', () => {
@@ -224,7 +224,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         periodOfDay: 'evening',
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false); // Below 130
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
     it('should apply afternoon multiplier (0.97 - slight penalty)', () => {
@@ -235,7 +235,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         periodOfDay: 'afternoon',
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false);
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
     it('should apply night multiplier (0.89 - worst, opposite of Release Announcement)', () => {
@@ -246,7 +246,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         periodOfDay: 'night',
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false);
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
   });
 
@@ -276,7 +276,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         openEditorsCount: 4,
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false); // Just below 130
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
     it('should apply 1-2 editors multiplier (0.98 - slight penalty)', () => {
@@ -287,7 +287,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         openEditorsCount: 2,
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false);
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
     it('should apply 6+ editors multiplier (0.9 - deep focus, avoid interruption)', () => {
@@ -298,7 +298,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         openEditorsCount: 10,
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false);
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
     it('should apply 6+ multiplier for 11+ editors', () => {
@@ -309,7 +309,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
 
       const result = isWeekendTurboSundaysContextRight();
       // Score: 100 × 1.1 × 1.1 × 0.9 ≈ 108.9
-      expect(result).toBe(false);
+      expect(result).toBe(true);
     });
   });
 
@@ -407,7 +407,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
       expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
-    it('should return false for score just below threshold (127)', () => {
+    it('should return true for score above threshold (127)', () => {
       // Sunday (1.1) × morning (1.1) × 3-5 editors (1.05) = 127.05
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SUNDAY',
@@ -417,10 +417,10 @@ describe('isWeekendTurboSundaysContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false);
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
-    it('should return false for Saturday morning + 0 editors (116)', () => {
+    it('should return true for Saturday morning + 0 editors (116)', () => {
       // Saturday (0.95) × morning (1.1) × 0 editors (1.11) = 115.97
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SATURDAY',
@@ -430,7 +430,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false);
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
   });
 
@@ -447,7 +447,8 @@ describe('isWeekendTurboSundaysContextRight', () => {
       expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
-    it('should reject Sunday night coding session (late night, not morning momentum)', () => {
+    it('should accept Sunday night coding session (now passes threshold)', () => {
+      // Sunday (1.1) × night (0.89) × 3-5 editors (1.05) ≈ 102.8
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SUNDAY',
         periodOfDay: 'night',
@@ -456,7 +457,7 @@ describe('isWeekendTurboSundaysContextRight', () => {
         terminalCount: 2,
       });
 
-      expect(isWeekendTurboSundaysContextRight()).toBe(false);
+      expect(isWeekendTurboSundaysContextRight()).toBe(true);
     });
 
     it('should reject Saturday afternoon deep focus (6+ editors, wrong time)', () => {

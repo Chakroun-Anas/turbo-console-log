@@ -62,8 +62,15 @@ export function ternaryChecker(
         const binding = findBindingElement(id, wanted);
         if (binding) {
           // For AssignmentPattern, check the 'right' (default value)
+          // e.g. const [x = ternary] = ...
           const right = (binding as { right?: AcornNode }).right;
           if (right && containsTernary(right)) {
+            isChecked = true;
+            return true;
+          }
+          // For plain destructuring (no default), check if the whole init is a ternary
+          // e.g. const [cookieName, cookieValue] = cond ? x : y
+          if (!right && init && containsTernary(init)) {
             isChecked = true;
             return true;
           }

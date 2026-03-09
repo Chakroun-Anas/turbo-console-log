@@ -15,8 +15,8 @@ describe('isReleaseAnnouncementContextRight', () => {
     jest.clearAllMocks();
   });
 
-  describe('Threshold validation (150)', () => {
-    it('should return true for score exactly at threshold (150)', () => {
+  describe('Threshold validation (100)', () => {
+    it('should return true for score well above threshold (100)', () => {
       // Friday (1.2) × night (1.31) × baseline unsaved (0.985) × 0 editors (1.02)
       // = 100 × 1.2 × 1.31 × 0.985 × 1.02 ≈ 158.8
       mockCollectWorkspaceContext.mockReturnValue({
@@ -141,7 +141,7 @@ describe('isReleaseAnnouncementContextRight', () => {
       expect(isReleaseAnnouncementContextRight()).toBe(false);
     });
 
-    it('should return false for Sunday evening baseline context', () => {
+    it('should return true for Sunday evening baseline context', () => {
       // Sunday (1.14) × evening (1.14) × baseline unsaved (0.985) × 11+ editors (0.89)
       // = 100 × 1.14 × 1.14 × 0.985 × 0.89 ≈ 113
       mockCollectWorkspaceContext.mockReturnValue({
@@ -152,7 +152,7 @@ describe('isReleaseAnnouncementContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isReleaseAnnouncementContextRight()).toBe(false);
+      expect(isReleaseAnnouncementContextRight()).toBe(true);
     });
   });
 
@@ -172,7 +172,7 @@ describe('isReleaseAnnouncementContextRight', () => {
         dayOfWeek: 'SATURDAY',
       });
 
-      expect(isReleaseAnnouncementContextRight()).toBe(false); // Below 150
+      expect(isReleaseAnnouncementContextRight()).toBe(true); // Above 100
     });
 
     it('should apply Thursday/Friday multiplier (1.2)', () => {
@@ -183,7 +183,7 @@ describe('isReleaseAnnouncementContextRight', () => {
 
       const result = isReleaseAnnouncementContextRight();
       // Score: 100 × 1.2 × 0.97 × 0.985 × 1.0 ≈ 115
-      expect(result).toBe(false); // Below 150
+      expect(result).toBe(true); // Above 100
     });
 
     it('should apply Tuesday multiplier (0.91 - worst)', () => {
@@ -225,7 +225,7 @@ describe('isReleaseAnnouncementContextRight', () => {
         periodOfDay: 'evening',
       });
 
-      expect(isReleaseAnnouncementContextRight()).toBe(false); // Below 150
+      expect(isReleaseAnnouncementContextRight()).toBe(true); // Above 100
     });
 
     it('should apply morning multiplier (0.89 - worst)', () => {
@@ -236,7 +236,7 @@ describe('isReleaseAnnouncementContextRight', () => {
 
       const result = isReleaseAnnouncementContextRight();
       // Score: 100 × 1.08 × 0.89 × 0.985 × 1.09 ≈ 103
-      expect(result).toBe(false);
+      expect(result).toBe(true); // Above 100
     });
   });
 
@@ -267,7 +267,7 @@ describe('isReleaseAnnouncementContextRight', () => {
 
       const result = isReleaseAnnouncementContextRight();
       // Score: 100 × 1.42 × 0.97 × 0.97 × 1.0 ≈ 134
-      expect(result).toBe(false); // Below 150
+      expect(result).toBe(true); // Above 100
     });
 
     it('should apply clean state multiplier (0.985)', () => {
@@ -278,7 +278,7 @@ describe('isReleaseAnnouncementContextRight', () => {
 
       const result = isReleaseAnnouncementContextRight();
       // Score: 100 × 1.42 × 0.97 × 0.985 × 1.0 ≈ 136
-      expect(result).toBe(false); // Below 150
+      expect(result).toBe(true); // Above 100
     });
   });
 
@@ -298,7 +298,7 @@ describe('isReleaseAnnouncementContextRight', () => {
         openEditorsCount: 2,
       });
 
-      expect(isReleaseAnnouncementContextRight()).toBe(false); // Just below 150
+      expect(isReleaseAnnouncementContextRight()).toBe(true); // Above 100
     });
 
     it('should apply 0 editors multiplier (1.02)', () => {
@@ -309,7 +309,7 @@ describe('isReleaseAnnouncementContextRight', () => {
 
       const result = isReleaseAnnouncementContextRight();
       // Score: 100 × 1.42 × 0.97 × 0.985 × 1.02 ≈ 139
-      expect(result).toBe(false);
+      expect(result).toBe(true); // Above 100
     });
 
     it('should apply 3-5 editors multiplier (1.0 - baseline)', () => {
@@ -320,7 +320,7 @@ describe('isReleaseAnnouncementContextRight', () => {
 
       const result = isReleaseAnnouncementContextRight();
       // Score: 100 × 1.42 × 0.97 × 0.985 × 1.0 ≈ 136
-      expect(result).toBe(false);
+      expect(result).toBe(true); // Above 100
     });
 
     it('should apply 6-10 editors multiplier (0.83 - worst flow state)', () => {
@@ -331,7 +331,7 @@ describe('isReleaseAnnouncementContextRight', () => {
 
       const result = isReleaseAnnouncementContextRight();
       // Score: 100 × 1.42 × 0.97 × 0.985 × 0.83 ≈ 113
-      expect(result).toBe(false);
+      expect(result).toBe(true); // Above 100
     });
 
     it('should apply 11+ editors multiplier (0.89 - deep flow)', () => {
@@ -342,7 +342,7 @@ describe('isReleaseAnnouncementContextRight', () => {
 
       const result = isReleaseAnnouncementContextRight();
       // Score: 100 × 1.42 × 0.97 × 0.985 × 0.89 ≈ 121
-      expect(result).toBe(false);
+      expect(result).toBe(true); // Above 100
     });
   });
 
@@ -361,7 +361,7 @@ describe('isReleaseAnnouncementContextRight', () => {
 
       // Wednesday (1.08) × afternoon (0.97) × baseline (0.985) × 3-5 editors (1.0)
       // = 100 × 1.08 × 0.97 × 0.985 × 1.0 ≈ 103
-      expect(isReleaseAnnouncementContextRight()).toBe(false);
+      expect(isReleaseAnnouncementContextRight()).toBe(true); // Above 100
     });
 
     it('should handle multiple negative multipliers', () => {
@@ -418,7 +418,7 @@ describe('isReleaseAnnouncementContextRight', () => {
       expect(isReleaseAnnouncementContextRight()).toBe(true);
     });
 
-    it('should return false for score just below threshold (149)', () => {
+    it('should return false for score just below threshold (99)', () => {
       // Sunday (1.14) × evening (1.14) × baseline (0.985) × 1-2 editors (1.09)
       // = 100 × 1.14 × 1.14 × 0.985 × 1.09 ≈ 141
       mockCollectWorkspaceContext.mockReturnValue({
@@ -429,7 +429,7 @@ describe('isReleaseAnnouncementContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isReleaseAnnouncementContextRight()).toBe(false);
+      expect(isReleaseAnnouncementContextRight()).toBe(true); // Now passes at 100 threshold
     });
   });
 });

@@ -1,0 +1,21 @@
+export default {
+  name: 'identifier nested deep inside multi-line statement (Angular HTTP interceptor)',
+  fileExtension: '.ts',
+  lines: [
+    'class Interceptor {',
+    '  handle(initialRequest: HttpRequest<any>): Observable<HttpEvent<any>> {',
+    '    if (this.chain === null) {',
+    '      const dedupedInterceptorFns = Array.from(',
+    '        new Set([',
+    '          ...this.injector.get(HTTP_INTERCEPTOR_FNS),',
+    '          ...this.injector.get(HTTP_ROOT_INTERCEPTOR_FNS, []),',
+    '        ]),',
+    '      );',
+    '    }',
+    '  }',
+    '}',
+  ],
+  selectionLine: 5,
+  variableName: 'HTTP_INTERCEPTOR_FNS',
+  expectedLine: 3,
+};

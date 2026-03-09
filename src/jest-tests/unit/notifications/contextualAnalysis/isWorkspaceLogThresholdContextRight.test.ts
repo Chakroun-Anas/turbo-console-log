@@ -15,7 +15,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
     jest.clearAllMocks();
   });
 
-  describe('Threshold validation (150)', () => {
+  describe('Threshold validation (100)', () => {
     it('should return true for Saturday night (weekend discovery)', () => {
       // Saturday (1.5) × night (1.31) = 196.5
       mockCollectWorkspaceContext.mockReturnValue({
@@ -181,7 +181,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
       expect(isWorkspaceLogThresholdContextRight()).toBe(false);
     });
 
-    it('should return false for Friday evening (just below threshold)', () => {
+    it('should return true for Friday evening (now above threshold)', () => {
       // Friday (1.12) × evening (1.15) = 128.8
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'FRIDAY',
@@ -191,7 +191,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true);
     });
   });
 
@@ -230,7 +230,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         dayOfWeek: 'FRIDAY',
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false); // Just below 150
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
 
     it('should apply Thursday multiplier (1.0 - baseline)', () => {
@@ -240,7 +240,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         dayOfWeek: 'THURSDAY',
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
 
     it('should apply Monday multiplier (0.91 - worst)', () => {
@@ -250,7 +250,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         dayOfWeek: 'MONDAY',
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
   });
 
@@ -289,7 +289,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         periodOfDay: 'afternoon',
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
 
     it('should apply morning multiplier (0.94 - worst)', () => {
@@ -299,7 +299,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         periodOfDay: 'morning',
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
   });
 
@@ -341,7 +341,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         unsavedFilesCount: 5,
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false); // Just below 150
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
   });
 
@@ -383,7 +383,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         openEditorsCount: 4,
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
 
     it('should apply 6-10 editors multiplier (0.9 - worst, deep flow)', () => {
@@ -394,7 +394,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         openEditorsCount: 8,
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
 
     it('should apply 11+ editors multiplier (0.96)', () => {
@@ -405,7 +405,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         openEditorsCount: 15,
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
   });
 
@@ -479,7 +479,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
       expect(isWorkspaceLogThresholdContextRight()).toBe(true);
     });
 
-    it('should return false for score just below threshold (149)', () => {
+    it('should return true for score above threshold (146.7)', () => {
       // Friday (1.12) × night (1.31) = 146.7
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'FRIDAY',
@@ -489,10 +489,10 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
 
-    it('should return false for Friday evening (128.8)', () => {
+    it('should return true for Friday evening (128.8)', () => {
       // Friday (1.12) × evening (1.15) = 128.8
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'FRIDAY',
@@ -502,7 +502,7 @@ describe('isWorkspaceLogThresholdContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isWorkspaceLogThresholdContextRight()).toBe(false);
+      expect(isWorkspaceLogThresholdContextRight()).toBe(true); // Above 100
     });
   });
 
@@ -605,8 +605,8 @@ describe('isWorkspaceLogThresholdContextRight', () => {
       mockCollectWorkspaceContext.mockReturnValue(mondayMorningContext);
       const mondayMorning = isWorkspaceLogThresholdContextRight();
 
-      // Night should be better than morning (though both may fail)
-      expect(mondayNight).toBe(false);
+      // Night should be better than morning
+      expect(mondayNight).toBe(true); // Now passes with 100 threshold
       expect(mondayMorning).toBe(false);
       expect(119.2).toBeGreaterThan(85.5); // Night score > morning score
     });

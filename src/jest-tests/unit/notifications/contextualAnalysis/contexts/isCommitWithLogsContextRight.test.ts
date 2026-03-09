@@ -15,7 +15,7 @@ describe('isCommitWithLogsContextRight', () => {
   });
 
   describe('threshold validation', () => {
-    it('should return true when score >= 150', () => {
+    it('should return true when score >= 100', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SATURDAY',
         periodOfDay: 'night',
@@ -27,7 +27,7 @@ describe('isCommitWithLogsContextRight', () => {
       expect(isCommitWithLogsContextRight()).toBe(true);
     });
 
-    it('should return false when score < 150', () => {
+    it('should return false when score < 100', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'MONDAY',
         periodOfDay: 'morning',
@@ -39,7 +39,7 @@ describe('isCommitWithLogsContextRight', () => {
       expect(isCommitWithLogsContextRight()).toBe(false);
     });
 
-    it('should return true at exact threshold', () => {
+    it('should return true well above threshold', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'THURSDAY',
         periodOfDay: 'night',
@@ -47,7 +47,7 @@ describe('isCommitWithLogsContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 2,
       });
-      // Thursday (1.17) × night (1.29) = 151 (just above 150) ✅
+      // Thursday (1.17) × night (1.29) = 151 (well above 100) ✅
       expect(isCommitWithLogsContextRight()).toBe(true);
     });
   });
@@ -187,7 +187,7 @@ describe('isCommitWithLogsContextRight', () => {
       expect(isCommitWithLogsContextRight()).toBe(false);
     });
 
-    it('should return false for Sunday evening (just below threshold)', () => {
+    it('should return true for Sunday evening (now passes)', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SUNDAY',
         periodOfDay: 'evening',
@@ -195,11 +195,11 @@ describe('isCommitWithLogsContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 2,
       });
-      // Sunday (1.09) × evening (0.98) = 107 ❌
-      expect(isCommitWithLogsContextRight()).toBe(false);
+      // Sunday (1.09) × evening (0.98) = 107 ✅
+      expect(isCommitWithLogsContextRight()).toBe(true);
     });
 
-    it('should return false for Saturday evening (just below threshold)', () => {
+    it('should return true for Saturday evening (now passes)', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SATURDAY',
         periodOfDay: 'evening',
@@ -207,8 +207,8 @@ describe('isCommitWithLogsContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 2,
       });
-      // Saturday (1.48) × evening (0.98) = 145 (just below 150) ❌
-      expect(isCommitWithLogsContextRight()).toBe(false);
+      // Saturday (1.48) × evening (0.98) = 145 (now well above 100) ✅
+      expect(isCommitWithLogsContextRight()).toBe(true);
     });
   });
 
@@ -506,7 +506,7 @@ describe('isCommitWithLogsContextRight', () => {
       expect(isCommitWithLogsContextRight()).toBe(false);
     });
 
-    it('should handle single strong multiplier (not enough)', () => {
+    it('should handle single strong multiplier (now passes)', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SATURDAY',
         periodOfDay: 'afternoon',
@@ -514,8 +514,8 @@ describe('isCommitWithLogsContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 1,
       });
-      // Saturday (1.48) × afternoon (0.98) × 1 terminal (0.91) = 132 ❌
-      expect(isCommitWithLogsContextRight()).toBe(false);
+      // Saturday (1.48) × afternoon (0.98) × 1 terminal (0.91) = 132 ✅
+      expect(isCommitWithLogsContextRight()).toBe(true);
     });
   });
 
@@ -532,7 +532,7 @@ describe('isCommitWithLogsContextRight', () => {
       expect(isCommitWithLogsContextRight()).toBe(true);
     });
 
-    it('should fail just below threshold', () => {
+    it('should pass above threshold', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SATURDAY',
         periodOfDay: 'evening',
@@ -540,8 +540,8 @@ describe('isCommitWithLogsContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 2,
       });
-      // Saturday (1.48) × evening (0.98) = 145 (just below 150) ❌
-      expect(isCommitWithLogsContextRight()).toBe(false);
+      // Saturday (1.48) × evening (0.98) = 145 (above 100) ✅
+      expect(isCommitWithLogsContextRight()).toBe(true);
     });
 
     it('should pass with two moderate multipliers', () => {
@@ -658,8 +658,8 @@ describe('isCommitWithLogsContextRight', () => {
 
       const organizedContext = { ...chaosContext, terminalCount: 1 };
       mockCollectWorkspaceContext.mockReturnValue(organizedContext);
-      // Thursday (1.17) × night (1.29) × 1 terminal (0.91) = 137 ❌
-      expect(isCommitWithLogsContextRight()).toBe(false);
+      // Thursday (1.17) × night (1.29) × 1 terminal (0.91) = 137 (now passes) ✅
+      expect(isCommitWithLogsContextRight()).toBe(true);
     });
 
     it('should prefer chaos: weekend over Monday', () => {
@@ -702,8 +702,8 @@ describe('isCommitWithLogsContextRight', () => {
         unsavedFilesCount: 0,
       };
       mockCollectWorkspaceContext.mockReturnValue(organizedContext);
-      // Thursday (1.17) × morning (0.91) × 1-2 editors (1.0) = 106 ❌
-      expect(isCommitWithLogsContextRight()).toBe(false);
+      // Thursday (1.17) × morning (0.91) × 1-2 editors (1.0) = 106 (now passes) ✅
+      expect(isCommitWithLogsContextRight()).toBe(true);
     });
   });
 });

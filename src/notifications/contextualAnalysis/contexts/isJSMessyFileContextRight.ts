@@ -53,6 +53,6 @@ export function isJSMessyFileContextRight(): boolean {
   else if (ctx.openEditorsCount >= 6 && ctx.openEditorsCount <= 10)
     score *= 0.87; // 7.8% CTR (-13%)
 
-  const THRESHOLD = 140;
+  const THRESHOLD = 100;
   return score >= THRESHOLD;
 }
