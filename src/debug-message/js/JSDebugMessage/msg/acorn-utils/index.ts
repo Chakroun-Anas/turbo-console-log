@@ -35,6 +35,7 @@ export type {
   MethodDefinition,
   ClassMethod,
   TSParameterProperty,
+  PropertyDefinition,
 } from './types';
 
 // Type guards
@@ -74,6 +75,8 @@ export {
   isClassDeclaration,
   isVariableDeclarator,
   isTSParameterProperty,
+  isPropertyDefinition,
+  STATEMENT_TYPES,
 } from './guards';
 
 // AST walker

@@ -68,6 +68,6 @@ export function isInactiveFourWeeksSurveyContextRight(): boolean {
     score *= 0.96;
   }
 
-  const THRESHOLD = 200;
+  const THRESHOLD = 100;
   return score >= THRESHOLD;
 }

@@ -13,6 +13,7 @@ import case12 from './12';
 import case13 from './13';
 import case14 from './14';
 import case15 from './15';
+import case16 from './16';
 
 export const passingCases = [
   case1,
@@ -30,6 +31,7 @@ export const passingCases = [
   case13,
   case14,
   case15,
+  case16,
 ];
 
 export default passingCases;

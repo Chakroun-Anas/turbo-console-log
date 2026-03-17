@@ -66,6 +66,6 @@ export function isJSMultiLogTypesContextRight(): boolean {
   // UNSAVED FILES MULTIPLIERS (Active changes = cleanup mode)
   if (ctx.unsavedFilesCount >= 1) score *= 1.21; // 12.0% CTR (+21%) - 443 samples
 
-  const THRESHOLD = 150;
+  const THRESHOLD = 100;
   return score >= THRESHOLD;
 }

@@ -199,10 +199,9 @@ export async function showNotification(
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/turbo-sundays-001`,
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
-        message:
-          '🧠 v3.17.0: Smarter notification timing based on your usage patterns',
-        ctaText: 'See How',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3170`,
+        message: '🔬 v3.18.0: Five fixes live. Now help us find the sixth!',
+        ctaText: 'See Fixes',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3180`,
       },
       [NotificationEvent.EXTENSION_COMMIT_WITH_LOGS]: {
         message:

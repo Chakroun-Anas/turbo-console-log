@@ -36,7 +36,7 @@ export function isInactiveTwoWeeksReturnContextRight(): boolean {
     score *= 0.86; // 7.5% CTR (-14%)
   }
 
-  const THRESHOLD = 140;
+  const THRESHOLD = 100;
 
   return score >= THRESHOLD;
 }

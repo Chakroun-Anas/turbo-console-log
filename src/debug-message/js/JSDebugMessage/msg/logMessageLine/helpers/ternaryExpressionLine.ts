@@ -6,6 +6,8 @@ import {
   isConditionalExpression,
   isVariableDeclaration,
   isIdentifier,
+  isArrayPattern,
+  isObjectPattern,
   walk,
 } from '../../acorn-utils';
 
@@ -92,15 +94,37 @@ function findVariableDeclaration(
     if (isVariableDeclaration(n)) {
       const varDecl = n as VariableDeclaration;
       for (const decl of varDecl.declarations) {
+        if (!decl.init) continue;
+
+        // Simple identifier: const cookieName = ...
         if (
           isIdentifier(decl.id) &&
-          (decl.id as { name: string }).name === name &&
-          decl.init
+          (decl.id as { name: string }).name === name
         ) {
           found = decl as { id: AcornNode; init: AcornNode };
-          return true; // Stop early
+          return true;
+        }
+
+        // Destructuring: const [cookieName, cookieValue] = ... or const { x } = ...
+        if (
+          (isArrayPattern(decl.id) || isObjectPattern(decl.id)) &&
+          patternContainsIdentifier(decl.id, name)
+        ) {
+          found = decl as { id: AcornNode; init: AcornNode };
+          return true;
         }
       }
+    }
+  });
+  return found;
+}
+
+function patternContainsIdentifier(pattern: AcornNode, name: string): boolean {
+  let found = false;
+  walk(pattern, (n: AcornNode): boolean | void => {
+    if (isIdentifier(n) && (n as { name: string }).name === name) {
+      found = true;
+      return true;
     }
   });
   return found;

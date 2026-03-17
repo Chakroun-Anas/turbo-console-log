@@ -191,6 +191,14 @@ export interface TSParameterProperty extends AcornNode {
   readonly?: boolean;
 }
 
+export interface PropertyDefinition extends AcornNode {
+  type: 'PropertyDefinition';
+  key: AcornNode;
+  value: AcornNode | null;
+  static: boolean;
+  computed: boolean;
+}
+
 export interface MethodDefinition extends AcornNode {
   type: 'MethodDefinition';
   key: AcornNode;

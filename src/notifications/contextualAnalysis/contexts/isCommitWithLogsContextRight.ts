@@ -40,6 +40,6 @@ export function isCommitWithLogsContextRight(): boolean {
     score *= 1.03; // 6.0% CTR vs 5.8% baseline (546 samples)
   else score *= 1.0; // 5.8% CTR baseline (18,327 samples)
 
-  const THRESHOLD = 150;
+  const THRESHOLD = 100;
   return score >= THRESHOLD;
 }

@@ -13,6 +13,7 @@ import {
   isTSTypeAssertion,
   isParenthesizedExpression,
   isLogicalExpression,
+  isPropertyDefinition,
   walk,
 } from '../../acorn-utils';
 
@@ -29,6 +30,21 @@ export function functionCallAssignmentChecker(
 
   walk(ast, (node: AcornNode): boolean | void => {
     if (isChecked) return true;
+
+    // Check if this node is a class property definition (e.g. protected config = new Foo())
+    if (isPropertyDefinition(node)) {
+      if (!node.loc) return;
+      const defStartLine = node.loc.start.line - 1;
+      const defEndLine = node.loc.end.line - 1;
+      if (selectionLine < defStartLine || selectionLine > defEndLine) return;
+      if (!node.value) return;
+      if (isIdentifier(node.key) && node.key.name === variableName) {
+        if (containsFunctionCall(node.value)) {
+          isChecked = true;
+          return true;
+        }
+      }
+    }
 
     // Check if this node is a variable declaration and process it
     if (isVariableDeclaration(node)) {
@@ -126,8 +142,8 @@ function containsFunctionCall(expr: AcornNode): boolean {
     if (!node || visited.has(node) || depth++ >= MAX_DEPTH) return false;
     visited.add(node);
 
-    // Direct function call
-    if (isCallExpression(node)) return true;
+    // Direct function call or new expression (e.g. new Foo())
+    if (isCallExpression(node) || node.type === 'NewExpression') return true;
 
     // Await expression: check the awaited expression
     if (isAwaitExpression(node)) {

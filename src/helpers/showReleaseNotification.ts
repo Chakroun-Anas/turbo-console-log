@@ -28,6 +28,7 @@ export async function showReleaseNotification(
     '3.15.0', // Git integration announcement,
     '3.16.1', // Logs count announcement
     '3.17.0', // Smarter notifications timing
+    '3.18.0', // Edge Cases page announcement
   ];
 
   // Only show notification for specific versions

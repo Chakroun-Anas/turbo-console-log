@@ -15,7 +15,7 @@ describe('isJSMultiLogTypesContextRight', () => {
   });
 
   describe('threshold validation', () => {
-    it('should return true when score >= 150', () => {
+    it('should return true when score >= 100', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SATURDAY',
         periodOfDay: 'night',
@@ -27,7 +27,7 @@ describe('isJSMultiLogTypesContextRight', () => {
       expect(isJSMultiLogTypesContextRight()).toBe(true);
     });
 
-    it('should return false when score < 150', () => {
+    it('should return false when score < 100', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'MONDAY',
         periodOfDay: 'morning',
@@ -39,7 +39,7 @@ describe('isJSMultiLogTypesContextRight', () => {
       expect(isJSMultiLogTypesContextRight()).toBe(false);
     });
 
-    it('should return true at borderline threshold', () => {
+    it('should return true at well above threshold', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SATURDAY',
         periodOfDay: 'evening',
@@ -269,8 +269,8 @@ describe('isJSMultiLogTypesContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 2,
       });
-      // Thursday (0.95) × night (1.28) × 1-2 editors (1.03) × 2-3 terminals (1.04) = 130 ❌
-      expect(isJSMultiLogTypesContextRight()).toBe(false);
+      // Thursday (0.95) × night (1.28) × 1-2 editors (1.03) × 2-3 terminals (1.04) = 130 ✅
+      expect(isJSMultiLogTypesContextRight()).toBe(true);
     });
 
     it('should apply Tuesday penalty (0.93)', () => {
@@ -537,7 +537,7 @@ describe('isJSMultiLogTypesContextRight', () => {
       expect(isJSMultiLogTypesContextRight()).toBe(true);
     });
 
-    it('should fail just below threshold', () => {
+    it('should pass above threshold', () => {
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'FRIDAY',
         periodOfDay: 'evening',
@@ -545,8 +545,8 @@ describe('isJSMultiLogTypesContextRight', () => {
         unsavedFilesCount: 0,
         terminalCount: 3,
       });
-      // Friday (1.17) × evening (0.96) × 1-2 editors (1.03) × 2-3 terminals (1.04) = 121 ❌
-      expect(isJSMultiLogTypesContextRight()).toBe(false);
+      // Friday (1.17) × evening (0.96) × 1-2 editors (1.03) × 2-3 terminals (1.04) = 121 ✅
+      expect(isJSMultiLogTypesContextRight()).toBe(true);
     });
 
     it('should pass with three moderate multipliers', () => {
@@ -667,8 +667,8 @@ describe('isJSMultiLogTypesContextRight', () => {
         terminalCount: 1,
       };
       mockCollectWorkspaceContext.mockReturnValue(calmContext);
-      // Saturday (1.33) × night (1.28) × 1-2 editors (1.03) × 1 terminal (0.85) = 149 ❌ (borderline)
-      expect(isJSMultiLogTypesContextRight()).toBe(false);
+      // Saturday (1.33) × night (1.28) × 1-2 editors (1.03) × 1 terminal (0.85) = 149 (now passes) ✅
+      expect(isJSMultiLogTypesContextRight()).toBe(true);
     });
 
     it('should prefer active cleanup (unsaved files) over passive browsing', () => {
@@ -706,8 +706,8 @@ describe('isJSMultiLogTypesContextRight', () => {
         dayOfWeek: 'MONDAY' as WorkspaceContext['dayOfWeek'],
       };
       mockCollectWorkspaceContext.mockReturnValue(weekdayContext);
-      // Monday (0.86) × afternoon (0.95) × 6-10 editors (1.07) × 4+ terminals (1.48) = 130 ❌
-      expect(isJSMultiLogTypesContextRight()).toBe(false);
+      // Monday (0.86) × afternoon (0.95) × 6-10 editors (1.07) × 4+ terminals (1.48) = 130 (now passes) ✅
+      expect(isJSMultiLogTypesContextRight()).toBe(true);
     });
   });
 });

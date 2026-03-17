@@ -6,6 +6,7 @@ import {
   isArrayPattern,
   isRestElement,
   isAssignmentPattern,
+  isTSParameterProperty,
   walk,
 } from '../../acorn-utils';
 
@@ -109,6 +110,12 @@ function paramContainsIdentifier(
   }
 
   visited.add(param);
+
+  // Handle TypeScript constructor access modifiers: private name, public age, etc.
+  if (isTSParameterProperty(param)) {
+    if (!param.parameter) return false;
+    return paramContainsIdentifier(param.parameter, wanted, visited, depth + 1);
+  }
 
   // Handle rest parameters: ...numbers
   if (isRestElement(param)) {

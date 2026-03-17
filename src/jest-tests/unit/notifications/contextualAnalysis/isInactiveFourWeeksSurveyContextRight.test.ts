@@ -15,7 +15,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
     jest.clearAllMocks();
   });
 
-  describe('Threshold validation (200 - very restrictive for surveys)', () => {
+  describe('Threshold validation (100 - survey-friendly time)', () => {
     it('should return true for Saturday night (weekend survey-friendly time)', () => {
       // Saturday (2.2) × night (1.6) = 352
       mockCollectWorkspaceContext.mockReturnValue({
@@ -195,7 +195,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
       expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
     });
 
-    it('should return false for Sunday evening (just below threshold)', () => {
+    it('should return true for Sunday evening (now above threshold)', () => {
       // Sunday (1.4) × evening (1.35) = 189
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SUNDAY',
@@ -205,10 +205,10 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
 
-    it('should return false for Friday evening', () => {
+    it('should return true for Friday evening', () => {
       // Friday (1.3) × evening (1.35) = 175.5
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'FRIDAY',
@@ -218,7 +218,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
   });
 
@@ -280,7 +280,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
         dayOfWeek: 'TUESDAY',
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false); // Below 200
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true); // Above 100
     });
 
     it('should apply Thursday multiplier (0.85)', () => {
@@ -290,7 +290,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
         dayOfWeek: 'THURSDAY',
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
 
     it('should apply Wednesday multiplier (0.54 - worst)', () => {
@@ -339,7 +339,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
         periodOfDay: 'morning',
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
 
     it('should apply afternoon multiplier (0.8 - worst)', () => {
@@ -349,7 +349,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
         periodOfDay: 'afternoon',
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
   });
 
@@ -407,13 +407,13 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
 
     it('should apply 0 editors multiplier (0.7 - worst, cold start)', () => {
       // Saturday (2.2) × evening (1.35) × 0 editors (0.7) × 0 unsaved (0.96)
-      // = 100 × 2.2 × 1.35 × 0.7 × 0.96 ≈ 199.6 (just below!)
+      // = 100 × 2.2 × 1.35 × 0.7 × 0.96 ≈ 199.6 (passes now!)
       mockCollectWorkspaceContext.mockReturnValue({
         ...baseContext,
         openEditorsCount: 0,
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
   });
 
@@ -525,7 +525,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
       expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
 
-    it('should return false for score just below threshold (199)', () => {
+    it('should return true for score above threshold (189)', () => {
       // Sunday (1.4) × evening (1.35) = 189
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'SUNDAY',
@@ -535,10 +535,10 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
 
-    it('should return false for Friday evening (175.5)', () => {
+    it('should return true for Friday evening (175.5)', () => {
       // Friday (1.3) × evening (1.35) = 175.5
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'FRIDAY',
@@ -548,10 +548,10 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
 
-    it('should return false for Tuesday night (172.8)', () => {
+    it('should return true for Tuesday night (172.8)', () => {
       // Tuesday (1.08) × night (1.6) = 172.8
       mockCollectWorkspaceContext.mockReturnValue({
         dayOfWeek: 'TUESDAY',
@@ -561,7 +561,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
         terminalCount: 0,
       });
 
-      expect(isInactiveFourWeeksSurveyContextRight()).toBe(false);
+      expect(isInactiveFourWeeksSurveyContextRight()).toBe(true);
     });
   });
 
@@ -694,7 +694,7 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
       const afternoonResult = isInactiveFourWeeksSurveyContextRight();
 
       expect(nightResult).toBe(true); // 352 score
-      expect(afternoonResult).toBe(false); // 176 score
+      expect(afternoonResult).toBe(true); // 176 score
       expect(352 / 176).toBe(2); // 2× difference
     });
 
@@ -702,16 +702,16 @@ describe('isInactiveFourWeeksSurveyContextRight', () => {
       // Goal: Block >75% of contexts to achieve 3-5× CTR improvement
       // Best context: Saturday night 5.7% CTR
       // Worst context: Wednesday afternoon 1.4% CTR
-      // Quality threshold: Only show surveys when score ≥ 200
+      // Quality threshold: Only show surveys when score ≥ 100
 
       const testContexts = [
         { day: 'SATURDAY', time: 'night', editors: 3, shouldPass: true }, // 352 × 0.85 × 0.96 = 287
         { day: 'SUNDAY', time: 'night', editors: 2, shouldPass: true }, // With 1-2 editors: 280
         { day: 'FRIDAY', time: 'night', editors: 2, shouldPass: true }, // With 1-2 editors: 260
         { day: 'MONDAY', time: 'night', editors: 2, shouldPass: true }, // With 1-2 editors: 260
-        { day: 'TUESDAY', time: 'night', editors: 3, shouldPass: false }, // 172.8 × 0.85 × 0.96 = 141
+        { day: 'TUESDAY', time: 'night', editors: 3, shouldPass: true }, // 172.8 × 0.85 × 0.96 = 141
         { day: 'WEDNESDAY', time: 'night', editors: 3, shouldPass: false }, // 86.4 × 0.85 × 0.96 = 70
-        { day: 'THURSDAY', time: 'night', editors: 3, shouldPass: false }, // 136 × 0.85 × 0.96 = 111
+        { day: 'THURSDAY', time: 'night', editors: 3, shouldPass: true }, // 136 × 0.85 × 0.96 = 111
       ];
 
       testContexts.forEach(({ day, time, editors, shouldPass }) => {

@@ -104,7 +104,10 @@ export function traceExtensionVersionHistory(
     );
   }
 
-  showReleaseNotification(context, '3.17.0');
+  // Only show release notifications to existing users (not fresh installs)
+  if (!isFreshInstall) {
+    showReleaseNotification(context, '3.18.0');
+  }
 
   // Report telemetry for fresh installs and updates (decoupled from notifications)
   try {

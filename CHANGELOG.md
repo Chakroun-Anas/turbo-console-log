@@ -2,6 +2,52 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.18.0] - 2026-03-10
+
+### 🧠 Smarter Log Placement — The Engine Gets Sharper
+
+**We hunted down edge cases so you don't have to.**
+
+This release is all about correctness and collaboration. We've fixed five real-world patterns that exposed subtle AST engine bugs — and we've built a dedicated page for you to report any pattern that Turbo still gets wrong.
+
+#### 🎯 New
+
+- **Edge Cases Reporting Page**
+
+  Found a code pattern that Turbo handles incorrectly? We've launched a dedicated [Edge Cases Reporting page](https://www.turboconsolelog.io/edge-cases) where you can submit snippets, describe what happened, and tell us what you expected. Every submission becomes a test case that drives a fix. Help us make Turbo smarter for everyone.
+
+#### 🐛 Bug Fixes
+
+- **Array Destructuring + Ternary: Correct Classification & Insertion Line**
+
+  When a variable was declared via array (or object) destructuring from a ternary expression — e.g. `const [cookieName, cookieValue]: string[] = eqIndex === -1 ? [...] : [...]` — Turbo was misclassifying the log type and inserting the log one line too early. Both the ternary checker and the insertion line calculator only handled plain `Identifier` left-hand sides, missing `ArrayPattern` and `ObjectPattern` entirely.
+
+  **Fix**: Both helpers now correctly recognize destructuring patterns, identify the ternary initializer, and insert the log after the full ternary block.
+
+- **TypeScript Constructor Parameters with Access Modifiers Not Recognized**
+
+  When selecting a parameter declared with a TypeScript access modifier inside a constructor — e.g. `private backend: HttpBackend` in a multi-line Angular-style constructor with a non-empty body — Turbo failed to classify it as a `FunctionParameter`. As a result, the log was inserted at the wrong line instead of inside the constructor body. The parameter checker only handled plain `Identifier`, `ObjectPattern`, `ArrayPattern`, and `RestElement` nodes, but TypeScript access modifiers (`private`, `public`, `protected`, `readonly`) wrap the parameter in a `TSParameterProperty` node that was never unwrapped.
+
+  **Fix**: The checker now handles `TSParameterProperty` by unwrapping it and inspecting the inner parameter, correctly classifying access-modified constructor parameters and inserting the log at the right position.
+
+- **WanderingExpression Identifier Nested Deep Inside Multi-Line Statement Inserts at Wrong Line**
+
+  When selecting an identifier that appears deep inside a multi-line statement — e.g. `HTTP_INTERCEPTOR_FNS` nested inside `const dedupedInterceptorFns = Array.from(new Set([...this.injector.get(HTTP_INTERCEPTOR_FNS), ...]))` — Turbo was inserting the log inside the expression (between array elements) rather than adjacent to the containing statement. The line calculator climbed the AST parent chain only while `parent.start === node.start`, so it stopped at the `Identifier` level when the immediate parent had a different start offset, yielding a position mid-expression.
+
+  **Fix**: The parent climb now continues until it reaches an enclosing statement boundary (`VariableDeclaration`, `ExpressionStatement`, etc.). For multi-line statements the log is inserted **before** the statement; for single-line statements it is inserted **after** — matching the behaviour of all other log types.
+
+- **PropertyMethodCall Misclassification for Identifier Inside a Return Statement**
+
+  When selecting an identifier used as the object of a method call inside a `return` statement body — e.g. `rawMessagePart` in `return rawMessagePart.charAt(0) === BLOCK_MARKER ? ... : ...` — Turbo was classifying the log type as `PropertyMethodCall` (priority 11) instead of `WithinReturnStatement` (priority 15). Because `PropertyMethodCall` has higher priority in the type-order table, `WithinReturnStatement` never got a chance to match, and the log was inserted at the wrong line.
+
+  **Fix**: `propertyMethodCallChecker` now builds an ancestor map and rejects matches where the `CallExpression` is nested inside a `ReturnStatement`, letting `WithinReturnStatement` correctly claim those cases.
+
+- **Class Property Initializer with `new` Expression Not Classified as FunctionCallAssignment**
+
+  When selecting a class field initialized with a `new` expression — e.g. `config` in `protected config: InMemoryBackendConfigArgs = new InMemoryBackendConfig()` — Turbo failed to classify it as a `FunctionCallAssignment`. The checker only walked `VariableDeclaration` nodes and only recognized `CallExpression` as a function call, so both `PropertyDefinition` (class field) nodes and `NewExpression` (`new Foo()`) initializers were silently skipped, causing incorrect log placement.
+
+  **Fix**: The `containsFunctionCall` helper now recognizes `NewExpression` alongside `CallExpression`. A new `PropertyDefinition` branch (backed by the `isPropertyDefinition` type guard in `acorn-utils`) was added to the walker so class field initializers are correctly inspected and classified.
+
 ## [3.17.0] - 2026-02-25
 
 ### 🧠 Context-Aware Notification Timing
