@@ -5,7 +5,6 @@ import { createTelemetryService } from '../telemetry/telemetryService';
 import { generateDeveloperId } from '../helpers/generateDeveloperId';
 import { writeToGlobalState } from '../helpers/writeToGlobalState';
 import { GlobalStateKey } from '@/entities';
-import { isRightContext } from './contextualAnalysis';
 import {
   shouldShowNotification,
   recordNotificationShown,
@@ -24,11 +23,6 @@ export async function showNotification(
   context: vscode.ExtensionContext,
   logCount?: number,
 ): Promise<boolean> {
-  // Check if we're in the right context for this notification
-  if (!isRightContext(notificationEvent)) {
-    return false; // Not the right context, don't show notification
-  }
-
   // Check cooldown system
   if (!shouldShowNotification(context, notificationEvent)) {
     return false; // Not shown due to cooldown
