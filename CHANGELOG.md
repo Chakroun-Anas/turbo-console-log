@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.18.1] - 2026-03-17
+
+Internal fixes and upgrades
+
 ## [3.18.0] - 2026-03-10
 
 ### 🧠 Smarter Log Placement — The Engine Gets Sharper
