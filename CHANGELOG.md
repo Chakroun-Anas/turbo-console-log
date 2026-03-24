@@ -2,6 +2,37 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.19.0] - 2026-03-24
+
+### Line-Level Git Filtering & Personalized Freemium Panel
+
+**Two major improvements to help you debug smarter and clean up faster.**
+
+#### What's New
+
+**For Pro Users: Surgical Git Filtering**
+
+The "Git Changes" filter now shows **only the logs in the exact lines you changed**, not every log in modified files. When you add 2 new logs to a file with 50 existing ones, the filter shows just those 2 — making pre-commit cleanup effortless.
+
+- **Line-Level Precision**: Filters logs by changed line ranges, not entire files
+- **Real-Time Diff Parsing**: Tracks changes automatically via git diff analysis
+- **Instant Updates**: Tree refreshes when you stage/unstage changes
+- **82 comprehensive tests** ensure rock-solid reliability
+
+→ [Read the Full Technical Deep Dive](https://www.turboconsolelog.io/articles/release-3190)
+
+**For Freemium Users: Personalized Data Panel**
+
+The Turbo Pro showcase panel now displays **your actual workspace analytics** instead of generic examples:
+
+- **Real Log Counts**: See your total logs across the entire workspace repositories
+- **Repository Breakdown**: Logs count per repository
+- **Log Type Distribution**: Visualize your debugging patterns (log, error, warn, etc.)
+- **Hotspot Analysis**: Identify folders with the most logging activity
+- **Conditional Rendering**: Analytics shown only when workspace data is available
+
+→ [Learn more about Turbo Pro](https://www.turboconsolelog.io/pro)
+
 ## [3.18.1] - 2026-03-17
 
 Internal fixes and upgrades

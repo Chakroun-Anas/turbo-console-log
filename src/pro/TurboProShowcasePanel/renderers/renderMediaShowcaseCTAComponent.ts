@@ -22,6 +22,7 @@ export function renderMediaShowcaseCTAComponent(
         <div class="media-showcase-images">
           ${imagesHtml}
         </div>
+        ${component.tagline ? `<div class="media-showcase-tagline">${escapeHtml(component.tagline)}</div>` : ''}
         <a class="media-showcase-cta-button" onclick="openUrlWithTracking('${escapeHtml(component.cta.url)}', 'media-showcase-cta', '${escapeHtml(component.cta.text)}'); return false;" style="cursor: pointer;">
           ${escapeHtml(component.cta.text)}
         </a>

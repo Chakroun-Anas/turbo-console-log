@@ -121,7 +121,18 @@ describe('initialWorkspaceLogsCount', () => {
 
       // But notification should not be shown again
       expect(mockShowNotification).not.toHaveBeenCalled();
-      expect(mockWriteToGlobalState).not.toHaveBeenCalled();
+      // Metadata IS written (panel always needs it)
+      expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+        context,
+        'WORKSPACE_LOG_METADATA',
+        expect.any(Object),
+      );
+      // But notification flag is NOT written again
+      expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+        context,
+        GlobalStateKey.HAS_SHOWN_WORKSPACE_LOG_THRESHOLD_NOTIFICATION,
+        true,
+      );
     });
 
     it('should return early if no workspace folders are opened', async () => {
@@ -411,7 +422,18 @@ describe('initialWorkspaceLogsCount', () => {
       );
 
       expect(mockShowNotification).not.toHaveBeenCalled();
-      expect(mockWriteToGlobalState).not.toHaveBeenCalled();
+      // Note: writeToGlobalState IS called for WORKSPACE_LOG_METADATA (panel needs it)
+      expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+        context,
+        'WORKSPACE_LOG_METADATA',
+        expect.any(Object),
+      );
+      // But NOT called for notification flag
+      expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+        context,
+        GlobalStateKey.HAS_SHOWN_WORKSPACE_LOG_THRESHOLD_NOTIFICATION,
+        true,
+      );
     });
 
     it('should show notification if log count equals threshold (100)', async () => {
@@ -515,7 +537,18 @@ describe('initialWorkspaceLogsCount', () => {
         version,
       );
 
-      expect(mockWriteToGlobalState).not.toHaveBeenCalled();
+      // Metadata IS written (panel needs it)
+      expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+        context,
+        'WORKSPACE_LOG_METADATA',
+        expect.any(Object),
+      );
+      // But notification flag is NOT written (user dismissed notification)
+      expect(mockWriteToGlobalState).not.toHaveBeenCalledWith(
+        context,
+        GlobalStateKey.HAS_SHOWN_WORKSPACE_LOG_THRESHOLD_NOTIFICATION,
+        true,
+      );
     });
   });
 
@@ -628,6 +661,193 @@ describe('initialWorkspaceLogsCount', () => {
 
       // Should not show notification (below threshold)
       expect(mockShowNotification).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Log Type Distribution Percentage Calculation', () => {
+    it('should ensure percentages always sum to exactly 100%', async () => {
+      workspaceFolders = [
+        {
+          uri: { fsPath: '/test/workspace' },
+          name: 'test-workspace',
+          index: 0,
+        },
+      ] as vscode.WorkspaceFolder[];
+
+      // Create a scenario that would cause rounding issues with Math.round()
+      // Example: 5, 4, 4, 4 logs (total 17) would give:
+      // 29.411%, 23.529%, 23.529%, 23.529% -> rounds to 29%, 24%, 24%, 24% = 101%
+      const mockMessages: Message[] = [
+        { ...createMockMessage(), logFunction: 'console.log' },
+        { ...createMockMessage(), logFunction: 'console.log' },
+        { ...createMockMessage(), logFunction: 'console.log' },
+        { ...createMockMessage(), logFunction: 'console.log' },
+        { ...createMockMessage(), logFunction: 'console.log' },
+        { ...createMockMessage(), logFunction: 'console.error' },
+        { ...createMockMessage(), logFunction: 'console.error' },
+        { ...createMockMessage(), logFunction: 'console.error' },
+        { ...createMockMessage(), logFunction: 'console.error' },
+        { ...createMockMessage(), logFunction: 'console.warn' },
+        { ...createMockMessage(), logFunction: 'console.warn' },
+        { ...createMockMessage(), logFunction: 'console.warn' },
+        { ...createMockMessage(), logFunction: 'console.warn' },
+        { ...createMockMessage(), logFunction: 'console.debug' },
+        { ...createMockMessage(), logFunction: 'console.debug' },
+        { ...createMockMessage(), logFunction: 'console.debug' },
+        { ...createMockMessage(), logFunction: 'console.debug' },
+      ];
+
+      const mockLogsMap = new Map<string, Message[]>([
+        ['/test/workspace/file.js', mockMessages],
+      ]);
+
+      mockCollectFilesWithLogs.mockResolvedValue(mockLogsMap);
+
+      await initialWorkspaceLogsCount(
+        mockConfig,
+        mockLauncherView,
+        context,
+        version,
+      );
+
+      // Get the written metadata
+      const metadataCall = mockWriteToGlobalState.mock.calls.find(
+        (call) => call[1] === 'WORKSPACE_LOG_METADATA',
+      );
+      expect(metadataCall).toBeDefined();
+
+      const metadata = metadataCall![2] as {
+        logTypeDistribution: Array<{
+          type: string;
+          count: number;
+          percentage: number;
+        }>;
+      };
+
+      // Sum of all percentages should be exactly 100
+      const totalPercentage = metadata.logTypeDistribution.reduce(
+        (sum, item) => sum + item.percentage,
+        0,
+      );
+      expect(totalPercentage).toBe(100);
+
+      // Each percentage should be non-negative
+      metadata.logTypeDistribution.forEach((item) => {
+        expect(item.percentage).toBeGreaterThanOrEqual(0);
+        expect(item.percentage).toBeLessThanOrEqual(100);
+      });
+    });
+
+    it('should handle edge case with many log types causing rounding errors', async () => {
+      workspaceFolders = [
+        {
+          uri: { fsPath: '/test/workspace' },
+          name: 'test-workspace',
+          index: 0,
+        },
+      ] as vscode.WorkspaceFolder[];
+
+      // Create 7 log types with uneven distribution (total 23 logs)
+      // This creates many fractional percentages that could round incorrectly
+      const mockMessages: Message[] = [
+        { ...createMockMessage(), logFunction: 'console.log' }, // 1
+        { ...createMockMessage(), logFunction: 'console.log' }, // 2
+        { ...createMockMessage(), logFunction: 'console.log' }, // 3
+        { ...createMockMessage(), logFunction: 'console.log' }, // 4 (17.39%)
+        { ...createMockMessage(), logFunction: 'console.error' }, // 1
+        { ...createMockMessage(), logFunction: 'console.error' }, // 2
+        { ...createMockMessage(), logFunction: 'console.error' }, // 3
+        { ...createMockMessage(), logFunction: 'console.error' }, // 4 (17.39%)
+        { ...createMockMessage(), logFunction: 'console.warn' }, // 1
+        { ...createMockMessage(), logFunction: 'console.warn' }, // 2
+        { ...createMockMessage(), logFunction: 'console.warn' }, // 3 (13.04%)
+        { ...createMockMessage(), logFunction: 'console.debug' }, // 1
+        { ...createMockMessage(), logFunction: 'console.debug' }, // 2
+        { ...createMockMessage(), logFunction: 'console.debug' }, // 3 (13.04%)
+        { ...createMockMessage(), logFunction: 'console.info' }, // 1
+        { ...createMockMessage(), logFunction: 'console.info' }, // 2
+        { ...createMockMessage(), logFunction: 'console.info' }, // 3 (13.04%)
+        { ...createMockMessage(), logFunction: 'console.trace' }, // 1
+        { ...createMockMessage(), logFunction: 'console.trace' }, // 2
+        { ...createMockMessage(), logFunction: 'console.trace' }, // 3 (13.04%)
+        { ...createMockMessage(), logFunction: 'console.dir' }, // 1
+        { ...createMockMessage(), logFunction: 'console.dir' }, // 2
+        { ...createMockMessage(), logFunction: 'console.dir' }, // 3 (13.04%)
+      ];
+
+      const mockLogsMap = new Map<string, Message[]>([
+        ['/test/workspace/file.js', mockMessages],
+      ]);
+
+      mockCollectFilesWithLogs.mockResolvedValue(mockLogsMap);
+
+      await initialWorkspaceLogsCount(
+        mockConfig,
+        mockLauncherView,
+        context,
+        version,
+      );
+
+      // Get the written metadata
+      const metadataCall = mockWriteToGlobalState.mock.calls.find(
+        (call) => call[1] === 'WORKSPACE_LOG_METADATA',
+      );
+      const metadata = metadataCall![2] as {
+        logTypeDistribution: Array<{
+          type: string;
+          count: number;
+          percentage: number;
+        }>;
+      };
+
+      // Sum should still be exactly 100
+      const totalPercentage = metadata.logTypeDistribution.reduce(
+        (sum, item) => sum + item.percentage,
+        0,
+      );
+      expect(totalPercentage).toBe(100);
+    });
+
+    it('should handle single log type (100% case)', async () => {
+      workspaceFolders = [
+        {
+          uri: { fsPath: '/test/workspace' },
+          name: 'test-workspace',
+          index: 0,
+        },
+      ] as vscode.WorkspaceFolder[];
+
+      const mockMessages: Message[] = Array(50)
+        .fill(null)
+        .map(() => ({ ...createMockMessage(), logFunction: 'console.log' }));
+
+      const mockLogsMap = new Map<string, Message[]>([
+        ['/test/workspace/file.js', mockMessages],
+      ]);
+
+      mockCollectFilesWithLogs.mockResolvedValue(mockLogsMap);
+
+      await initialWorkspaceLogsCount(
+        mockConfig,
+        mockLauncherView,
+        context,
+        version,
+      );
+
+      const metadataCall = mockWriteToGlobalState.mock.calls.find(
+        (call) => call[1] === 'WORKSPACE_LOG_METADATA',
+      );
+      const metadata = metadataCall![2] as {
+        logTypeDistribution: Array<{
+          type: string;
+          count: number;
+          percentage: number;
+        }>;
+      };
+
+      // Single log type should be 100%
+      expect(metadata.logTypeDistribution).toHaveLength(1);
+      expect(metadata.logTypeDistribution[0].percentage).toBe(100);
     });
   });
 });

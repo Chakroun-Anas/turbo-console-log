@@ -1,8 +1,5 @@
 import * as vscode from 'vscode';
-import { DynamicFreemiumPanel, DynamicFreemiumPanelContent } from './types';
-import { getDynamicHtml } from './html/getDynamicHtml';
 import { getStaticHtml } from './html/getStaticHtml';
-import { GlobalStateKeys } from '../../helpers/GlobalStateKeys';
 import { createTelemetryService } from '../../telemetry/telemetryService';
 import { trackPanelOpenings } from '../../helpers/trackPanelOpenings';
 
@@ -53,10 +50,27 @@ export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
   }
 
   private getHtml(): string {
-    // Load dynamic content from global storage
-    const dynamicContent = this.context.globalState.get<DynamicFreemiumPanel>(
-      GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_CONTENT,
-    );
+    // Get workspace log metadata from global state
+    const metadata = this.context.globalState.get<{
+      totalLogs: number;
+      totalFiles: number;
+      repositories: Array<{
+        name: string;
+        path: string;
+        logCount: number;
+        fileCount: number;
+        topNestedFolder?: {
+          relativePath: string;
+          logCount: number;
+          percentage: number;
+        };
+      }>;
+      logTypeDistribution: Array<{
+        type: string;
+        count: number;
+        percentage: number;
+      }>;
+    } | null>('WORKSPACE_LOG_METADATA');
 
     // Get the workspace log count directly from the launcher badge
     const logCount =
@@ -64,52 +78,7 @@ export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
         ? this.launcherView.badge.value
         : 0;
 
-    // Clear separation: return dynamic version if content exists, otherwise static version
-    if (
-      dynamicContent &&
-      dynamicContent.content &&
-      dynamicContent.content.length > 0
-    ) {
-      // Create workspace log count component with color-coded count
-      const workspaceLogCount: DynamicFreemiumPanelContent = {
-        type: 'workspace-log-count',
-        order: 0,
-        component: {
-          logCount: logCount,
-          title: '📊 Your Workspace Log Count',
-          description:
-            'Turbo Pro navigates and manages them all in real-time as you code.',
-        },
-      };
-
-      // Create Turbo Pro illustration showcase with CTA
-      const turboProShowcase: DynamicFreemiumPanelContent = {
-        type: 'media-showcase-cta',
-        order: 1,
-        component: {
-          illustrationSrcs: [
-            'https://www.turboconsolelog.io/assets/turbo-pro-illustration.png',
-          ],
-          cta: {
-            text: 'Upgrade to Turbo PRO →',
-            url: 'https://www.turboconsolelog.io/pro?utm_source=panel&utm_campaign=workspace_log_count&utm_medium=dynamic_panel',
-          },
-        },
-      };
-
-      // Inject workspace log count and Pro showcase at the beginning of content
-      const contentWithBadge: DynamicFreemiumPanelContent[] = [
-        workspaceLogCount,
-        turboProShowcase,
-        ...dynamicContent.content,
-      ];
-
-      return getDynamicHtml({
-        ...dynamicContent,
-        content: contentWithBadge,
-      });
-    } else {
-      return getStaticHtml(logCount);
-    }
+    // Pro-only panel: Always show workspace analytics, Pro features, and Pro illustration
+    return getStaticHtml(logCount, metadata);
   }
 }

@@ -9,10 +9,15 @@ import { escapeHtml } from './escapeHtml';
 export function renderParagraphComponent(
   component: ParagraphPanelComponent,
 ): string {
+  // Render content as raw HTML if rawHtml flag is set, otherwise escape for safety
+  const contentHtml = component.rawHtml
+    ? component.content
+    : `<p>${escapeHtml(component.content)}</p>`;
+
   return `
       <div class="dynamic-content">
         <h3>${escapeHtml(component.title)}</h3>
-        <p>${escapeHtml(component.content)}</p>
+        ${contentHtml}
       </div>
     `;
 }
