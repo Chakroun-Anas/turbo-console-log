@@ -160,7 +160,13 @@ describe('TurboProShowcasePanel', () => {
       mockGetStaticHtml.mockReturnValue(
         '<div>Static content with analytics</div>',
       );
-      jest.spyOn(context.globalState, 'get').mockReturnValue(workspaceMetadata);
+      jest
+        .spyOn(context.globalState, 'get')
+        .mockImplementation((key: string) => {
+          if (key === 'WORKSPACE_LOG_METADATA') return workspaceMetadata;
+          if (key === 'trial-status') return undefined;
+          return undefined;
+        });
 
       panel.resolveWebviewView(mockWebviewView);
 
@@ -171,6 +177,7 @@ describe('TurboProShowcasePanel', () => {
       expect(mockGetStaticHtml).toHaveBeenCalledWith(
         expect.any(Number),
         workspaceMetadata,
+        undefined, // trialStatus parameter
       );
     });
   });

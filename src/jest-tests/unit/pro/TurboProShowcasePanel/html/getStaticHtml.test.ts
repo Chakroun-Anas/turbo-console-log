@@ -185,9 +185,8 @@ describe('getStaticHtml', () => {
       expect(result).not.toContain('Your Workspace Analytics');
       expect(result).not.toContain('100 Logs');
 
-      // Pro features title should be standalone version
-      expect(result).toContain('🚀 Turbo Pro Ultimate Logs Manager');
-      expect(result).not.toContain('What Turbo Pro Brings ✨');
+      // Pro features should still be shown
+      expect(result).toContain('What Turbo Pro Brings ✨');
     });
 
     it('should skip analytics section when logCount is 0', () => {
@@ -196,45 +195,34 @@ describe('getStaticHtml', () => {
       // Should NOT contain analytics section even with metadata
       expect(result).not.toContain('Your Workspace Analytics');
 
-      // Pro features title should be standalone version
-      expect(result).toContain('🚀 Turbo Pro Ultimate Logs Manager');
+      // Pro features should still be shown
+      expect(result).toContain('What Turbo Pro Brings ✨');
     });
 
-    it('should show both CTAs when analytics is shown', () => {
+    it('should show Pro CTA when analytics is shown', () => {
       const result = getStaticHtml(150, mockMetadata);
 
-      // Should contain two CTA buttons with same text
-      const ctaMatches = result.match(/Take Back Control/g);
-      expect(ctaMatches).toBeTruthy();
-      expect(ctaMatches!.length).toBeGreaterThanOrEqual(2);
-
-      // Should contain two taglines
-      const taglineMatches = result.match(/Stop hunting logs file by file/g);
-      expect(taglineMatches).toBeTruthy();
-      expect(taglineMatches!.length).toBeGreaterThanOrEqual(2);
-    });
-
-    it('should show only final CTA when analytics is not shown', () => {
-      const result = getStaticHtml(100, null);
-
-      // Should still contain CTA (final one)
+      // Should contain Pro CTA button and tagline
       expect(result).toContain('Take Back Control');
       expect(result).toContain('Stop hunting logs file by file');
     });
 
-    it('should include correct log count in feature description when analytics shown', () => {
-      const result = getStaticHtml(123, mockMetadata);
-
-      // Should reference specific log count
-      expect(result).toContain('See all 123 logs');
-    });
-
-    it('should use generic text in feature description when analytics not shown', () => {
+    it('should show Pro CTA when analytics is not shown', () => {
       const result = getStaticHtml(100, null);
 
-      // Should use generic "logs" text
-      expect(result).toContain('See all logs');
-      expect(result).not.toContain('See all 100 logs');
+      // Should still contain CTA
+      expect(result).toContain('Take Back Control');
+      expect(result).toContain('Stop hunting logs file by file');
+    });
+
+    it('should include feature descriptions', () => {
+      const result = getStaticHtml(123, mockMetadata);
+
+      // Should include feature descriptions (not personalized with log count anymore)
+      expect(result).toContain('See all logs organized by file in one view');
+      expect(result).toContain('Workspace Tree View');
+      expect(result).toContain('Instant Search');
+      expect(result).toContain('Bulk Cleanup');
     });
 
     it('should include testimonial in both scenarios', () => {
@@ -287,9 +275,166 @@ describe('getStaticHtml', () => {
       expect(result).toContain('utm_campaign=workspace_log_count');
       expect(result).toContain('utm_medium=dynamic_panel');
 
-      // Should differentiate positions
+      // Should have position tracking
       expect(result).toContain('position=after_analytics');
-      expect(result).toContain('position=final');
+    });
+  });
+
+  describe('trial CTA rendering based on trial status', () => {
+    const mockMetadata = {
+      totalLogs: 150,
+      totalFiles: 25,
+      repositories: [
+        {
+          name: 'frontend',
+          path: '/workspace/frontend',
+          logCount: 100,
+          fileCount: 15,
+          topNestedFolder: {
+            relativePath: 'src/components',
+            logCount: 60,
+            percentage: 60,
+          },
+        },
+      ],
+      logTypeDistribution: [
+        { type: 'console.log', count: 100, percentage: 67 },
+        { type: 'console.error', count: 50, percentage: 33 },
+      ],
+    };
+
+    it('should show trial invitation CTA when no trial status provided', () => {
+      const result = getStaticHtml(150, mockMetadata, undefined);
+
+      // Should show trial invitation
+      expect(result).toContain('Try Turbo Pro Free for 2 Hours 🎁');
+      expect(result).toContain('Start Free Trial →');
+      expect(result).toContain('No credit card required');
+      expect(result).toContain('variant=panel-trial-invitation');
+
+      // Should NOT show expired trial CTA
+      expect(result).not.toContain('Your Trial Has Ended ⏰');
+      expect(result).not.toContain('Get Turbo Pro Now 🚀');
+      expect(result).not.toContain('variant=panel-trial-expired');
+    });
+
+    it('should hide trial invitation CTA when trial is active', () => {
+      const result = getStaticHtml(150, mockMetadata, 'active');
+
+      // Should NOT show trial invitation
+      expect(result).not.toContain('Try Turbo Pro Free for 2 Hours 🎁');
+      expect(result).not.toContain('Start Free Trial →');
+
+      // Should NOT show expired trial CTA
+      expect(result).not.toContain('Your Trial Has Ended ⏰');
+      expect(result).not.toContain('Get Turbo Pro Now 🚀');
+    });
+
+    it('should show trial expired CTA when trial has expired', () => {
+      const result = getStaticHtml(150, mockMetadata, 'expired');
+
+      // Should show expired trial CTA
+      expect(result).toContain('Your Trial Has Ended ⏰');
+      expect(result).toContain(
+        "You've experienced the power of <strong>Turbo Pro</strong>",
+      );
+      expect(result).toContain('Get Turbo Pro Now 🚀');
+      expect(result).toContain('variant=panel-trial-expired');
+      expect(result).toContain('Unlock unlimited access to all Pro features');
+
+      // Should NOT show trial invitation
+      expect(result).not.toContain('Try Turbo Pro Free for 2 Hours 🎁');
+      expect(result).not.toContain('Start Free Trial →');
+      expect(result).not.toContain('variant=panel-trial-invitation');
+    });
+
+    it('should include correct tracking parameters for trial invitation', () => {
+      const result = getStaticHtml(150, mockMetadata, undefined);
+
+      expect(result).toContain('utm_source=panel');
+      expect(result).toContain('utm_campaign=trial_cta');
+      expect(result).toContain('utm_medium=extension_panel');
+      expect(result).toContain('position=top');
+      expect(result).toContain('event=trial-workflow');
+      expect(result).toContain('variant=panel-trial-invitation');
+    });
+
+    it('should include correct tracking parameters for expired trial CTA', () => {
+      const result = getStaticHtml(150, mockMetadata, 'expired');
+
+      expect(result).toContain('utm_source=panel');
+      expect(result).toContain('utm_campaign=trial_expired');
+      expect(result).toContain('utm_medium=extension_panel');
+      expect(result).toContain('position=top');
+      expect(result).toContain('event=trial-workflow');
+      expect(result).toContain('variant=panel-trial-expired');
+    });
+
+    it('should show trial invitation CTA without analytics when no metadata provided', () => {
+      const result = getStaticHtml(100, null, undefined);
+
+      // Should show trial invitation
+      expect(result).toContain('Try Turbo Pro Free for 2 Hours 🎁');
+      expect(result).toContain('Start Free Trial →');
+
+      // Should NOT show analytics
+      expect(result).not.toContain('Your Workspace Analytics');
+    });
+
+    it('should show trial expired CTA without analytics when no metadata provided', () => {
+      const result = getStaticHtml(100, null, 'expired');
+
+      // Should show expired trial CTA
+      expect(result).toContain('Your Trial Has Ended ⏰');
+      expect(result).toContain('Get Turbo Pro Now 🚀');
+
+      // Should NOT show analytics
+      expect(result).not.toContain('Your Workspace Analytics');
+
+      // Should NOT show trial invitation
+      expect(result).not.toContain('Try Turbo Pro Free for 2 Hours 🎁');
+    });
+
+    it('should ensure trial CTAs are mutually exclusive', () => {
+      const noTrialResult = getStaticHtml(150, mockMetadata, undefined);
+      const activeTrialResult = getStaticHtml(150, mockMetadata, 'active');
+      const expiredTrialResult = getStaticHtml(150, mockMetadata, 'expired');
+
+      // No trial: show invitation, hide expired
+      expect(noTrialResult).toContain('Try Turbo Pro Free for 2 Hours 🎁');
+      expect(noTrialResult).not.toContain('Your Trial Has Ended ⏰');
+
+      // Active trial: hide both
+      expect(activeTrialResult).not.toContain(
+        'Try Turbo Pro Free for 2 Hours 🎁',
+      );
+      expect(activeTrialResult).not.toContain('Your Trial Has Ended ⏰');
+
+      // Expired trial: hide invitation, show expired
+      expect(expiredTrialResult).not.toContain(
+        'Try Turbo Pro Free for 2 Hours 🎁',
+      );
+      expect(expiredTrialResult).toContain('Your Trial Has Ended ⏰');
+    });
+
+    it('should include onclick handler for trial invitation CTA', () => {
+      const result = getStaticHtml(150, mockMetadata, undefined);
+
+      expect(result).toContain('class="trial-button"');
+      expect(result).toContain('onclick="event.preventDefault();');
+      expect(result).toContain(
+        "acquireVsCodeApi().postMessage({ type: 'open-external', url: this.href });",
+      );
+    });
+
+    it('should include onclick handler for trial expired CTA', () => {
+      const result = getStaticHtml(150, mockMetadata, 'expired');
+
+      expect(result).toContain('class="trial-expired-button"');
+      expect(result).toContain('onclick="event.preventDefault();');
+      expect(result).toContain(
+        "acquireVsCodeApi().postMessage({ type: 'open-external', url: this.href });",
+      );
     });
   });
 });

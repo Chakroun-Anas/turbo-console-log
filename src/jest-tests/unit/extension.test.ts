@@ -10,6 +10,16 @@ jest.mock('../../helpers');
 jest.mock('../../releases');
 
 const updateViewMock = jest.fn();
+const mockStatusBarItem = {
+  show: jest.fn(),
+  hide: jest.fn(),
+  dispose: jest.fn(),
+  text: '',
+  tooltip: '',
+  command: undefined,
+  backgroundColor: undefined,
+};
+
 jest.mock('../../pro', () => {
   return {
     TurboProShowcasePanel: class {
@@ -22,6 +32,16 @@ jest.mock('../../pro', () => {
     TurboFreemiumLauncherPanel: class {
       static viewType = 'mocked.panel.freemiumLauncherPanel';
     },
+    TrialCountdownTimer: class {
+      start = jest.fn();
+      dispose = jest.fn();
+      isExpired = jest.fn(() => false);
+    },
+    TurboProTrialGuidePanel: class {
+      static viewType = 'mocked.panel.trialGuidePanel';
+    },
+    createTrialInvitationStatusBar: jest.fn(() => ({ ...mockStatusBarItem })),
+    createTrialExpiredStatusBar: jest.fn(() => ({ ...mockStatusBarItem })),
   };
 });
 
@@ -29,6 +49,7 @@ jest.mock('../../pro/utilities', () => ({
   runProBundle: jest.fn(),
   updateProBundle: jest.fn(),
   proBundleNeedsUpdate: jest.fn(),
+  fetchTrialBundle: jest.fn(),
 }));
 
 describe('activate - command registration', () => {

@@ -2,6 +2,17 @@ import { WorkspaceLogCountComponent } from '../types';
 import { escapeHtml } from './escapeHtml';
 
 /**
+ * Format large numbers with K suffix (1000 -> 1K, 1500 -> 1.5K)
+ */
+function formatLogCount(count: number): string {
+  if (count >= 1000) {
+    const thousands = count / 1000;
+    return count % 1000 === 0 ? `${thousands}K` : `${thousands.toFixed(1)}K`;
+  }
+  return count.toString();
+}
+
+/**
  * Render a workspace log count component as HTML with real data visualization
  * @param component The workspace log count component to render
  * @returns HTML string for the workspace log count component
@@ -10,6 +21,7 @@ export function renderWorkspaceLogCountComponent(
   component: WorkspaceLogCountComponent,
 ): string {
   const { logCount, metadata } = component;
+  const formattedCount = formatLogCount(logCount);
 
   // If no metadata available, show simple count fallback
   if (!metadata || metadata.totalLogs === 0) {
@@ -17,7 +29,7 @@ export function renderWorkspaceLogCountComponent(
       <div class="workspace-analytics-card">
         <div class="analytics-header">
           <h3 class="analytics-title">📊 ${escapeHtml(component.title)}</h3>
-          <div class="log-count-badge">${logCount} Logs</div>
+          <div class="log-count-badge">${formattedCount} Logs</div>
         </div>
         <p class="analytics-description">${escapeHtml(component.description)}</p>
       </div>
@@ -39,7 +51,7 @@ export function renderWorkspaceLogCountComponent(
       <!-- Analytics Header -->
       <div class="analytics-header">
         <h3 class="analytics-title">${escapeHtml(component.title)} 🚀</h3>
-        <div class="log-count-badge">${logCount} Logs</div>
+        <div class="log-count-badge">${formattedCount} Logs</div>
       </div>
 
       <!-- Repository Breakdown -->

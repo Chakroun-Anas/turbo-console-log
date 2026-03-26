@@ -168,9 +168,11 @@ function detectLogMessages(
       const hasTurboMarkers =
         prefixRegex.test(lineText) && delimiterRegex.test(lineText);
       const spaces = spacesBeforeLogMsg(document, i, closedParenthesisLine);
+      const content = line.text.trim(); // Capture single-line content
       messages.push({
         spaces,
         lines: [line.rangeIncludingLineBreak],
+        content,
         ...(isCommented && { isCommented: true }),
         ...(logFunction && { logFunction }),
         isTurboConsoleLog: hasTurboMarkers,
@@ -194,6 +196,7 @@ function detectLogMessages(
 
     const hasTurboMarkers = prefixRegex.test(msg) && delimiterRegex.test(msg);
     logMessage.isTurboConsoleLog = hasTurboMarkers;
+    logMessage.content = msg.trim(); // Capture multi-line content (normalized)
 
     messages.push(logMessage);
   }

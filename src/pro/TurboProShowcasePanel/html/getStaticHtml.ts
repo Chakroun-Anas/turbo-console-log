@@ -2,6 +2,11 @@ import { getCommonStyles } from '../styles/getCommonStyles';
 import { getJavaScript } from '../javascript/javascript';
 import { contentByType } from '../contentByType';
 import { DynamicFreemiumPanelContent } from '../types';
+import { isTestMode } from '@/runTime';
+
+const TURBO_WEBSITE_BASE_URL = isTestMode()
+  ? 'http://localhost:3000'
+  : 'https://www.turboconsolelog.io';
 
 /**
  * Generate static HTML using the same structure as dynamic content
@@ -29,10 +34,63 @@ export function getStaticHtml(
       percentage: number;
     }>;
   } | null,
+  trialStatus?: 'active' | 'expired' | undefined,
 ): string {
   // Determine if we should show analytics section
   // Skip when: metadata is null (error) OR logCount is 0 (no logs found)
   const showAnalytics = metadata !== null && logCount > 0;
+
+  // Create trial CTA at the very top (for users who haven't tried yet)
+  const trialCta: DynamicFreemiumPanelContent | null =
+    trialStatus !== 'expired' && trialStatus !== 'active'
+      ? {
+          type: 'paragraph',
+          order: showAnalytics ? -1 : 1, // Show before everything else
+          component: {
+            title: 'Try Turbo Pro Free for 2 Hours 🎁',
+            rawHtml: true,
+            content: `
+        <div class="trial-cta-banner">
+          <p class="trial-message">
+            Experience <strong>workspace navigation, bulk cleanup, filtering, and search</strong> with zero commitment.
+          </p>
+          <a href="${TURBO_WEBSITE_BASE_URL}/pro-trial?utm_source=panel&utm_campaign=trial_cta&utm_medium=extension_panel&position=top&event=trial-workflow&variant=panel-trial-invitation" 
+             class="trial-button" 
+             onclick="event.preventDefault(); acquireVsCodeApi().postMessage({ type: 'open-external', url: this.href });">
+            Start Free Trial →
+          </a>
+          <p class="trial-details">No credit card required • Activate whenever you're ready</p>
+        </div>
+      `,
+          },
+        }
+      : null;
+
+  // Create expired trial CTA (for users whose trial has ended)
+  const trialExpiredCta: DynamicFreemiumPanelContent | null =
+    trialStatus === 'expired'
+      ? {
+          type: 'paragraph',
+          order: showAnalytics ? -1 : 1, // Show before everything else
+          component: {
+            title: 'Your Trial Has Ended ⏰',
+            rawHtml: true,
+            content: `
+        <div class="trial-expired-banner">
+          <p class="trial-expired-message">
+            You've experienced the power of <strong>Turbo Pro</strong>. Ready to make it permanent?
+          </p>
+          <a href="${TURBO_WEBSITE_BASE_URL}/pro?utm_source=panel&utm_campaign=trial_expired&utm_medium=extension_panel&position=top&event=trial-workflow&variant=panel-trial-expired" 
+             class="trial-expired-button" 
+             onclick="event.preventDefault(); acquireVsCodeApi().postMessage({ type: 'open-external', url: this.href });">
+            Get Turbo Pro Now 🚀
+          </a>
+          <p class="trial-expired-details">Unlock unlimited access to all Pro features</p>
+        </div>
+      `,
+          },
+        }
+      : null;
 
   // Conditionally create workspace analytics component (only if we have data to show)
   const workspaceLogCount: DynamicFreemiumPanelContent | null = showAnalytics
@@ -48,15 +106,28 @@ export function getStaticHtml(
       }
     : null;
 
-  // Create Pro features reveal component (separate from analytics)
-  // Adjust title and content based on whether analytics is shown
+  // Create Turbo Pro illustration showcase with CTA (after analytics, before features)
+  const turboProShowcase: DynamicFreemiumPanelContent = {
+    type: 'media-showcase-cta',
+    order: showAnalytics ? 1 : 2,
+    component: {
+      illustrationSrcs: [
+        `${TURBO_WEBSITE_BASE_URL}/assets/turbo-pro-illustration.png`,
+      ],
+      tagline: 'Stop hunting logs file by file',
+      cta: {
+        text: 'Take Back Control',
+        url: `${TURBO_WEBSITE_BASE_URL}/pro?utm_source=panel&utm_campaign=workspace_log_count&utm_medium=dynamic_panel&position=after_analytics&event=trial-workflow&variant=panel-pro-cta`,
+      },
+    },
+  };
+
+  // Create Pro features reveal component (after Pro showcase)
   const proFeaturesReveal: DynamicFreemiumPanelContent = {
     type: 'paragraph',
     order: showAnalytics ? 2 : 0,
     component: {
-      title: showAnalytics
-        ? 'What Turbo Pro Brings ✨'
-        : '🚀 Turbo Pro Ultimate Logs Manager',
+      title: 'What Turbo Pro Brings ✨',
       rawHtml: true, // Render HTML for feature items
       content: `
         <div class="features-reveal-standalone">
@@ -65,7 +136,7 @@ export function getStaticHtml(
               <div class="feature-icon">🌲</div>
               <div class="feature-content">
                 <div class="feature-name">Workspace Tree View</div>
-                <div class="feature-desc">See all ${showAnalytics ? `${logCount} logs` : 'logs'} organized by file in one view</div>
+                <div class="feature-desc">See all logs organized by file in one view</div>
               </div>
             </div>
             <div class="feature-item">
@@ -101,45 +172,13 @@ export function getStaticHtml(
     },
   };
 
-  // Create first CTA after analytics (if shown)
-  const firstCta: DynamicFreemiumPanelContent | null = showAnalytics
-    ? {
-        type: 'media-showcase-cta',
-        order: 1,
-        component: {
-          illustrationSrcs: [
-            'https://www.turboconsolelog.io/assets/turbo-pro-illustration.png',
-          ],
-          tagline: 'Stop hunting logs file by file',
-          cta: {
-            text: 'Take Back Control',
-            url: 'https://www.turboconsolelog.io/pro?utm_source=panel&utm_campaign=workspace_log_count&utm_medium=dynamic_panel&position=after_analytics',
-          },
-        },
-      }
-    : null;
-
-  // Create Turbo Pro illustration showcase with CTA (final)
-  const turboProShowcase: DynamicFreemiumPanelContent = {
-    type: 'media-showcase-cta',
-    order: 3,
-    component: {
-      illustrationSrcs: [
-        'https://www.turboconsolelog.io/assets/turbo-pro-illustration.png',
-      ],
-      tagline: 'Stop hunting logs file by file',
-      cta: {
-        text: 'Take Back Control',
-        url: 'https://www.turboconsolelog.io/pro?utm_source=panel&utm_campaign=workspace_log_count&utm_medium=dynamic_panel&position=final',
-      },
-    },
-  };
-  // Pro-only content: Conditionally include workspace analytics (skip when error or zero logs)
+  // Pro-only content: Trial CTA and analytics conditionally shown
   const proOnlyContent: DynamicFreemiumPanelContent[] = [
+    ...(trialCta ? [trialCta] : []),
+    ...(trialExpiredCta ? [trialExpiredCta] : []),
     ...(workspaceLogCount ? [workspaceLogCount] : []),
-    ...(firstCta ? [firstCta] : []),
-    proFeaturesReveal,
     turboProShowcase,
+    proFeaturesReveal,
   ];
 
   // Use content separation logic for Pro components

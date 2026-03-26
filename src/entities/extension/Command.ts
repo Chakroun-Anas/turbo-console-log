@@ -8,6 +8,7 @@ type CommandHandlerProperties = {
   extensionProperties: ExtensionProperties;
   debugMessage: DebugMessage;
   args?: unknown[];
+  launcherView?: vscode.TreeView<unknown>;
 };
 
 export type Command = {

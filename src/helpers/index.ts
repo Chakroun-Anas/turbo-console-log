@@ -15,7 +15,6 @@ import { isJavaScriptOrTypeScriptFile } from './isJavaScriptOrTypeScriptFile';
 import { canInsertLogInDocument } from './canInsertLogInDocument';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
-
 import { listenToPhpFileOpenings } from './listenToPhpFileOpenings';
 import { listenToJSMessyFileDetection } from './listenToJSMessyFileDetection';
 import { listenToPhpMessyFileDetection } from './listenToPhpMessyFileDetection';
@@ -24,6 +23,7 @@ import { listenToPhpMultiLogTypes } from './listenToPhpMultiLogTypes';
 import { listenToWeekendTurboSundays } from './listenToWeekendTurboSundays';
 import { listenToCommitWithLogs } from './listenToCommitWithLogs';
 import { listenToCustomLogLibrary } from './listenToCustomLogLibrary';
+import { listenToLogLibraryInstalled } from './listenToLogLibraryInstalled';
 import { listenToLogsInTestFile } from './listenToLogsInTestFile';
 import { loadPhpDebugMessage } from './loadPhpDebugMessage';
 import { showReleaseWebView } from './showReleaseWebView';
@@ -32,7 +32,7 @@ import { updateUserActivityStatus } from './updateUserActivityStatus';
 import { getUserActivityStatus } from './getUserActivityStatus';
 import { listenToManualConsoleLogs } from './listenToManualConsoleLogs';
 import { listenToInactiveTwoWeeksReturn } from './listenToInactiveTwoWeeksReturn';
-import { listenToInactiveFourWeeksSurvey } from './listenToInactiveFourWeeksSurvey';
+import { listenToActivityDrop } from './listenToActivityDrop';
 import { listenToActivationDayThree } from './listenToActivationDayThree';
 import { listenToActivationDaySeven } from './listenToActivationDaySeven';
 import { initialWorkspaceLogsCount } from './initialWorkspaceLogsCount/initialWorkspaceLogsCount';
@@ -61,6 +61,7 @@ export {
   listenToWeekendTurboSundays,
   listenToCommitWithLogs,
   listenToCustomLogLibrary,
+  listenToLogLibraryInstalled,
   listenToLogsInTestFile,
   listenToPhpFileOpenings,
   loadPhpDebugMessage,
@@ -70,7 +71,7 @@ export {
   getUserActivityStatus,
   listenToManualConsoleLogs,
   listenToInactiveTwoWeeksReturn,
-  listenToInactiveFourWeeksSurvey,
+  listenToActivityDrop,
   listenToActivationDayThree,
   listenToActivationDaySeven,
   initialWorkspaceLogsCount,
