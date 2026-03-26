@@ -185,4 +185,105 @@ describe('renderMediaShowcaseCTAComponent', () => {
     expect(result).toContain('width=800&amp;height=600');
     expect(result).toContain('a=1&amp;b=2');
   });
+
+  describe('tagline feature', () => {
+    it('should render tagline when provided', () => {
+      const component: MediaShowcaseCTAPanelComponent = {
+        illustrationSrcs: ['https://example.com/image.png'],
+        tagline: 'Stop hunting logs file by file',
+        cta: {
+          text: 'Take Back Control',
+          url: 'https://example.com/pro',
+        },
+      };
+
+      const result = renderMediaShowcaseCTAComponent(component);
+
+      expect(result).toContain('class="media-showcase-tagline"');
+      expect(result).toContain('Stop hunting logs file by file');
+    });
+
+    it('should NOT render tagline section when tagline is undefined', () => {
+      const component: MediaShowcaseCTAPanelComponent = {
+        illustrationSrcs: ['https://example.com/image.png'],
+        cta: {
+          text: 'Learn More',
+          url: 'https://example.com/feature',
+        },
+      };
+
+      const result = renderMediaShowcaseCTAComponent(component);
+
+      expect(result).not.toContain('class="media-showcase-tagline"');
+    });
+
+    it('should NOT render tagline section when tagline is empty string', () => {
+      const component: MediaShowcaseCTAPanelComponent = {
+        illustrationSrcs: ['https://example.com/image.png'],
+        tagline: '',
+        cta: {
+          text: 'Learn More',
+          url: 'https://example.com/feature',
+        },
+      };
+
+      const result = renderMediaShowcaseCTAComponent(component);
+
+      // Empty string is falsy, so tagline section should not render
+      expect(result).not.toContain('class="media-showcase-tagline"');
+    });
+
+    it('should escape HTML in tagline', () => {
+      const component: MediaShowcaseCTAPanelComponent = {
+        illustrationSrcs: ['https://example.com/image.png'],
+        tagline: 'Get <strong>Pro</strong> features now!',
+        cta: {
+          text: 'Upgrade',
+          url: 'https://example.com/upgrade',
+        },
+      };
+
+      const result = renderMediaShowcaseCTAComponent(component);
+
+      expect(result).not.toContain('<strong>Pro</strong>');
+      expect(result).toContain('&lt;strong&gt;Pro&lt;/strong&gt;');
+    });
+
+    it('should render tagline between images and CTA button', () => {
+      const component: MediaShowcaseCTAPanelComponent = {
+        illustrationSrcs: ['https://example.com/image.png'],
+        tagline: 'Your perfect tagline',
+        cta: {
+          text: 'Click Here',
+          url: 'https://example.com/page',
+        },
+      };
+
+      const result = renderMediaShowcaseCTAComponent(component);
+
+      const imagesIndex = result.indexOf('class="media-showcase-images"');
+      const taglineIndex = result.indexOf('class="media-showcase-tagline"');
+      const buttonIndex = result.indexOf('class="media-showcase-cta-button"');
+
+      expect(imagesIndex).toBeLessThan(taglineIndex);
+      expect(taglineIndex).toBeLessThan(buttonIndex);
+    });
+
+    it('should handle long taglines', () => {
+      const component: MediaShowcaseCTAPanelComponent = {
+        illustrationSrcs: ['https://example.com/image.png'],
+        tagline:
+          'This is a very long tagline that explains the product features in detail and provides comprehensive information to the user',
+        cta: {
+          text: 'Learn More',
+          url: 'https://example.com/details',
+        },
+      };
+
+      const result = renderMediaShowcaseCTAComponent(component);
+
+      expect(result).toContain('class="media-showcase-tagline"');
+      expect(result).toContain('very long tagline');
+    });
+  });
 });

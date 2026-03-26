@@ -29,6 +29,7 @@ export async function showReleaseNotification(
     '3.16.1', // Logs count announcement
     '3.17.0', // Smarter notifications timing
     '3.18.0', // Edge Cases page announcement
+    '3.19.0', // Line-level Git filtering announcement
   ];
 
   // Only show notification for specific versions

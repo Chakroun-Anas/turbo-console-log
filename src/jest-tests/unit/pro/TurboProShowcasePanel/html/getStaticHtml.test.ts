@@ -139,4 +139,157 @@ describe('getStaticHtml', () => {
     // This test ensures the function signature doesn't change
     expect(() => getStaticHtml(1)).not.toThrow();
   });
+
+  describe('conditional rendering with workspace metadata', () => {
+    const mockMetadata = {
+      totalLogs: 150,
+      totalFiles: 25,
+      repositories: [
+        {
+          name: 'frontend',
+          path: '/workspace/frontend',
+          logCount: 100,
+          fileCount: 15,
+          topNestedFolder: {
+            relativePath: 'src/components',
+            logCount: 60,
+            percentage: 60,
+          },
+        },
+      ],
+      logTypeDistribution: [
+        { type: 'console.log', count: 100, percentage: 67 },
+        { type: 'console.error', count: 50, percentage: 33 },
+      ],
+    };
+
+    it('should show analytics section when metadata is provided and logCount > 0', () => {
+      const result = getStaticHtml(150, mockMetadata);
+
+      // Should contain analytics section
+      expect(result).toContain('Your Workspace Analytics');
+      expect(result).toContain('150 Logs');
+
+      // Should show first CTA after analytics
+      expect(result).toContain('Stop hunting logs file by file');
+      expect(result).toContain('Take Back Control');
+
+      // Pro features title should indicate "What Turbo Pro Brings"
+      expect(result).toContain('What Turbo Pro Brings ✨');
+    });
+
+    it('should skip analytics section when metadata is null', () => {
+      const result = getStaticHtml(100, null);
+
+      // Should NOT contain analytics section
+      expect(result).not.toContain('Your Workspace Analytics');
+      expect(result).not.toContain('100 Logs');
+
+      // Pro features title should be standalone version
+      expect(result).toContain('🚀 Turbo Pro Ultimate Logs Manager');
+      expect(result).not.toContain('What Turbo Pro Brings ✨');
+    });
+
+    it('should skip analytics section when logCount is 0', () => {
+      const result = getStaticHtml(0, mockMetadata);
+
+      // Should NOT contain analytics section even with metadata
+      expect(result).not.toContain('Your Workspace Analytics');
+
+      // Pro features title should be standalone version
+      expect(result).toContain('🚀 Turbo Pro Ultimate Logs Manager');
+    });
+
+    it('should show both CTAs when analytics is shown', () => {
+      const result = getStaticHtml(150, mockMetadata);
+
+      // Should contain two CTA buttons with same text
+      const ctaMatches = result.match(/Take Back Control/g);
+      expect(ctaMatches).toBeTruthy();
+      expect(ctaMatches!.length).toBeGreaterThanOrEqual(2);
+
+      // Should contain two taglines
+      const taglineMatches = result.match(/Stop hunting logs file by file/g);
+      expect(taglineMatches).toBeTruthy();
+      expect(taglineMatches!.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should show only final CTA when analytics is not shown', () => {
+      const result = getStaticHtml(100, null);
+
+      // Should still contain CTA (final one)
+      expect(result).toContain('Take Back Control');
+      expect(result).toContain('Stop hunting logs file by file');
+    });
+
+    it('should include correct log count in feature description when analytics shown', () => {
+      const result = getStaticHtml(123, mockMetadata);
+
+      // Should reference specific log count
+      expect(result).toContain('See all 123 logs');
+    });
+
+    it('should use generic text in feature description when analytics not shown', () => {
+      const result = getStaticHtml(100, null);
+
+      // Should use generic "logs" text
+      expect(result).toContain('See all logs');
+      expect(result).not.toContain('See all 100 logs');
+    });
+
+    it('should include testimonial in both scenarios', () => {
+      const resultWithAnalytics = getStaticHtml(150, mockMetadata);
+      const resultWithoutAnalytics = getStaticHtml(100, null);
+
+      // Both should contain Kristian Serrano testimonial
+      expect(resultWithAnalytics).toContain('Kristian Serrano');
+      expect(resultWithoutAnalytics).toContain('Kristian Serrano');
+
+      expect(resultWithAnalytics).toContain(
+        'This is one of the best extensions',
+      );
+      expect(resultWithoutAnalytics).toContain(
+        'This is one of the best extensions',
+      );
+    });
+
+    it('should include Git Filter feature with version badge', () => {
+      const result = getStaticHtml(150, mockMetadata);
+
+      // Should contain Git Filter feature
+      expect(result).toContain('Git Filter');
+      expect(result).toContain('v3.19.0');
+      expect(result).toContain('Show ONLY logs in your changed files');
+    });
+
+    it('should include all Pro features regardless of analytics visibility', () => {
+      const resultWithAnalytics = getStaticHtml(150, mockMetadata);
+      const resultWithoutAnalytics = getStaticHtml(0, null);
+
+      const features = [
+        'Workspace Tree View',
+        'Instant Search',
+        'Git Filter',
+        'Bulk Cleanup',
+      ];
+
+      features.forEach((feature) => {
+        expect(resultWithAnalytics).toContain(feature);
+        expect(resultWithoutAnalytics).toContain(feature);
+      });
+    });
+
+    it('should include correct UTM parameters in CTAs', () => {
+      const result = getStaticHtml(150, mockMetadata);
+
+      // Should have UTM parameters for tracking
+      expect(result).toContain('utm_source=panel');
+      expect(result).toContain('utm_campaign=workspace_log_count');
+      expect(result).toContain('utm_medium=dynamic_panel');
+
+      // Should differentiate positions
+      expect(result).toContain('position=after_analytics');
+      expect(result).toContain('position=final');
+    });
+  });
 });

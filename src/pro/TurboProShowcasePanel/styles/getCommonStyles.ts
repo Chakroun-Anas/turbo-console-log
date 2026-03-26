@@ -42,6 +42,344 @@ export function getCommonStyles(): string {
           line-height: 1.5;
         }
 
+        /* Workspace Analytics Card - Data-Driven Approach */
+        .workspace-analytics-card {
+          margin-bottom: 24px;
+          padding: 20px;
+          background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(233, 30, 99, 0.05) 100%);
+          border-radius: 12px;
+          border: 2px solid #FF6B6B;
+        }
+        
+        .analytics-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        .analytics-title {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 700;
+          color: #FFC947;
+        }
+        
+        .log-count-badge {
+          background: linear-gradient(135deg, #FF6B6B 0%, #E91E63 100%);
+          color: white;
+          font-size: 24px;
+          font-weight: 900;
+          padding: 8px 16px;
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        }
+        
+        .analytics-description {
+          color: rgba(255, 255, 255, 0.8);
+          margin: 0;
+          font-size: 14px;
+        }
+        
+        .analytics-section {
+          margin-top: 24px;
+          margin-bottom: 24px;
+        }
+        
+        .section-title {
+          font-size: 15px;
+          font-weight: 700;
+          color: #48BFE3;
+          margin: 0 0 12px 0;
+        }
+        
+        /* Repository Chart */
+        .repo-chart {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        
+        .repo-bar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        
+        .repo-name {
+          min-width: 120px;
+          flex-shrink: 0;
+          font-size: 13px;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.9);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        
+        .repo-bar-container {
+          flex: 1;
+          height: 28px;
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 6px;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .repo-bar-fill {
+          position: absolute;
+          left: 0;
+          top: 0;
+          height: 100%;
+          background: linear-gradient(90deg, #8B7BD8 0%, #48BFE3 100%);
+          border-radius: 6px;
+          transition: width 0.5s ease;
+        }
+        
+        .repo-count {
+          position: absolute;
+          right: 8px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 12px;
+          font-weight: 700;
+          color: white;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Log Type Distribution Grid */
+        .log-type-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+          gap: 12px;
+        }
+        
+        .log-type-card {
+          background: rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 107, 107, 0.2);
+          border-radius: 8px;
+          padding: 12px;
+        }
+        
+        .log-type-name {
+          font-size: 12px;
+          font-weight: 600;
+          color: #FFC947;
+          margin-bottom: 8px;
+          font-family: monospace;
+        }
+        
+        .log-type-stats {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          margin-bottom: 8px;
+        }
+        
+        .log-type-count {
+          font-size: 20px;
+          font-weight: 700;
+          color: white;
+        }
+        
+        .log-type-percentage {
+          font-size: 14px;
+          font-weight: 600;
+          color: #48BFE3;
+        }
+        
+        .log-type-bar {
+          height: 4px;
+          background: rgba(0, 0, 0, 0.4);
+          border-radius: 2px;
+          overflow: hidden;
+        }
+        
+        .log-type-bar-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #FF6B6B 0%, #FFC947 100%);
+          border-radius: 2px;
+          transition: width 0.5s ease;
+        }
+        
+        /* Impact Section - Data-driven insights */
+        .impact-section {
+          background: rgba(72, 191, 227, 0.08);
+          border-left: 4px solid #48BFE3;
+          padding: 16px;
+          border-radius: 8px;
+        }
+        
+        .impact-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+          gap: 12px;
+          margin-top: 12px;
+        }
+        
+        .impact-card {
+          background: rgba(0, 0, 0, 0.3);
+          border-radius: 8px;
+          padding: 14px;
+          text-align: center;
+          border: 1px solid rgba(72, 191, 227, 0.2);
+          transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        
+        .impact-card:hover {
+          transform: translateY(-2px);
+          border-color: rgba(72, 191, 227, 0.5);
+        }
+        
+        .impact-card-highlight {
+          background: rgba(72, 191, 227, 0.15);
+          border-color: rgba(72, 191, 227, 0.4);
+        }
+        
+        .impact-card-highlight:hover {
+          border-color: rgba(72, 191, 227, 0.7);
+        }
+        
+        .impact-metric {
+          font-size: 32px;
+          font-weight: 700;
+          color: #48BFE3;
+          margin-bottom: 6px;
+          line-height: 1;
+        }
+        
+        .impact-label {
+          font-size: 13px;
+          font-weight: 600;
+          color: rgba(255, 255, 255, 0.9);
+          margin-bottom: 6px;
+          line-height: 1.3;
+          word-break: break-word;
+          overflow-wrap: break-word;
+        }
+        
+        .impact-hint {
+          font-size: 11px;
+          color: rgba(255, 201, 71, 0.9);
+          font-style: italic;
+          line-height: 1.3;
+        }
+        
+        .insights-footer {
+          margin-top: 14px;
+          padding-top: 12px;
+          border-top: 1px solid rgba(72, 191, 227, 0.2);
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.8);
+          line-height: 1.5;
+        }
+        
+        .insights-footer strong {
+          color: #FFC947;
+        }
+        
+        /* Features Reveal */
+        .features-reveal {
+          background: rgba(139, 123, 216, 0.08);
+          border-left: 4px solid #8B7BD8;
+          padding: 16px;
+          border-radius: 8px;
+        }
+        
+        /* Features Reveal Standalone - for separate component */
+        .features-reveal-standalone {
+          background: linear-gradient(135deg, rgba(139, 123, 216, 0.1) 0%, rgba(72, 191, 227, 0.08) 100%);
+          border: 2px solid rgba(139, 123, 216, 0.2);
+          padding: 20px;
+          border-radius: 12px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          margin-top: 12px;
+        }
+        
+        .feature-item {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 6px;
+          padding: 12px;
+          display: flex;
+          align-items: start;
+          gap: 12px;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .feature-item:hover {
+          transform: translateX(4px);
+          box-shadow: 0 4px 12px rgba(139, 123, 216, 0.3);
+        }
+        
+        .feature-item.feature-new {
+          border: 1px solid rgba(255, 201, 71, 0.3);
+        }
+        
+        .feature-icon {
+          font-size: 24px;
+          flex-shrink: 0;
+        }
+        
+        .feature-content {
+          flex: 1;
+        }
+        
+        .feature-name {
+          font-size: 14px;
+          font-weight: 700;
+          color: #FFC947;
+          margin-bottom: 4px;
+        }
+        
+        .feature-desc {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.75);
+          line-height: 1.4;
+        }
+        
+        .new-badge {
+          display: inline-block;
+          background: linear-gradient(135deg, #FFC947 0%, #FF6B6B 100%);
+          color: #1e1e1e;
+          font-size: 10px;
+          font-weight: 900;
+          padding: 2px 6px;
+          border-radius: 4px;
+          margin-left: 6px;
+          text-transform: uppercase;
+        }
+        
+        /* Testimonial Section */
+        .testimonial-section {
+          background: rgba(72, 191, 227, 0.08);
+          border-left: 4px solid #48BFE3;
+          padding: 16px;
+          border-radius: 8px;
+          margin-top: 16px;
+        }
+        
+        .testimonial-quote {
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.9);
+          line-height: 1.6;
+          margin-bottom: 8px;
+          font-style: italic;
+        }
+        
+        .testimonial-author {
+          font-size: 12px;
+          color: #48BFE3;
+          font-weight: 600;
+        }
+
         /* Countdown Widget Styles */
         .countdown-widget {
           margin-bottom: 24px;
@@ -240,7 +578,7 @@ export function getCommonStyles(): string {
         }
 
         .media-showcase-cta {
-          margin: 16px 0;
+          margin: 16px auto;
           padding: 16px;
           background: rgba(255, 255, 255, 0.05);
           border-radius: 8px;
@@ -250,6 +588,7 @@ export function getCommonStyles(): string {
           flex-direction: column;
           align-items: center;
           gap: 12px;
+          max-width: 250px;
         }
         
         .media-showcase-images {
@@ -275,8 +614,8 @@ export function getCommonStyles(): string {
         
         .media-showcase-image {
           width: auto;
-          max-width: 360px;
-          max-height: 400px;
+          max-width: 240px;
+          max-height: 280px;
           margin: 0 auto;
           display: block;
           border-radius: 8px;
@@ -284,6 +623,14 @@ export function getCommonStyles(): string {
         
         .media-showcase-images img {
           border-radius: 8px;
+        }
+
+        .media-showcase-tagline {
+          font-size: 16px;
+          font-weight: 600;
+          color: #FFC947;
+          margin: 8px 0;
+          line-height: 1.4;
         }
 
         .media-showcase-cta-button {

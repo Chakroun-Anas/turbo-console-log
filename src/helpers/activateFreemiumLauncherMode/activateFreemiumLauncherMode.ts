@@ -1,17 +1,16 @@
 import * as vscode from 'vscode';
-import { activateFreemiumMode } from '../activeFreemiumMode';
-import { manageDynamicFreemiumPanel } from './launcherContent';
 import { writeToGlobalState } from '../writeToGlobalState';
 import { GlobalStateKeys } from '../GlobalStateKeys';
 import { createTelemetryService } from '../../telemetry/telemetryService';
 import { trackPanelOpenings } from '../trackPanelOpenings';
+import { activateFreemiumMode } from '../activeFreemiumMode';
 
 export function activateFreemiumLauncherMode(
   context: vscode.ExtensionContext,
   launcherView: vscode.TreeView<string>,
 ): void {
-  // Initialize badge with 0 and manage dynamic content if setting is enabled
-  manageDynamicFreemiumPanel(context);
+  // Manage dynamic content if setting is enabled
+  // manageDynamicFreemiumPanel(context);
 
   const launcherVisibilityDisposable = launcherView.onDidChangeVisibility(
     async (e: vscode.TreeViewVisibilityChangeEvent) => {

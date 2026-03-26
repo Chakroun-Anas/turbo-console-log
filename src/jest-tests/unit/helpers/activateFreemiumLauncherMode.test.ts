@@ -112,10 +112,11 @@ describe('activateFreemiumLauncherMode', () => {
       expect(mockTreeView).toBeDefined();
     });
 
-    it('should call manageDynamicFreemiumPanel with context', () => {
+    // Note: manageDynamicFreemiumPanel is now commented out since panel is static-only
+    it('should not call manageDynamicFreemiumPanel (commented out for static panel)', () => {
       activateFreemiumLauncherMode(context, mockTreeView);
 
-      expect(mockManageDynamicFreemiumPanel).toHaveBeenCalledWith(context);
+      expect(mockManageDynamicFreemiumPanel).not.toHaveBeenCalled();
     });
 
     it('should register visibility change handler', () => {
@@ -304,14 +305,16 @@ describe('activateFreemiumLauncherMode', () => {
   });
 
   describe('Error Handling', () => {
-    it('should handle manageDynamicFreemiumPanel errors gracefully', () => {
+    // Note: manageDynamicFreemiumPanel error test removed since it's commented out
+    it('should not throw errors from manageDynamicFreemiumPanel (no longer called)', () => {
       mockManageDynamicFreemiumPanel.mockImplementation(() => {
         throw new Error('Dynamic panel error');
       });
 
+      // Should not throw since manageDynamicFreemiumPanel is commented out
       expect(() => {
         activateFreemiumLauncherMode(context, mockTreeView);
-      }).toThrow('Dynamic panel error');
+      }).not.toThrow();
     });
 
     it('should handle context command execution errors', () => {
@@ -341,8 +344,8 @@ describe('activateFreemiumLauncherMode', () => {
       // Activate launcher mode
       activateFreemiumLauncherMode(context, mockTreeView);
 
-      // Verify manageDynamicFreemiumPanel was called
-      expect(mockManageDynamicFreemiumPanel).toHaveBeenCalledWith(context);
+      // Note: manageDynamicFreemiumPanel check removed (commented out in implementation)
+      expect(mockManageDynamicFreemiumPanel).not.toHaveBeenCalled();
 
       // Simulate user viewing the panel
       visibilityChangeHandler({ visible: true });

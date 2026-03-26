@@ -195,19 +195,25 @@ export async function activate(
     return;
   }
 
-  // Activate freemium launcher for non-Pro users
-  activateFreemiumLauncherMode(context, launcherView);
-
   // Count initial workspace logs and potentially show notification (with error handling)
-  initialWorkspaceLogsCount(
-    extensionProperties,
-    launcherView,
-    context,
-    version,
-  ).catch((error) => {
+  // Wait for completion before making panel accessible to avoid empty state
+  try {
+    await initialWorkspaceLogsCount(
+      extensionProperties,
+      launcherView,
+      context,
+      version,
+    );
+  } catch (error) {
     console.error(
       '[Extension] Failed to initialize workspace log count:',
       error,
     );
-  });
+    // On error, set metadata to null to skip analytics section in panel
+    context.globalState.update('WORKSPACE_LOG_METADATA', null);
+    // Make panel accessible (will show Pro features only, no analytics)
+  } finally {
+    // Activate freemium launcher for non-Pro users
+    activateFreemiumLauncherMode(context, launcherView);
+  }
 }

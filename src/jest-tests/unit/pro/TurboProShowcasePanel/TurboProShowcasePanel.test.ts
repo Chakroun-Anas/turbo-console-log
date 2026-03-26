@@ -1,8 +1,6 @@
 import { TurboProShowcasePanel } from '@/pro/TurboProShowcasePanel/TurboProShowcasePanel';
 import * as vscode from 'vscode';
 import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
-import { GlobalStateKeys } from '@/helpers/GlobalStateKeys';
-import { DynamicFreemiumPanel } from '@/pro/TurboProShowcasePanel/types';
 
 // Mock the HTML generators to focus on panel logic
 jest.mock('@/pro/TurboProShowcasePanel/html/getDynamicHtml', () => ({
@@ -14,7 +12,6 @@ jest.mock('@/pro/TurboProShowcasePanel/html/getStaticHtml', () => ({
 jest.mock('@/telemetry/telemetryService');
 jest.mock('@/helpers/trackPanelOpenings');
 
-import { getDynamicHtml } from '@/pro/TurboProShowcasePanel/html/getDynamicHtml';
 import { getStaticHtml } from '@/pro/TurboProShowcasePanel/html/getStaticHtml';
 import { createTelemetryService } from '@/telemetry/telemetryService';
 import { trackPanelOpenings } from '@/helpers/trackPanelOpenings';
@@ -32,9 +29,6 @@ const mockCreateTelemetryService =
   createTelemetryService as jest.MockedFunction<typeof createTelemetryService>;
 mockCreateTelemetryService.mockReturnValue(mockTelemetryService);
 
-const mockGetDynamicHtml = getDynamicHtml as jest.MockedFunction<
-  typeof getDynamicHtml
->;
 const mockGetStaticHtml = getStaticHtml as jest.MockedFunction<
   typeof getStaticHtml
 >;
@@ -116,90 +110,68 @@ describe('TurboProShowcasePanel', () => {
   });
 
   describe('getHtml method', () => {
-    it('should return static HTML when no dynamic content exists', () => {
+    it('should return static HTML when no workspace metadata exists', () => {
       mockGetStaticHtml.mockReturnValue('<div>Static content</div>');
       jest.spyOn(context.globalState, 'get').mockReturnValue(undefined);
 
       panel.resolveWebviewView(mockWebviewView);
 
+      // Panel now loads WORKSPACE_LOG_METADATA instead of dynamic content
       expect(context.globalState.get).toHaveBeenCalledWith(
-        GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_CONTENT,
+        'WORKSPACE_LOG_METADATA',
       );
       expect(mockGetStaticHtml).toHaveBeenCalled();
-      expect(mockGetDynamicHtml).not.toHaveBeenCalled();
     });
 
-    it('should return static HTML when dynamic content has empty content array', () => {
-      const emptyDynamicContent: DynamicFreemiumPanel = {
-        tooltip: 'Test tooltip',
-        date: '2025-09-27',
-        content: [],
-      };
-
+    it('should return static HTML regardless of global state content (dynamic panel removed)', () => {
+      // These tests are now irrelevant since panel is static-only
+      // Just verify static HTML is always returned
       mockGetStaticHtml.mockReturnValue('<div>Static content</div>');
-      jest
-        .spyOn(context.globalState, 'get')
-        .mockReturnValue(emptyDynamicContent);
+      jest.spyOn(context.globalState, 'get').mockReturnValue(null);
 
       panel.resolveWebviewView(mockWebviewView);
 
       expect(mockGetStaticHtml).toHaveBeenCalled();
-      expect(mockGetDynamicHtml).not.toHaveBeenCalled();
     });
 
-    it('should return static HTML when dynamic content has no content property', () => {
-      const incompleteContent = {
-        tooltip: 'Test tooltip',
-        date: '2025-09-27',
-        // Missing content property
-      } as DynamicFreemiumPanel;
-
-      mockGetStaticHtml.mockReturnValue('<div>Static content</div>');
-      jest.spyOn(context.globalState, 'get').mockReturnValue(incompleteContent);
-
-      panel.resolveWebviewView(mockWebviewView);
-
-      expect(mockGetStaticHtml).toHaveBeenCalled();
-      expect(mockGetDynamicHtml).not.toHaveBeenCalled();
-    });
-
-    it('should return dynamic HTML when valid dynamic content exists', () => {
-      const validDynamicContent: DynamicFreemiumPanel = {
-        tooltip: 'Test tooltip',
-        date: '2025-09-27',
-        content: [
+    it('should return static HTML when workspace metadata exists', () => {
+      const workspaceMetadata = {
+        totalLogs: 100,
+        totalFiles: 10,
+        repositories: [
           {
-            type: 'paragraph',
-            component: { title: 'Test Title', content: 'Test content' },
+            name: 'test-repo',
+            path: '/path/to/repo',
+            logCount: 100,
+            fileCount: 10,
+            topNestedFolder: {
+              relativePath: 'src/components',
+              logCount: 50,
+              percentage: 50,
+            },
           },
+        ],
+        logTypeDistribution: [
+          { type: 'console.log', count: 80, percentage: 80 },
+          { type: 'console.error', count: 20, percentage: 20 },
         ],
       };
 
-      mockGetDynamicHtml.mockReturnValue('<div>Dynamic content</div>');
-      jest
-        .spyOn(context.globalState, 'get')
-        .mockReturnValue(validDynamicContent);
+      mockGetStaticHtml.mockReturnValue(
+        '<div>Static content with analytics</div>',
+      );
+      jest.spyOn(context.globalState, 'get').mockReturnValue(workspaceMetadata);
 
       panel.resolveWebviewView(mockWebviewView);
 
+      // Panel now loads WORKSPACE_LOG_METADATA and always returns static HTML
       expect(context.globalState.get).toHaveBeenCalledWith(
-        GlobalStateKeys.DYNAMIC_FREEMIUM_PANEL_CONTENT,
+        'WORKSPACE_LOG_METADATA',
       );
-      // Should be called with content that includes workspace-log-count component
-      expect(mockGetDynamicHtml).toHaveBeenCalledWith(
-        expect.objectContaining({
-          content: expect.arrayContaining([
-            expect.objectContaining({
-              type: 'workspace-log-count',
-              order: 0,
-            }),
-            expect.objectContaining({
-              type: 'paragraph',
-            }),
-          ]),
-        }),
+      expect(mockGetStaticHtml).toHaveBeenCalledWith(
+        expect.any(Number),
+        workspaceMetadata,
       );
-      expect(mockGetStaticHtml).not.toHaveBeenCalled();
     });
   });
 

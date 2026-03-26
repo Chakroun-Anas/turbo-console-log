@@ -2,6 +2,7 @@
 export interface ParagraphPanelComponent {
   title: string;
   content: string;
+  rawHtml?: boolean; // If true, content will be rendered as raw HTML without escaping
 }
 
 export interface ArticlePanelComponent {
@@ -39,6 +40,7 @@ export interface TablePanelComponent {
 
 export interface MediaShowcaseCTAPanelComponent {
   illustrationSrcs: Array<string>;
+  tagline?: string; // Optional tagline to show before the CTA
   cta: {
     text: string;
     url: string;
@@ -67,6 +69,26 @@ export interface WorkspaceLogCountComponent {
   logCount: number;
   title: string;
   description: string;
+  metadata?: {
+    totalLogs: number;
+    totalFiles: number;
+    repositories: Array<{
+      name: string;
+      path: string;
+      logCount: number;
+      fileCount: number;
+      topNestedFolder?: {
+        relativePath: string;
+        logCount: number;
+        percentage: number;
+      };
+    }>;
+    logTypeDistribution: Array<{
+      type: string;
+      count: number;
+      percentage: number;
+    }>;
+  } | null; // Allow null to indicate error state
 }
 
 export type FreemiumPanelComponent =
