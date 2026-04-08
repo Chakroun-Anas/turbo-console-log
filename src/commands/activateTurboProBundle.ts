@@ -8,11 +8,12 @@ import {
   writeProBundleToCache,
 } from '../pro/utilities';
 import { isOnline } from '../pro/utilities/isOnline';
+import { writeToGlobalState } from '../helpers';
 
 export function activateTurboProBundleCommand(): Command {
   return {
     name: 'turboConsoleLog.activateTurboProBundle',
-    handler: async ({ extensionProperties, context }) => {
+    handler: async ({ extensionProperties, context, launcherView }) => {
       const licenseKey = (
         await vscode.window.showInputBox({
           placeHolder: 'Enter your Turbo Pro license key',
@@ -66,6 +67,18 @@ export function activateTurboProBundleCommand(): Command {
           'ChakrounAnas.turbo-console-log',
         )?.packageJSON.version;
         const proBundle = await fetchProBundle(licenseKey, version);
+
+        // Clear freemium launcher badge before activating Pro
+        if (launcherView) {
+          launcherView.badge = undefined;
+        }
+
+        // Clean up any active trial metadata (if user purchases Pro during trial)
+        // The countdown timer will stop automatically on next tick or reload
+        writeToGlobalState(context, 'trial-key', undefined);
+        writeToGlobalState(context, 'trial-expires-at', undefined);
+        writeToGlobalState(context, 'trial-status', undefined);
+
         runProBundle(extensionProperties, proBundle, context);
         writeProBundleToCache(context, licenseKey, proBundle, version);
         showNotification(

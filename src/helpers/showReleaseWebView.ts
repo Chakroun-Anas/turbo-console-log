@@ -1,13 +1,15 @@
 import * as vscode from 'vscode';
 import axios from 'axios';
 import { readFromGlobalState, writeToGlobalState } from '@/helpers';
+import { isTestMode } from '@/runTime';
 import { GlobalStateKey } from '@/entities';
 import { createTelemetryService } from '../telemetry/telemetryService';
 import { WebviewVariantResponse } from '@/entities/WebviewVariant';
 import { WEBVIEW_FALLBACK_VARIANTS } from '../releases/3120';
 
-const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
-// const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
+const TURBO_WEBSITE_BASE_URL = isTestMode()
+  ? 'http://localhost:3000'
+  : 'https://www.turboconsolelog.io';
 
 /**
  * Shows v3.12.0 release webview announcing new Turbo Pro shape using Thompson Sampling

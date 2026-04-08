@@ -48,6 +48,22 @@ describe('TurboProBundleRepairPanel', () => {
       panel = new TurboProBundleRepairPanel('Bundle corrupted', 'run');
       expect(panel).toBeDefined();
     });
+
+    it('should create panel with trial-fetch mode', () => {
+      panel = new TurboProBundleRepairPanel(
+        'Network error fetching trial',
+        'trial-fetch',
+      );
+      expect(panel).toBeDefined();
+    });
+
+    it('should create panel with trial-run mode', () => {
+      panel = new TurboProBundleRepairPanel(
+        'Trial bundle execution failed',
+        'trial-run',
+      );
+      expect(panel).toBeDefined();
+    });
   });
 
   describe('resolveWebviewView', () => {
@@ -132,7 +148,7 @@ describe('TurboProBundleRepairPanel', () => {
     });
 
     it('should execute retry update command for update mode', async () => {
-      await messageHandler({ command: 'retryUpdateProBundle' });
+      messageHandler({ command: 'retryUpdateProBundle' });
 
       expect(mockCommands.executeCommand).toHaveBeenCalledWith(
         'turboConsoleLog.retryProUpdate',
@@ -141,7 +157,7 @@ describe('TurboProBundleRepairPanel', () => {
     });
 
     it('should execute retry run command for other commands', async () => {
-      await messageHandler({ command: 'retryRunProBundle' });
+      messageHandler({ command: 'retryRunProBundle' });
 
       expect(mockCommands.executeCommand).toHaveBeenCalledWith(
         'turboConsoleLog.retryProBundleRun',
@@ -149,12 +165,48 @@ describe('TurboProBundleRepairPanel', () => {
       expect(mockWebviewView.webview.html).toContain('Retrying...');
     });
 
-    it('should default to run command for unknown commands', async () => {
-      await messageHandler({ command: 'unknownCommand' });
+    it('should ignore unknown commands', async () => {
+      messageHandler({ command: 'unknownCommand' });
+
+      // Should not execute any command for unknown messages
+      expect(mockCommands.executeCommand).not.toHaveBeenCalled();
+    });
+
+    it('should execute retry trial fetch command for trial-fetch mode', async () => {
+      panel = new TurboProBundleRepairPanel('Network error', 'trial-fetch');
+      panel.resolveWebviewView(mockWebviewView);
+
+      const onDidReceiveMessageMock = mockWebviewView.webview
+        .onDidReceiveMessage as jest.Mock;
+      const onDidReceiveMessageCall = onDidReceiveMessageMock.mock.calls[0];
+      const trialMessageHandler = onDidReceiveMessageCall[0];
+
+      trialMessageHandler({ command: 'retryTrialFetch' });
 
       expect(mockCommands.executeCommand).toHaveBeenCalledWith(
-        'turboConsoleLog.retryProBundleRun',
+        'turboConsoleLog.retryTrialFetch',
       );
+      expect(mockWebviewView.webview.html).toContain('Retrying...');
+    });
+
+    it('should execute retry trial run command for trial-run mode', async () => {
+      panel = new TurboProBundleRepairPanel(
+        'Bundle execution failed',
+        'trial-run',
+      );
+      panel.resolveWebviewView(mockWebviewView);
+
+      const onDidReceiveMessageMock = mockWebviewView.webview
+        .onDidReceiveMessage as jest.Mock;
+      const onDidReceiveMessageCall = onDidReceiveMessageMock.mock.calls[0];
+      const trialMessageHandler = onDidReceiveMessageCall[0];
+
+      trialMessageHandler({ command: 'retryTrialRun' });
+
+      expect(mockCommands.executeCommand).toHaveBeenCalledWith(
+        'turboConsoleLog.retryTrialRun',
+      );
+      expect(mockWebviewView.webview.html).toContain('Retrying...');
     });
   });
 
@@ -225,6 +277,39 @@ describe('TurboProBundleRepairPanel', () => {
       expect(html).toContain('Retrying...');
       expect(html).toContain('disabled');
     });
+
+    it('should generate correct HTML for trial-fetch mode', () => {
+      panel = new TurboProBundleRepairPanel(
+        'Network error fetching trial',
+        'trial-fetch',
+      );
+      panel.resolveWebviewView(mockWebviewView);
+
+      const html = mockWebviewView.webview.html;
+
+      expect(html).toContain('<html>');
+      expect(html).toContain('failed to fetch your trial bundle');
+      expect(html).toContain('Network error fetching trial');
+      expect(html).toContain('Retry Fetch');
+      expect(html).toContain('retryTrialFetch');
+      expect(html).toContain('support@turboconsolelog.io');
+    });
+
+    it('should generate correct HTML for trial-run mode', () => {
+      panel = new TurboProBundleRepairPanel(
+        'Trial bundle execution failed',
+        'trial-run',
+      );
+      panel.resolveWebviewView(mockWebviewView);
+
+      const html = mockWebviewView.webview.html;
+
+      expect(html).toContain('<html>');
+      expect(html).toContain('failed to run your trial bundle');
+      expect(html).toContain('Trial bundle execution failed');
+      expect(html).toContain('Retry Run');
+      expect(html).toContain('retryTrialRun');
+    });
   });
 
   describe('static properties', () => {
@@ -250,8 +335,28 @@ describe('TurboProBundleRepairPanel', () => {
       runPanel.resolveWebviewView(mockWebviewView);
       const runHtml = mockWebviewView.webview.html;
 
+      mockWebviewView.webview.html = ''; // Reset
+
+      const trialFetchPanel = new TurboProBundleRepairPanel(
+        'Fetch error',
+        'trial-fetch',
+      );
+      trialFetchPanel.resolveWebviewView(mockWebviewView);
+      const trialFetchHtml = mockWebviewView.webview.html;
+
+      mockWebviewView.webview.html = ''; // Reset
+
+      const trialRunPanel = new TurboProBundleRepairPanel(
+        'Trial run error',
+        'trial-run',
+      );
+      trialRunPanel.resolveWebviewView(mockWebviewView);
+      const trialRunHtml = mockWebviewView.webview.html;
+
       expect(updateHtml).toContain('failed to update your previous pro bundle');
       expect(runHtml).toContain('failed to run your pro bundle');
+      expect(trialFetchHtml).toContain('failed to fetch your trial bundle');
+      expect(trialRunHtml).toContain('failed to run your trial bundle');
       expect(updateHtml).not.toContain('failed to run your pro bundle');
       expect(runHtml).not.toContain(
         'failed to update your previous pro bundle',
@@ -269,8 +374,25 @@ describe('TurboProBundleRepairPanel', () => {
       runPanel.resolveWebviewView(mockWebviewView);
       const runHtml = mockWebviewView.webview.html;
 
+      mockWebviewView.webview.html = ''; // Reset
+
+      const trialFetchPanel = new TurboProBundleRepairPanel(
+        'Error',
+        'trial-fetch',
+      );
+      trialFetchPanel.resolveWebviewView(mockWebviewView);
+      const trialFetchHtml = mockWebviewView.webview.html;
+
+      mockWebviewView.webview.html = ''; // Reset
+
+      const trialRunPanel = new TurboProBundleRepairPanel('Error', 'trial-run');
+      trialRunPanel.resolveWebviewView(mockWebviewView);
+      const trialRunHtml = mockWebviewView.webview.html;
+
       expect(updateHtml).toContain('Retry Update');
       expect(runHtml).toContain('Retry Run');
+      expect(trialFetchHtml).toContain('Retry Fetch');
+      expect(trialRunHtml).toContain('Retry Run');
     });
 
     it('should generate correct post message commands', () => {
@@ -284,8 +406,25 @@ describe('TurboProBundleRepairPanel', () => {
       runPanel.resolveWebviewView(mockWebviewView);
       const runHtml = mockWebviewView.webview.html;
 
+      mockWebviewView.webview.html = ''; // Reset
+
+      const trialFetchPanel = new TurboProBundleRepairPanel(
+        'Error',
+        'trial-fetch',
+      );
+      trialFetchPanel.resolveWebviewView(mockWebviewView);
+      const trialFetchHtml = mockWebviewView.webview.html;
+
+      mockWebviewView.webview.html = ''; // Reset
+
+      const trialRunPanel = new TurboProBundleRepairPanel('Error', 'trial-run');
+      trialRunPanel.resolveWebviewView(mockWebviewView);
+      const trialRunHtml = mockWebviewView.webview.html;
+
       expect(updateHtml).toContain('retryUpdateProBundle');
       expect(runHtml).toContain('retryRunProBundle');
+      expect(trialFetchHtml).toContain('retryTrialFetch');
+      expect(trialRunHtml).toContain('retryTrialRun');
     });
   });
 });

@@ -9,14 +9,16 @@ import {
   CommandsInsertedAnalyticsData,
   FreemiumPanelCtaClickAnalyticsData,
 } from './TurboAnalyticsProvider';
+import { isTestMode } from '@/runTime';
 
 // Type extension for VS Code env API compatibility
 interface ExtendedEnv {
   isTelemetryEnabled?: boolean;
 }
 
-const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
-// const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
+const TURBO_WEBSITE_BASE_URL = isTestMode()
+  ? 'http://localhost:3000'
+  : 'https://www.turboconsolelog.io';
 
 /**
  * Telemetry service implementation that respects VS Code and user privacy settings

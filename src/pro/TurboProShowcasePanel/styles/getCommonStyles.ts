@@ -29,6 +29,11 @@ export function getCommonStyles(): string {
           border-radius: 8px;
           border-left: 4px solid #48BFE3;
         }
+
+        /* Red left border for trial expired content */
+        .dynamic-content:has(.trial-expired-banner) {
+          border-left-color: #E53935;
+        }
         
         .dynamic-content h3 {
           color: #FFC947;
@@ -55,6 +60,7 @@ export function getCommonStyles(): string {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          gap: 12px;
           margin-bottom: 20px;
           padding-bottom: 16px;
           border-bottom: 1px solid rgba(255, 107, 107, 0.3);
@@ -65,6 +71,8 @@ export function getCommonStyles(): string {
           font-size: 18px;
           font-weight: 700;
           color: #FFC947;
+          flex: 1;
+          min-width: 0;
         }
         
         .log-count-badge {
@@ -75,6 +83,9 @@ export function getCommonStyles(): string {
           padding: 8px 16px;
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+          white-space: nowrap;
+          min-width: fit-content;
+          flex-shrink: 0;
         }
         
         .analytics-description {
@@ -614,8 +625,8 @@ export function getCommonStyles(): string {
         
         .media-showcase-image {
           width: auto;
-          max-width: 240px;
-          max-height: 280px;
+          max-width: 340px;
+          max-height: 400px;
           margin: 0 auto;
           display: block;
           border-radius: 8px;
@@ -680,7 +691,7 @@ export function getCommonStyles(): string {
 
         /* YouTube Video Card Styles */
         .youtube-video-component {
-          margin: 16px 0;
+          margin-bottom: 16px;
         }
         
         .youtube-video-card {
@@ -760,6 +771,106 @@ export function getCommonStyles(): string {
         
         .youtube-video-card:hover .youtube-video-cta {
           color: #5DCDFA;
+        }
+
+        /* Trial CTA Banner Styles */
+        .trial-cta-banner {
+          margin-bottom: 24px;
+          padding: 20px;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
+          border-radius: 12px;
+          border: 2px solid #667EEA;
+          text-align: center;
+        }
+        
+        .trial-message {
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0 0 16px 0;
+          line-height: 1.6;
+        }
+        
+        .trial-message strong {
+          color: #FFC947;
+          font-weight: 600;
+        }
+        
+        .trial-button {
+          display: inline-block;
+          padding: 12px 28px;
+          margin: 8px 0;
+          background: linear-gradient(135deg, #667EEA, #764BA2);
+          color: #FFFFFF !important;
+          text-decoration: none !important;
+          border-radius: 8px;
+          font-weight: 700;
+          font-size: 15px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+          cursor: pointer;
+        }
+        
+        .trial-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+          text-decoration: none !important;
+        }
+        
+        .trial-details {
+          margin: 12px 0 0 0;
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.6);
+          font-style: italic;
+        }
+
+        /* Trial Expired Banner Styles */
+        .trial-expired-banner {
+          margin-bottom: 24px;
+          padding: 20px;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.1) 100%);
+          border-radius: 12px;
+          border: 2px solid rgba(255, 255, 255, 0.1);
+          text-align: center;
+        }
+        
+        .trial-expired-message {
+          font-size: 15px;
+          color: rgba(255, 255, 255, 0.9);
+          margin: 0 0 16px 0;
+          line-height: 1.6;
+        }
+        
+        .trial-expired-message strong {
+          color: #FFC947;
+          font-weight: 600;
+        }
+        
+        .trial-expired-button {
+          display: inline-block;
+          padding: 12px 28px;
+          margin: 8px 0;
+          background: linear-gradient(135deg, #667EEA, #764BA2);
+          color: #FFFFFF !important;
+          text-decoration: none !important;
+          border-radius: 8px;
+          font-weight: 700;
+          font-size: 15px;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+          cursor: pointer;
+        }
+        
+        .trial-expired-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+          text-decoration: none !important;
+        }
+        
+        .trial-expired-details {
+          margin: 12px 0 0 0;
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.6);
+          font-style: italic;
         }
 
         .footer {

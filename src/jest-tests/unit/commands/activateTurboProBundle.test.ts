@@ -8,12 +8,14 @@ import { ExtensionProperties } from '@/entities';
 import { showNotification } from '@/ui';
 import * as proUtilities from '@/pro/utilities';
 import { isOnline } from '@/pro/utilities/isOnline';
+import { writeToGlobalState } from '@/helpers';
 import { AxiosError } from 'axios';
 
 // Mock the dependencies
 jest.mock('@/ui');
 jest.mock('@/pro/utilities');
 jest.mock('@/pro/utilities/isOnline');
+jest.mock('@/helpers');
 
 describe('activateTurboProBundleCommand', () => {
   const mockContext = makeExtensionContext();
@@ -333,6 +335,250 @@ describe('activateTurboProBundleCommand', () => {
         'TCLP-TESTKEY12345678901234567890AB',
         undefined,
       );
+    });
+  });
+
+  describe('trial metadata cleanup', () => {
+    it('should clear trial metadata when Pro is successfully activated', async () => {
+      const mockBundle = 'mock-pro-bundle';
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'TCLP-TESTKEY12345678901234567890AB',
+      );
+      (proUtilities.fetchProBundle as jest.Mock).mockResolvedValue(mockBundle);
+
+      const command = activateTurboProBundleCommand();
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+      });
+
+      // Verify all three trial metadata keys are cleared
+      expect(writeToGlobalState).toHaveBeenCalledWith(
+        mockContext,
+        'trial-key',
+        undefined,
+      );
+      expect(writeToGlobalState).toHaveBeenCalledWith(
+        mockContext,
+        'trial-expires-at',
+        undefined,
+      );
+      expect(writeToGlobalState).toHaveBeenCalledWith(
+        mockContext,
+        'trial-status',
+        undefined,
+      );
+    });
+
+    it('should NOT clear trial metadata when Pro activation fails', async () => {
+      const axiosError = new AxiosError('Invalid license key');
+      (axiosError as unknown as { response: unknown }).response = {
+        data: { error: 'Invalid license key' },
+        status: 400,
+        statusText: 'Bad Request',
+        headers: {},
+        config: {},
+      };
+
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'TCLP-INVALIDKEY1234567890123456789',
+      );
+      (proUtilities.fetchProBundle as jest.Mock).mockRejectedValue(axiosError);
+
+      const command = activateTurboProBundleCommand();
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+      });
+
+      // Trial metadata should NOT be cleared when activation fails
+      expect(writeToGlobalState).not.toHaveBeenCalledWith(
+        mockContext,
+        'trial-key',
+        undefined,
+      );
+      expect(writeToGlobalState).not.toHaveBeenCalledWith(
+        mockContext,
+        'trial-expires-at',
+        undefined,
+      );
+      expect(writeToGlobalState).not.toHaveBeenCalledWith(
+        mockContext,
+        'trial-status',
+        undefined,
+      );
+    });
+
+    it('should NOT clear trial metadata when offline', async () => {
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'TCLP-TESTKEY12345678901234567890AB',
+      );
+      (isOnline as jest.Mock).mockResolvedValue(false);
+
+      const command = activateTurboProBundleCommand();
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+      });
+
+      // Trial metadata should NOT be cleared when offline
+      expect(writeToGlobalState).not.toHaveBeenCalled();
+    });
+
+    it('should clear trial metadata before running Pro bundle', async () => {
+      const mockBundle = 'mock-pro-bundle';
+      const callOrder: string[] = [];
+
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'TCLP-TESTKEY12345678901234567890AB',
+      );
+      (proUtilities.fetchProBundle as jest.Mock).mockResolvedValue(mockBundle);
+
+      // Track call order
+      (writeToGlobalState as jest.Mock).mockImplementation(() => {
+        callOrder.push('writeToGlobalState');
+      });
+      (proUtilities.runProBundle as jest.Mock).mockImplementation(() => {
+        callOrder.push('runProBundle');
+      });
+
+      const command = activateTurboProBundleCommand();
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+      });
+
+      // Trial cleanup should happen before runProBundle
+      expect(callOrder.indexOf('writeToGlobalState')).toBeLessThan(
+        callOrder.indexOf('runProBundle'),
+      );
+    });
+  });
+
+  describe('launcher view badge clearing', () => {
+    it('should clear launcher view badge when provided', async () => {
+      const mockBundle = 'mock-pro-bundle';
+      const mockLauncherView = {
+        badge: { value: 1000, tooltip: 'Total logs' },
+      } as vscode.TreeView<unknown>;
+
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'TCLP-TESTKEY12345678901234567890AB',
+      );
+      (proUtilities.fetchProBundle as jest.Mock).mockResolvedValue(mockBundle);
+
+      const command = activateTurboProBundleCommand();
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+        launcherView: mockLauncherView,
+      });
+
+      expect(mockLauncherView.badge).toBeUndefined();
+    });
+
+    it('should not crash when launcher view is undefined', async () => {
+      const mockBundle = 'mock-pro-bundle';
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'TCLP-TESTKEY12345678901234567890AB',
+      );
+      (proUtilities.fetchProBundle as jest.Mock).mockResolvedValue(mockBundle);
+
+      const command = activateTurboProBundleCommand();
+
+      // Should not throw when launcherView is undefined
+      await expect(
+        command.handler({
+          context: mockContext,
+          extensionProperties: mockExtensionProperties,
+          debugMessage: mockDebugMessage,
+          launcherView: undefined,
+        }),
+      ).resolves.not.toThrow();
+
+      expect(proUtilities.runProBundle).toHaveBeenCalled();
+    });
+
+    it('should clear badge before trial metadata cleanup', async () => {
+      const mockBundle = 'mock-pro-bundle';
+      const callOrder: string[] = [];
+      const mockLauncherView = {
+        badge: { value: 1000, tooltip: 'Total logs' },
+      } as vscode.TreeView<unknown>;
+
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'TCLP-TESTKEY12345678901234567890AB',
+      );
+      (proUtilities.fetchProBundle as jest.Mock).mockResolvedValue(mockBundle);
+
+      // Track call order using a getter
+      let badgeCleared = false;
+      Object.defineProperty(mockLauncherView, 'badge', {
+        get: () => undefined,
+        set: (value) => {
+          if (value === undefined) {
+            badgeCleared = true;
+            callOrder.push('badge-cleared');
+          }
+        },
+      });
+
+      (writeToGlobalState as jest.Mock).mockImplementation(() => {
+        if (badgeCleared) {
+          callOrder.push('writeToGlobalState');
+        }
+      });
+
+      const command = activateTurboProBundleCommand();
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+        launcherView: mockLauncherView,
+      });
+
+      // Badge should be cleared before trial metadata cleanup
+      expect(callOrder[0]).toBe('badge-cleared');
+      expect(callOrder).toContain('writeToGlobalState');
+    });
+
+    it('should NOT clear badge when activation fails', async () => {
+      const axiosError = new AxiosError('Invalid license key');
+      (axiosError as unknown as { response: unknown }).response = {
+        data: { error: 'Invalid license key' },
+        status: 400,
+        statusText: 'Bad Request',
+        headers: {},
+        config: {},
+      };
+
+      const mockLauncherView = {
+        badge: { value: 1000, tooltip: 'Total logs' },
+      } as vscode.TreeView<unknown>;
+
+      (vscode.window.showInputBox as jest.Mock).mockResolvedValue(
+        'TCLP-INVALIDKEY1234567890123456789',
+      );
+      (proUtilities.fetchProBundle as jest.Mock).mockRejectedValue(axiosError);
+
+      const command = activateTurboProBundleCommand();
+      await command.handler({
+        context: mockContext,
+        extensionProperties: mockExtensionProperties,
+        debugMessage: mockDebugMessage,
+        launcherView: mockLauncherView,
+      });
+
+      // Badge should remain unchanged when activation fails
+      expect(mockLauncherView.badge).toEqual({
+        value: 1000,
+        tooltip: 'Total logs',
+      });
     });
   });
 

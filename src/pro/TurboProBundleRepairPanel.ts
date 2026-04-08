@@ -3,10 +3,13 @@ import * as vscode from 'vscode';
 export class TurboProBundleRepairPanel implements vscode.WebviewViewProvider {
   public static readonly viewType = 'turboConsoleLogBundleRepairPanel';
   private proBundleRemovalReason = '';
-  private mode: 'run' | 'update';
+  private mode: 'run' | 'update' | 'trial-fetch' | 'trial-run';
   private webviewView?: vscode.WebviewView;
 
-  constructor(proBundleRemovalReason: string, mode: 'run' | 'update') {
+  constructor(
+    proBundleRemovalReason: string,
+    mode: 'run' | 'update' | 'trial-fetch' | 'trial-run',
+  ) {
     this.proBundleRemovalReason = proBundleRemovalReason;
     this.mode = mode;
   }
@@ -23,18 +26,32 @@ export class TurboProBundleRepairPanel implements vscode.WebviewViewProvider {
           this.webviewView.webview.html = this.getHtml(true);
         }
         vscode.commands.executeCommand('turboConsoleLog.retryProUpdate');
-      } else {
+      } else if (message.command === 'retryRunProBundle') {
         if (this.webviewView) {
           this.webviewView.webview.html = this.getHtml(true);
         }
         vscode.commands.executeCommand('turboConsoleLog.retryProBundleRun');
+      } else if (message.command === 'retryTrialFetch') {
+        if (this.webviewView) {
+          this.webviewView.webview.html = this.getHtml(true);
+        }
+        vscode.commands.executeCommand('turboConsoleLog.retryTrialFetch');
+      } else if (message.command === 'retryTrialRun') {
+        if (this.webviewView) {
+          this.webviewView.webview.html = this.getHtml(true);
+        }
+        vscode.commands.executeCommand('turboConsoleLog.retryTrialRun');
       }
+      // Unknown commands are ignored
     });
 
     webviewView.webview.html = this.getHtml(false);
   }
 
-  updateView(mode: 'run' | 'update', proBundleRemovalReason: string) {
+  updateView(
+    mode: 'run' | 'update' | 'trial-fetch' | 'trial-run',
+    proBundleRemovalReason: string,
+  ) {
     this.mode = mode;
     this.proBundleRemovalReason = proBundleRemovalReason;
     if (this.webviewView) {
@@ -48,6 +65,16 @@ export class TurboProBundleRepairPanel implements vscode.WebviewViewProvider {
         ? `Turbo Console Log failed to update your previous pro bundle for the following reason: <span class='secondary-color'>${this.proBundleRemovalReason}</span>`
         : 'Turbo Console Log failed to update your previous pro bundle.';
     }
+    if (this.mode === 'trial-fetch') {
+      return this.proBundleRemovalReason !== ''
+        ? `Turbo Console Log failed to fetch your trial bundle for the following reason: <span class='secondary-color'>${this.proBundleRemovalReason}</span>`
+        : 'Turbo Console Log failed to fetch your trial bundle.';
+    }
+    if (this.mode === 'trial-run') {
+      return this.proBundleRemovalReason !== ''
+        ? `Turbo Console Log failed to run your trial bundle for the following reason: <span class='secondary-color'>${this.proBundleRemovalReason}</span>`
+        : 'Turbo Console Log failed to run your trial bundle.';
+    }
     return this.proBundleRemovalReason !== ''
       ? `Turbo Console Log failed to run your pro bundle for the following reason: <span class='secondary-color'>${this.proBundleRemovalReason}</span>`
       : 'Turbo Console Log failed to run your pro bundle.';
@@ -57,13 +84,29 @@ export class TurboProBundleRepairPanel implements vscode.WebviewViewProvider {
     if (loading) {
       return 'Retrying...';
     }
-    return this.mode === 'update' ? 'Retry Update' : 'Retry Run';
+    if (this.mode === 'update') {
+      return 'Retry Update';
+    }
+    if (this.mode === 'trial-fetch') {
+      return 'Retry Fetch';
+    }
+    if (this.mode === 'trial-run') {
+      return 'Retry Run';
+    }
+    return 'Retry Run';
   }
 
   private repairPostMessage(): string {
-    return this.mode === 'update'
-      ? 'retryUpdateProBundle'
-      : 'retryRunProBundle';
+    if (this.mode === 'update') {
+      return 'retryUpdateProBundle';
+    }
+    if (this.mode === 'trial-fetch') {
+      return 'retryTrialFetch';
+    }
+    if (this.mode === 'trial-run') {
+      return 'retryTrialRun';
+    }
+    return 'retryRunProBundle';
   }
 
   private getHtml(loading: boolean): string {
@@ -91,7 +134,8 @@ export class TurboProBundleRepairPanel implements vscode.WebviewViewProvider {
           }
         </style>
         <body style="padding-top: 0; display: flex; flex-direction: column; align-items: center; overflow-x: hidden;">
-          <h2 class="primary-color" style="text-align: center;">No Panick We Will Repair This Together 🚀</h2>
+          <h1 class="primary-color" style="text-align: center; margin-bottom: 0;">Turbo Pro Repair Panel 🚀</h1>
+          <h2 class="secondary-color" style="text-align: center;">No Panick We Will Repair This Together ✨</h2>
           <p style="text-align: center; padding: 0 16px;">
             ${this.repairShownMessage()}
           </p>

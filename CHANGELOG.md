@@ -2,6 +2,22 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.20.0] - 2026-04-07
+
+### Try Turbo Pro Free — 2-Hour Trial Now Available 🚀
+
+**Experience the full power of Turbo Pro with zero commitment.**
+
+The most requested feature after "what does Pro actually do?" has always been "can I try it first?" v3.20.0 delivers a comprehensive trial system that removes the biggest barrier to Pro adoption: the unknown.
+
+**How It Works:**
+
+1. **Request Your Trial Key:** Visit the [trial page](https://www.turboconsolelog.io/pro-trial), enter your email (no credit card), receive a unique `TRIAL-XXXXXXXX` key instantly
+2. **Activate in VS Code:** Run `Turbo Console Log: Activate Trial` command, paste your key, activation happens in seconds
+3. **Full Access for 2 Hours:** Every Pro feature unlocks—workspace analytics, git filtering, search, mass operations, all of it
+
+→ [Read the Full v3.20.0 Release Article](https://www.turboconsolelog.io/articles/release-3200)
+
 ## [3.19.0] - 2026-03-24
 
 ### Line-Level Git Filtering & Personalized Freemium Panel

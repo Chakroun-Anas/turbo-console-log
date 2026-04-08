@@ -10,6 +10,7 @@ import { deleteAllLogMessagesCommand } from './deleteAllLogMessages';
 import { correctAllLogMessagesCommand } from './correctAllLogMessages';
 import { insertConsoleErrorCommand } from './insertConsoleError';
 import { activateTurboProBundleCommand } from './activateTurboProBundle';
+import { activateTrialCommand } from './activateTrial';
 import { displayLogMessageCommand } from './displayLogMessage';
 import { Command } from '../entities';
 export function getAllCommands(): Array<Command> {
@@ -27,5 +28,6 @@ export function getAllCommands(): Array<Command> {
     deleteAllLogMessagesCommand(),
     correctAllLogMessagesCommand(),
     activateTurboProBundleCommand(),
+    activateTrialCommand(),
   ];
 }

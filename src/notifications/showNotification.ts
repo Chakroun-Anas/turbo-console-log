@@ -13,18 +13,21 @@ import {
   undoNotificationRecording,
 } from './notificationCooldown';
 import { TurboAnalyticsProvider } from '@/telemetry';
+import { isTestMode } from '@/runTime';
 
-const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
-// const TURBO_WEBSITE_BASE_URL = 'http://localhost:3000';
+const TURBO_WEBSITE_BASE_URL = isTestMode()
+  ? 'http://localhost:3000'
+  : 'https://www.turboconsolelog.io';
 
 export async function showNotification(
   notificationEvent: NotificationEvent,
   version: string,
   context: vscode.ExtensionContext,
-  logCount?: number,
+  count?: number, // Generic count (logCount, duplicateCount, commentedCount, hotFolderCount, etc.)
+  additionalContext?: string, // Additional context (e.g., folder path for hot folder event)
 ): Promise<boolean> {
   // Check cooldown system
-  if (!shouldShowNotification(context, notificationEvent)) {
+  if (!isTestMode() && !shouldShowNotification(context, notificationEvent)) {
     return false; // Not shown due to cooldown
   }
 
@@ -39,7 +42,8 @@ export async function showNotification(
     notificationData = await fetchNotificationData(
       notificationEvent,
       version,
-      logCount,
+      count,
+      additionalContext,
     );
   } catch (error) {
     console.error('Failed to fetch notification data:', error);
@@ -144,11 +148,11 @@ export async function showNotification(
         ctaText: 'Quick Refresher',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
       },
-      [NotificationEvent.EXTENSION_INACTIVE_FOUR_WEEKS_SURVEY]: {
+      [NotificationEvent.EXTENSION_ACTIVITY_DROP]: {
         message:
-          '💬 We miss you! Help us improve Turbo by sharing why you stopped using it (< 2 min survey).',
-        ctaText: 'Share Feedback',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/inactive-users-survey`,
+          '💡 Miss debugging faster? Select any variable → Ctrl+Alt+L → See the magic!',
+        ctaText: 'Quick Reminder',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
       },
       [NotificationEvent.EXTENSION_ACTIVATION_DAY_THREE]: {
         message:
@@ -193,9 +197,10 @@ export async function showNotification(
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/turbo-sundays-001`,
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
-        message: '🔬 v3.18.0: Five fixes live. Now help us find the sixth!',
-        ctaText: 'See Fixes',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3180`,
+        message:
+          '🎁 v3.20.0: Try Turbo Pro free for 2 hours - no credit card required!',
+        ctaText: 'Start Trial',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro-trial`,
       },
       [NotificationEvent.EXTENSION_COMMIT_WITH_LOGS]: {
         message:
@@ -209,6 +214,12 @@ export async function showNotification(
         ctaText: 'Learn How',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/settings/log-function-name`,
       },
+      [NotificationEvent.EXTENSION_LOG_LIBRARY_INSTALLED]: {
+        message:
+          '📦 Installed a logging library? Turbo can insert your custom log function automatically! Set it up now.',
+        ctaText: 'Configure',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/settings/log-function-name`,
+      },
       [NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE]: {
         message:
           '🧪 Debugging tests? Turbo Pro offers test-file-aware features for cleaner test logs!',
@@ -217,15 +228,85 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD]: {
         message:
-          '🚨 Your workspace has 100+ logs! Turbo Pro navigates and manages them all instantly.',
+          '🚨 Your workspace has {logCount} logs! Turbo Pro navigates and manages them all instantly.',
         ctaText: 'See Pro Features',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+      [NotificationEvent.EXTENSION_WORKSPACE_COMMENTED_LOGS]: {
+        message:
+          "💤 {commentedCount} commented logs detected! Instead of commenting out, use Turbo's comment/uncomment commands.",
+        ctaText: 'Learn How',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/comment-inserted-log-messages`,
+      },
+      [NotificationEvent.EXTENSION_WORKSPACE_DUPLICATE_LOGS]: {
+        message:
+          '🔍 {duplicateCount} duplicate log groups found! Clean up copy-paste mistakes and improve code quality.',
+        ctaText: 'Learn Best Practices',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/delete-all-log-messages`,
+      },
+      [NotificationEvent.EXTENSION_WORKSPACE_HOT_FOLDER]: {
+        message:
+          '🔥 {hotFolderCount} logs concentrated in {hotFolderPath}! Pro helps navigate dense code hotspots.',
+        ctaText: 'See Pro Tree View',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
+      },
+      [NotificationEvent.EXTENSION_TRIAL_EXPIRED]: {
+        message:
+          '⏰ Your Turbo Console Log Pro trial has expired. Upgrade to continue using Pro features!',
+        ctaText: 'Upgrade to Pro',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro?fromExpiredTrial=true`,
       },
     };
 
     const fallback = fallbackMessages[notificationEvent];
+
+    // Replace count placeholders in fallback messages if count is provided
+    let fallbackMessage = fallback.message;
+    if (count !== undefined) {
+      if (
+        notificationEvent ===
+        NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD
+      ) {
+        fallbackMessage = fallbackMessage.replace(
+          '{logCount}',
+          count.toString(),
+        );
+      } else if (
+        notificationEvent ===
+        NotificationEvent.EXTENSION_WORKSPACE_COMMENTED_LOGS
+      ) {
+        fallbackMessage = fallbackMessage.replace(
+          '{commentedCount}',
+          count.toString(),
+        );
+      } else if (
+        notificationEvent ===
+        NotificationEvent.EXTENSION_WORKSPACE_DUPLICATE_LOGS
+      ) {
+        fallbackMessage = fallbackMessage.replace(
+          '{duplicateCount}',
+          count.toString(),
+        );
+      } else if (
+        notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_HOT_FOLDER
+      ) {
+        fallbackMessage = fallbackMessage.replace(
+          '{hotFolderCount}',
+          count.toString(),
+        );
+        if (additionalContext) {
+          fallbackMessage = fallbackMessage.replace(
+            '{hotFolderPath}',
+            additionalContext,
+          );
+        }
+      }
+    }
+
     notificationData = {
-      ...fallback,
+      message: fallbackMessage,
+      ctaText: fallback.ctaText,
+      ctaUrl: fallback.ctaUrl,
       variant: 'fallback',
       isDeactivated: false,
       isDuplicated: false,
@@ -273,7 +354,8 @@ export async function showNotification(
 async function fetchNotificationData(
   notificationEvent: NotificationEvent,
   version?: string,
-  logCount?: number,
+  count?: number,
+  additionalContext?: string,
 ): Promise<ExtensionNotificationResponse> {
   const params = new URLSearchParams({
     notificationEvent: notificationEvent,
@@ -283,8 +365,28 @@ async function fetchNotificationData(
     params.append('version', version);
   }
 
-  if (logCount !== undefined) {
-    params.append('logCount', logCount.toString());
+  // Pass different count parameter names based on event type
+  if (count !== undefined) {
+    if (
+      notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD
+    ) {
+      params.append('logCount', count.toString());
+    } else if (
+      notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_COMMENTED_LOGS
+    ) {
+      params.append('commentedCount', count.toString());
+    } else if (
+      notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_DUPLICATE_LOGS
+    ) {
+      params.append('duplicateCount', count.toString());
+    } else if (
+      notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_HOT_FOLDER
+    ) {
+      params.append('hotFolderCount', count.toString());
+      if (additionalContext) {
+        params.append('hotFolderPath', additionalContext);
+      }
+    }
   }
 
   const developerId = generateDeveloperId();

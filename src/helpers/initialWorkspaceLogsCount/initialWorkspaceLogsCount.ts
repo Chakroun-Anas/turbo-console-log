@@ -10,7 +10,28 @@ import { NotificationEvent } from '@/notifications/NotificationEvent';
 /**
  * Minimum log count threshold to trigger notification
  */
-const LOG_COUNT_THRESHOLD = 100;
+const WORKSPACE_LOG_COUNT_THRESHOLD = 1000;
+
+/**
+ * Minimum commented log count threshold to trigger notification
+ * Set to 50 as practical sweet spot - catches significant patterns without being too restrictive
+ * Balances signal quality (real workflow issue) with reach (catches before becoming massive)
+ */
+const WORKSPACE_COMMENTED_LOG_THRESHOLD = 50;
+
+/**
+ * Minimum duplicate log count threshold to trigger notification
+ * Consecutive duplicates are always a code smell indicating copy-paste mistakes or debugging artifacts
+ * Set to 1 because even a single duplicate group warrants immediate attention
+ */
+const WORKSPACE_DUPLICATE_LOGS_THRESHOLD = 1;
+
+/**
+ * Minimum log count in a single nested folder to trigger hot folder notification
+ * High log concentration in one folder indicates architectural issues and navigation challenges
+ * Set to 100 as it represents significant complexity warranting attention
+ */
+const WORKSPACE_HOT_FOLDER_THRESHOLD = 100;
 
 /**
  * Workspace log analytics metadata
@@ -18,6 +39,11 @@ const LOG_COUNT_THRESHOLD = 100;
 export type WorkspaceLogMetadata = {
   totalLogs: number;
   totalFiles: number;
+  totalCommentedLogs: number;
+  commentedLogsPercentage: number;
+  totalDuplicateLogs: number;
+  duplicateGroupsCount: number;
+  duplicateLogsPercentage: number;
   repositories: Array<{
     name: string;
     path: string;
@@ -148,6 +174,9 @@ export async function initialWorkspaceLogsCount(
 
   // Calculate total logs and log type distribution
   let totalLogsCount = 0;
+  let totalCommentedLogsCount = 0;
+  let totalDuplicateLogsCount = 0;
+  let duplicateGroupsCount = 0;
   const logTypeCounts: Map<string, number> = new Map();
 
   for (const [, logs] of filesLogsMap) {
@@ -157,7 +186,46 @@ export async function initialWorkspaceLogsCount(
     logs.forEach((message) => {
       const logFunction = message.logFunction || 'console.log';
       logTypeCounts.set(logFunction, (logTypeCounts.get(logFunction) || 0) + 1);
+
+      // Count commented logs
+      if (message.isCommented) {
+        totalCommentedLogsCount++;
+      }
     });
+
+    // Detect consecutive duplicate logs within each file
+    // A duplicate is defined as having the same content in consecutive lines
+    for (let i = 0; i < logs.length - 1; i++) {
+      const currentLog = logs[i];
+      const nextLog = logs[i + 1];
+
+      // Check if logs are actually on consecutive lines in the file
+      // VS Code Range has exclusive end, so if currentLog.end.line === nextLog.start.line, they're consecutive
+      const currentLogEndLine =
+        currentLog.lines[currentLog.lines.length - 1].end.line;
+      const nextLogStartLine = nextLog.lines[0].start.line;
+      const areConsecutiveLines = nextLogStartLine === currentLogEndLine;
+
+      // Compare normalized content (trimmed to handle whitespace variations)
+      // AND ensure they are actually on consecutive lines
+      if (
+        currentLog.content &&
+        nextLog.content &&
+        currentLog.content === nextLog.content &&
+        areConsecutiveLines
+      ) {
+        // Start of a new duplicate group?
+        const isStartOfGroup =
+          i === 0 || logs[i - 1]?.content !== currentLog.content;
+        if (isStartOfGroup) {
+          duplicateGroupsCount++;
+          // Count the first log in the group
+          totalDuplicateLogsCount++;
+        }
+        // Always count the next log (even if it continues a group)
+        totalDuplicateLogsCount++;
+      }
+    }
   }
 
   // Build log type distribution with percentages using largest remainder method
@@ -200,10 +268,27 @@ export async function initialWorkspaceLogsCount(
     return result.sort((a, b) => b.count - a.count);
   })();
 
+  // Calculate commented logs percentage
+  const commentedLogsPercentage =
+    totalLogsCount > 0
+      ? Math.round((totalCommentedLogsCount / totalLogsCount) * 100)
+      : 0;
+
+  // Calculate duplicate logs percentage
+  const duplicateLogsPercentage =
+    totalLogsCount > 0
+      ? Math.round((totalDuplicateLogsCount / totalLogsCount) * 100)
+      : 0;
+
   // Store workspace metadata in global state for panel access
   const metadata: WorkspaceLogMetadata = {
     totalLogs: totalLogsCount,
     totalFiles: filesLogsMap.size,
+    totalCommentedLogs: totalCommentedLogsCount,
+    commentedLogsPercentage,
+    totalDuplicateLogs: totalDuplicateLogsCount,
+    duplicateGroupsCount,
+    duplicateLogsPercentage,
     repositories: repositoryData,
     logTypeDistribution,
   };
@@ -221,19 +306,18 @@ export async function initialWorkspaceLogsCount(
     tooltip: 'Total log statements in workspace',
   };
 
-  // Check if we should trigger notification (one-time only)
+  // Check all notification triggers independently (each one-time only)
   // Note: This function is only called for non-Pro users (see extension.ts activation)
-  const hasShownNotification = readFromGlobalState<boolean>(
+
+  // 1. Workspace log threshold notification (1000+ logs)
+  const hasShownLogThresholdNotification = readFromGlobalState<boolean>(
     context,
     GlobalStateKey.HAS_SHOWN_WORKSPACE_LOG_THRESHOLD_NOTIFICATION,
   );
-  if (hasShownNotification) {
-    return;
-  }
-
-  if (totalLogsCount >= LOG_COUNT_THRESHOLD) {
-    // Show notification with personalized log count
-    // Note: Backend will replace {logCount} placeholder with actual count
+  if (
+    !hasShownLogThresholdNotification &&
+    totalLogsCount >= WORKSPACE_LOG_COUNT_THRESHOLD
+  ) {
     const wasShown = await showNotification(
       NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD,
       version,
@@ -241,12 +325,109 @@ export async function initialWorkspaceLogsCount(
       totalLogsCount,
     );
     if (wasShown) {
-      // Mark notification as shown (prevent duplicates)
       writeToGlobalState(
         context,
         GlobalStateKey.HAS_SHOWN_WORKSPACE_LOG_THRESHOLD_NOTIFICATION,
         true,
       );
+    }
+  }
+
+  // 2. Commented logs notification (50+ commented logs)
+  const hasShownCommentedLogsNotification = readFromGlobalState<boolean>(
+    context,
+    GlobalStateKey.HAS_SHOWN_WORKSPACE_COMMENTED_LOGS_NOTIFICATION,
+  );
+  if (
+    !hasShownCommentedLogsNotification &&
+    totalCommentedLogsCount >= WORKSPACE_COMMENTED_LOG_THRESHOLD
+  ) {
+    const wasShown = await showNotification(
+      NotificationEvent.EXTENSION_WORKSPACE_COMMENTED_LOGS,
+      version,
+      context,
+      totalCommentedLogsCount,
+    );
+    if (wasShown) {
+      writeToGlobalState(
+        context,
+        GlobalStateKey.HAS_SHOWN_WORKSPACE_COMMENTED_LOGS_NOTIFICATION,
+        true,
+      );
+    }
+  }
+
+  // 3. Duplicate logs notification (1+ duplicate groups)
+  const hasShownDuplicateLogsNotification = readFromGlobalState<boolean>(
+    context,
+    GlobalStateKey.HAS_SHOWN_WORKSPACE_DUPLICATE_LOGS_NOTIFICATION,
+  );
+  if (
+    !hasShownDuplicateLogsNotification &&
+    duplicateGroupsCount >= WORKSPACE_DUPLICATE_LOGS_THRESHOLD
+  ) {
+    const wasShown = await showNotification(
+      NotificationEvent.EXTENSION_WORKSPACE_DUPLICATE_LOGS,
+      version,
+      context,
+      duplicateGroupsCount,
+    );
+    if (wasShown) {
+      writeToGlobalState(
+        context,
+        GlobalStateKey.HAS_SHOWN_WORKSPACE_DUPLICATE_LOGS_NOTIFICATION,
+        true,
+      );
+    }
+  }
+
+  // 4. Hot folder notification (100+ logs in single nested folder)
+  // Find the hottest folder across all repositories
+  const hasShownHotFolderNotification = readFromGlobalState<boolean>(
+    context,
+    GlobalStateKey.HAS_SHOWN_WORKSPACE_HOT_FOLDER_NOTIFICATION,
+  );
+  if (!hasShownHotFolderNotification) {
+    // Find the repository with the highest log concentration in a single folder
+    let hottestFolder: {
+      repoName: string;
+      folderPath: string;
+      logCount: number;
+    } | null = null;
+
+    for (const repo of repositoryData) {
+      if (
+        repo.topNestedFolder &&
+        repo.topNestedFolder.logCount >= WORKSPACE_HOT_FOLDER_THRESHOLD
+      ) {
+        if (
+          !hottestFolder ||
+          repo.topNestedFolder.logCount > hottestFolder.logCount
+        ) {
+          hottestFolder = {
+            repoName: repo.name,
+            folderPath: repo.topNestedFolder.relativePath,
+            logCount: repo.topNestedFolder.logCount,
+          };
+        }
+      }
+    }
+
+    if (hottestFolder) {
+      const wasShown = await showNotification(
+        NotificationEvent.EXTENSION_WORKSPACE_HOT_FOLDER,
+        version,
+        context,
+        hottestFolder.logCount,
+        `${hottestFolder.repoName}/${hottestFolder.folderPath}`,
+      );
+      if (wasShown) {
+        writeToGlobalState(
+          context,
+          GlobalStateKey.HAS_SHOWN_WORKSPACE_HOT_FOLDER_NOTIFICATION,
+          true,
+        );
+      }
     }
   }
 }
