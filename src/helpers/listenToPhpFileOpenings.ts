@@ -8,64 +8,52 @@ import {
 import { showNotification } from '../notifications/showNotification';
 import { NotificationEvent } from '../notifications/NotificationEvent';
 import { GlobalStateKey } from '@/entities';
+import { NotificationEventHandler } from './notificationEventHandler';
 
 /**
- * Listens to document openings and shows PHP support notification when user opens a PHP file
- * Shows notification immediately (not delayed) for better engagement (v3.10.0 strategy)
- * One-time notification per user (free users only - Pro users already have access)
- *
- * @param context VS Code extension context
+ * Notification handler for PHP File Openings detection
+ * Shows PHP support notification when user opens a PHP file
  */
-export function listenToPhpFileOpenings(
-  context: vscode.ExtensionContext,
-  version: string,
-): void {
-  // Skip for Pro users - they already have PHP access
-  if (isProUser(context)) {
-    return;
-  }
+export const phpFileOpeningsHandler: NotificationEventHandler = {
+  id: 'phpFileOpenings',
 
-  // Check if notification has already been shown BEFORE setting up listener
-  const hasShownNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
-  );
+  shouldRegister: (context: vscode.ExtensionContext): boolean => {
+    if (isProUser(context)) {
+      return false;
+    }
 
-  if (hasShownNotification) {
-    return; // Already shown, no need to listen
-  }
+    const hasShownNotification = readFromGlobalState<boolean>(
+      context,
+      GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
+    );
 
-  // Listen to active text editor changes (when user opens/switches files)
-  const disposable = vscode.window.onDidChangeActiveTextEditor(
-    async (editor) => {
-      if (!editor) {
-        return;
-      }
+    return !hasShownNotification;
+  },
 
-      const document = editor.document;
+  shouldProcess: (editor: vscode.TextEditor): boolean => {
+    return isPhpFile(editor.document);
+  },
 
-      // Check if it's a PHP file
-      if (isPhpFile(document)) {
-        // Show notification immediately (v3.10.0 strategy)
-        const wasShown = await showNotification(
-          NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
-          version,
-          context,
-        );
+  process: async (
+    _editor: vscode.TextEditor,
+    context: vscode.ExtensionContext,
+    version: string,
+  ): Promise<boolean> => {
+    const wasShown = await showNotification(
+      NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED,
+      version,
+      context,
+    );
 
-        // Only mark as shown if it was actually displayed (not blocked by cooldown)
-        if (wasShown) {
-          writeToGlobalState(
-            context,
-            GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
-            true,
-          );
-          disposable.dispose(); // Stop listening once notification shown
-        }
-      }
-    },
-  );
+    if (wasShown) {
+      writeToGlobalState(
+        context,
+        GlobalStateKey.HAS_SHOWN_PHP_WORKSPACE_NOTIFICATION,
+        true,
+      );
+      return true;
+    }
 
-  // Add to subscriptions for cleanup
-  context.subscriptions.push(disposable);
-}
+    return false;
+  },
+};

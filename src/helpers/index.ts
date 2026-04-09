@@ -15,27 +15,23 @@ import { isJavaScriptOrTypeScriptFile } from './isJavaScriptOrTypeScriptFile';
 import { canInsertLogInDocument } from './canInsertLogInDocument';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
-import { listenToPhpFileOpenings } from './listenToPhpFileOpenings';
-import { listenToJSMessyFileDetection } from './listenToJSMessyFileDetection';
-import { listenToPhpMessyFileDetection } from './listenToPhpMessyFileDetection';
-import { listenToJSMultiLogTypes } from './listenToJSMultiLogTypes';
-import { listenToPhpMultiLogTypes } from './listenToPhpMultiLogTypes';
 import { listenToWeekendTurboSundays } from './listenToWeekendTurboSundays';
 import { listenToCommitWithLogs } from './listenToCommitWithLogs';
-import { listenToCustomLogLibrary } from './listenToCustomLogLibrary';
 import { listenToLogLibraryInstalled } from './listenToLogLibraryInstalled';
-import { listenToLogsInTestFile } from './listenToLogsInTestFile';
 import { loadPhpDebugMessage } from './loadPhpDebugMessage';
 import { showReleaseWebView } from './showReleaseWebView';
 import { showReleaseNotification } from './showReleaseNotification';
 import { updateUserActivityStatus } from './updateUserActivityStatus';
 import { getUserActivityStatus } from './getUserActivityStatus';
 import { listenToManualConsoleLogs } from './listenToManualConsoleLogs';
-import { listenToInactiveTwoWeeksReturn } from './listenToInactiveTwoWeeksReturn';
-import { listenToActivityDrop } from './listenToActivityDrop';
-import { listenToActivationDayThree } from './listenToActivationDayThree';
-import { listenToActivationDaySeven } from './listenToActivationDaySeven';
 import { initialWorkspaceLogsCount } from './initialWorkspaceLogsCount/initialWorkspaceLogsCount';
+import { listenToFileOpeningNotifications } from './listenToFileOpeningNotifications';
+import { allNotificationHandlers } from './notificationHandlers';
+import { setupNotificationListeners } from './setupNotificationListeners';
+
+// Export individual handlers for potential standalone use
+export { customLogLibraryHandler } from './listenToCustomLogLibrary';
+
 export {
   readFromGlobalState,
   writeToGlobalState,
@@ -54,25 +50,17 @@ export {
   canInsertLogInDocument,
   traceExtensionVersionHistory,
   isFreshInstall,
-  listenToJSMessyFileDetection,
-  listenToPhpMessyFileDetection,
-  listenToJSMultiLogTypes,
-  listenToPhpMultiLogTypes,
   listenToWeekendTurboSundays,
   listenToCommitWithLogs,
-  listenToCustomLogLibrary,
   listenToLogLibraryInstalled,
-  listenToLogsInTestFile,
-  listenToPhpFileOpenings,
   loadPhpDebugMessage,
   showReleaseWebView,
   showReleaseNotification,
   updateUserActivityStatus,
   getUserActivityStatus,
   listenToManualConsoleLogs,
-  listenToInactiveTwoWeeksReturn,
-  listenToActivityDrop,
-  listenToActivationDayThree,
-  listenToActivationDaySeven,
   initialWorkspaceLogsCount,
+  listenToFileOpeningNotifications,
+  allNotificationHandlers,
+  setupNotificationListeners,
 };

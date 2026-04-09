@@ -1,14 +1,23 @@
-import { TextDocument } from 'vscode';
+import type { TurboTextDocument } from '../../detectAll/TurboTextDocument';
+
+/**
+ * Gets the index of the first non-whitespace character in a string.
+ * Returns the string length if the line is all whitespace.
+ */
+function getFirstNonWhitespaceCharacterIndex(text: string): number {
+  const match = text.match(/\S/);
+  return match ? match.index! : text.length;
+}
 
 // FIXME: Should be improved
 export function spacesBeforeLogMsg(
-  document: TextDocument,
+  document: TurboTextDocument,
   selectedVarLine: number,
   logMsgLine: number,
 ): string {
   const selectedVarTextLine = document.lineAt(selectedVarLine);
   const selectedVarTextLineFirstNonWhitespaceCharacterIndex =
-    selectedVarTextLine.firstNonWhitespaceCharacterIndex;
+    getFirstNonWhitespaceCharacterIndex(selectedVarTextLine.text);
   const spacesBeforeSelectedVarLine = selectedVarTextLine.text
     .split('')
     .splice(0, selectedVarTextLineFirstNonWhitespaceCharacterIndex)
@@ -16,7 +25,7 @@ export function spacesBeforeLogMsg(
   if (logMsgLine < document.lineCount) {
     const logMsgTextLine = document.lineAt(logMsgLine);
     const logMsgTextLineFirstNonWhitespaceCharacterIndex =
-      logMsgTextLine.firstNonWhitespaceCharacterIndex;
+      getFirstNonWhitespaceCharacterIndex(logMsgTextLine.text);
     const spacesBeforeLogMsgLine = logMsgTextLine.text
       .split('')
       .splice(0, logMsgTextLineFirstNonWhitespaceCharacterIndex)

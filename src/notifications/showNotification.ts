@@ -198,9 +198,9 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
         message:
-          '🎁 v3.20.0: Try Turbo Pro free for 2 hours - no credit card required!',
-        ctaText: 'Start Trial',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro-trial`,
+          '🔥 v3.21.0: 15-20x performance gains with video proof. See it yourself!',
+        ctaText: 'See The Gains',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3210`,
       },
       [NotificationEvent.EXTENSION_COMMIT_WITH_LOGS]: {
         message:

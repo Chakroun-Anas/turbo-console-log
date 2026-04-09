@@ -1,376 +1,251 @@
-import { listenToLogsInTestFile } from '@/helpers/listenToLogsInTestFile';
-import { makeTextDocument } from '@/jest-tests/mocks/helpers';
-import { GlobalStateKey } from '@/entities';
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import { detectAll } from '@/debug-message/js/JSDebugMessage/detectAll/detectAll';
+import { logsInTestFileHandler } from '@/helpers/listenToLogsInTestFile';
+import {
+  readFromGlobalState,
+  writeToGlobalState,
+  isJavaScriptOrTypeScriptFile,
+  getExtensionProperties,
+  isProUser,
+} from '@/helpers';
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
+import { GlobalStateKey } from '@/entities';
+import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
+import { detectAll } from '@/debug-message/js/JSDebugMessage/detectAll/detectAll';
 
-// Mock dependencies
-jest.mock('@/debug-message/js/JSDebugMessage/detectAll/detectAll');
-jest.mock('@/notifications/showNotification');
-jest.mock('@/helpers/isProUser');
-jest.mock('@/helpers/readFromGlobalState');
-jest.mock('@/helpers/writeToGlobalState');
-jest.mock('@/helpers/isJavaScriptOrTypeScriptFile');
-jest.mock('@/helpers/getExtensionProperties');
+jest.mock('@/helpers', () => ({
+  readFromGlobalState: jest.fn(),
+  writeToGlobalState: jest.fn(),
+  isJavaScriptOrTypeScriptFile: jest.fn(),
+  getExtensionProperties: jest.fn(),
+  isProUser: jest.fn(),
+}));
+
+jest.mock('@/notifications/showNotification', () => ({
+  showNotification: jest.fn(),
+}));
+
+jest.mock('@/debug-message/js/JSDebugMessage/detectAll/detectAll', () => ({
+  detectAll: jest.fn(),
+}));
+
 jest.mock('vscode', () => ({
-  window: {
-    onDidChangeActiveTextEditor: jest.fn(),
-    activeTextEditor: undefined,
-  },
   workspace: {
     getConfiguration: jest.fn(),
   },
 }));
 
-const mockDetectAll = detectAll as jest.MockedFunction<typeof detectAll>;
-const mockShowNotification = showNotification as jest.MockedFunction<
-  typeof showNotification
->;
-
-import { isProUser } from '@/helpers/isProUser';
-import { readFromGlobalState } from '@/helpers/readFromGlobalState';
-import { writeToGlobalState } from '@/helpers/writeToGlobalState';
-import { isJavaScriptOrTypeScriptFile } from '@/helpers/isJavaScriptOrTypeScriptFile';
-import { getExtensionProperties } from '@/helpers/getExtensionProperties';
-
-const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
-const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
-  typeof readFromGlobalState
->;
-const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
-  typeof writeToGlobalState
->;
-const mockIsJavaScriptOrTypeScriptFile =
-  isJavaScriptOrTypeScriptFile as jest.MockedFunction<
-    typeof isJavaScriptOrTypeScriptFile
+describe('logsInTestFileHandler', () => {
+  const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
+    typeof readFromGlobalState
   >;
-const mockGetExtensionProperties =
-  getExtensionProperties as jest.MockedFunction<typeof getExtensionProperties>;
-
-interface MockVSCodeWindow {
-  activeTextEditor?: vscode.TextEditor;
-  onDidChangeActiveTextEditor: jest.Mock;
-}
-
-describe('listenToLogsInTestFile', () => {
-  let mockContext: vscode.ExtensionContext;
-  let mockWindow: MockVSCodeWindow;
-  let listeners: Array<
-    (editor: vscode.TextEditor | undefined) => void | Promise<void>
+  const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
+    typeof writeToGlobalState
   >;
-  let disposables: Array<vscode.Disposable>;
-  const version = '3.15.0';
+  const mockShowNotification = showNotification as jest.MockedFunction<
+    typeof showNotification
+  >;
+  const mockIsJavaScriptOrTypeScriptFile =
+    isJavaScriptOrTypeScriptFile as jest.MockedFunction<
+      typeof isJavaScriptOrTypeScriptFile
+    >;
+  const mockGetExtensionProperties =
+    getExtensionProperties as jest.MockedFunction<
+      typeof getExtensionProperties
+    >;
+  const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
+  const mockDetectAll = detectAll as jest.MockedFunction<typeof detectAll>;
+  const mockGetConfiguration = vscode.workspace
+    .getConfiguration as jest.MockedFunction<
+    typeof vscode.workspace.getConfiguration
+  >;
+
+  let context: vscode.ExtensionContext;
+  const testVersion = '3.14.1';
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    listeners = [];
-    disposables = [];
-
-    // Mock context
-    mockContext = {
-      subscriptions: {
-        push: jest.fn((disposable: vscode.Disposable) => {
-          disposables.push(disposable);
-        }),
-      },
-    } as unknown as vscode.ExtensionContext;
-
-    // Mock window with listener registration
-    mockWindow = vscode.window as unknown as MockVSCodeWindow;
-    mockWindow.onDidChangeActiveTextEditor = jest.fn((listener) => {
-      listeners.push(listener);
-      return {
-        dispose: jest.fn(),
-      };
-    });
-    mockWindow.activeTextEditor = undefined;
+    context = makeExtensionContext();
 
     // Default mocks
     mockIsProUser.mockReturnValue(false);
-    mockReadFromGlobalState.mockReturnValue(undefined);
+    mockReadFromGlobalState.mockReturnValue(false);
+    mockGetConfiguration.mockReturnValue({} as vscode.WorkspaceConfiguration);
     mockGetExtensionProperties.mockReturnValue({
       logFunction: 'log',
       logMessagePrefix: '🚀',
       delimiterInsideMessage: '~',
-    } as never);
+    } as unknown as ReturnType<typeof getExtensionProperties>);
   });
 
-  describe('Activation Guards', () => {
-    it('should not listen if user is Pro', () => {
+  describe('shouldRegister', () => {
+    it('should not register handler for Pro users', () => {
       mockIsProUser.mockReturnValue(true);
 
-      listenToLogsInTestFile(mockContext, version);
+      const result = logsInTestFileHandler.shouldRegister(context);
 
-      expect(mockWindow.onDidChangeActiveTextEditor).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
 
-    it('should not listen if notification has already been shown', () => {
+    it('should not register handler when notification already shown', () => {
       mockReadFromGlobalState.mockReturnValue(true);
 
-      listenToLogsInTestFile(mockContext, version);
+      const result = logsInTestFileHandler.shouldRegister(context);
 
       expect(mockReadFromGlobalState).toHaveBeenCalledWith(
-        mockContext,
+        context,
         GlobalStateKey.HAS_SHOWN_LOGS_IN_TEST_FILE_NOTIFICATION,
       );
-      expect(mockWindow.onDidChangeActiveTextEditor).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
 
-    it('should listen if user is free and notification not shown', () => {
-      listenToLogsInTestFile(mockContext, version);
+    it('should register handler for free users who have not seen notification', () => {
+      const result = logsInTestFileHandler.shouldRegister(context);
 
-      expect(mockWindow.onDidChangeActiveTextEditor).toHaveBeenCalled();
-      expect(mockContext.subscriptions.push).toHaveBeenCalled();
+      expect(result).toBe(true);
     });
   });
 
-  describe('Test File Detection', () => {
+  describe('shouldProcess - Test File Detection', () => {
     beforeEach(() => {
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     });
 
-    it('should detect .test.ts files', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("test 1");',
-        'console.log("test 2");',
-        'console.log("test 3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/path/to/file.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should process .test.ts files', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/path/to/file.test.ts' },
+        },
       } as vscode.TextEditor;
 
-      mockDetectAll.mockResolvedValue([
-        { line: 0 },
-        { line: 1 },
-        { line: 2 },
-      ] as never);
-      mockShowNotification.mockResolvedValue(true);
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
 
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockShowNotification).toHaveBeenCalledWith(
-        NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE,
-        version,
-        mockContext,
-      );
+      expect(result).toBe(true);
     });
 
-    it('should detect .spec.js files', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("test 1");',
-        'console.log("test 2");',
-        'console.log("test 3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/path/to/file.spec.js' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should process .spec.js files', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/path/to/file.spec.js' },
+        },
       } as vscode.TextEditor;
 
-      mockDetectAll.mockResolvedValue([
-        { line: 0 },
-        { line: 1 },
-        { line: 2 },
-      ] as never);
-      mockShowNotification.mockResolvedValue(true);
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
 
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockShowNotification).toHaveBeenCalled();
+      expect(result).toBe(true);
     });
 
-    it('should detect .test.tsx files', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("test 1");',
-        'console.log("test 2");',
-        'console.log("test 3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/components/Button.test.tsx' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should process .test.tsx files', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/components/Button.test.tsx' },
+        },
       } as vscode.TextEditor;
 
-      mockDetectAll.mockResolvedValue([
-        { line: 0 },
-        { line: 1 },
-        { line: 2 },
-      ] as never);
-      mockShowNotification.mockResolvedValue(true);
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
 
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockShowNotification).toHaveBeenCalled();
+      expect(result).toBe(true);
     });
 
-    it('should detect .spec.jsx files', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("test 1");',
-        'console.log("test 2");',
-        'console.log("test 3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/src/App.spec.jsx' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should process .spec.jsx files', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/src/App.spec.jsx' },
+        },
       } as vscode.TextEditor;
 
-      mockDetectAll.mockResolvedValue([
-        { line: 0 },
-        { line: 1 },
-        { line: 2 },
-      ] as never);
-      mockShowNotification.mockResolvedValue(true);
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
 
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockShowNotification).toHaveBeenCalled();
+      expect(result).toBe(true);
     });
 
-    it('should detect files in __tests__ directory', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("test 1");',
-        'console.log("test 2");',
-        'console.log("test 3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/src/__tests__/utils.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should process files in __tests__ directory', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/src/__tests__/utils.ts' },
+        },
       } as vscode.TextEditor;
 
-      mockDetectAll.mockResolvedValue([
-        { line: 0 },
-        { line: 1 },
-        { line: 2 },
-      ] as never);
-      mockShowNotification.mockResolvedValue(true);
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
 
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockShowNotification).toHaveBeenCalled();
+      expect(result).toBe(true);
     });
 
-    it('should detect .test.php files', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("test 1");',
-        'console.log("test 2");',
-        'console.log("test 3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/tests/UserTest.test.php' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should process .test.php files', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/tests/UserTest.test.php' },
+        },
       } as vscode.TextEditor;
 
-      mockDetectAll.mockResolvedValue([
-        { line: 0 },
-        { line: 1 },
-        { line: 2 },
-      ] as never);
-      mockShowNotification.mockResolvedValue(true);
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
 
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockShowNotification).toHaveBeenCalled();
+      expect(result).toBe(true);
     });
 
-    it('should detect .spec.php files', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("test 1");',
-        'console.log("test 2");',
-        'console.log("test 3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/tests/Feature/AuthSpec.spec.php' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should process .spec.php files', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/tests/Feature/AuthSpec.spec.php' },
+        },
       } as vscode.TextEditor;
 
-      mockDetectAll.mockResolvedValue([
-        { line: 0 },
-        { line: 1 },
-        { line: 2 },
-      ] as never);
-      mockShowNotification.mockResolvedValue(true);
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
 
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockShowNotification).toHaveBeenCalled();
+      expect(result).toBe(true);
     });
 
-    it('should NOT detect regular files', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument(['console.log("not a test");']);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/src/utils/helpers.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should NOT process regular files', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/src/utils/helpers.ts' },
+        },
       } as vscode.TextEditor;
 
-      await listeners[0](mockWindow.activeTextEditor);
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
 
-      expect(mockDetectAll).not.toHaveBeenCalled();
-      expect(mockShowNotification).not.toHaveBeenCalled();
+      expect(result).toBe(false);
+    });
+
+    it('should not process when non-JS/TS file is opened', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/test/file.test.txt' },
+        },
+      } as vscode.TextEditor;
+
+      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(false);
+
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
+
+      expect(result).toBe(false);
+    });
+
+    it('should not process when file path is undefined', () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '' },
+        },
+      } as vscode.TextEditor;
+
+      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
+
+      const result = logsInTestFileHandler.shouldProcess(mockEditor, context);
+
+      expect(result).toBe(false);
     });
   });
 
-  describe('Log Threshold', () => {
+  describe('process - Log Threshold', () => {
     beforeEach(() => {
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     });
 
     it('should show notification when test file has 3 logs (threshold)', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("log 1");',
-        'console.log("log 2");',
-        'console.log("log 3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/app.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/test/app.test.ts' },
+        },
       } as vscode.TextEditor;
 
       mockDetectAll.mockResolvedValue([
@@ -380,27 +255,25 @@ describe('listenToLogsInTestFile', () => {
       ] as never);
       mockShowNotification.mockResolvedValue(true);
 
-      await listeners[0](mockWindow.activeTextEditor);
+      const result = await logsInTestFileHandler.process(
+        mockEditor,
+        context,
+        testVersion,
+      );
 
-      expect(mockShowNotification).toHaveBeenCalled();
+      expect(mockShowNotification).toHaveBeenCalledWith(
+        NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE,
+        testVersion,
+        context,
+      );
+      expect(result).toBe(true);
     });
 
     it('should show notification when test file has more than 3 logs', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("log 1");',
-        'console.log("log 2");',
-        'console.log("log 3");',
-        'console.log("log 4");',
-        'console.log("log 5");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/integration.spec.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/test/integration.spec.ts' },
+        },
       } as vscode.TextEditor;
 
       mockDetectAll.mockResolvedValue([
@@ -412,152 +285,65 @@ describe('listenToLogsInTestFile', () => {
       ] as never);
       mockShowNotification.mockResolvedValue(true);
 
-      await listeners[0](mockWindow.activeTextEditor);
+      const result = await logsInTestFileHandler.process(
+        mockEditor,
+        context,
+        testVersion,
+      );
 
       expect(mockShowNotification).toHaveBeenCalled();
+      expect(result).toBe(true);
     });
 
     it('should NOT show notification when test file has less than 3 logs', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("log 1");',
-        'console.log("log 2");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/small.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/test/small.test.ts' },
+        },
       } as vscode.TextEditor;
 
       mockDetectAll.mockResolvedValue([{ line: 0 }, { line: 1 }] as never);
 
-      await listeners[0](mockWindow.activeTextEditor);
+      const result = await logsInTestFileHandler.process(
+        mockEditor,
+        context,
+        testVersion,
+      );
 
       expect(mockShowNotification).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
 
     it('should NOT show notification when test file has 0 logs', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument(['it("should work", () => {});']);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/clean.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/test/clean.test.ts' },
+        },
       } as vscode.TextEditor;
 
       mockDetectAll.mockResolvedValue([] as never);
 
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockShowNotification).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Edge Cases', () => {
-    it('should handle undefined editor gracefully', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      await listeners[0](undefined);
-
-      expect(mockDetectAll).not.toHaveBeenCalled();
-      expect(mockShowNotification).not.toHaveBeenCalled();
-    });
-
-    it('should skip non-JS/TS files', async () => {
-      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(false);
-
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument(['some text']);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/file.test.txt' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
-      } as vscode.TextEditor;
-
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockDetectAll).not.toHaveBeenCalled();
-    });
-
-    it('should handle detectAll throwing error', async () => {
-      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
-
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument(['console.log("test");']);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/error.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
-      } as vscode.TextEditor;
-
-      mockDetectAll.mockRejectedValue(new Error('Parse error'));
-
-      const consoleError = jest
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(consoleError).toHaveBeenCalledWith(
-        'Error detecting logs in test file:',
-        expect.any(Error),
+      const result = await logsInTestFileHandler.process(
+        mockEditor,
+        context,
+        testVersion,
       );
+
       expect(mockShowNotification).not.toHaveBeenCalled();
-
-      consoleError.mockRestore();
-    });
-
-    it('should handle missing fsPath gracefully', async () => {
-      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
-
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument(['console.log("test");']);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
-      } as vscode.TextEditor;
-
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(mockDetectAll).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
   });
 
-  describe('Lifecycle Management', () => {
+  describe('process - Lifecycle Management', () => {
     beforeEach(() => {
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     });
 
-    it('should call writeToGlobalState when notification is shown', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("1");',
-        'console.log("2");',
-        'console.log("3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/file.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should mark notification as shown after successfully displaying it', async () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/test/file.test.ts' },
+        },
       } as vscode.TextEditor;
 
       mockDetectAll.mockResolvedValue([
@@ -567,29 +353,20 @@ describe('listenToLogsInTestFile', () => {
       ] as never);
       mockShowNotification.mockResolvedValue(true);
 
-      await listeners[0](mockWindow.activeTextEditor);
+      await logsInTestFileHandler.process(mockEditor, context, testVersion);
 
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-        mockContext,
+        context,
         GlobalStateKey.HAS_SHOWN_LOGS_IN_TEST_FILE_NOTIFICATION,
         true,
       );
     });
 
-    it('should NOT call writeToGlobalState when notification was not shown', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("1");',
-        'console.log("2");',
-        'console.log("3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/file.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+    it('should NOT call writeToGlobalState when notification was not shown (cooldown)', async () => {
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/test/file.test.ts' },
+        },
       } as vscode.TextEditor;
 
       mockDetectAll.mockResolvedValue([
@@ -599,75 +376,18 @@ describe('listenToLogsInTestFile', () => {
       ] as never);
       mockShowNotification.mockResolvedValue(false);
 
-      await listeners[0](mockWindow.activeTextEditor);
+      const result = await logsInTestFileHandler.process(
+        mockEditor,
+        context,
+        testVersion,
+      );
 
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    });
-
-    it('should dispose listener after showing notification', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("1");',
-        'console.log("2");',
-        'console.log("3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/file.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
-      } as vscode.TextEditor;
-
-      mockDetectAll.mockResolvedValue([
-        { line: 0 },
-        { line: 1 },
-        { line: 2 },
-      ] as never);
-      mockShowNotification.mockResolvedValue(true);
-
-      const disposable = disposables[0];
-      const disposeSpy = jest.spyOn(disposable, 'dispose');
-
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(disposeSpy).toHaveBeenCalled();
-    });
-
-    it('should NOT dispose listener if notification was not shown (cooldown)', async () => {
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'console.log("1");',
-        'console.log("2");',
-        'console.log("3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/file.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
-      } as vscode.TextEditor;
-
-      mockDetectAll.mockResolvedValue([
-        { line: 0 },
-        { line: 1 },
-        { line: 2 },
-      ] as never);
-      mockShowNotification.mockResolvedValue(false);
-
-      const disposable = disposables[0];
-      const disposeSpy = jest.spyOn(disposable, 'dispose');
-
-      await listeners[0](mockWindow.activeTextEditor);
-
-      expect(disposeSpy).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
   });
 
-  describe('detectAll Configuration', () => {
+  describe('process - detectAll Configuration', () => {
     beforeEach(() => {
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     });
@@ -678,21 +398,14 @@ describe('listenToLogsInTestFile', () => {
         logMessagePrefix: '✨',
         delimiterInsideMessage: '|',
       };
-      mockGetExtensionProperties.mockReturnValue(customConfig as never);
+      mockGetExtensionProperties.mockReturnValue(
+        customConfig as unknown as ReturnType<typeof getExtensionProperties>,
+      );
 
-      listenToLogsInTestFile(mockContext, version);
-
-      const document = makeTextDocument([
-        'customLog("test 1");',
-        'customLog("test 2");',
-        'customLog("test 3");',
-      ]);
-      Object.defineProperty(document, 'uri', {
-        value: { fsPath: '/test/custom.test.ts' },
-      });
-
-      mockWindow.activeTextEditor = {
-        document,
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/test/custom.test.ts' },
+        },
       } as vscode.TextEditor;
 
       mockDetectAll.mockResolvedValue([
@@ -702,16 +415,49 @@ describe('listenToLogsInTestFile', () => {
       ] as never);
       mockShowNotification.mockResolvedValue(true);
 
-      await listeners[0](mockWindow.activeTextEditor);
+      await logsInTestFileHandler.process(mockEditor, context, testVersion);
 
       expect(mockDetectAll).toHaveBeenCalledWith(
-        fs,
+        expect.anything(), // fs
         vscode,
         '/test/custom.test.ts',
         'customLog',
         '✨',
         '|',
       );
+    });
+  });
+
+  describe('process - Error Handling', () => {
+    it('should handle detectAll throwing error', async () => {
+      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
+
+      const consoleErrorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      const mockEditor = {
+        document: {
+          uri: { fsPath: '/test/error.test.ts' },
+        },
+      } as vscode.TextEditor;
+
+      mockDetectAll.mockRejectedValue(new Error('Parse error'));
+
+      const result = await logsInTestFileHandler.process(
+        mockEditor,
+        context,
+        testVersion,
+      );
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error detecting logs in test file:',
+        expect.any(Error),
+      );
+      expect(mockShowNotification).not.toHaveBeenCalled();
+      expect(result).toBe(false);
+
+      consoleErrorSpy.mockRestore();
     });
   });
 });

@@ -2,6 +2,10 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.21.0] - 2026-04-12
+
+→ [Read the full v3.21.0 release article](https://www.turboconsolelog.io/articles/release-3210)
+
 ## [3.20.0] - 2026-04-07
 
 ### Try Turbo Pro Free — 2-Hour Trial Now Available 🚀

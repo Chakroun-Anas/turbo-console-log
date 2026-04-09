@@ -10,17 +10,15 @@ jest.mock('@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg', () => ({
 }));
 
 jest.mock('fs', () => ({
-  promises: {
-    readFile: jest.fn(),
-  },
+  readFileSync: jest.fn(),
 }));
 
 const mockSpacesBeforeLogMsg = spacesBeforeLogMsg as jest.MockedFunction<
   typeof spacesBeforeLogMsg
 >;
 
-const mockFsReadFile = fs.promises.readFile as jest.MockedFunction<
-  typeof fs.promises.readFile
+const mockFsReadFileSync = fs.readFileSync as jest.MockedFunction<
+  typeof fs.readFileSync
 >;
 
 const mockVscodeOpenTextDocument = vscode.workspace
@@ -59,7 +57,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -84,7 +82,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -100,7 +98,7 @@ describe('detectAll', () => {
       expect(result[0].spaces).toBe('');
       expect(result[0].lines).toHaveLength(1);
       expect(result[0].lines[0].start.line).toBe(2);
-      expect(result[0].lines[0].end.line).toBe(2);
+      expect(result[0].lines[0].end.line).toBe(3); // Extends to next line (includes \n)
     });
 
     it('should detect multi-line log message', async () => {
@@ -116,7 +114,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -146,7 +144,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -168,7 +166,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -192,7 +190,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -216,7 +214,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('    ');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -240,7 +238,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -264,7 +262,7 @@ describe('detectAll', () => {
       const document = makeTextDocument(['$log.info("🚀 ~ info:", info);']);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -288,7 +286,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -310,7 +308,7 @@ describe('detectAll', () => {
       const document = makeTextDocument(['console.log("🚀 | value:", value);']);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -341,7 +339,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -379,7 +377,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -419,7 +417,7 @@ describe('detectAll', () => {
     it('should handle empty document', async () => {
       const document = makeTextDocument([]);
 
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -437,7 +435,7 @@ describe('detectAll', () => {
     it('should handle document with only whitespace', async () => {
       const document = makeTextDocument(['   ', '', '  \t  ']);
 
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -460,7 +458,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -494,7 +492,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -531,7 +529,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('  ');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -570,7 +568,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('    ');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -647,7 +645,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('  ');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -738,7 +736,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('    ');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -787,7 +785,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -816,7 +814,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -848,7 +846,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -887,7 +885,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -943,7 +941,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('  ');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -983,7 +981,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -1031,7 +1029,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -1074,7 +1072,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -1108,7 +1106,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -1151,7 +1149,7 @@ describe('detectAll', () => {
       ]);
 
       mockSpacesBeforeLogMsg.mockReturnValue('');
-      mockFsReadFile.mockResolvedValue(document.getText());
+      mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
       const result = await detectAll(
@@ -1193,9 +1191,11 @@ describe('detectAll', () => {
       consoleErrorSpy.mockRestore();
     });
 
-    it('should return empty array and log error when fs.readFile fails', async () => {
+    it('should return empty array and log error when fs.readFileSync fails', async () => {
       const readError = new Error('ENOENT: no such file or directory');
-      mockFsReadFile.mockRejectedValue(readError);
+      mockFsReadFileSync.mockImplementation(() => {
+        throw readError;
+      });
 
       const result = await detectAll(
         fs,
@@ -1212,32 +1212,6 @@ describe('detectAll', () => {
         'ENOENT: no such file or directory',
       );
       expect(mockVscodeOpenTextDocument).not.toHaveBeenCalled();
-    });
-
-    it('should return empty array and log error when openTextDocument fails', async () => {
-      const document = makeTextDocument(['console.log("🚀 ~ test:", x);']);
-
-      mockFsReadFile.mockResolvedValue(document.getText());
-
-      const openDocError = new Error('Failed to open document');
-      mockVscodeOpenTextDocument.mockRejectedValue(openDocError);
-
-      const result = await detectAll(
-        fs,
-        vscode,
-        '/test/file.ts',
-        defaultExtensionProperties.logFunction,
-        defaultExtensionProperties.logMessagePrefix,
-        defaultExtensionProperties.delimiterInsideMessage,
-      );
-
-      expect(result).toEqual([]);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to detect logs in file "/test/file.ts":',
-        'Failed to open document',
-      );
-      expect(mockFsReadFile).toHaveBeenCalledWith('/test/file.ts', 'utf8');
-      expect(mockVscodeOpenTextDocument).toHaveBeenCalled();
     });
   });
 });

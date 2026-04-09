@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { listenToPhpMultiLogTypes } from '@/helpers/listenToPhpMultiLogTypes';
+import { phpMultiLogTypesHandler } from '@/helpers/listenToPhpMultiLogTypes';
 import {
   readFromGlobalState,
   writeToGlobalState,
@@ -30,20 +30,20 @@ jest.mock('@/debug-message/php/detectAll', () => ({
 }));
 
 jest.mock('vscode', () => ({
-  window: {
-    onDidChangeActiveTextEditor: jest.fn(),
-  },
   workspace: {
     getConfiguration: jest.fn(),
   },
 }));
 
-describe('listenToPhpMultiLogTypes', () => {
+describe('phpMultiLogTypesHandler', () => {
   const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
     typeof readFromGlobalState
   >;
   const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
     typeof writeToGlobalState
+  >;
+  const mockShowNotification = showNotification as jest.MockedFunction<
+    typeof showNotification
   >;
   const mockIsPhpFile = isPhpFile as jest.MockedFunction<typeof isPhpFile>;
   const mockGetExtensionProperties =
@@ -51,77 +51,57 @@ describe('listenToPhpMultiLogTypes', () => {
       typeof getExtensionProperties
     >;
   const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
-  const mockShowNotification = showNotification as jest.MockedFunction<
-    typeof showNotification
-  >;
   const mockDetectAll = detectAll as jest.MockedFunction<typeof detectAll>;
-  const mockOnDidChangeActiveTextEditor = vscode.window
-    .onDidChangeActiveTextEditor as jest.MockedFunction<
-    typeof vscode.window.onDidChangeActiveTextEditor
-  >;
   const mockGetConfiguration = vscode.workspace
     .getConfiguration as jest.MockedFunction<
     typeof vscode.workspace.getConfiguration
   >;
 
-  const testVersion = '3.14.1';
   let context: vscode.ExtensionContext;
+  const testVersion = '3.14.1';
 
   beforeEach(() => {
     jest.clearAllMocks();
     context = makeExtensionContext();
 
-    // Default mock returns
+    // Default mocks
     mockIsProUser.mockReturnValue(false);
     mockReadFromGlobalState.mockReturnValue(false);
-    mockGetConfiguration.mockReturnValue({
-      get: jest.fn(),
-    } as unknown as vscode.WorkspaceConfiguration);
+    mockGetConfiguration.mockReturnValue({} as vscode.WorkspaceConfiguration);
     mockGetExtensionProperties.mockReturnValue({
-      logFunction: 'error_log',
-      logMessagePrefix: 'TCL:',
+      logFunction: 'console.log',
+      logMessagePrefix: '🚀',
       delimiterInsideMessage: '~',
-    } as ReturnType<typeof getExtensionProperties>);
+    } as unknown as ReturnType<typeof getExtensionProperties>);
   });
 
-  it('should not register listener for Pro users', () => {
+  it('should not register handler for Pro users', () => {
     mockIsProUser.mockReturnValue(true);
 
-    listenToPhpMultiLogTypes(context, testVersion);
+    const result = phpMultiLogTypesHandler.shouldRegister(context);
 
-    expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should not register listener when notification already shown', () => {
+  it('should not register handler when notification already shown', () => {
     mockReadFromGlobalState.mockReturnValue(true);
 
-    listenToPhpMultiLogTypes(context, testVersion);
+    const result = phpMultiLogTypesHandler.shouldRegister(context);
 
     expect(mockReadFromGlobalState).toHaveBeenCalledWith(
       context,
       GlobalStateKey.HAS_SHOWN_PHP_MULTI_LOG_TYPES_NOTIFICATION,
     );
-    expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should register onDidChangeActiveTextEditor listener for free users who have not seen notification', () => {
-    listenToPhpMultiLogTypes(context, testVersion);
+  it('should register handler for free users who have not seen notification', () => {
+    const result = phpMultiLogTypesHandler.shouldRegister(context);
 
-    expect(mockOnDidChangeActiveTextEditor).toHaveBeenCalledTimes(1);
-    expect(mockOnDidChangeActiveTextEditor).toHaveBeenCalledWith(
-      expect.any(Function),
-    );
+    expect(result).toBe(true);
   });
 
   it('should show notification when file has 2+ different log types', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.php' },
@@ -135,31 +115,29 @@ describe('listenToPhpMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(true);
 
-    listenToPhpMultiLogTypes(context, testVersion);
+    const shouldProcess = phpMultiLogTypesHandler.shouldProcess(
+      mockEditor,
+      context,
+    );
+    expect(shouldProcess).toBe(true);
 
-    await editorCallback!(mockEditor);
+    const result = await phpMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
+    expect(mockIsPhpFile).toHaveBeenCalledWith(mockEditor.document);
+    expect(mockDetectAll).toHaveBeenCalled();
     expect(mockShowNotification).toHaveBeenCalledWith(
       NotificationEvent.EXTENSION_PHP_MULTI_LOG_TYPES,
       testVersion,
       context,
     );
-    expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-      context,
-      GlobalStateKey.HAS_SHOWN_PHP_MULTI_LOG_TYPES_NOTIFICATION,
-      true,
-    );
+    expect(result).toBe(true);
   });
 
-  it('should dispose listener after successfully showing notification', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
+  it('should mark notification as shown after successfully displaying it', async () => {
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.php' },
@@ -173,22 +151,16 @@ describe('listenToPhpMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(true);
 
-    listenToPhpMultiLogTypes(context, testVersion);
+    await phpMultiLogTypesHandler.process(mockEditor, context, testVersion);
 
-    await editorCallback!(mockEditor);
-
-    expect(disposable.dispose).toHaveBeenCalledTimes(1);
+    expect(mockWriteToGlobalState).toHaveBeenCalledWith(
+      context,
+      GlobalStateKey.HAS_SHOWN_PHP_MULTI_LOG_TYPES_NOTIFICATION,
+      true,
+    );
   });
 
   it('should not show notification when file has only 1 log type', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.php' },
@@ -202,24 +174,18 @@ describe('listenToPhpMultiLogTypes', () => {
       { spaces: '', lines: [], logFunction: 'error_log' },
     ]);
 
-    listenToPhpMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
+    const result = await phpMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockShowNotification).not.toHaveBeenCalled();
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    expect(disposable.dispose).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
   it('should detect 3 different log types', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.php' },
@@ -235,26 +201,17 @@ describe('listenToPhpMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(true);
 
-    listenToPhpMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
-
-    expect(mockShowNotification).toHaveBeenCalledWith(
-      NotificationEvent.EXTENSION_PHP_MULTI_LOG_TYPES,
-      testVersion,
+    const result = await phpMultiLogTypesHandler.process(
+      mockEditor,
       context,
+      testVersion,
     );
+
+    expect(mockShowNotification).toHaveBeenCalled();
+    expect(result).toBe(true);
   });
 
-  it('should not show notification when non-PHP file is opened', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
+  it('should not process when non-PHP file is opened', () => {
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.js' },
@@ -263,41 +220,12 @@ describe('listenToPhpMultiLogTypes', () => {
 
     mockIsPhpFile.mockReturnValue(false);
 
-    listenToPhpMultiLogTypes(context, testVersion);
+    const result = phpMultiLogTypesHandler.shouldProcess(mockEditor, context);
 
-    await editorCallback!(mockEditor);
-
-    expect(mockDetectAll).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should not show notification when editor is undefined', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    listenToPhpMultiLogTypes(context, testVersion);
-
-    await editorCallback!(undefined);
-
-    expect(mockIsPhpFile).not.toHaveBeenCalled();
-    expect(mockDetectAll).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
-  });
-
-  it('should not show notification when file path is undefined', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
+  it('should not process when file path is undefined', () => {
     const mockEditor = {
       document: {
         uri: { fsPath: '' },
@@ -306,37 +234,15 @@ describe('listenToPhpMultiLogTypes', () => {
 
     mockIsPhpFile.mockReturnValue(true);
 
-    listenToPhpMultiLogTypes(context, testVersion);
+    const result = phpMultiLogTypesHandler.shouldProcess(mockEditor, context);
 
-    await editorCallback!(mockEditor);
-
-    expect(mockDetectAll).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
-  });
-
-  it('should add disposable to context subscriptions', () => {
-    const disposable = { dispose: jest.fn() };
-    mockOnDidChangeActiveTextEditor.mockReturnValue(
-      disposable as unknown as vscode.Disposable,
-    );
-
-    listenToPhpMultiLogTypes(context, testVersion);
-
-    expect(context.subscriptions).toContain(disposable);
+    expect(result).toBe(false);
   });
 
   it('should handle detectAll errors gracefully', async () => {
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});
-
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
 
     const mockEditor = {
       document: {
@@ -347,63 +253,23 @@ describe('listenToPhpMultiLogTypes', () => {
     mockIsPhpFile.mockReturnValue(true);
     mockDetectAll.mockRejectedValue(new Error('Detection failed'));
 
-    listenToPhpMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
+    const result = await phpMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       '[Turbo Console Log] Error detecting multi-type logs:',
       expect.any(Error),
     );
     expect(mockShowNotification).not.toHaveBeenCalled();
+    expect(result).toBe(false);
 
     consoleErrorSpy.mockRestore();
   });
 
-  it('should stop listening after notification is shown (disposal prevents further calls)', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '/path/to/file.php' },
-      },
-    } as vscode.TextEditor;
-
-    mockIsPhpFile.mockReturnValue(true);
-    mockDetectAll.mockResolvedValue([
-      { spaces: '', lines: [], logFunction: 'error_log' },
-      { spaces: '', lines: [], logFunction: 'var_dump' },
-    ]);
-    mockShowNotification.mockResolvedValue(true);
-
-    listenToPhpMultiLogTypes(context, testVersion);
-
-    // First call - should show notification
-    await editorCallback!(mockEditor);
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(disposable.dispose).toHaveBeenCalledTimes(1);
-
-    // Second call - should not show notification (disposable already disposed)
-    mockShowNotification.mockClear();
-    await editorCallback!(mockEditor);
-    expect(mockShowNotification).toHaveBeenCalledTimes(1); // Still called but wouldn't execute if real disposable
-  });
-
-  it('should not mark as shown or dispose when notification is blocked by cooldown', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
+  it('should not mark as shown when notification is blocked by cooldown', async () => {
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.php' },
@@ -417,24 +283,17 @@ describe('listenToPhpMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(false); // Cooldown blocked
 
-    listenToPhpMultiLogTypes(context, testVersion);
+    const result = await phpMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
-    await editorCallback!(mockEditor);
-
-    expect(mockShowNotification).toHaveBeenCalled();
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    expect(disposable.dispose).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
   it('should handle messages without logFunction property', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.php' },
@@ -449,11 +308,14 @@ describe('listenToPhpMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(true);
 
-    listenToPhpMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
+    const result = await phpMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     // Should still detect 2 types and show notification
     expect(mockShowNotification).toHaveBeenCalled();
+    expect(result).toBe(true);
   });
 });

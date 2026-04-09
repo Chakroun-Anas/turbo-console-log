@@ -1,6 +1,6 @@
 import { BracketType } from '@/entities';
 import { closingContextLine } from '@/utilities';
-import { makeTextDocument } from '../../mocks/helpers';
+import { openTurboTextDocument } from '@/debug-message/js/JSDebugMessage/detectAll/TurboTextDocument';
 
 const locBracketsMock = jest.fn();
 jest.mock('../../../utilities/locBrackets', () => ({
@@ -12,7 +12,7 @@ describe('closingContextLine', () => {
     jest.clearAllMocks();
   });
   it('returns same line when braces close on the same line', () => {
-    const doc = makeTextDocument(['function foo() { return 42; }']);
+    const doc = openTurboTextDocument('function foo() { return 42; }');
     locBracketsMock.mockReturnValueOnce({
       openingBrackets: 1,
       closingBrackets: 1,
@@ -21,11 +21,9 @@ describe('closingContextLine', () => {
   });
 
   it('finds closing line across multiple lines', () => {
-    const doc = makeTextDocument([
-      'function foo() {',
-      '  console.log("bar");',
-      '}',
-    ]);
+    const doc = openTurboTextDocument(
+      'function foo() {\n' + '  console.log("bar");\n' + '}',
+    );
     locBracketsMock
       .mockReturnValueOnce({
         openingBrackets: 1,
@@ -43,13 +41,13 @@ describe('closingContextLine', () => {
   });
 
   it('handles nested scopes and still finds outer closing brace', () => {
-    const doc = makeTextDocument([
-      'function foo() {', // 0
-      '  if (true) {', // 1
-      '    console.log(1);', // 2
-      '  }', // 3
-      '}', // 4  ← should return here
-    ]);
+    const doc = openTurboTextDocument(
+      'function foo() {\n' + // 0
+        '  if (true) {\n' + // 1
+        '    console.log(1);\n' + // 2
+        '  }\n' + // 3
+        '}', // 4  ← should return here
+    );
     locBracketsMock
       .mockReturnValueOnce({
         openingBrackets: 1,
@@ -75,7 +73,7 @@ describe('closingContextLine', () => {
   });
 
   it('returns -1 when braces never close', () => {
-    const doc = makeTextDocument(['function foo() { console.log("oops");']);
+    const doc = openTurboTextDocument('function foo() { console.log("oops");');
     locBracketsMock.mockReturnValueOnce({
       openingBrackets: 1,
       closingBrackets: 0,

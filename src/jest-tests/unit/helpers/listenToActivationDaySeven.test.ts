@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { listenToActivationDaySeven } from '@/helpers/listenToActivationDaySeven';
+import { activationDaySevenHandler } from '@/helpers/listenToActivationDaySeven';
 import {
   readFromGlobalState,
   writeToGlobalState,
@@ -9,91 +9,69 @@ import {
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
 import { GlobalStateKey } from '@/entities';
+import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
 
-jest.mock('vscode');
 jest.mock('@/helpers', () => ({
   readFromGlobalState: jest.fn(),
   writeToGlobalState: jest.fn(),
   isProUser: jest.fn(),
   isJavaScriptOrTypeScriptFile: jest.fn(),
 }));
-jest.mock('@/notifications/showNotification');
 
-const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
-const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
-  typeof readFromGlobalState
->;
-const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
-  typeof writeToGlobalState
->;
-const mockIsJavaScriptOrTypeScriptFile =
-  isJavaScriptOrTypeScriptFile as jest.MockedFunction<
-    typeof isJavaScriptOrTypeScriptFile
+jest.mock('@/notifications/showNotification', () => ({
+  showNotification: jest.fn(),
+}));
+
+describe('activationDaySevenHandler', () => {
+  const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
+  const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
+    typeof readFromGlobalState
   >;
-const mockShowNotification = showNotification as jest.MockedFunction<
-  typeof showNotification
->;
+  const mockWriteToGlobalState = writeToGlobalState as jest.MockedFunction<
+    typeof writeToGlobalState
+  >;
+  const mockIsJavaScriptOrTypeScriptFile =
+    isJavaScriptOrTypeScriptFile as jest.MockedFunction<
+      typeof isJavaScriptOrTypeScriptFile
+    >;
+  const mockShowNotification = showNotification as jest.MockedFunction<
+    typeof showNotification
+  >;
 
-describe('listenToActivationDaySeven', () => {
-  let mockContext: vscode.ExtensionContext;
-  let mockDisposable: vscode.Disposable;
-  let onDidChangeActiveTextEditorCallback: (
-    editor: vscode.TextEditor | undefined,
-  ) => Promise<void>;
+  let context: vscode.ExtensionContext;
+  const testVersion = '3.17.0';
 
   const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-  const SEVEN_DAYS_MS = 7 * ONE_DAY_MS;
   const TEN_DAYS_MS = 10 * ONE_DAY_MS;
   const TWO_WEEKS_MS = 14 * ONE_DAY_MS;
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    mockDisposable = {
-      dispose: jest.fn(),
-    };
-
-    mockContext = {
-      subscriptions: [],
-      extensionPath: '/test/path',
-      globalState: {} as vscode.Memento,
-      workspaceState: {} as vscode.Memento,
-    } as unknown as vscode.ExtensionContext;
-
-    // Mock vscode.window.onDidChangeActiveTextEditor
-    (vscode.window.onDidChangeActiveTextEditor as jest.Mock) = jest.fn(
-      (callback) => {
-        onDidChangeActiveTextEditorCallback = callback;
-        return mockDisposable;
-      },
-    );
-
-    // Mock vscode.extensions.getExtension
-    (vscode.extensions.getExtension as jest.Mock) = jest.fn(() => ({
-      packageJSON: { version: '3.17.0' },
-    }));
+    context = makeExtensionContext();
 
     // Mock Date.now() for consistent testing
-    jest.spyOn(Date, 'now').mockReturnValue(1000000000000); // Fixed timestamp
+    jest.spyOn(Date, 'now').mockReturnValue(1000000000000);
+
+    // Default mocks
+    mockIsProUser.mockReturnValue(false);
+    mockReadFromGlobalState.mockReturnValue(false);
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  describe('Early exits (setup-time filters)', () => {
-    it('should return early for Pro users without setting up listener', () => {
+  describe('shouldRegister - setup-time filters', () => {
+    it('should not register handler for Pro users', () => {
       mockIsProUser.mockReturnValue(true);
 
-      listenToActivationDaySeven(mockContext, '3.17.0');
+      const result = activationDaySevenHandler.shouldRegister(context);
 
-      expect(vscode.window.onDidChangeActiveTextEditor).not.toHaveBeenCalled();
-      expect(mockContext.subscriptions).toHaveLength(0);
+      expect(result).toBe(false);
     });
 
-    it('should return early if notification already shown without setting up listener', () => {
-      mockIsProUser.mockReturnValue(false);
-      mockReadFromGlobalState.mockImplementation((context, key) => {
+    it('should not register handler if notification already shown', () => {
+      mockReadFromGlobalState.mockImplementation((ctx, key) => {
         if (
           key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
         ) {
@@ -102,15 +80,17 @@ describe('listenToActivationDaySeven', () => {
         return undefined;
       });
 
-      listenToActivationDaySeven(mockContext, '3.17.0');
+      const result = activationDaySevenHandler.shouldRegister(context);
 
-      expect(vscode.window.onDidChangeActiveTextEditor).not.toHaveBeenCalled();
-      expect(mockContext.subscriptions).toHaveLength(0);
+      expect(mockReadFromGlobalState).toHaveBeenCalledWith(
+        context,
+        GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION,
+      );
+      expect(result).toBe(false);
     });
 
-    it('should return early if user has already used the extension (commandUsageCount > 0)', () => {
-      mockIsProUser.mockReturnValue(false);
-      mockReadFromGlobalState.mockImplementation((context, key) => {
+    it('should not register if user has already used the extension (commandUsageCount > 0)', () => {
+      mockReadFromGlobalState.mockImplementation((ctx, key) => {
         if (
           key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
         ) {
@@ -122,64 +102,18 @@ describe('listenToActivationDaySeven', () => {
           return false;
         }
         if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 5; // User has used the extension 5 times
+          return 5;
         }
         return undefined;
       });
 
-      listenToActivationDaySeven(mockContext, '3.17.0');
+      const result = activationDaySevenHandler.shouldRegister(context);
 
-      expect(vscode.window.onDidChangeActiveTextEditor).not.toHaveBeenCalled();
-      expect(mockContext.subscriptions).toHaveLength(0);
-    });
-  });
-
-  describe('Listener setup', () => {
-    it('should set up listener for free users with zero usage who have not seen Day 7 notification', () => {
-      mockIsProUser.mockReturnValue(false);
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0; // Zero usage
-        }
-        return undefined;
-      });
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      expect(vscode.window.onDidChangeActiveTextEditor).toHaveBeenCalled();
-      expect(mockContext.subscriptions).toHaveLength(1);
+      expect(result).toBe(false);
     });
 
-    it('should set up listener when COMMAND_USAGE_COUNT is undefined (defaults to 0)', () => {
-      mockIsProUser.mockReturnValue(false);
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return undefined; // No usage data (defaults to 0)
-        }
-        return undefined;
-      });
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      expect(vscode.window.onDidChangeActiveTextEditor).toHaveBeenCalled();
-      expect(mockContext.subscriptions).toHaveLength(1);
-    });
-  });
-
-  describe('File type filtering', () => {
-    beforeEach(() => {
-      mockIsProUser.mockReturnValue(false);
-      mockReadFromGlobalState.mockImplementation((context, key) => {
+    it('should register for free users with zero usage who have not seen Day 7 notification', () => {
+      mockReadFromGlobalState.mockImplementation((ctx, key) => {
         if (
           key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
         ) {
@@ -188,257 +122,88 @@ describe('listenToActivationDaySeven', () => {
         if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
           return 0;
         }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - TEN_DAYS_MS; // 10 days since install (within 7-14 window)
+        return undefined;
+      });
+
+      const result = activationDaySevenHandler.shouldRegister(context);
+
+      expect(result).toBe(true);
+    });
+
+    it('should register when COMMAND_USAGE_COUNT is undefined (defaults to 0)', () => {
+      mockReadFromGlobalState.mockImplementation((ctx, key) => {
+        if (
+          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
+        ) {
+          return false;
+        }
+        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
+          return undefined;
         }
         return undefined;
       });
+
+      const result = activationDaySevenHandler.shouldRegister(context);
+
+      expect(result).toBe(true);
     });
+  });
 
-    it('should process JS/TS files', () => {
-      listenToActivationDaySeven(mockContext, '3.17.0');
+  describe('shouldProcess - runtime filtering', () => {
+    const mockDocument = {
+      fileName: 'test.ts',
+      uri: { fsPath: 'test.ts' },
+    } as vscode.TextDocument;
 
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
+    const mockEditor = {
+      document: mockDocument,
+    } as vscode.TextEditor;
 
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
+    it('should process JS/TS files within valid window', () => {
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
+      mockReadFromGlobalState.mockImplementation((ctx, key) => {
+        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
+          return 0;
+        }
+        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
+          return Date.now() - TEN_DAYS_MS; // 10 days - valid window
+        }
+        return undefined;
+      });
 
-      onDidChangeActiveTextEditorCallback(mockEditor);
+      const result = activationDaySevenHandler.shouldProcess(
+        mockEditor,
+        context,
+      );
 
       expect(mockIsJavaScriptOrTypeScriptFile).toHaveBeenCalledWith(
         mockDocument,
       );
+      expect(result).toBe(true);
     });
 
-    it('should skip non-JS/TS files', () => {
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
+    it('should not process non-JS/TS files', () => {
+      const mdDocument = {
         fileName: 'test.md',
         uri: { fsPath: 'test.md' },
       } as vscode.TextDocument;
 
-      const mockEditor = {
-        document: mockDocument,
+      const mdEditor = {
+        document: mdDocument,
       } as vscode.TextEditor;
 
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(false);
 
-      onDidChangeActiveTextEditorCallback(mockEditor);
+      const result = activationDaySevenHandler.shouldProcess(mdEditor, context);
 
-      expect(mockShowNotification).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
 
-    it('should handle undefined editor gracefully', () => {
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      onDidChangeActiveTextEditorCallback(undefined);
-
-      expect(mockIsJavaScriptOrTypeScriptFile).not.toHaveBeenCalled();
-      expect(mockShowNotification).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Activation window checking (7-14 day window)', () => {
-    beforeEach(() => {
-      mockIsProUser.mockReturnValue(false);
-      mockShowNotification.mockResolvedValue(true);
+    it('should not process if usage count > 0', () => {
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
-    });
-
-    it('should NOT show notification if user installed less than 7 days ago', async () => {
-      const FIVE_DAYS_MS = 5 * ONE_DAY_MS;
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
+      mockReadFromGlobalState.mockImplementation((ctx, key) => {
         if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0;
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - FIVE_DAYS_MS; // Only 5 days - too early
-        }
-        return undefined;
-      });
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      expect(mockShowNotification).not.toHaveBeenCalled();
-    });
-
-    it('should show notification if user installed exactly 7 days ago', async () => {
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0;
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - SEVEN_DAYS_MS; // Exactly 7 days
-        }
-        return undefined;
-      });
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      expect(mockShowNotification).toHaveBeenCalledWith(
-        NotificationEvent.EXTENSION_ACTIVATION_DAY_SEVEN,
-        '3.17.0',
-        mockContext,
-      );
-    });
-
-    it('should show notification if user installed between 7-14 days ago (10 days)', async () => {
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0;
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - TEN_DAYS_MS; // 10 days - within 7-14 window
-        }
-        return undefined;
-      });
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      expect(mockShowNotification).toHaveBeenCalledWith(
-        NotificationEvent.EXTENSION_ACTIVATION_DAY_SEVEN,
-        '3.17.0',
-        mockContext,
-      );
-    });
-
-    it('should NOT show notification if user installed 14 days or more ago (handled by two-week return)', async () => {
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0;
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - TWO_WEEKS_MS; // 14 days - too late for Day 7 event
-        }
-        return undefined;
-      });
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      expect(mockShowNotification).not.toHaveBeenCalled();
-      expect(mockDisposable.dispose).toHaveBeenCalled(); // Listener disposed
-    });
-
-    it('should NOT show notification if no install date available (assumes just installed)', async () => {
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0;
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return undefined; // No install date
-        }
-        return undefined;
-      });
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      expect(mockShowNotification).not.toHaveBeenCalled(); // 0 days = too early
-    });
-  });
-
-  describe('Re-checking usage count on each trigger', () => {
-    beforeEach(() => {
-      mockIsProUser.mockReturnValue(false);
-      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
-    });
-
-    it('should dispose listener if user activated extension between setup and trigger', async () => {
-      // Setup: user has zero usage initially
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0; // Zero usage at setup time
+          return 5;
         }
         if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
           return Date.now() - TEN_DAYS_MS;
@@ -446,280 +211,121 @@ describe('listenToActivationDaySeven', () => {
         return undefined;
       });
 
-      listenToActivationDaySeven(mockContext, '3.17.0');
+      const result = activationDaySevenHandler.shouldProcess(
+        mockEditor,
+        context,
+      );
 
-      // Trigger: user now has usage (used extension between setup and trigger)
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 3; // User activated! (inserted 3 logs between setup and trigger)
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - TEN_DAYS_MS;
-        }
-        return false;
-      });
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      expect(mockShowNotification).not.toHaveBeenCalled(); // User already activated
-      expect(mockDisposable.dispose).toHaveBeenCalled(); // Listener disposed
+      expect(result).toBe(false);
     });
 
-    it('should continue if usage count is still zero on trigger', async () => {
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0; // Still zero
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - TEN_DAYS_MS;
-        }
-        return undefined;
-      });
-      mockShowNotification.mockResolvedValue(true);
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      expect(mockShowNotification).toHaveBeenCalled(); // Proceed with notification
-    });
-  });
-
-  describe('Notification showing and state update', () => {
-    beforeEach(() => {
-      mockIsProUser.mockReturnValue(false);
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
+    it('should not process if before 7 day window', () => {
+      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
+      mockReadFromGlobalState.mockImplementation((ctx, key) => {
         if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
           return 0;
         }
         if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - TEN_DAYS_MS; // 10 days since install
+          return Date.now() - 5 * ONE_DAY_MS; // 5 days - too early
         }
         return undefined;
       });
-      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
+
+      const result = activationDaySevenHandler.shouldProcess(
+        mockEditor,
+        context,
+      );
+
+      expect(result).toBe(false);
     });
 
-    it('should mark notification as shown and dispose listener when notification is displayed', async () => {
+    it('should not process if after 14 day window', () => {
+      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
+      mockReadFromGlobalState.mockImplementation((ctx, key) => {
+        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
+          return 0;
+        }
+        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
+          return Date.now() - TWO_WEEKS_MS; // 14 days - too late
+        }
+        return undefined;
+      });
+
+      const result = activationDaySevenHandler.shouldProcess(
+        mockEditor,
+        context,
+      );
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('process - calls showNotification', () => {
+    const mockDocument = {
+      fileName: 'test.ts',
+      uri: { fsPath: 'test.ts' },
+    } as vscode.TextDocument;
+
+    const mockEditor = {
+      document: mockDocument,
+    } as vscode.TextEditor;
+
+    it('should call showNotification with correct parameters', async () => {
       mockShowNotification.mockResolvedValue(true);
 
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
+      const result = await activationDaySevenHandler.process(
+        mockEditor,
+        context,
+        testVersion,
+      );
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_ACTIVATION_DAY_SEVEN,
-        '3.17.0',
-        mockContext,
+        testVersion,
+        context,
       );
+      expect(result).toBe(true);
+    });
+
+    it('should mark notification as shown when successful', async () => {
+      mockShowNotification.mockResolvedValue(true);
+
+      await activationDaySevenHandler.process(mockEditor, context, testVersion);
+
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
-        mockContext,
+        context,
         GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION,
         true,
       );
-      expect(mockDisposable.dispose).toHaveBeenCalled();
     });
 
-    it('should NOT mark as shown or dispose if notification was blocked by cooldown', async () => {
-      mockShowNotification.mockResolvedValue(false); // Blocked by cooldown
+    it('should not mark as shown when blocked by cooldown', async () => {
+      mockShowNotification.mockResolvedValue(false);
 
-      listenToActivationDaySeven(mockContext, '3.17.0');
+      const result = await activationDaySevenHandler.process(
+        mockEditor,
+        context,
+        testVersion,
+      );
 
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      expect(mockShowNotification).toHaveBeenCalled();
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-      expect(mockDisposable.dispose).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
-  });
 
-  describe('Version parameter', () => {
-    beforeEach(() => {
-      mockIsProUser.mockReturnValue(false);
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0;
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - TEN_DAYS_MS;
-        }
-        return undefined;
-      });
+    it('should pass custom version parameter', async () => {
       mockShowNotification.mockResolvedValue(true);
-      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
-    });
+      const customVersion = '4.0.0';
 
-    it('should pass version parameter to showNotification', async () => {
-      const testVersion = '3.17.0';
-      listenToActivationDaySeven(mockContext, testVersion);
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      expect(mockShowNotification).toHaveBeenCalledWith(
-        NotificationEvent.EXTENSION_ACTIVATION_DAY_SEVEN,
-        testVersion,
-        mockContext,
+      await activationDaySevenHandler.process(
+        mockEditor,
+        context,
+        customVersion,
       );
-    });
-
-    it('should pass different version parameter correctly', async () => {
-      const testVersion = '4.0.0';
-      listenToActivationDaySeven(mockContext, testVersion);
-
-      const mockDocument = {
-        fileName: 'test.js',
-        uri: { fsPath: 'test.js' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_ACTIVATION_DAY_SEVEN,
-        testVersion,
-        mockContext,
-      );
-    });
-  });
-
-  describe('Edge cases', () => {
-    beforeEach(() => {
-      mockIsProUser.mockReturnValue(false);
-      mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
-    });
-
-    it('should handle boundary condition at exactly 14 days', async () => {
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0;
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - TWO_WEEKS_MS; // Exactly 14 days (boundary)
-        }
-        return undefined;
-      });
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      // At exactly 14 days, should NOT show (>= TWO_WEEKS_MS condition)
-      expect(mockShowNotification).not.toHaveBeenCalled();
-      expect(mockDisposable.dispose).toHaveBeenCalled();
-    });
-
-    it('should handle boundary condition at exactly 7 days', async () => {
-      mockReadFromGlobalState.mockImplementation((context, key) => {
-        if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
-        ) {
-          return false;
-        }
-        if (key === GlobalStateKey.COMMAND_USAGE_COUNT) {
-          return 0;
-        }
-        if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE) {
-          return Date.now() - SEVEN_DAYS_MS; // Exactly 7 days (boundary)
-        }
-        return undefined;
-      });
-      mockShowNotification.mockResolvedValue(true);
-
-      listenToActivationDaySeven(mockContext, '3.17.0');
-
-      const mockDocument = {
-        fileName: 'test.ts',
-        uri: { fsPath: 'test.ts' },
-      } as vscode.TextDocument;
-
-      const mockEditor = {
-        document: mockDocument,
-      } as vscode.TextEditor;
-
-      await onDidChangeActiveTextEditorCallback(mockEditor);
-
-      // At exactly 7 days, should show (>= SEVEN_DAYS_MS condition)
-      expect(mockShowNotification).toHaveBeenCalledWith(
-        NotificationEvent.EXTENSION_ACTIVATION_DAY_SEVEN,
-        '3.17.0',
-        mockContext,
+        customVersion,
+        context,
       );
     });
   });
