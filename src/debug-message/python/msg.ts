@@ -5,7 +5,25 @@ import { addFileInfo } from '@/debug-message/js/JSDebugMessage/msg/constructDebu
 import { addPrefix } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/addPrefix/addPrefix';
 import { addVariable } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/addVariable/addVariable';
 import { getFileName } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/getFileName/getFileName';
-import { selectQuote } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent/helpers/selectQuote/selectQuote';
+
+function selectPythonQuote(defaultQuote: string, content: string): string {
+  const hasDoubleQuote = content.includes('"');
+  const hasSingleQuote = content.includes("'");
+
+  if (hasDoubleQuote && !hasSingleQuote) {
+    return "'";
+  }
+
+  if (hasSingleQuote && !hasDoubleQuote) {
+    return '"';
+  }
+
+  if (defaultQuote === '"' || defaultQuote === "'") {
+    return defaultQuote;
+  }
+
+  return '"';
+}
 
 function getIndentation(text: string): string {
   const firstNonWhitespace = text.search(/\S|$/);
@@ -76,7 +94,7 @@ function buildPythonCall(
   logFunction: string,
   extensionProperties: ExtensionProperties,
 ): string {
-  const quote = selectQuote(
+  const quote = selectPythonQuote(
     extensionProperties.quote,
     selectedVar ?? extensionProperties.logMessagePrefix,
   );
