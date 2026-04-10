@@ -20,6 +20,11 @@ const LOGGING_LIBRARIES = {
 
   // PHP
   monolog: /(?:use\s+Monolog\\|new\s+Monolog\\Logger)/,
+
+  // Python
+  pythonLogging: /(?:^|\n)\s*import\s+logging(?:\s|$)|(?:^|\n)\s*from\s+logging\s+import\s+/m,
+  loguru: /(?:^|\n)\s*(?:import\s+loguru|from\s+loguru\s+import\s+)/m,
+  structlog: /(?:^|\n)\s*(?:import\s+structlog|from\s+structlog\s+import\s+)/m,
 };
 
 /**

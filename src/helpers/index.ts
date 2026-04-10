@@ -11,8 +11,13 @@ import { trackLogInsertions } from './trackLogInsertions';
 import { trackLogManagementCommands } from './trackLogManagementCommands';
 import { isProUser } from './isProUser';
 import { isPhpFile } from './isPhpFile';
+import { isPythonFile } from './isPythonFile';
 import { isJavaScriptOrTypeScriptFile } from './isJavaScriptOrTypeScriptFile';
 import { canInsertLogInDocument } from './canInsertLogInDocument';
+import {
+  resolveDebugRuntime,
+  resolveLogFunctionForRuntime,
+} from './resolveDebugRuntime';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
 import { listenToWeekendTurboSundays } from './listenToWeekendTurboSundays';
@@ -47,7 +52,10 @@ export {
   isProUser,
   isJavaScriptOrTypeScriptFile,
   isPhpFile,
+  isPythonFile,
   canInsertLogInDocument,
+  resolveDebugRuntime,
+  resolveLogFunctionForRuntime,
   traceExtensionVersionHistory,
   isFreshInstall,
   listenToWeekendTurboSundays,

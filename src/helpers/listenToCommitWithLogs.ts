@@ -4,6 +4,7 @@ import {
   writeToGlobalState,
   isJavaScriptOrTypeScriptFile,
   isPhpFile,
+  isPythonFile,
   getExtensionProperties,
   isProUser,
 } from './index';
@@ -97,8 +98,9 @@ export function listenToCommitWithLogs(
       // Check file type
       const isJS = isJavaScriptOrTypeScriptFile(document);
       const isPHP = isPhpFile(document);
+      const isPython = isPythonFile(document);
 
-      if (!isJS && !isPHP) {
+      if (!isJS && !isPHP && !isPython) {
         return false; // Skip unsupported file types
       }
 
@@ -137,7 +139,16 @@ export function listenToCommitWithLogs(
         /dd\s*\(/,
       ];
 
-      const patterns = isJS ? jsLogPatterns : phpLogPatterns;
+      const pythonLogPatterns = [
+        /print\s*\(/,
+        /logging\.(debug|info|warning|warn|error|exception|critical)\s*\(/,
+      ];
+
+      const patterns = isJS
+        ? jsLogPatterns
+        : isPHP
+          ? phpLogPatterns
+          : pythonLogPatterns;
 
       // Check if any added line contains a log statement
       return addedLines.some((line) =>

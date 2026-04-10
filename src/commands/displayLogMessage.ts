@@ -1,11 +1,8 @@
 import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
-import {
-  trackLogInsertions,
-  canInsertLogInDocument,
-  loadPhpDebugMessage,
-} from '../helpers';
+import { trackLogInsertions, canInsertLogInDocument } from '../helpers';
+import { insertForSelections } from './commandRuntime';
 
 export function displayLogMessageCommand(): Command {
   return {
@@ -30,48 +27,14 @@ export function displayLogMessageCommand(): Command {
         return;
       }
 
-      // For PHP files, load PHP debug message from Pro bundle
-      let activeDebugMessage = debugMessage;
-      let logType = 'log';
-
-      if (document.languageId === 'php') {
-        const phpDebugMessage = await loadPhpDebugMessage(context);
-        if (!phpDebugMessage) {
-          vscode.window.showErrorMessage(
-            'Failed to load PHP support from Pro bundle.',
-          );
-          return;
-        }
-        activeDebugMessage = phpDebugMessage;
-        logType = 'var_dump';
-      }
-
-      for (let index = 0; index < editor.selections.length; index++) {
-        const selection: vscode.Selection = editor.selections[index];
-        let wordUnderCursor = '';
-        const rangeUnderCursor: vscode.Range | undefined =
-          document.getWordRangeAtPosition(selection.active);
-        // if rangeUnderCursor is undefined, `document.getText(undefined)` will return the entire file.
-        if (rangeUnderCursor) {
-          wordUnderCursor = document.getText(rangeUnderCursor);
-        }
-        const selectedVar: string =
-          document.getText(selection) || wordUnderCursor;
-        const lineOfSelectedVar: number = selection.active.line;
-        if (selectedVar.trim().length !== 0) {
-          await editor.edit((editBuilder) => {
-            activeDebugMessage.msg(
-              editBuilder,
-              document,
-              selectedVar,
-              lineOfSelectedVar,
-              tabSize,
-              extensionProperties,
-              logType,
-            );
-          });
-        }
-      }
+      await insertForSelections(
+        editor,
+        context,
+        extensionProperties,
+        debugMessage,
+        'log',
+        tabSize,
+      );
 
       // Track logs insertions
       trackLogInsertions(context);

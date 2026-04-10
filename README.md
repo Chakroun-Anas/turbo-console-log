@@ -6,7 +6,7 @@
 
 ## 🚀 Automated Logging for JavaScript/TypeScript and PHP
 
-**Turbo Console Log automates the process of writing meaningful log statements.** Insert logs with a single keyboard shortcut, then manage them across your entire workspace with precision and speed.
+**Turbo Console Log transforms debugging in JavaScript, TypeScript, Python, and PHP.** It's built for developers who refuse to waste time manually typing log statements or hunting them down across dozens of files.
 
 ### **Two Editions**
 
@@ -109,13 +109,22 @@ The free version provides intelligent log insertion in your active editor:
 
 ### 🔍 Instant Search
 
-**Find logs by content across your workspace.** Search results update as you type, and you can jump directly to any match.
+**Find any log by content in seconds.** Type the keyword, see matching logs instantly, click to jump to the exact line.
 
-- Search across all workspace files
-- Real-time results as you type
-- Click to navigate directly to the log location
+- No grep, no scrolling through files, no memory required
+- Search across your entire workspace
+- Results update as you type
 
-### ✨ Additional Features
+### 🌍 Multi-Language Support
+
+Pro recognizes **JavaScript, TypeScript, Python, and PHP** logs in one unified view:
+
+- **JavaScript/TypeScript:** All console methods and a custom log method from the settings
+- **Python:** `print()`, `logging.debug()`, `logging.info()`, `logging.warning()`, `logging.error()`, and a custom log method from the settings
+- **PHP:** `var_dump()`, `print_r()`, `error_log()`, and a custom log method from the settings
+- **Custom Functions:** Your own logging functions, any language
+
+### ✨ Enhanced Experience
 
 - **Context Actions:** Right-click any log for quick actions (comment, delete, correct)
 - **Auto-Correction:** Automatically updates file names and line numbers after refactoring
