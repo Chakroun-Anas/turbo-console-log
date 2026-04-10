@@ -154,7 +154,7 @@ export async function activate(
     launcherView.badge = undefined;
 
     try {
-      await runProBundle(extensionProperties, proBundle, context);
+      await runProBundle(extensionProperties, proBundle, context, version);
     } catch (error) {
       activateRepairMode({
         context,
