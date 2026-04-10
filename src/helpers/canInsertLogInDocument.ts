@@ -14,8 +14,8 @@ export function resetNotificationLock(): void {
 }
 
 /**
- * Checks if the user is trying to use PHP logging without Pro
- * Shows notification and returns false if PHP logging is not allowed
+ * Checks if the user is trying to use a gated language without Pro.
+ * Currently only PHP is gated. Python is available in the free tier.
  * @param context VS Code extension context
  * @param document The document being edited
  * @param version Extension version for notification tracking

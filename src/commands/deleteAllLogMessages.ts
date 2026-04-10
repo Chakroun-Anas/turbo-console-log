@@ -2,10 +2,10 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Command, Message } from '../entities';
 import {
-  loadPhpDebugMessage,
   canInsertLogInDocument,
   trackLogManagementCommands,
 } from '../helpers';
+import { getActiveDebugRuntime } from './commandRuntime';
 
 export function deleteAllLogMessagesCommand(): Command {
   return {
@@ -31,20 +31,12 @@ export function deleteAllLogMessagesCommand(): Command {
         return;
       }
 
-      // For PHP files, load PHP debug message from Pro bundle
-      let activeDebugMessage = debugMessage;
-      if (document.languageId === 'php') {
-        const phpDebugMessage = await loadPhpDebugMessage(context);
-        if (!phpDebugMessage) {
-          vscode.window.showErrorMessage(
-            'Failed to load PHP support from Pro bundle.',
-          );
-          return;
-        }
-        activeDebugMessage = phpDebugMessage;
+      const runtime = await getActiveDebugRuntime(context, document, debugMessage);
+      if (!runtime) {
+        return;
       }
 
-      const logMessages: Message[] = await activeDebugMessage.detectAll(
+      const logMessages: Message[] = await runtime.debugMessage.detectAll(
         fs,
         vscode,
         document.uri.fsPath,

@@ -6,7 +6,8 @@ import { ExtensionProperties, Message } from '@/entities';
 import { GitIgnoreMatcher } from './GitIgnoreMatcher';
 import { detectAll as phpDetectAll } from '@/debug-message/php/detectAll';
 import { detectAll as jsDetectAll } from '@/debug-message/js/JSDebugMessage/detectAll';
-import { filesToWatch } from './targetFiles';
+import { detectAll as phpDetectAll } from '@/debug-message/php/detectAll';
+import { detectAll as pythonDetectAll } from '@/debug-message/python/detectAll';
 
 /**
  * Collect all files with log messages using fast-glob for parallel directory scanning.
@@ -59,11 +60,21 @@ export async function collectFilesWithLogs(
         limit(async () => {
           try {
             // Determine which detectAll to use based on file extension
-            const isPHP = filePath.endsWith('.php');
+            const isPHP = entryPath.endsWith('.php');
+            const isPython = entryPath.endsWith('.py');
             let logs: Array<Message> = [];
             if (isPHP) {
               logs = await phpDetectAll(
-                filePath,
+                entryPath,
+                config.logFunction,
+                config.logMessagePrefix,
+                config.delimiterInsideMessage,
+              );
+            } else if (isPython) {
+              logs = await pythonDetectAll(
+                fs,
+                vscode,
+                entryPath,
                 config.logFunction,
                 config.logMessagePrefix,
                 config.delimiterInsideMessage,

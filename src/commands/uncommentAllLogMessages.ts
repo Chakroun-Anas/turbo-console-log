@@ -2,10 +2,14 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Command, Message } from '../entities';
 import {
-  loadPhpDebugMessage,
   canInsertLogInDocument,
   trackLogManagementCommands,
 } from '../helpers';
+import { getActiveDebugRuntime } from './commandRuntime';
+
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 export function uncommentAllLogMessagesCommand(): Command {
   return {
@@ -31,20 +35,12 @@ export function uncommentAllLogMessagesCommand(): Command {
         return;
       }
 
-      // For PHP files, load PHP debug message from Pro bundle
-      let activeDebugMessage = debugMessage;
-      if (document.languageId === 'php') {
-        const phpDebugMessage = await loadPhpDebugMessage(context);
-        if (!phpDebugMessage) {
-          vscode.window.showErrorMessage(
-            'Failed to load PHP support from Pro bundle.',
-          );
-          return;
-        }
-        activeDebugMessage = phpDebugMessage;
+      const runtime = await getActiveDebugRuntime(context, document, debugMessage);
+      if (!runtime) {
+        return;
       }
 
-      const logMessages: Message[] = await activeDebugMessage.detectAll(
+      const logMessages: Message[] = await runtime.debugMessage.detectAll(
         fs,
         vscode,
         document.uri.fsPath,
@@ -65,9 +61,18 @@ export function uncommentAllLogMessagesCommand(): Command {
               }
               lines.forEach((line: vscode.Range) => {
                 editBuilder.delete(line);
+                const uncommentedLine = document
+                  .getText(line)
+                  .replace(
+                    new RegExp(
+                      `^\\s*${escapeRegex(runtime.commentPrefix)}\\s?`,
+                    ),
+                    '',
+                  )
+                  .trim();
                 editBuilder.insert(
                   new vscode.Position(line.start.line, 0),
-                  `${spaces}${document.getText(line).replace(/\/\//, '').trim()}\n`,
+                  `${spaces}${uncommentedLine}\n`,
                 );
               });
             },

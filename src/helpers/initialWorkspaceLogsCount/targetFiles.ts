@@ -10,6 +10,7 @@ export const supportedExtensions = [
   'vue',
   'svelte',
   'astro',
+  'py',
   'php',
 ];
 
