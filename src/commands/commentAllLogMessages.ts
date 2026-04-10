@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Command, Message } from '../entities';
 import { trackLogManagementCommands } from '../helpers';
-import { phpDebugMessage } from '@/debug-message/php';
+import { getActiveDebugRuntime } from './commandRuntime';
 
 export function commentAllLogMessagesCommand(): Command {
   return {
@@ -15,15 +15,10 @@ export function commentAllLogMessagesCommand(): Command {
       if (!editor) {
         return;
       }
+
       const document: vscode.TextDocument = editor.document;
-
-      // For PHP files, use PHP debug message from core
-      let activeDebugMessage = debugMessage;
-      if (document.languageId === 'php') {
-        activeDebugMessage = phpDebugMessage;
-      }
-
-      const logMessages: Message[] = await activeDebugMessage.detectAll(
+      const runtime = await getActiveDebugRuntime(document, debugMessage);
+      const logMessages: Message[] = await runtime.debugMessage.detectAll(
         fs,
         vscode,
         document.uri.fsPath,
@@ -31,6 +26,7 @@ export function commentAllLogMessagesCommand(): Command {
         logMessagePrefix,
         delimiterInsideMessage,
       );
+
       editor
         .edit((editBuilder) => {
           logMessages.forEach(
@@ -46,7 +42,7 @@ export function commentAllLogMessagesCommand(): Command {
                 editBuilder.delete(line);
                 editBuilder.insert(
                   new vscode.Position(line.start.line, 0),
-                  `${spaces}// ${document.getText(line).trim()}\n`,
+                  `${spaces}${runtime.commentPrefix} ${document.getText(line).trim()}\n`,
                 );
               });
             },

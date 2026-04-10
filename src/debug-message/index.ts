@@ -1,2 +1,4 @@
 import { DebugMessage } from './DebugMessage';
-export { DebugMessage };
+import { pythonDebugMessage } from './python';
+
+export { DebugMessage, pythonDebugMessage };
