@@ -11,6 +11,7 @@ import { detectAll } from '@/debug-message/php/detectAll';
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
 import { Message } from '@/entities/extension/message';
+import { NotificationEventHandler } from './notificationEventHandler';
 
 /**
  * Minimum number of different log types to trigger notification
@@ -30,96 +31,81 @@ function getUniqueLogTypes(messages: Message[]): string[] {
 }
 
 /**
- * Listens to document openings and detects PHP files with multiple log types
- * Shows notification promoting Pro's color-coding feature for different log types
- * One-time notification per user (global state guard)
- *
- * @param context VS Code extension context
- * @param version Extension version
+ * Notification handler for PHP Multi Log Types detection
+ * Detects PHP files with multiple log types
  */
-export function listenToPhpMultiLogTypes(
-  context: vscode.ExtensionContext,
-  version: string,
-): void {
-  // Skip for Pro users
-  if (isProUser(context)) {
-    return;
-  }
+export const phpMultiLogTypesHandler: NotificationEventHandler = {
+  id: 'phpMultiLogTypes',
 
-  // Check if notification has already been shown BEFORE setting up listener
-  const hasShownNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_PHP_MULTI_LOG_TYPES_NOTIFICATION,
-  );
-  if (hasShownNotification) {
-    return; // Already shown, no need to listen
-  }
+  shouldRegister: (context: vscode.ExtensionContext): boolean => {
+    if (isProUser(context)) {
+      return false;
+    }
 
-  // Get extension properties for log detection config
-  const config: vscode.WorkspaceConfiguration =
-    vscode.workspace.getConfiguration('turboConsoleLog');
-  const extensionProperties = getExtensionProperties(config);
+    const hasShownNotification = readFromGlobalState<boolean>(
+      context,
+      GlobalStateKey.HAS_SHOWN_PHP_MULTI_LOG_TYPES_NOTIFICATION,
+    );
 
-  // Listen to active text editor changes (when user opens/switches files)
-  const disposable = vscode.window.onDidChangeActiveTextEditor(
-    async (editor) => {
-      if (!editor) {
-        return;
-      }
+    return !hasShownNotification;
+  },
 
-      const document = editor.document;
+  shouldProcess: (editor: vscode.TextEditor): boolean => {
+    const document = editor.document;
 
-      // Check if it's a PHP file
-      if (!isPhpFile(document)) {
-        return;
-      }
+    if (!isPhpFile(document)) {
+      return false;
+    }
 
-      // Get file path
-      const filePath = document.uri.fsPath;
-      if (!filePath) {
-        return;
-      }
+    const filePath = document.uri.fsPath;
+    return !!filePath;
+  },
 
-      try {
-        // Detect all logs in the PHP file
-        const messages = await detectAll(
-          filePath,
-          extensionProperties.logFunction,
-          extensionProperties.logMessagePrefix,
-          extensionProperties.delimiterInsideMessage,
+  process: async (
+    editor: vscode.TextEditor,
+    context: vscode.ExtensionContext,
+    version: string,
+  ): Promise<boolean> => {
+    const filePath = editor.document.uri.fsPath;
+
+    try {
+      const config: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration('turboConsoleLog');
+      const extensionProperties = getExtensionProperties(config);
+
+      const messages = await detectAll(
+        filePath,
+        extensionProperties.logFunction,
+        extensionProperties.logMessagePrefix,
+        extensionProperties.delimiterInsideMessage,
+      );
+
+      const uniqueLogTypes = getUniqueLogTypes(messages);
+
+      if (uniqueLogTypes.length >= MIN_LOG_TYPES_THRESHOLD) {
+        const wasShown = await showNotification(
+          NotificationEvent.EXTENSION_PHP_MULTI_LOG_TYPES,
+          version,
+          context,
         );
 
-        // Extract unique log types
-        const uniqueLogTypes = getUniqueLogTypes(messages);
-
-        // Check if file has multiple log types (2+)
-        if (uniqueLogTypes.length >= MIN_LOG_TYPES_THRESHOLD) {
-          // Show notification
-          const wasShown = await showNotification(
-            NotificationEvent.EXTENSION_PHP_MULTI_LOG_TYPES,
-            version,
+        if (wasShown) {
+          writeToGlobalState(
             context,
+            GlobalStateKey.HAS_SHOWN_PHP_MULTI_LOG_TYPES_NOTIFICATION,
+            true,
           );
-
-          // Only mark as shown if it was actually displayed (not blocked by cooldown)
-          if (wasShown) {
-            writeToGlobalState(
-              context,
-              GlobalStateKey.HAS_SHOWN_PHP_MULTI_LOG_TYPES_NOTIFICATION,
-              true,
-            );
-            disposable.dispose(); // Stop listening once notification shown
-          }
+          return true;
         }
-      } catch (error) {
-        console.error(
-          '[Turbo Console Log] Error detecting multi-type logs:',
-          error,
-        );
       }
-    },
-  );
 
-  // Add disposable to context so it's cleaned up on deactivation
-  context.subscriptions.push(disposable);
-}
+      return false;
+    } catch (error) {
+      console.error(
+        '[Turbo Console Log] Error detecting multi-type logs:',
+        error,
+      );
+      return false;
+    }
+  },
+};

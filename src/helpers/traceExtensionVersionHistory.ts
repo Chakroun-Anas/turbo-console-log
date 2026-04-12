@@ -106,7 +106,7 @@ export function traceExtensionVersionHistory(
 
   // Only show release notifications to existing users (not fresh installs)
   if (!isFreshInstall) {
-    showReleaseNotification(context, '3.20.0');
+    showReleaseNotification(context, '3.21.0');
   }
 
   // Report telemetry for fresh installs and updates (decoupled from notifications)

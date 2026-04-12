@@ -1,53 +1,60 @@
-import vscode from 'vscode';
+import type { Ignore } from 'ignore';
 import fs from 'fs';
 import path from 'path';
-import pLimit from 'p-limit';
+import vscode from 'vscode';
 import ignore from 'ignore';
-import type { Ignore } from 'ignore';
+import pLimit from 'p-limit';
+import fastGlob from 'fast-glob';
 
 export class GitIgnoreMatcher {
-  private matchers: Map<string, Ignore>; // Map of workspace root -> ignore matcher
+  private matchers: Map<string, Ignore>; // Map of directory path -> ignore matcher for that directory
+  private workspaceFolders: Array<{ uri: { fsPath: string } }>;
+  private pathToRootCache: Map<string, string>; // Cache for path -> workspace root mapping
 
   constructor() {
     this.matchers = new Map();
+    this.workspaceFolders = [];
+    this.pathToRootCache = new Map();
   }
 
   async init(): Promise<void> {
-    const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
+    this.workspaceFolders = [...(vscode.workspace.workspaceFolders ?? [])];
 
-    // Initialize a matcher for each workspace folder
-    for (const folder of workspaceFolders) {
-      this.matchers.set(folder.uri.fsPath, ignore());
-    }
+    const workspaceRoot = this.workspaceFolders[0]?.uri.fsPath;
+    if (!workspaceRoot) return;
 
-    const gitIgnores = await vscode.workspace.findFiles('**/.gitignore');
+    // Use fast-glob instead of vscode.workspace.findFiles to respect essential ignore patterns
+    const gitIgnorePaths = await fastGlob(['**/.gitignore'], {
+      cwd: workspaceRoot,
+      absolute: true,
+      ignore: ['**/node_modules/**'],
+    });
+
     const limit = pLimit(16);
-    const tasks = gitIgnores.map((uri) =>
-      limit(async () => {
-        // Find which workspace folder this .gitignore belongs to
-        const gitignorePath = uri.fsPath;
-        const workspaceFolder = workspaceFolders.find((folder) =>
-          gitignorePath.startsWith(folder.uri.fsPath),
-        );
 
-        if (!workspaceFolder) return;
+    const tasks = gitIgnorePaths.map((gitignorePath) =>
+      limit(() => {
+        try {
+          const gitignoreDir = path.dirname(gitignorePath);
 
-        const root = workspaceFolder.uri.fsPath;
-        const matcher = this.matchers.get(root);
-        if (!matcher) return;
+          // Read .gitignore content synchronously
+          const rulesContent = fs.readFileSync(gitignorePath, 'utf8');
 
-        const rulesContent = await fs.promises.readFile(uri.fsPath, 'utf8');
-        const folderOfGitignore = path.dirname(uri.fsPath);
-        const scopedRules = rulesContent
-          .split(/\r?\n/)
-          .map((line) => line.trim())
-          .filter((line) => line && !line.startsWith('#'))
-          .map((line) =>
-            path
-              .join(path.relative(root, folderOfGitignore), line)
-              .replace(/\\/g, '/'),
-          );
-        matcher.add(scopedRules);
+          // Parse rules (no path transformation - rules are relative to .gitignore location)
+          const rules = rulesContent
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter((line) => line && !line.startsWith('#'));
+
+          if (rules.length > 0) {
+            // Create a matcher for this directory
+            const matcher = ignore();
+            matcher.add(rules);
+            this.matchers.set(gitignoreDir, matcher);
+          }
+        } catch {
+          // Silently skip failed .gitignore files
+        }
       }),
     );
 
@@ -56,27 +63,49 @@ export class GitIgnoreMatcher {
 
   ignores(absolutePath: string): boolean {
     try {
-      const workspaceFolders = vscode.workspace.workspaceFolders ?? [];
+      // Fast path: check cache for parent directory's workspace root
+      const parentDir = path.dirname(absolutePath);
+      let root = this.pathToRootCache.get(parentDir);
 
-      // Find which workspace folder this path belongs to
-      const workspaceFolder = workspaceFolders.find((folder) =>
-        absolutePath.startsWith(folder.uri.fsPath),
-      );
+      if (!root) {
+        // Find which workspace folder this path belongs to
+        const workspaceFolder = this.workspaceFolders.find((folder) =>
+          absolutePath.startsWith(folder.uri.fsPath),
+        );
 
-      if (!workspaceFolder) return false;
+        if (!workspaceFolder) return false;
+        root = workspaceFolder.uri.fsPath;
 
-      const root = workspaceFolder.uri.fsPath;
-      const matcher = this.matchers.get(root);
-      if (!matcher) return false;
-
-      const relative = path.relative(root, absolutePath);
-
-      // If relative path is empty (checking workspace root itself) or just '.', never ignore
-      if (!relative || relative === '.') {
-        return false;
+        // Cache the parent directory -> root mapping
+        this.pathToRootCache.set(parentDir, root);
       }
 
-      return matcher.ignores(relative);
+      // Get all ancestor directories from file location up to workspace root
+      const ancestors: string[] = [];
+      let currentDir = parentDir;
+
+      while (currentDir.startsWith(root)) {
+        ancestors.push(currentDir);
+        if (currentDir === root) break;
+        currentDir = path.dirname(currentDir);
+      }
+
+      // Check matchers from root down to file (respecting Git precedence)
+      // Later .gitignore files (closer to file) can override earlier ones
+      for (const dir of ancestors.reverse()) {
+        const matcher = this.matchers.get(dir);
+        if (matcher) {
+          const relative = path.relative(dir, absolutePath);
+
+          // The ignore library handles negation patterns correctly
+          // So we check each matcher and let it modify the result
+          if (matcher.ignores(relative)) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     } catch (error) {
       console.error(
         `Failed to check if path should be ignored "${absolutePath}":`,

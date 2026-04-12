@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { listenToJSMultiLogTypes } from '@/helpers/listenToJSMultiLogTypes';
+import { jsMultiLogTypesHandler } from '@/helpers/listenToJSMultiLogTypes';
 import {
   readFromGlobalState,
   writeToGlobalState,
@@ -30,15 +30,12 @@ jest.mock('@/debug-message/js/JSDebugMessage/detectAll/detectAll', () => ({
 }));
 
 jest.mock('vscode', () => ({
-  window: {
-    onDidChangeActiveTextEditor: jest.fn(),
-  },
   workspace: {
     getConfiguration: jest.fn(),
   },
 }));
 
-describe('listenToJSMultiLogTypes', () => {
+describe('jsMultiLogTypesHandler', () => {
   const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
     typeof readFromGlobalState
   >;
@@ -58,10 +55,6 @@ describe('listenToJSMultiLogTypes', () => {
     >;
   const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
   const mockDetectAll = detectAll as jest.MockedFunction<typeof detectAll>;
-  const mockOnDidChangeActiveTextEditor = vscode.window
-    .onDidChangeActiveTextEditor as jest.MockedFunction<
-    typeof vscode.window.onDidChangeActiveTextEditor
-  >;
   const mockGetConfiguration = vscode.workspace
     .getConfiguration as jest.MockedFunction<
     typeof vscode.workspace.getConfiguration
@@ -85,51 +78,33 @@ describe('listenToJSMultiLogTypes', () => {
     } as unknown as ReturnType<typeof getExtensionProperties>);
   });
 
-  it('should not register listener for Pro users', () => {
+  it('should not register handler for Pro users', () => {
     mockIsProUser.mockReturnValue(true);
 
-    listenToJSMultiLogTypes(context, testVersion);
+    const result = jsMultiLogTypesHandler.shouldRegister(context);
 
-    expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should not register listener when notification already shown', () => {
+  it('should not register handler when notification already shown', () => {
     mockReadFromGlobalState.mockReturnValue(true);
 
-    listenToJSMultiLogTypes(context, testVersion);
+    const result = jsMultiLogTypesHandler.shouldRegister(context);
 
     expect(mockReadFromGlobalState).toHaveBeenCalledWith(
       context,
       GlobalStateKey.HAS_SHOWN_JS_MULTI_LOG_TYPES_NOTIFICATION,
     );
-    expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should register onDidChangeActiveTextEditor listener for free users who have not seen notification', () => {
-    const disposable = { dispose: jest.fn() };
-    mockOnDidChangeActiveTextEditor.mockReturnValue(
-      disposable as unknown as vscode.Disposable,
-    );
+  it('should register handler for free users who have not seen notification', () => {
+    const result = jsMultiLogTypesHandler.shouldRegister(context);
 
-    const pushSpy = jest.spyOn(context.subscriptions, 'push');
-
-    listenToJSMultiLogTypes(context, testVersion);
-
-    expect(mockOnDidChangeActiveTextEditor).toHaveBeenCalledWith(
-      expect.any(Function),
-    );
-    expect(pushSpy).toHaveBeenCalledWith(disposable);
+    expect(result).toBe(true);
   });
 
   it('should show notification when file has 2+ different log types', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.ts' },
@@ -143,9 +118,17 @@ describe('listenToJSMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(true);
 
-    listenToJSMultiLogTypes(context, testVersion);
+    const shouldProcess = jsMultiLogTypesHandler.shouldProcess(
+      mockEditor,
+      context,
+    );
+    expect(shouldProcess).toBe(true);
 
-    await editorCallback!(mockEditor);
+    const result = await jsMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockIsJavaScriptOrTypeScriptFile).toHaveBeenCalledWith(
       mockEditor.document,
@@ -156,17 +139,10 @@ describe('listenToJSMultiLogTypes', () => {
       testVersion,
       context,
     );
+    expect(result).toBe(true);
   });
 
-  it('should dispose listener after successfully showing notification', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
+  it('should mark notification as shown after successfully displaying it', async () => {
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.ts' },
@@ -180,27 +156,16 @@ describe('listenToJSMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(true);
 
-    listenToJSMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
+    await jsMultiLogTypesHandler.process(mockEditor, context, testVersion);
 
     expect(mockWriteToGlobalState).toHaveBeenCalledWith(
       context,
       GlobalStateKey.HAS_SHOWN_JS_MULTI_LOG_TYPES_NOTIFICATION,
       true,
     );
-    expect(disposable.dispose).toHaveBeenCalled();
   });
 
   it('should not show notification when file has only 1 log type', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.ts' },
@@ -214,23 +179,18 @@ describe('listenToJSMultiLogTypes', () => {
       { spaces: '', lines: [], logFunction: 'console.log' },
     ]);
 
-    listenToJSMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
+    const result = await jsMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockShowNotification).not.toHaveBeenCalled();
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
   it('should detect 3 different log types', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.ts' },
@@ -246,22 +206,17 @@ describe('listenToJSMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(true);
 
-    listenToJSMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
+    const result = await jsMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockShowNotification).toHaveBeenCalled();
+    expect(result).toBe(true);
   });
 
-  it('should not show notification when non-JS/TS file is opened', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
+  it('should not process when non-JS/TS file is opened', () => {
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.py' },
@@ -270,39 +225,12 @@ describe('listenToJSMultiLogTypes', () => {
 
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(false);
 
-    listenToJSMultiLogTypes(context, testVersion);
+    const result = jsMultiLogTypesHandler.shouldProcess(mockEditor, context);
 
-    await editorCallback!(mockEditor);
-
-    expect(mockDetectAll).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should not show notification when editor is undefined', async () => {
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return { dispose: jest.fn() } as unknown as vscode.Disposable;
-    });
-
-    listenToJSMultiLogTypes(context, testVersion);
-
-    await editorCallback!(undefined);
-
-    expect(mockIsJavaScriptOrTypeScriptFile).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
-  });
-
-  it('should not show notification when file path is undefined', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
+  it('should not process when file path is undefined', () => {
     const mockEditor = {
       document: {
         uri: { fsPath: '' },
@@ -311,38 +239,15 @@ describe('listenToJSMultiLogTypes', () => {
 
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
 
-    listenToJSMultiLogTypes(context, testVersion);
+    const result = jsMultiLogTypesHandler.shouldProcess(mockEditor, context);
 
-    await editorCallback!(mockEditor);
-
-    expect(mockDetectAll).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
-  });
-
-  it('should add disposable to context subscriptions', () => {
-    const disposable = { dispose: jest.fn() };
-    mockOnDidChangeActiveTextEditor.mockReturnValue(
-      disposable as unknown as vscode.Disposable,
-    );
-
-    const pushSpy = jest.spyOn(context.subscriptions, 'push');
-
-    listenToJSMultiLogTypes(context, testVersion);
-
-    expect(pushSpy).toHaveBeenCalledWith(disposable);
+    expect(result).toBe(false);
   });
 
   it('should handle detectAll errors gracefully', async () => {
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
 
     const mockEditor = {
       document: {
@@ -353,63 +258,23 @@ describe('listenToJSMultiLogTypes', () => {
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     mockDetectAll.mockRejectedValue(new Error('Detection failed'));
 
-    listenToJSMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
+    const result = await jsMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       '[Turbo Console Log] Error detecting multi-type logs:',
       expect.any(Error),
     );
     expect(mockShowNotification).not.toHaveBeenCalled();
+    expect(result).toBe(false);
 
     consoleErrorSpy.mockRestore();
   });
 
-  it('should stop listening after notification is shown (disposal prevents further calls)', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '/path/to/file.ts' },
-      },
-    } as vscode.TextEditor;
-
-    mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
-    mockDetectAll.mockResolvedValue([
-      { spaces: '', lines: [], logFunction: 'console.log' },
-      { spaces: '', lines: [], logFunction: 'console.error' },
-    ]);
-    mockShowNotification.mockResolvedValue(true);
-
-    listenToJSMultiLogTypes(context, testVersion);
-
-    // First call - should show notification
-    await editorCallback!(mockEditor);
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(disposable.dispose).toHaveBeenCalledTimes(1);
-
-    // Second call - should not show notification (disposable already disposed)
-    mockShowNotification.mockClear();
-    await editorCallback!(mockEditor);
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
-  });
-
-  it('should not mark as shown or dispose when notification is blocked by cooldown', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
+  it('should not mark as shown when notification is blocked by cooldown', async () => {
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.ts' },
@@ -423,23 +288,17 @@ describe('listenToJSMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(false); // Cooldown blocked
 
-    listenToJSMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
+    const result = await jsMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    expect(disposable.dispose).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
   it('should handle messages without logFunction property', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
     const mockEditor = {
       document: {
         uri: { fsPath: '/path/to/file.ts' },
@@ -454,11 +313,14 @@ describe('listenToJSMultiLogTypes', () => {
     ]);
     mockShowNotification.mockResolvedValue(true);
 
-    listenToJSMultiLogTypes(context, testVersion);
-
-    await editorCallback!(mockEditor);
+    const result = await jsMultiLogTypesHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     // Should still detect 2 types and show notification
     expect(mockShowNotification).toHaveBeenCalled();
+    expect(result).toBe(true);
   });
 });

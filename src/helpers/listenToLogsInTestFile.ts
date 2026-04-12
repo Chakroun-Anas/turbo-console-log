@@ -11,6 +11,7 @@ import { GlobalStateKey } from '@/entities';
 import { detectAll } from '@/debug-message/js/JSDebugMessage/detectAll/detectAll';
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
+import { NotificationEventHandler } from './notificationEventHandler';
 
 /**
  * Minimum number of logs in a test file to trigger notification
@@ -38,98 +39,82 @@ function isTestFile(filePath: string): boolean {
 }
 
 /**
- * Listens to document openings and detects logs in test files
- * Shows notification when user opens a test file with 3+ logs
- * One-time notification per user (global state guard)
- *
- * @param context VS Code extension context
- * @param version Extension version
+ * Notification handler for Logs In Test File detection
+ * Detects test files with 3+ logs
  */
-export function listenToLogsInTestFile(
-  context: vscode.ExtensionContext,
-  version: string,
-): void {
-  // Skip for Pro users
-  if (isProUser(context)) {
-    return;
-  }
+export const logsInTestFileHandler: NotificationEventHandler = {
+  id: 'logsInTestFile',
 
-  // Check if notification has already been shown
-  const hasShownNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_LOGS_IN_TEST_FILE_NOTIFICATION,
-  );
-  if (hasShownNotification) {
-    return;
-  }
+  shouldRegister: (context: vscode.ExtensionContext): boolean => {
+    if (isProUser(context)) {
+      return false;
+    }
 
-  // Get extension properties for log detection config
-  const config: vscode.WorkspaceConfiguration =
-    vscode.workspace.getConfiguration('turboConsoleLog');
-  const extensionProperties = getExtensionProperties(config);
+    const hasShownNotification = readFromGlobalState<boolean>(
+      context,
+      GlobalStateKey.HAS_SHOWN_LOGS_IN_TEST_FILE_NOTIFICATION,
+    );
 
-  // Listen to active text editor changes
-  const disposable = vscode.window.onDidChangeActiveTextEditor(
-    async (editor) => {
-      if (!editor) {
-        return;
-      }
+    return !hasShownNotification;
+  },
 
-      const document = editor.document;
+  shouldProcess: (editor: vscode.TextEditor): boolean => {
+    const document = editor.document;
 
-      // Check if it's a JS/TS file
-      if (!isJavaScriptOrTypeScriptFile(document)) {
-        return;
-      }
+    if (!isJavaScriptOrTypeScriptFile(document)) {
+      return false;
+    }
 
-      // Get file path
-      const filePath = document.uri.fsPath;
-      if (!filePath) {
-        return;
-      }
+    const filePath = document.uri.fsPath;
+    if (!filePath) {
+      return false;
+    }
 
-      // Check if it's a test file
-      if (!isTestFile(filePath)) {
-        return;
-      }
+    return isTestFile(filePath);
+  },
 
-      try {
-        // Detect all logs in the test file
-        const messages = await detectAll(
-          fs,
-          vscode,
-          filePath,
-          extensionProperties.logFunction,
-          extensionProperties.logMessagePrefix,
-          extensionProperties.delimiterInsideMessage,
+  process: async (
+    editor: vscode.TextEditor,
+    context: vscode.ExtensionContext,
+    version: string,
+  ): Promise<boolean> => {
+    const filePath = editor.document.uri.fsPath;
+
+    try {
+      const config: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration('turboConsoleLog');
+      const extensionProperties = getExtensionProperties(config);
+
+      const messages = await detectAll(
+        fs,
+        vscode,
+        filePath,
+        extensionProperties.logFunction,
+        extensionProperties.logMessagePrefix,
+        extensionProperties.delimiterInsideMessage,
+      );
+
+      if (messages.length >= TEST_FILE_LOG_THRESHOLD) {
+        const wasShown = await showNotification(
+          NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE,
+          version,
+          context,
         );
 
-        // Check if test file has enough logs to trigger notification
-        if (messages.length >= TEST_FILE_LOG_THRESHOLD) {
-          // Show notification
-          const wasShown = await showNotification(
-            NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE,
-            version,
+        if (wasShown) {
+          writeToGlobalState(
             context,
+            GlobalStateKey.HAS_SHOWN_LOGS_IN_TEST_FILE_NOTIFICATION,
+            true,
           );
-
-          // Only mark as shown if it was actually displayed
-          if (wasShown) {
-            writeToGlobalState(
-              context,
-              GlobalStateKey.HAS_SHOWN_LOGS_IN_TEST_FILE_NOTIFICATION,
-              true,
-            );
-            // Stop listening - notification shown
-            disposable.dispose();
-          }
+          return true;
         }
-      } catch (error) {
-        // Silently fail - don't disrupt user experience
-        console.error('Error detecting logs in test file:', error);
       }
-    },
-  );
 
-  context.subscriptions.push(disposable);
-}
+      return false;
+    } catch (error) {
+      console.error('Error detecting logs in test file:', error);
+      return false;
+    }
+  },
+};

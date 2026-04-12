@@ -1,9 +1,9 @@
-import { TextDocument } from 'vscode';
+import type { TurboTextDocument } from '../debug-message/js/JSDebugMessage/detectAll/TurboTextDocument';
 import { BracketType } from '../entities';
 import { locBrackets } from './locBrackets';
 
 export function closingContextLine(
-  document: TextDocument,
+  document: TurboTextDocument,
   declarationLine: number,
   bracketType: BracketType,
 ): number {

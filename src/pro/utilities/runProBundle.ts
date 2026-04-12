@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import fs from 'fs';
 import path from 'path';
 import ignore from 'ignore';
-import os from 'os';
+import fastGlob from 'fast-glob';
 import pLimit from 'p-limit';
 import { ExtensionProperties } from '../../entities';
 import { activateProMode, deactivateRepairMode } from '../../helpers';
@@ -23,7 +23,7 @@ export async function runProBundle(
     'fs',
     'path',
     'ignore',
-    'os',
+    'fastGlob',
     'pLimit',
     'detectAll',
     proBundle,
@@ -36,7 +36,7 @@ export async function runProBundle(
     fs,
     path,
     ignore,
-    os,
+    fastGlob,
     pLimit,
     detectAll,
   );

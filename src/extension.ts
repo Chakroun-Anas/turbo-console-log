@@ -9,23 +9,9 @@ import {
   activateRepairMode,
   activateFreemiumLauncherMode,
   traceExtensionVersionHistory,
-  listenToPhpFileOpenings,
   updateUserActivityStatus,
-  listenToManualConsoleLogs,
-  listenToInactiveTwoWeeksReturn,
-  listenToActivityDrop,
-  listenToActivationDayThree,
-  listenToActivationDaySeven,
-  listenToJSMessyFileDetection,
-  listenToPhpMessyFileDetection,
-  listenToJSMultiLogTypes,
-  listenToPhpMultiLogTypes,
-  listenToWeekendTurboSundays,
-  listenToCommitWithLogs,
-  listenToCustomLogLibrary,
-  listenToLogLibraryInstalled,
-  listenToLogsInTestFile,
   initialWorkspaceLogsCount,
+  setupNotificationListeners,
 } from './helpers';
 import { isTestMode } from './runTime';
 import {
@@ -124,56 +110,17 @@ export async function activate(
   // (creates or updates version array in global state + shows welcome for new users)
   traceExtensionVersionHistory(context, version);
 
-  // Listen to PHP file openings and show announcement immediately (v3.10.0 strategy)
-  listenToPhpFileOpenings(context, version);
-
-  // Listen to manual console.log typing for INACTIVE users (re-engagement strategy)
-  listenToManualConsoleLogs(context);
-
-  // Listen to JS/TS file openings for inactive users (14-28 days)
-  listenToInactiveTwoWeeksReturn(context, version);
-
-  // Listen to JS/TS file openings for drifting users (4-6 days before inactivity)
-  listenToActivityDrop(context, version);
-
-  // Listen to JS/TS file openings for new users with zero usage (3-7 days activation nudge)
-  listenToActivationDayThree(context, version);
-
-  // Listen to JS/TS file openings for new users with zero usage (7-14 days final activation attempt)
-  listenToActivationDaySeven(context, version);
-
-  // Listen to JS/TS messy file detection and show notification
-  listenToJSMessyFileDetection(context, version);
-
-  // Listen to PHP messy file detection and show notification
-  listenToPhpMessyFileDetection(context, version);
-
-  // Listen to JS/TS multi-log-type detection and show notification
-  listenToJSMultiLogTypes(context, version);
-
-  // Listen to PHP multi-log-type detection and show notification
-  listenToPhpMultiLogTypes(context, version);
-
-  // Listen to Git commits with logs and show notification
-  listenToCommitWithLogs(context, version);
-
-  // Listen to custom logging library usage and show notification
-  listenToCustomLogLibrary(context, version);
-
-  // Listen to logging library installation and show notification
-  listenToLogLibraryInstalled(context, version);
-
-  // Listen to logs in test files and show notification
-  listenToLogsInTestFile(context, version);
-
-  // Show weekend Turbo Sundays article notification (if it's weekend)
-  listenToWeekendTurboSundays(context, version);
-
-  // Handle Pro user logic
+  // Check Pro user status early to optimize notification setup
   const proLicenseKey = readFromGlobalState<string>(context, 'license-key');
   const proBundle = readFromGlobalState<string>(context, 'pro-bundle');
   const proBundleVersion = readFromGlobalState<string>(context, 'version');
   const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
+
+  // Sets up all notification event listeners (file opening + other triggers)
+  // Skipped entirely for Pro users since they don't see marketing notifications
+  if (!isProUser) {
+    setupNotificationListeners(context, version);
+  }
 
   if (!isTestMode() && isProUser) {
     if (

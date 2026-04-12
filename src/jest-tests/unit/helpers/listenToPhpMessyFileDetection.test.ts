@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { listenToPhpMessyFileDetection } from '@/helpers/listenToPhpMessyFileDetection';
+import { phpMessyFileHandler } from '@/helpers/listenToPhpMessyFileDetection';
 import {
   readFromGlobalState,
   writeToGlobalState,
@@ -30,15 +30,12 @@ jest.mock('@/debug-message/php/detectAll', () => ({
 }));
 
 jest.mock('vscode', () => ({
-  window: {
-    onDidChangeActiveTextEditor: jest.fn(),
-  },
   workspace: {
     getConfiguration: jest.fn(),
   },
 }));
 
-describe('listenToPhpMessyFileDetection', () => {
+describe('phpMessyFileHandler', () => {
   const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
     typeof readFromGlobalState
   >;
@@ -55,10 +52,6 @@ describe('listenToPhpMessyFileDetection', () => {
     >;
   const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
   const mockDetectAll = detectAll as jest.MockedFunction<typeof detectAll>;
-  const mockOnDidChangeActiveTextEditor = vscode.window
-    .onDidChangeActiveTextEditor as jest.MockedFunction<
-    typeof vscode.window.onDidChangeActiveTextEditor
-  >;
   const mockGetConfiguration = vscode.workspace
     .getConfiguration as jest.MockedFunction<
     typeof vscode.workspace.getConfiguration
@@ -82,66 +75,55 @@ describe('listenToPhpMessyFileDetection', () => {
     } as unknown as ReturnType<typeof getExtensionProperties>);
   });
 
-  it('should not register listener for Pro users', () => {
+  it('should not register handler for Pro users', () => {
     mockIsProUser.mockReturnValue(true);
 
-    listenToPhpMessyFileDetection(context, testVersion);
+    const result = phpMessyFileHandler.shouldRegister(context);
 
-    expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should not register listener when notification already shown', () => {
+  it('should not register handler when notification already shown', () => {
     mockReadFromGlobalState.mockReturnValue(true);
 
-    listenToPhpMessyFileDetection(context, testVersion);
+    const result = phpMessyFileHandler.shouldRegister(context);
 
     expect(mockReadFromGlobalState).toHaveBeenCalledWith(
       context,
       GlobalStateKey.HAS_SHOWN_PHP_MESSY_FILE_NOTIFICATION,
     );
-    expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should register onDidChangeActiveTextEditor listener for free users who have not seen notification', () => {
-    const disposable = { dispose: jest.fn() };
-    mockOnDidChangeActiveTextEditor.mockReturnValue(
-      disposable as unknown as vscode.Disposable,
-    );
+  it('should register handler for free users who have not seen notification', () => {
+    const result = phpMessyFileHandler.shouldRegister(context);
 
-    const pushSpy = jest.spyOn(context.subscriptions, 'push');
-
-    listenToPhpMessyFileDetection(context, testVersion);
-
-    expect(mockOnDidChangeActiveTextEditor).toHaveBeenCalledWith(
-      expect.any(Function),
-    );
-    expect(pushSpy).toHaveBeenCalledWith(disposable);
+    expect(result).toBe(true);
   });
 
   it('should show notification when messy PHP file is opened (10+ logs)', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '/path/to/file.php' },
-      },
-    } as vscode.TextEditor;
-
     mockIsPhpFile.mockReturnValue(true);
     mockDetectAll.mockResolvedValue(new Array(10).fill({})); // 10 logs
     mockShowNotification.mockResolvedValue(true);
 
-    listenToPhpMessyFileDetection(context, testVersion);
+    const mockDocument = {
+      uri: { fsPath: '/path/to/file.php' },
+    } as vscode.TextDocument;
+    const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    await editorCallback!(mockEditor);
+    const shouldProcess = phpMessyFileHandler.shouldProcess(
+      mockEditor,
+      context,
+    );
+    expect(shouldProcess).toBe(true);
 
-    expect(mockIsPhpFile).toHaveBeenCalledWith(mockEditor.document);
+    const result = await phpMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
+
+    expect(mockIsPhpFile).toHaveBeenCalledWith(mockDocument);
     expect(mockDetectAll).toHaveBeenCalledWith(
       '/path/to/file.php',
       'error_log',
@@ -153,234 +135,159 @@ describe('listenToPhpMessyFileDetection', () => {
       testVersion,
       context,
     );
-  });
-
-  it('should dispose listener after successfully showing notification', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '/path/to/file.php' },
-      },
-    } as vscode.TextEditor;
-
-    mockIsPhpFile.mockReturnValue(true);
-    mockDetectAll.mockResolvedValue(new Array(10).fill({})); // 10 logs
-    mockShowNotification.mockResolvedValue(true);
-
-    listenToPhpMessyFileDetection(context, testVersion);
-
-    await editorCallback!(mockEditor);
-
     expect(mockWriteToGlobalState).toHaveBeenCalledWith(
       context,
       GlobalStateKey.HAS_SHOWN_PHP_MESSY_FILE_NOTIFICATION,
       true,
     );
-    expect(disposable.dispose).toHaveBeenCalled();
+    expect(result).toBe(true);
+  });
+
+  it('should return true when successfully showing notification', async () => {
+    mockIsPhpFile.mockReturnValue(true);
+    mockDetectAll.mockResolvedValue(new Array(15).fill({})); // 15 logs
+    mockShowNotification.mockResolvedValue(true);
+
+    const mockDocument = {
+      uri: { fsPath: '/path/to/file.php' },
+    } as vscode.TextDocument;
+    const mockEditor = { document: mockDocument } as vscode.TextEditor;
+
+    const result = await phpMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
+
+    expect(result).toBe(true);
   });
 
   it('should not show notification when file has fewer than 10 logs', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '/path/to/file.php' },
-      },
-    } as vscode.TextEditor;
-
     mockIsPhpFile.mockReturnValue(true);
     mockDetectAll.mockResolvedValue(new Array(9).fill({})); // 9 logs
 
-    listenToPhpMessyFileDetection(context, testVersion);
+    const mockDocument = {
+      uri: { fsPath: '/path/to/file.php' },
+    } as vscode.TextDocument;
+    const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    await editorCallback!(mockEditor);
-
-    expect(mockShowNotification).not.toHaveBeenCalled();
-    expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-  });
-
-  it('should not show notification when non-PHP file is opened', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '/path/to/file.js' },
-      },
-    } as vscode.TextEditor;
-
-    mockIsPhpFile.mockReturnValue(false);
-
-    listenToPhpMessyFileDetection(context, testVersion);
-
-    await editorCallback!(mockEditor);
-
-    expect(mockDetectAll).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
-  });
-
-  it('should not show notification when editor is undefined', async () => {
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return { dispose: jest.fn() } as unknown as vscode.Disposable;
-    });
-
-    listenToPhpMessyFileDetection(context, testVersion);
-
-    await editorCallback!(undefined);
-
-    expect(mockIsPhpFile).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
-  });
-
-  it('should not show notification when file path is undefined', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '' },
-      },
-    } as vscode.TextEditor;
-
-    mockIsPhpFile.mockReturnValue(true);
-
-    listenToPhpMessyFileDetection(context, testVersion);
-
-    await editorCallback!(mockEditor);
-
-    expect(mockDetectAll).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
-  });
-
-  it('should add disposable to context subscriptions', () => {
-    const disposable = { dispose: jest.fn() };
-    mockOnDidChangeActiveTextEditor.mockReturnValue(
-      disposable as unknown as vscode.Disposable,
+    const result = await phpMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
     );
 
-    const pushSpy = jest.spyOn(context.subscriptions, 'push');
+    expect(mockDetectAll).toHaveBeenCalled();
+    expect(mockShowNotification).not.toHaveBeenCalled();
+    expect(mockWriteToGlobalState).not.toHaveBeenCalled();
+    expect(result).toBe(false);
+  });
 
-    listenToPhpMessyFileDetection(context, testVersion);
+  it('should not process when non-PHP file is opened', () => {
+    mockIsPhpFile.mockReturnValue(false); // Not a PHP file
 
-    expect(pushSpy).toHaveBeenCalledWith(disposable);
+    const mockDocument = {
+      uri: { fsPath: '/path/to/file.js' },
+    } as vscode.TextDocument;
+    const mockEditor = { document: mockDocument } as vscode.TextEditor;
+
+    const shouldProcess = phpMessyFileHandler.shouldProcess(
+      mockEditor,
+      context,
+    );
+
+    expect(shouldProcess).toBe(false);
+    expect(mockIsPhpFile).toHaveBeenCalledWith(mockDocument);
+  });
+
+  it('should not process when file path is undefined', async () => {
+    mockIsPhpFile.mockReturnValue(true);
+
+    const mockDocument = {
+      uri: { fsPath: '' }, // Empty path
+    } as vscode.TextDocument;
+    const mockEditor = { document: mockDocument } as vscode.TextEditor;
+
+    const shouldProcess = phpMessyFileHandler.shouldProcess(
+      mockEditor,
+      context,
+    );
+
+    expect(shouldProcess).toBe(false);
+    expect(mockDetectAll).not.toHaveBeenCalled();
+    expect(mockShowNotification).not.toHaveBeenCalled();
+  });
+
+  it('should have a unique handler id', () => {
+    expect(phpMessyFileHandler.id).toBe('phpMessyFile');
   });
 
   it('should handle detectAll errors gracefully', async () => {
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '/path/to/file.php' },
-      },
-    } as vscode.TextEditor;
-
     mockIsPhpFile.mockReturnValue(true);
     mockDetectAll.mockRejectedValue(new Error('Detection failed'));
 
-    listenToPhpMessyFileDetection(context, testVersion);
+    const mockDocument = {
+      uri: { fsPath: '/path/to/file.php' },
+    } as vscode.TextDocument;
+    const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    await editorCallback!(mockEditor);
+    const result = await phpMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'Failed to detect logs in PHP file "/path/to/file.php":',
       'Detection failed',
     );
     expect(mockShowNotification).not.toHaveBeenCalled();
+    expect(result).toBe(false);
 
     consoleErrorSpy.mockRestore();
   });
 
-  it('should stop listening after notification is shown (disposal prevents further calls)', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '/path/to/file.php' },
-      },
-    } as vscode.TextEditor;
-
+  it('should successfully process and show notification', async () => {
     mockIsPhpFile.mockReturnValue(true);
-    mockDetectAll.mockResolvedValue(new Array(10).fill({})); // 10 logs
+    mockDetectAll.mockResolvedValue(new Array(12).fill({})); // 12 logs
     mockShowNotification.mockResolvedValue(true);
 
-    listenToPhpMessyFileDetection(context, testVersion);
+    const mockDocument = {
+      uri: { fsPath: '/path/to/file1.php' },
+    } as vscode.TextDocument;
+    const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    // First call - should show notification
-    await editorCallback!(mockEditor);
+    const result = await phpMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
+
     expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(disposable.dispose).toHaveBeenCalledTimes(1);
-
-    // Second call - should not show notification (disposable already disposed)
-    mockShowNotification.mockClear();
-    await editorCallback!(mockEditor);
-    expect(mockShowNotification).toHaveBeenCalledTimes(1); // Called again, but disposable prevents re-registration
+    expect(result).toBe(true);
   });
 
-  it('should not mark as shown or dispose when notification is blocked by cooldown', async () => {
-    const disposable = { dispose: jest.fn() };
-    let editorCallback: (editor: vscode.TextEditor | undefined) => void;
-
-    mockOnDidChangeActiveTextEditor.mockImplementation((callback) => {
-      editorCallback = callback;
-      return disposable as unknown as vscode.Disposable;
-    });
-
-    const mockEditor = {
-      document: {
-        uri: { fsPath: '/path/to/file.php' },
-      },
-    } as vscode.TextEditor;
-
+  it('should not mark as shown when notification is blocked by cooldown', async () => {
     mockIsPhpFile.mockReturnValue(true);
     mockDetectAll.mockResolvedValue(new Array(10).fill({})); // 10 logs
-    mockShowNotification.mockResolvedValue(false); // Cooldown blocked
+    mockShowNotification.mockResolvedValue(false); // Blocked by cooldown
 
-    listenToPhpMessyFileDetection(context, testVersion);
+    const mockDocument = {
+      uri: { fsPath: '/path/to/file.php' },
+    } as vscode.TextDocument;
+    const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    await editorCallback!(mockEditor);
+    const result = await phpMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
+    expect(mockShowNotification).toHaveBeenCalled();
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    expect(disposable.dispose).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 });

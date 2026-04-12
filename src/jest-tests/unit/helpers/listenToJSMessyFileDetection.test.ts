@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { listenToJSMessyFileDetection } from '@/helpers/listenToJSMessyFileDetection';
+import { jsMessyFileHandler } from '@/helpers/listenToJSMessyFileDetection';
 import {
   readFromGlobalState,
   writeToGlobalState,
@@ -30,15 +30,12 @@ jest.mock('@/debug-message/js/JSDebugMessage/detectAll/detectAll', () => ({
 }));
 
 jest.mock('vscode', () => ({
-  window: {
-    onDidChangeActiveTextEditor: jest.fn(),
-  },
   workspace: {
     getConfiguration: jest.fn(),
   },
 }));
 
-describe('listenToJSMessyFileDetection', () => {
+describe('jsMessyFileHandler', () => {
   const mockReadFromGlobalState = readFromGlobalState as jest.MockedFunction<
     typeof readFromGlobalState
   >;
@@ -58,85 +55,56 @@ describe('listenToJSMessyFileDetection', () => {
     >;
   const mockIsProUser = isProUser as jest.MockedFunction<typeof isProUser>;
   const mockDetectAll = detectAll as jest.MockedFunction<typeof detectAll>;
+  const mockGetConfiguration = vscode.workspace
+    .getConfiguration as jest.MockedFunction<
+    typeof vscode.workspace.getConfiguration
+  >;
 
-  let mockOnDidChangeActiveTextEditor: jest.Mock;
-  let mockDisposable: { dispose: jest.Mock };
-  let editorChangeCallback: (editor?: vscode.TextEditor) => Promise<void>;
+  let context: vscode.ExtensionContext;
   const testVersion = '3.14.1';
 
   beforeEach(() => {
     jest.clearAllMocks();
+    context = makeExtensionContext();
 
-    // Mock disposable with spy
-    mockDisposable = { dispose: jest.fn() };
-
-    // Mock vscode.window.onDidChangeActiveTextEditor
-    mockOnDidChangeActiveTextEditor = jest.fn((callback) => {
-      editorChangeCallback = callback;
-      return mockDisposable;
-    });
-    (vscode.window.onDidChangeActiveTextEditor as jest.Mock) =
-      mockOnDidChangeActiveTextEditor;
-
-    // Mock workspace configuration
-    (vscode.workspace.getConfiguration as jest.Mock).mockReturnValue({});
+    // Default mocks
+    mockIsProUser.mockReturnValue(false);
+    mockReadFromGlobalState.mockReturnValue(false);
+    mockGetConfiguration.mockReturnValue({} as vscode.WorkspaceConfiguration);
     mockGetExtensionProperties.mockReturnValue({
       logFunction: 'console.log',
       logMessagePrefix: '🚀',
       delimiterInsideMessage: '~',
     } as unknown as ReturnType<typeof getExtensionProperties>);
-
-    // Default: free user, notification not shown yet
-    mockIsProUser.mockReturnValue(false);
-    mockReadFromGlobalState.mockReturnValue(false);
   });
 
-  it('should not register listener for Pro users', () => {
-    const context = makeExtensionContext();
+  it('should not register handler for Pro users', () => {
     mockIsProUser.mockReturnValue(true);
 
-    listenToJSMessyFileDetection(context, testVersion);
+    const result = jsMessyFileHandler.shouldRegister(context);
 
-    expect(mockIsProUser).toHaveBeenCalledWith(context);
-    expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should not register listener when notification already shown', () => {
-    const context = makeExtensionContext();
-    mockIsProUser.mockReturnValue(false);
-    mockReadFromGlobalState.mockReturnValue(true); // Already shown
+  it('should not register handler when notification already shown', () => {
+    mockReadFromGlobalState.mockReturnValue(true);
 
-    listenToJSMessyFileDetection(context, testVersion);
+    const result = jsMessyFileHandler.shouldRegister(context);
 
-    expect(mockIsProUser).toHaveBeenCalledWith(context);
     expect(mockReadFromGlobalState).toHaveBeenCalledWith(
       context,
       GlobalStateKey.HAS_SHOWN_JS_MESSY_FILE_NOTIFICATION,
     );
-    expect(mockOnDidChangeActiveTextEditor).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should register onDidChangeActiveTextEditor listener for free users who have not seen notification', () => {
-    const context = makeExtensionContext();
-    mockIsProUser.mockReturnValue(false);
-    mockReadFromGlobalState.mockReturnValue(false); // Not shown yet
+  it('should register handler for free users who have not seen notification', () => {
+    const result = jsMessyFileHandler.shouldRegister(context);
 
-    listenToJSMessyFileDetection(context, testVersion);
-
-    expect(mockIsProUser).toHaveBeenCalledWith(context);
-    expect(mockReadFromGlobalState).toHaveBeenCalledWith(
-      context,
-      GlobalStateKey.HAS_SHOWN_JS_MESSY_FILE_NOTIFICATION,
-    );
-    expect(mockOnDidChangeActiveTextEditor).toHaveBeenCalledTimes(1);
-    expect(mockOnDidChangeActiveTextEditor).toHaveBeenCalledWith(
-      expect.any(Function),
-    );
+    expect(result).toBe(true);
   });
 
   it('should show notification when messy JS/TS file is opened (10+ logs)', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     mockDetectAll.mockResolvedValue(
       Array(15).fill({ spaces: 2, lines: [] }), // 15 logs
@@ -149,10 +117,14 @@ describe('listenToJSMessyFileDetection', () => {
     } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToJSMessyFileDetection(context, testVersion);
+    const shouldProcess = jsMessyFileHandler.shouldProcess(mockEditor, context);
+    expect(shouldProcess).toBe(true);
 
-    // Simulate user opening a messy file
-    await editorChangeCallback(mockEditor);
+    const result = await jsMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockIsJavaScriptOrTypeScriptFile).toHaveBeenCalledWith(mockDocument);
     expect(mockDetectAll).toHaveBeenCalledWith(
@@ -173,11 +145,10 @@ describe('listenToJSMessyFileDetection', () => {
       GlobalStateKey.HAS_SHOWN_JS_MESSY_FILE_NOTIFICATION,
       true,
     );
+    expect(result).toBe(true);
   });
 
-  it('should dispose listener after successfully showing notification', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
+  it('should return true when successfully showing notification', async () => {
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     mockDetectAll.mockResolvedValue(Array(10).fill({ spaces: 2, lines: [] }));
     mockShowNotification.mockResolvedValue(true);
@@ -187,16 +158,16 @@ describe('listenToJSMessyFileDetection', () => {
     } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToJSMessyFileDetection(context, testVersion);
+    const result = await jsMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
-    await editorChangeCallback(mockEditor);
-
-    expect(mockDisposable.dispose).toHaveBeenCalledTimes(1);
+    expect(result).toBe(true);
   });
 
   it('should not show notification when file has fewer than 10 logs', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     mockDetectAll.mockResolvedValue(
       Array(5).fill({ spaces: 2, lines: [] }), // Only 5 logs
@@ -207,18 +178,19 @@ describe('listenToJSMessyFileDetection', () => {
     } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToJSMessyFileDetection(context, testVersion);
-
-    await editorChangeCallback(mockEditor);
+    const result = await jsMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockDetectAll).toHaveBeenCalled();
     expect(mockShowNotification).not.toHaveBeenCalled();
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
-  it('should not show notification when non-JS/TS file is opened', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
+  it('should not process when non-JS/TS file is opened', () => {
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(false); // Not a JS/TS file
 
     const mockDocument = {
@@ -227,33 +199,13 @@ describe('listenToJSMessyFileDetection', () => {
     } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToJSMessyFileDetection(context, testVersion);
+    const shouldProcess = jsMessyFileHandler.shouldProcess(mockEditor, context);
 
-    await editorChangeCallback(mockEditor);
-
+    expect(shouldProcess).toBe(false);
     expect(mockIsJavaScriptOrTypeScriptFile).toHaveBeenCalledWith(mockDocument);
-    expect(mockDetectAll).not.toHaveBeenCalled();
-    expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
   });
 
-  it('should not show notification when editor is undefined', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
-
-    listenToJSMessyFileDetection(context, testVersion);
-
-    await editorChangeCallback(undefined);
-
-    expect(mockIsJavaScriptOrTypeScriptFile).not.toHaveBeenCalled();
-    expect(mockDetectAll).not.toHaveBeenCalled();
-    expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    expect(mockShowNotification).not.toHaveBeenCalled();
-  });
-
-  it('should not show notification when file path is undefined', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
+  it('should not process when file path is undefined', async () => {
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
 
     const mockDocument = {
@@ -261,29 +213,21 @@ describe('listenToJSMessyFileDetection', () => {
     } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToJSMessyFileDetection(context, testVersion);
+    const shouldProcess = jsMessyFileHandler.shouldProcess(mockEditor, context);
 
-    await editorChangeCallback(mockEditor);
-
+    expect(shouldProcess).toBe(false);
     expect(mockDetectAll).not.toHaveBeenCalled();
     expect(mockShowNotification).not.toHaveBeenCalled();
   });
 
-  it('should add disposable to context subscriptions', () => {
-    const context = makeExtensionContext();
-    const pushSpy = jest.spyOn(context.subscriptions, 'push');
-
-    listenToJSMessyFileDetection(context, testVersion);
-
-    expect(pushSpy).toHaveBeenCalledWith(mockDisposable);
+  it('should have a unique handler id', () => {
+    expect(jsMessyFileHandler.id).toBe('jsMessyFile');
   });
 
   it('should handle detectAll errors gracefully', async () => {
-    const context = makeExtensionContext();
     const consoleErrorSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});
-    mockReadFromGlobalState.mockReturnValue(false);
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     mockDetectAll.mockRejectedValue(new Error('Detection failed'));
 
@@ -292,22 +236,23 @@ describe('listenToJSMessyFileDetection', () => {
     } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToJSMessyFileDetection(context, testVersion);
-
-    await editorChangeCallback(mockEditor);
+    const result = await jsMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      '[Turbo Console Log] Error detecting messy file:',
+      '[Turbo Console Log] Error detecting messy file logs:',
       expect.any(Error),
     );
     expect(mockShowNotification).not.toHaveBeenCalled();
+    expect(result).toBe(false);
 
     consoleErrorSpy.mockRestore();
   });
 
-  it('should stop listening after notification is shown (disposal prevents further calls)', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
+  it('should successfully process and show notification', async () => {
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     mockDetectAll.mockResolvedValue(Array(12).fill({ spaces: 2, lines: [] }));
     mockShowNotification.mockResolvedValue(true);
@@ -317,21 +262,17 @@ describe('listenToJSMessyFileDetection', () => {
     } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToJSMessyFileDetection(context, testVersion);
-
-    // Open first messy file
-    await editorChangeCallback(mockEditor);
+    const result = await jsMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(mockDisposable.dispose).toHaveBeenCalledTimes(1);
-
-    // Listener is disposed, so second call won't happen in real scenario
-    // This test just verifies disposal was called
+    expect(result).toBe(true);
   });
 
-  it('should not mark as shown or dispose when notification is blocked by cooldown', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
+  it('should not mark as shown when notification is blocked by cooldown', async () => {
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     mockDetectAll.mockResolvedValue(Array(10).fill({ spaces: 2, lines: [] }));
     mockShowNotification.mockResolvedValue(false); // Blocked by cooldown
@@ -341,9 +282,11 @@ describe('listenToJSMessyFileDetection', () => {
     } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToJSMessyFileDetection(context, testVersion);
-
-    await editorChangeCallback(mockEditor);
+    const result = await jsMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockShowNotification).toHaveBeenCalledWith(
       NotificationEvent.EXTENSION_JS_MESSY_FILE,
@@ -352,13 +295,10 @@ describe('listenToJSMessyFileDetection', () => {
     );
     // Should NOT mark as shown when notification was blocked
     expect(mockWriteToGlobalState).not.toHaveBeenCalled();
-    // Should NOT dispose listener (keep trying)
-    expect(mockDisposable.dispose).not.toHaveBeenCalled();
+    expect(result).toBe(false);
   });
 
   it('should detect Vue files as valid JS/TS files', async () => {
-    const context = makeExtensionContext();
-    mockReadFromGlobalState.mockReturnValue(false);
     mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
     mockDetectAll.mockResolvedValue(Array(10).fill({ spaces: 2, lines: [] }));
     mockShowNotification.mockResolvedValue(true);
@@ -369,11 +309,17 @@ describe('listenToJSMessyFileDetection', () => {
     } as vscode.TextDocument;
     const mockEditor = { document: mockDocument } as vscode.TextEditor;
 
-    listenToJSMessyFileDetection(context, testVersion);
+    const shouldProcess = jsMessyFileHandler.shouldProcess(mockEditor, context);
+    expect(shouldProcess).toBe(true);
 
-    await editorChangeCallback(mockEditor);
+    const result = await jsMessyFileHandler.process(
+      mockEditor,
+      context,
+      testVersion,
+    );
 
     expect(mockIsJavaScriptOrTypeScriptFile).toHaveBeenCalledWith(mockDocument);
     expect(mockShowNotification).toHaveBeenCalled();
+    expect(result).toBe(true);
   });
 });

@@ -1,62 +1,69 @@
 import fs from 'fs';
-import path from 'path';
 import vscode from 'vscode';
 import pLimit from 'p-limit';
+import fastGlob from 'fast-glob';
 import { ExtensionProperties, Message } from '@/entities';
-import { folderWorkspaceTargetFiles } from './targetFiles';
 import { GitIgnoreMatcher } from './GitIgnoreMatcher';
-
-import { detectAll as jsDetectAll } from '@/debug-message/js/JSDebugMessage/detectAll';
 import { detectAll as phpDetectAll } from '@/debug-message/php/detectAll';
+import { detectAll as jsDetectAll } from '@/debug-message/js/JSDebugMessage/detectAll';
+import { filesToWatch } from './targetFiles';
 
 /**
- * Internal recursive function that shares a single pLimit instance.
- * Directory traversal happens sequentially (outside limit).
- * Only file I/O operations use the limit.
+ * Collect all files with log messages using fast-glob for parallel directory scanning.
  */
-async function collectFilesWithLogsInternal(
+export async function collectFilesWithLogs(
   dir: string,
-  limit: ReturnType<(typeof import('p-limit'))['default']>,
   config: ExtensionProperties,
   ignoreMatcher: GitIgnoreMatcher,
 ): Promise<Map<string, Array<Message>>> {
   const filesLogsMap: Map<string, Array<Message>> = new Map();
-  let entries;
+
   try {
-    entries = await fs.promises.readdir(dir, { withFileTypes: true });
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
-      console.warn(`⛔ Skipped missing or deleted directory: ${dir}`);
-      return filesLogsMap;
-    }
-    throw err;
-  }
+    // Step 1: Use essential ignore patterns for fast-glob (broad strokes only)
+    const essentialPatterns = [
+      '**/node_modules/**',
+      '**/.git/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/out/**',
+      '**/.next/**',
+      '**/.turbo/**',
+      '**/coverage/**',
+      '**/.cache/**',
+      '**/vendor/**',
+    ];
 
-  // Process entries - collect directories and file tasks
-  const directories: string[] = [];
-  const fileTasks: Promise<void>[] = [];
+    // Step 2: Use fast-glob with essential patterns only
+    const allFiles = await fastGlob([filesToWatch], {
+      cwd: dir,
+      absolute: true,
+      ignore: essentialPatterns,
+      dot: false,
+      onlyFiles: true,
+      stats: false,
+    });
 
-  for (const entry of entries) {
-    const entryPath = path.join(dir, entry.name);
+    // Step 3: Filter with GitIgnoreMatcher for project-specific .gitignore rules
+    const filteredFiles = allFiles.filter((filePath) => {
+      if (ignoreMatcher.ignores(filePath)) {
+        return false;
+      }
+      return true;
+    });
 
-    if (ignoreMatcher.ignores(entryPath)) {
-      continue;
-    }
+    // Step 4: Process files with detectAll
+    const limit = pLimit(16);
 
-    if (entry.isDirectory()) {
-      // Collect directories to process after files
-      directories.push(entryPath);
-    } else if (folderWorkspaceTargetFiles.test(entry.name)) {
-      // Collect file processing tasks (don't await yet!)
-      fileTasks.push(
+    await Promise.all(
+      filteredFiles.map((filePath) =>
         limit(async () => {
           try {
             // Determine which detectAll to use based on file extension
-            const isPHP = entryPath.endsWith('.php');
+            const isPHP = filePath.endsWith('.php');
             let logs: Array<Message> = [];
             if (isPHP) {
               logs = await phpDetectAll(
-                entryPath,
+                filePath,
                 config.logFunction,
                 config.logMessagePrefix,
                 config.delimiterInsideMessage,
@@ -65,62 +72,24 @@ async function collectFilesWithLogsInternal(
               logs = await jsDetectAll(
                 fs,
                 vscode,
-                entryPath,
+                filePath,
                 config.logFunction,
                 config.logMessagePrefix,
                 config.delimiterInsideMessage,
               );
             }
             if (logs.length > 0) {
-              filesLogsMap.set(entryPath, logs);
+              filesLogsMap.set(filePath, logs);
             }
           } catch (error) {
-            console.warn(`Skipped file (detectAll error): ${entryPath}`, error);
+            console.warn(`Skipped file (detectAll error): ${filePath}`, error);
           }
         }),
-      );
-    }
+      ),
+    );
+  } catch (error) {
+    console.error('Error collecting files with logs:', error);
   }
 
-  // Process all files concurrently with limit
-  await Promise.all(fileTasks);
-
-  // Process subdirectories in parallel (they all share the same limit)
-  const nestedResults = await Promise.all(
-    directories.map((dirPath) =>
-      collectFilesWithLogsInternal(dirPath, limit, config, ignoreMatcher),
-    ),
-  );
-
-  // Merge all nested results into this map
-  nestedResults.forEach((nestedMap) => {
-    nestedMap.forEach((logs, filePath) => {
-      filesLogsMap.set(filePath, logs);
-    });
-  });
-
   return filesLogsMap;
-}
-
-/**
- * Wrapper function that creates a single shared pLimit instance
- * and delegates to the internal recursive function.
- */
-export async function collectFilesWithLogs(
-  dir: string,
-  config: ExtensionProperties,
-  ignoreMatcher: GitIgnoreMatcher,
-): Promise<Map<string, Array<Message>>> {
-  // Create single shared limit instance for all file operations
-  const limit = pLimit(16);
-
-  // Do the actual work with the tracked limit
-  const result = await collectFilesWithLogsInternal(
-    dir,
-    limit,
-    config,
-    ignoreMatcher,
-  );
-
-  return result;
 }

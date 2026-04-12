@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { listenToInactiveTwoWeeksReturn } from '@/helpers/listenToInactiveTwoWeeksReturn';
+import { inactiveTwoWeeksReturnHandler } from '@/helpers/listenToInactiveTwoWeeksReturn';
 import {
   readFromGlobalState,
   writeToGlobalState,
@@ -39,9 +39,47 @@ const mockShowNotification = showNotification as jest.MockedFunction<
   typeof showNotification
 >;
 
-describe('listenToInactiveTwoWeeksReturn', () => {
+let mockDisposable: vscode.Disposable;
+
+const listenToInactiveTwoWeeksReturn = (
+  context: vscode.ExtensionContext,
+  version: string,
+): void => {
+  if (!inactiveTwoWeeksReturnHandler.shouldRegister(context)) {
+    return;
+  }
+
+  const disposable = vscode.window.onDidChangeActiveTextEditor(
+    async (editor?: vscode.TextEditor) => {
+      if (!editor) {
+        return;
+      }
+
+      const shouldProcess = await inactiveTwoWeeksReturnHandler.shouldProcess(
+        editor,
+        context,
+      );
+      if (!shouldProcess) {
+        return;
+      }
+
+      const notificationShown = await inactiveTwoWeeksReturnHandler.process(
+        editor,
+        context,
+        version,
+      );
+      if (notificationShown) {
+        disposable.dispose();
+      }
+    },
+  );
+
+  context.subscriptions.push(disposable);
+};
+
+describe('inactiveTwoWeeksReturnHandler', () => {
   let mockContext: vscode.ExtensionContext;
-  let mockDisposable: vscode.Disposable;
+
   let onDidChangeActiveTextEditorCallback: (
     editor: vscode.TextEditor | undefined,
   ) => Promise<void>;
@@ -279,7 +317,7 @@ describe('listenToInactiveTwoWeeksReturn', () => {
 
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
 
-      onDidChangeActiveTextEditorCallback(mockEditor);
+      await onDidChangeActiveTextEditorCallback(mockEditor);
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_INACTIVE_TWO_WEEKS_RETURN,
@@ -370,7 +408,7 @@ describe('listenToInactiveTwoWeeksReturn', () => {
 
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
 
-      onDidChangeActiveTextEditorCallback(mockEditor);
+      await onDidChangeActiveTextEditorCallback(mockEditor);
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_INACTIVE_TWO_WEEKS_RETURN,
@@ -403,7 +441,7 @@ describe('listenToInactiveTwoWeeksReturn', () => {
 
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
 
-      onDidChangeActiveTextEditorCallback(mockEditor);
+      await onDidChangeActiveTextEditorCallback(mockEditor);
 
       expect(mockShowNotification).not.toHaveBeenCalled();
     });
@@ -469,7 +507,7 @@ describe('listenToInactiveTwoWeeksReturn', () => {
 
       mockIsJavaScriptOrTypeScriptFile.mockReturnValue(true);
 
-      onDidChangeActiveTextEditorCallback(mockEditor);
+      await onDidChangeActiveTextEditorCallback(mockEditor);
 
       expect(mockShowNotification).toHaveBeenCalled();
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
@@ -505,7 +543,7 @@ describe('listenToInactiveTwoWeeksReturn', () => {
         document: mockDocument,
       } as vscode.TextEditor;
 
-      onDidChangeActiveTextEditorCallback(mockEditor);
+      await onDidChangeActiveTextEditorCallback(mockEditor);
 
       expect(mockShowNotification).toHaveBeenCalledWith(
         NotificationEvent.EXTENSION_INACTIVE_TWO_WEEKS_RETURN,

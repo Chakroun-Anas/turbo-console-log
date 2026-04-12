@@ -11,6 +11,7 @@ import { GlobalStateKey } from '@/entities';
 import { detectAll } from '@/debug-message/js/JSDebugMessage/detectAll/detectAll';
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
+import { NotificationEventHandler } from './notificationEventHandler';
 
 /**
  * Minimum number of logs in a file to be considered "messy"
@@ -18,91 +19,81 @@ import { NotificationEvent } from '@/notifications/NotificationEvent';
 const MESSY_FILE_LOG_THRESHOLD = 10;
 
 /**
- * Listens to document openings and detects messy files (files with 10+ logs)
- * Shows notification when user opens a JS/TS file with many logs
- * One-time notification per user (global state guard)
- *
- * @param context VS Code extension context
+ * Notification handler for JS Messy File detection
+ * Detects files with 10+ logs
  */
-export function listenToJSMessyFileDetection(
-  context: vscode.ExtensionContext,
-  version: string,
-): void {
-  // Skip for Pro users
-  if (isProUser(context)) {
-    return;
-  }
+export const jsMessyFileHandler: NotificationEventHandler = {
+  id: 'jsMessyFile',
 
-  // Check if notification has already been shown BEFORE setting up listener
-  const hasShownNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_JS_MESSY_FILE_NOTIFICATION,
-  );
-  if (hasShownNotification) {
-    return; // Already shown, no need to listen
-  }
+  shouldRegister: (context: vscode.ExtensionContext): boolean => {
+    if (isProUser(context)) {
+      return false;
+    }
 
-  // Get extension properties for log detection config
-  const config: vscode.WorkspaceConfiguration =
-    vscode.workspace.getConfiguration('turboConsoleLog');
-  const extensionProperties = getExtensionProperties(config);
+    const hasShownNotification = readFromGlobalState<boolean>(
+      context,
+      GlobalStateKey.HAS_SHOWN_JS_MESSY_FILE_NOTIFICATION,
+    );
 
-  // Listen to active text editor changes (when user opens/switches files)
-  const disposable = vscode.window.onDidChangeActiveTextEditor(
-    async (editor) => {
-      if (!editor) {
-        return;
-      }
+    return !hasShownNotification;
+  },
 
-      const document = editor.document;
+  shouldProcess: (editor: vscode.TextEditor): boolean => {
+    const document = editor.document;
 
-      // Check if it's a JS/TS file
-      if (!isJavaScriptOrTypeScriptFile(document)) {
-        return;
-      }
+    if (!isJavaScriptOrTypeScriptFile(document)) {
+      return false;
+    }
 
-      // Get file path
-      const filePath = document.uri.fsPath;
-      if (!filePath) {
-        return;
-      }
+    const filePath = document.uri.fsPath;
+    return !!filePath;
+  },
 
-      try {
-        // Detect all logs in the file (runs in background)
-        const messages = await detectAll(
-          fs,
-          vscode,
-          filePath,
-          extensionProperties.logFunction,
-          extensionProperties.logMessagePrefix,
-          extensionProperties.delimiterInsideMessage,
+  process: async (
+    editor: vscode.TextEditor,
+    context: vscode.ExtensionContext,
+    version: string,
+  ): Promise<boolean> => {
+    const filePath = editor.document.uri.fsPath;
+
+    try {
+      const config: vscode.WorkspaceConfiguration =
+        vscode.workspace.getConfiguration('turboConsoleLog');
+      const extensionProperties = getExtensionProperties(config);
+
+      const messages = await detectAll(
+        fs,
+        vscode,
+        filePath,
+        extensionProperties.logFunction,
+        extensionProperties.logMessagePrefix,
+        extensionProperties.delimiterInsideMessage,
+      );
+
+      if (messages.length >= MESSY_FILE_LOG_THRESHOLD) {
+        const wasShown = await showNotification(
+          NotificationEvent.EXTENSION_JS_MESSY_FILE,
+          version,
+          context,
         );
 
-        // Check if file is "messy" (10+ logs)
-        if (messages.length >= MESSY_FILE_LOG_THRESHOLD) {
-          // Show notification
-          const wasShown = await showNotification(
-            NotificationEvent.EXTENSION_JS_MESSY_FILE,
-            version,
+        if (wasShown) {
+          writeToGlobalState(
             context,
+            GlobalStateKey.HAS_SHOWN_JS_MESSY_FILE_NOTIFICATION,
+            true,
           );
-
-          // Only mark as shown if it was actually displayed (not blocked by cooldown)
-          if (wasShown) {
-            writeToGlobalState(
-              context,
-              GlobalStateKey.HAS_SHOWN_JS_MESSY_FILE_NOTIFICATION,
-              true,
-            );
-            disposable.dispose(); // Stop listening once notification shown
-          }
+          return true;
         }
-      } catch (error) {
-        console.error('[Turbo Console Log] Error detecting messy file:', error);
       }
-    },
-  );
 
-  // Add to subscriptions for cleanup
-  context.subscriptions.push(disposable);
-}
+      return false;
+    } catch (error) {
+      console.error(
+        '[Turbo Console Log] Error detecting messy file logs:',
+        error,
+      );
+      return false;
+    }
+  },
+};
