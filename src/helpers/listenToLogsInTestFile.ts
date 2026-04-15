@@ -4,11 +4,13 @@ import {
   readFromGlobalState,
   writeToGlobalState,
   isJavaScriptOrTypeScriptFile,
+  isPythonFile,
   getExtensionProperties,
   isProUser,
 } from './index';
 import { GlobalStateKey } from '@/entities';
 import { detectAll } from '@/debug-message/js/JSDebugMessage/detectAll/detectAll';
+import { detectAll as detectAllPython } from '@/debug-message/python/detectAll';
 import { showNotification } from '@/notifications/showNotification';
 import { NotificationEvent } from '@/notifications/NotificationEvent';
 import { NotificationEventHandler } from './notificationEventHandler';
@@ -27,6 +29,9 @@ const TEST_FILE_PATTERNS = [
   /__tests__\//i,
   /\.test\.php$/i,
   /\.spec\.php$/i,
+  /(^|\/)test_[^/]+\.py$/i,
+  /(^|\/)[^/]+_test\.py$/i,
+  /(^|\/)tests?\//i,
 ];
 
 /**
@@ -60,47 +65,55 @@ export const logsInTestFileHandler: NotificationEventHandler = {
 
   shouldProcess: (editor: vscode.TextEditor): boolean => {
     const document = editor.document;
-
-    if (!isJavaScriptOrTypeScriptFile(document)) {
+    const isJS = isJavaScriptOrTypeScriptFile(document);
+    const isPython = isPythonFile(document);
+    if (!isJS && !isPython) {
       return false;
     }
-
     const filePath = document.uri.fsPath;
     if (!filePath) {
       return false;
     }
-
     return isTestFile(filePath);
   },
-
   process: async (
     editor: vscode.TextEditor,
     context: vscode.ExtensionContext,
     version: string,
   ): Promise<boolean> => {
     const filePath = editor.document.uri.fsPath;
-
     try {
       const config: vscode.WorkspaceConfiguration =
         vscode.workspace.getConfiguration('turboConsoleLog');
       const extensionProperties = getExtensionProperties(config);
-
-      const messages = await detectAll(
-        fs,
-        vscode,
-        filePath,
-        extensionProperties.logFunction,
-        extensionProperties.logMessagePrefix,
-        extensionProperties.delimiterInsideMessage,
-      );
-
-      if (messages.length >= TEST_FILE_LOG_THRESHOLD) {
+      const isJS = isJavaScriptOrTypeScriptFile(editor.document);
+      const isPython = isPythonFile(editor.document);
+      let messages = [];
+      if (isPython) {
+        messages = (await detectAllPython(
+          fs,
+          vscode,
+          filePath,
+          extensionProperties.logFunction,
+          extensionProperties.logMessagePrefix,
+          extensionProperties.delimiterInsideMessage,
+        )) || [];
+      } else if (isJS) {
+        messages = (await detectAll(
+          fs,
+          vscode,
+          filePath,
+          extensionProperties.logFunction,
+          extensionProperties.logMessagePrefix,
+          extensionProperties.delimiterInsideMessage,
+        )) || [];
+      }
+      if (Array.isArray(messages) && messages.length >= TEST_FILE_LOG_THRESHOLD) {
         const wasShown = await showNotification(
           NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE,
           version,
           context,
         );
-
         if (wasShown) {
           writeToGlobalState(
             context,
@@ -110,7 +123,6 @@ export const logsInTestFileHandler: NotificationEventHandler = {
           return true;
         }
       }
-
       return false;
     } catch (error) {
       console.error('Error detecting logs in test file:', error);
