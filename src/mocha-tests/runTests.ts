@@ -6,8 +6,12 @@ async function main() {
     const extensionDevelopmentPath = path.resolve(__dirname, '../../');
     const extensionTestsPath = path.resolve(__dirname, './testsRunner');
 
-    const vscodeVersion = 'stable';
-    const platform = 'darwin-arm64';
+    // Allow CI and local overrides via environment variables for flexibility
+    // Examples:
+    //  VSCODE_TEST_VERSION=stable
+    //  VSCODE_TEST_PLATFORM=linux-x64
+    const vscodeVersion = process.env.VSCODE_TEST_VERSION || 'stable';
+    const platform = process.env.VSCODE_TEST_PLATFORM || 'darwin-arm64';
 
     await runTests({
       version: vscodeVersion,
