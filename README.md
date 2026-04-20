@@ -202,4 +202,4 @@ Contributions are welcome! Report bugs, suggest features, or submit pull request
 Turbo Console Log is released under the **Turbo Unicorn Custom License**.  
 Free for personal and non-commercial use. Commercial use, redistribution, and Pro features are protected.
 
-See the full **[LICENSE](./LICENSE.txt)** for details.
+See the full **[LICENSE](./LICENSE.TXT).** for details.
