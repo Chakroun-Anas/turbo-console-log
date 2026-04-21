@@ -5,6 +5,8 @@ import { makeTextEditor } from './makeTextEditor';
 import { makeDebugMessage } from './makeDebugMessage';
 import { makeExtensionContext } from './makeExtensionContext';
 import { createMockChangeEvent } from './createMockChangeEvent';
+import { getPhpParser } from './phpParserHelper';
+
 export {
   makeTextDocument,
   makeTextLine,
@@ -13,4 +15,5 @@ export {
   makeDebugMessage,
   makeExtensionContext,
   createMockChangeEvent,
+  getPhpParser,
 };

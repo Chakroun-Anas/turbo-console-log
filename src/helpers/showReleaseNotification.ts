@@ -32,6 +32,7 @@ export async function showReleaseNotification(
     '3.19.0', // Line-level Git filtering announcement
     '3.20.0', // 2-hour Pro Trial announcement,
     '3.21.0', // Release 3.21.0 announcement
+    '3.22.0', // Release 3.22.0 announcement,
   ];
 
   // Only show notification for specific versions

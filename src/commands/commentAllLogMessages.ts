@@ -1,11 +1,8 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Command, Message } from '../entities';
-import {
-  loadPhpDebugMessage,
-  canInsertLogInDocument,
-  trackLogManagementCommands,
-} from '../helpers';
+import { trackLogManagementCommands } from '../helpers';
+import { phpDebugMessage } from '@/debug-message/php';
 
 export function commentAllLogMessagesCommand(): Command {
   return {
@@ -20,27 +17,9 @@ export function commentAllLogMessagesCommand(): Command {
       }
       const document: vscode.TextDocument = editor.document;
 
-      // Get extension version
-      const version = vscode.extensions.getExtension(
-        'ChakrounAnas.turbo-console-log',
-      )?.packageJSON.version;
-
-      // Check if log operations are allowed (PHP requires Pro)
-      const canOperate = canInsertLogInDocument(context, document, version);
-      if (!canOperate) {
-        return;
-      }
-
-      // For PHP files, load PHP debug message from Pro bundle
+      // For PHP files, use PHP debug message from core
       let activeDebugMessage = debugMessage;
       if (document.languageId === 'php') {
-        const phpDebugMessage = await loadPhpDebugMessage(context);
-        if (!phpDebugMessage) {
-          vscode.window.showErrorMessage(
-            'Failed to load PHP support from Pro bundle.',
-          );
-          return;
-        }
         activeDebugMessage = phpDebugMessage;
       }
 

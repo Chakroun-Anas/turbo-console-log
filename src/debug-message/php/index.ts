@@ -1,2 +1,2 @@
-import { detectAll } from './detectAll';
-export { detectAll };
+export { detectAll } from './detectAll';
+export { phpDebugMessage } from './PHPDebugMessage';

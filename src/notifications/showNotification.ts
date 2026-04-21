@@ -35,12 +35,6 @@ export async function showNotification(
         ctaText: 'Get Started',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/overview/motivation`,
       },
-      [NotificationEvent.EXTENSION_PHP_PRO_ONLY]: {
-        message:
-          '💡 Want to debug PHP with Turbo? This feature is available in Pro.',
-        ctaText: 'Upgrade Now',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
       [NotificationEvent.EXTENSION_INACTIVE_MANUAL_LOG]: {
         message:
           '💡 Still typing console.log()? Save time with Turbo! Insert logs 10x faster.',
@@ -61,9 +55,9 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
         message:
-          '🔥 v3.21.0: 15-20x performance gains with video proof. See it yourself!',
+          '🎉 PHP devs rejoice! Full Turbo logging support is now in the free tier.',
         ctaText: 'See The Gains',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3210`,
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3220`,
       },
     };
 

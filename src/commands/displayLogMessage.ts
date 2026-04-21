@@ -1,11 +1,8 @@
 import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
-import {
-  trackLogInsertions,
-  canInsertLogInDocument,
-  loadPhpDebugMessage,
-} from '../helpers';
+import { trackLogInsertions } from '../helpers';
+import { phpDebugMessage } from '@/debug-message/php';
 
 export function displayLogMessageCommand(): Command {
   return {
@@ -19,29 +16,11 @@ export function displayLogMessageCommand(): Command {
       const tabSize: number | string = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
 
-      // Get extension version
-      const version = vscode.extensions.getExtension(
-        'ChakrounAnas.turbo-console-log',
-      )?.packageJSON.version;
-
-      // Check if log insertion is allowed (PHP requires Pro)
-      const canInsert = canInsertLogInDocument(context, document, version);
-      if (!canInsert) {
-        return;
-      }
-
-      // For PHP files, load PHP debug message from Pro bundle
+      // For PHP files, use PHP debug message from core
       let activeDebugMessage = debugMessage;
       let logType = 'log';
 
       if (document.languageId === 'php') {
-        const phpDebugMessage = await loadPhpDebugMessage(context);
-        if (!phpDebugMessage) {
-          vscode.window.showErrorMessage(
-            'Failed to load PHP support from Pro bundle.',
-          );
-          return;
-        }
         activeDebugMessage = phpDebugMessage;
         logType = 'var_dump';
       }

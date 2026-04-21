@@ -1,0 +1,27 @@
+export default {
+  name: 'arrow function with $this (should NOT capture $this)',
+  lines: [
+    '<?php',
+    'class Foo {',
+    '  private $multiplier = 10;',
+    '  public function test() {',
+    '    $fn = fn($x) => $x * $this->multiplier;',
+    '  }',
+    '}',
+  ],
+  line: 4,
+  selectedVar: 'x',
+  debuggingMsg: 'error_log("x: " . print_r($x, true));',
+  expected: [
+    '<?php',
+    'class Foo {',
+    '  private $multiplier = 10;',
+    '  public function test() {',
+    '    $fn = function($x) {',
+    '      error_log("x: " . print_r($x, true));',
+    '      return $x * $this->multiplier;',
+    '    };',
+    '  }',
+    '}',
+  ],
+};

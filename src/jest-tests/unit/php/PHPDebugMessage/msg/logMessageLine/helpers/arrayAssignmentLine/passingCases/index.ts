@@ -1,0 +1,10 @@
+export { passingCase1 } from './1';
+export { passingCase2 } from './2';
+export { passingCase3 } from './3';
+export { passingCase4 } from './4';
+export { passingCase5 } from './5';
+export { passingCase6 } from './6';
+export { passingCase7 } from './7';
+export { passingCase8 } from './8';
+export { passingCase9 } from './9';
+export { passingCase10 } from './10';
