@@ -2,6 +2,22 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.21.1] - 2026-04-24
+
+### 🚀 Focusing on What Works Best
+
+After gathering valuable data from the trial program launched in v3.20.0, we're streamlining our approach to focus on delivering the best Pro experience possible.
+
+**What's Changing:**
+
+- Trial program has concluded after successfully validating user workflows
+- Turbo Pro remains available as a one-time purchase with lifetime access
+- All insights from trial users have been integrated into Pro feature development
+
+This release represents a maturation of our product strategy, allowing us to deliver maximum value where it matters most.
+
+→ [Explore Turbo Pro](https://www.turboconsolelog.io/pro)
+
 ## [3.21.0] - 2026-04-12
 
 → [Read the full v3.21.0 release article](https://www.turboconsolelog.io/articles/release-3210)

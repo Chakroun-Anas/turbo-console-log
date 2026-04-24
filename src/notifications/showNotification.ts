@@ -250,12 +250,6 @@ export async function showNotification(
         ctaText: 'See Pro Tree View',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
-      [NotificationEvent.EXTENSION_TRIAL_EXPIRED]: {
-        message:
-          '⏰ Your Turbo Console Log Pro trial has expired. Upgrade to continue using Pro features!',
-        ctaText: 'Upgrade to Pro',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro?fromExpiredTrial=true`,
-      },
     };
 
     const fallback = fallbackMessages[notificationEvent];

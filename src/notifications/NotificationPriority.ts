@@ -22,7 +22,6 @@ export const NOTIFICATION_PRIORITY_MAP: Record<
   [NotificationEvent.EXTENSION_PHP_PRO_ONLY]: NotificationPriority.BYPASS,
   [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]:
     NotificationPriority.BYPASS,
-  [NotificationEvent.EXTENSION_TRIAL_EXPIRED]: NotificationPriority.BYPASS,
 
   // IGNORE: Low-priority notifications that respect cooldown strictly
   [NotificationEvent.EXTENSION_INACTIVE_MANUAL_LOG]:

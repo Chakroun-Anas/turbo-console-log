@@ -34,5 +34,4 @@ export enum NotificationEvent {
   EXTENSION_WORKSPACE_COMMENTED_LOGS = 'extensionWorkspaceCommentedLogs',
   EXTENSION_WORKSPACE_DUPLICATE_LOGS = 'extensionWorkspaceDuplicateLogs',
   EXTENSION_WORKSPACE_HOT_FOLDER = 'extensionWorkspaceHotFolder',
-  EXTENSION_TRIAL_EXPIRED = 'extensionTrialExpired',
 }

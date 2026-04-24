@@ -18,25 +18,6 @@ Workspace-wide log management for JavaScript, TypeScript, and PHP. View all logs
 
 ---
 
-## 🎁 New in v3.20.0 - Free 2-Hour Pro Trial
-
-<p align="center">
-  <img src="https://www.turboconsolelog.io/assets/turbo-pro-two-hours-trial.png" alt="Try Turbo Pro Free for 2 Hours" width="300">
-</p>
-
-**Experience the full power of Turbo Pro before purchasing.** We've introduced a free 2-hour trial that gives you complete access to all Pro features—no credit card required.
-
-**How it works:**
-
-1. **[Request your trial key](https://www.turboconsolelog.io/pro-trial)** via email (instant delivery)
-2. Open VS Code: `Cmd+Shift+P` → "Turbo Console Log: Activate Trial"
-3. Explore workspace-wide log management with an interactive guide
-4. Full Pro features for 2 hours—workspace explorer, mass cleanup, filtering, search, and more
-
-**[Get Your Free Trial Key →](https://www.turboconsolelog.io/pro-trial)**
-
----
-
 ## 🆓 Free Version Features
 
 The free version provides intelligent log insertion in your active editor:
@@ -131,7 +112,7 @@ The free version provides intelligent log insertion in your active editor:
 
 **One-time payment, no subscription required.**
 
-**[Try the 2-Hour Free Trial](https://www.turboconsolelog.io/pro-trial)** | **[See Pro in Action](https://www.turboconsolelog.io/pro#see-it-in-action)** | **[Upgrade to Pro](https://www.turboconsolelog.io/pro)**
+**[See Pro in Action](https://www.turboconsolelog.io/pro#see-it-in-action)** | **[Upgrade to Pro](https://www.turboconsolelog.io/pro)**
 
 ---
 
