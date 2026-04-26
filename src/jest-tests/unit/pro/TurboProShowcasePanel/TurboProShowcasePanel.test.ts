@@ -177,7 +177,6 @@ describe('TurboProShowcasePanel', () => {
       expect(mockGetStaticHtml).toHaveBeenCalledWith(
         expect.any(Number),
         workspaceMetadata,
-        undefined, // trialStatus parameter
       );
     });
   });

@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Automated logging for JavaScript, TypeScript, and PHP. Insert, manage, and clean log messages with AST-powered precision.",
-  "version": "3.21.0",
+  "version": "3.21.2",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.94.0"
@@ -204,10 +204,6 @@
         "title": "Turbo Console Log: Activate Turbo Pro Bundle"
       },
       {
-        "command": "turboConsoleLog.activateTrial",
-        "title": "Turbo Console Log: Activate Trial"
-      },
-      {
         "command": "turboConsoleLogPro.hideLogs",
         "title": "Turbo Console Log Pro: Hide Logs"
       },
@@ -314,12 +310,6 @@
         "key": "alt+shift+p",
         "mac": "alt+shift+p",
         "when": "editorTextFocus"
-      },
-      {
-        "command": "turboConsoleLog.activateTrial",
-        "key": "alt+shift+t",
-        "mac": "alt+shift+t",
-        "when": "editorTextFocus"
       }
     ],
     "viewsContainers": {
@@ -363,14 +353,6 @@
           "icon": "images/icon.png",
           "type": "webview",
           "when": "turboConsoleLog:isInitialized && !turboConsoleLog:isPro && !turboConsoleLog:isRepairMode && !turboConsoleLog:isLauncherMode"
-        },
-        {
-          "id": "turboConsoleLogProTrialGuide",
-          "name": "Turbo Pro Quick Guide",
-          "icon": "images/icon.png",
-          "type": "webview",
-          "when": "turboConsoleLog:isInitialized",
-          "visibility": "collapsed"
         },
         {
           "id": "turboConsoleLogBundleRepairPanel",

@@ -5,13 +5,6 @@ import { createTelemetryService } from '../telemetry/telemetryService';
 import { generateDeveloperId } from '../helpers/generateDeveloperId';
 import { writeToGlobalState } from '../helpers/writeToGlobalState';
 import { GlobalStateKey } from '@/entities';
-import {
-  shouldShowNotification,
-  recordNotificationShown,
-  recordDismissal,
-  resetDismissalCounter,
-  undoNotificationRecording,
-} from './notificationCooldown';
 import { TurboAnalyticsProvider } from '@/telemetry';
 import { isTestMode } from '@/runTime';
 
@@ -23,32 +16,16 @@ export async function showNotification(
   notificationEvent: NotificationEvent,
   version: string,
   context: vscode.ExtensionContext,
-  count?: number, // Generic count (logCount, duplicateCount, commentedCount, hotFolderCount, etc.)
-  additionalContext?: string, // Additional context (e.g., folder path for hot folder event)
 ): Promise<boolean> {
-  // Check cooldown system
-  if (!isTestMode() && !shouldShowNotification(context, notificationEvent)) {
-    return false; // Not shown due to cooldown
-  }
-
-  // Record that a notification will be shown (updates cooldown timestamp)
-  // This must happen IMMEDIATELY after cooldown check to prevent race conditions
-  // If variant turns out to be deactivated, we'll decrement the monthly counter below
-  recordNotificationShown(context, notificationEvent);
-
   // Fetch notification
   let notificationData: ExtensionNotificationResponse | null = null;
   try {
-    notificationData = await fetchNotificationData(
-      notificationEvent,
-      version,
-      count,
-      additionalContext,
-    );
+    notificationData = await fetchNotificationData(notificationEvent, version);
   } catch (error) {
     console.error('Failed to fetch notification data:', error);
 
     // Define fallback messages per event type
+    // v3.21.2: Reduced to 6 core notification events
     const fallbackMessages: Record<
       NotificationEvent,
       { message: string; ctaText: string; ctaUrl: string }
@@ -58,82 +35,10 @@ export async function showNotification(
         ctaText: 'Get Started',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/overview/motivation`,
       },
-      [NotificationEvent.EXTENSION_MULTI_FILE_LOGS]: {
-        message:
-          "📂 Logs in 3+ files already? See them all in one place with Pro's central panel.",
-        ctaText: 'Learn More',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
-      },
-      [NotificationEvent.EXTENSION_TEN_INSERTS]: {
-        message:
-          '🎓 10 logs already! Did you know you can comment or delete them all at once?',
-        ctaText: 'Discover Features',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/comment-inserted-log-messages`,
-      },
-      [NotificationEvent.EXTENSION_TWENTY_INSERTS]: {
-        message:
-          '🎉 20 logs and counting! Join our newsletter to stay updated with tips, tricks, and new features.',
-        ctaText: 'Join Community',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/join`,
-      },
-      [NotificationEvent.EXTENSION_FIFTY_INSERTS]: {
-        message:
-          '💪 50 logs! Most users unlock the central log panel at this point. Curious why?',
-        ctaText: 'Show Me',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_HUNDRED_INSERTS]: {
-        message:
-          "🚀 100 logs! You're a power user. Unlock Pro to manage them all from one central panel.",
-        ctaText: 'Explore Pro',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS]: {
-        message:
-          "🔥 You're exploring the panel a lot. Turbo PRO shows ALL logs from ALL files instantly.",
-        ctaText: 'See It In Action',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_PHP_WORKSPACE_DETECTED]: {
-        message:
-          '🚀 Debug PHP with the speed you love! Turbo Pro now supports PHP logging.',
-        ctaText: 'Upgrade Now',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
       [NotificationEvent.EXTENSION_PHP_PRO_ONLY]: {
         message:
           '💡 Want to debug PHP with Turbo? This feature is available in Pro.',
         ctaText: 'Upgrade Now',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_FIVE_LOG_MANAGEMENT_COMMANDS]: {
-        message:
-          '🔥 Managing logs manually? Turbo PRO lets you clean them in bulk directly from the panel.',
-        ctaText: 'See It In Action',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_FIVE_COMMENTS_COMMANDS]: {
-        message:
-          '🔥 Commenting logs manually? Turbo PRO lets you manage them in bulk directly from the panel.',
-        ctaText: 'See It In Action',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_FIVE_UNCOMMENTS_COMMANDS]: {
-        message:
-          '🔥 Uncommenting logs manually? Turbo PRO lets you manage them in bulk directly from the panel.',
-        ctaText: 'See It In Action',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_FIVE_CORRECTIONS_COMMANDS]: {
-        message:
-          '🔥 Correcting logs manually? Turbo PRO lets you manage them in bulk directly from the panel.',
-        ctaText: 'See It In Action',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_FIVE_DELETE_COMMANDS]: {
-        message:
-          '🔥 Deleting logs manually? Turbo PRO lets you clean them in bulk directly from the panel.',
-        ctaText: 'See It In Action',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
       },
       [NotificationEvent.EXTENSION_INACTIVE_MANUAL_LOG]: {
@@ -148,53 +53,11 @@ export async function showNotification(
         ctaText: 'Quick Refresher',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
       },
-      [NotificationEvent.EXTENSION_ACTIVITY_DROP]: {
-        message:
-          '💡 Miss debugging faster? Select any variable → Ctrl+Alt+L → See the magic!',
-        ctaText: 'Quick Reminder',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
-      },
-      [NotificationEvent.EXTENSION_ACTIVATION_DAY_THREE]: {
-        message:
-          '⚡ Try it NOW: Select any variable → Insert a log → See the magic happen!',
-        ctaText: 'Quick Start Guide',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
-      },
       [NotificationEvent.EXTENSION_ACTIVATION_DAY_SEVEN]: {
         message:
           '💡 Ready to try? Select any variable → Insert a log → Experience faster debugging!',
         ctaText: 'See How It Works',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
-      },
-      [NotificationEvent.EXTENSION_JS_MESSY_FILE]: {
-        message:
-          "🌲 10+ logs in this file! Navigate them all effortlessly with Pro's tree view.",
-        ctaText: 'See Tree View',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message#pro-logs`,
-      },
-      [NotificationEvent.EXTENSION_PHP_MESSY_FILE]: {
-        message:
-          "🌲 10+ logs in this PHP file! Navigate them all effortlessly with Pro's tree view.",
-        ctaText: 'See Tree View',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message#pro-logs`,
-      },
-      [NotificationEvent.EXTENSION_JS_MULTI_LOG_TYPES]: {
-        message:
-          '🎨 Multiple log types detected! Pro color-codes each type for instant recognition.',
-        ctaText: 'See Colors',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message#pro-logs`,
-      },
-      [NotificationEvent.EXTENSION_PHP_MULTI_LOG_TYPES]: {
-        message:
-          '🎨 Multiple log types in PHP! Pro color-codes each type for instant recognition.',
-        ctaText: 'See Colors',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message#pro-logs`,
-      },
-      [NotificationEvent.EXTENSION_WEEKEND_TURBO_SUNDAYS]: {
-        message:
-          '🌅 Weekend coding? Discover how Turbo started as a Sunday side project!',
-        ctaText: 'Read Story',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/turbo-sundays-001`,
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
         message:
@@ -202,109 +65,12 @@ export async function showNotification(
         ctaText: 'See The Gains',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3210`,
       },
-      [NotificationEvent.EXTENSION_COMMIT_WITH_LOGS]: {
-        message:
-          "🌳 Committed with debug logs? See how Pro's Git-aware panel helps clean up before push.",
-        ctaText: 'Learn More',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3150`,
-      },
-      [NotificationEvent.EXTENSION_CUSTOM_LOG_LIBRARY]: {
-        message:
-          '🎯 Using a custom logger? Did you know Turbo supports custom log functions? Configure it now!',
-        ctaText: 'Learn How',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/settings/log-function-name`,
-      },
-      [NotificationEvent.EXTENSION_LOG_LIBRARY_INSTALLED]: {
-        message:
-          '📦 Installed a logging library? Turbo can insert your custom log function automatically! Set it up now.',
-        ctaText: 'Configure',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/settings/log-function-name`,
-      },
-      [NotificationEvent.EXTENSION_LOGS_IN_TEST_FILE]: {
-        message:
-          '🧪 Debugging tests? Turbo Pro offers test-file-aware features for cleaner test logs!',
-        ctaText: 'Explore Pro',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD]: {
-        message:
-          '🚨 Your workspace has {logCount} logs! Turbo Pro navigates and manages them all instantly.',
-        ctaText: 'See Pro Features',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_WORKSPACE_COMMENTED_LOGS]: {
-        message:
-          "💤 {commentedCount} commented logs detected! Instead of commenting out, use Turbo's comment/uncomment commands.",
-        ctaText: 'Learn How',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/comment-inserted-log-messages`,
-      },
-      [NotificationEvent.EXTENSION_WORKSPACE_DUPLICATE_LOGS]: {
-        message:
-          '🔍 {duplicateCount} duplicate log groups found! Clean up copy-paste mistakes and improve code quality.',
-        ctaText: 'Learn Best Practices',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/delete-all-log-messages`,
-      },
-      [NotificationEvent.EXTENSION_WORKSPACE_HOT_FOLDER]: {
-        message:
-          '🔥 {hotFolderCount} logs concentrated in {hotFolderPath}! Pro helps navigate dense code hotspots.',
-        ctaText: 'See Pro Tree View',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro`,
-      },
-      [NotificationEvent.EXTENSION_TRIAL_EXPIRED]: {
-        message:
-          '⏰ Your Turbo Console Log Pro trial has expired. Upgrade to continue using Pro features!',
-        ctaText: 'Upgrade to Pro',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/pro?fromExpiredTrial=true`,
-      },
     };
 
     const fallback = fallbackMessages[notificationEvent];
 
-    // Replace count placeholders in fallback messages if count is provided
-    let fallbackMessage = fallback.message;
-    if (count !== undefined) {
-      if (
-        notificationEvent ===
-        NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD
-      ) {
-        fallbackMessage = fallbackMessage.replace(
-          '{logCount}',
-          count.toString(),
-        );
-      } else if (
-        notificationEvent ===
-        NotificationEvent.EXTENSION_WORKSPACE_COMMENTED_LOGS
-      ) {
-        fallbackMessage = fallbackMessage.replace(
-          '{commentedCount}',
-          count.toString(),
-        );
-      } else if (
-        notificationEvent ===
-        NotificationEvent.EXTENSION_WORKSPACE_DUPLICATE_LOGS
-      ) {
-        fallbackMessage = fallbackMessage.replace(
-          '{duplicateCount}',
-          count.toString(),
-        );
-      } else if (
-        notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_HOT_FOLDER
-      ) {
-        fallbackMessage = fallbackMessage.replace(
-          '{hotFolderCount}',
-          count.toString(),
-        );
-        if (additionalContext) {
-          fallbackMessage = fallbackMessage.replace(
-            '{hotFolderPath}',
-            additionalContext,
-          );
-        }
-      }
-    }
-
     notificationData = {
-      message: fallbackMessage,
+      message: fallback.message,
       ctaText: fallback.ctaText,
       ctaUrl: fallback.ctaUrl,
       variant: 'fallback',
@@ -315,16 +81,12 @@ export async function showNotification(
 
   // If notification is a duplicate (already shown today), return true to acknowledge
   // Since Turbo v3.14.0 - Backend deduplication prevents duplicate notifications
-  // Keep the local recording to stay in sync with backend state
   if (notificationData.isDuplicated) {
-    undoNotificationRecording(context, notificationEvent);
     return true; // Already shown/handled by backend duplicate detection
   }
 
   if (notificationData.isDeactivated) {
     // Variant is deactivated, don't show notification
-    // Undo the notification recording to free up both timestamp and counter
-    undoNotificationRecording(context, notificationEvent);
     return false;
   }
 
@@ -354,8 +116,6 @@ export async function showNotification(
 async function fetchNotificationData(
   notificationEvent: NotificationEvent,
   version?: string,
-  count?: number,
-  additionalContext?: string,
 ): Promise<ExtensionNotificationResponse> {
   const params = new URLSearchParams({
     notificationEvent: notificationEvent,
@@ -365,29 +125,8 @@ async function fetchNotificationData(
     params.append('version', version);
   }
 
-  // Pass different count parameter names based on event type
-  if (count !== undefined) {
-    if (
-      notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD
-    ) {
-      params.append('logCount', count.toString());
-    } else if (
-      notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_COMMENTED_LOGS
-    ) {
-      params.append('commentedCount', count.toString());
-    } else if (
-      notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_DUPLICATE_LOGS
-    ) {
-      params.append('duplicateCount', count.toString());
-    } else if (
-      notificationEvent === NotificationEvent.EXTENSION_WORKSPACE_HOT_FOLDER
-    ) {
-      params.append('hotFolderCount', count.toString());
-      if (additionalContext) {
-        params.append('hotFolderPath', additionalContext);
-      }
-    }
-  }
+  // v3.21.2: Removed count parameter handling for deleted events
+  // (workspace log threshold, commented logs, duplicate logs, hot folder)
 
   const developerId = generateDeveloperId();
   params.append('developerId', developerId);
@@ -428,20 +167,11 @@ async function fireNotificationInBackground(
     const startTime = Date.now();
 
     // Show notification with CTA
-    // For panel frequent access, add "I already did" option
-    const action =
-      notificationEvent === NotificationEvent.EXTENSION_PANEL_FREQUENT_ACCESS
-        ? await vscode.window.showInformationMessage(
-            notificationData.message,
-            notificationData.ctaText,
-            'I already did',
-            'Maybe Later',
-          )
-        : await vscode.window.showInformationMessage(
-            notificationData.message,
-            notificationData.ctaText,
-            'Maybe Later',
-          );
+    const action = await vscode.window.showInformationMessage(
+      notificationData.message,
+      notificationData.ctaText,
+      'Maybe Later',
+    );
 
     // Calculate reaction time (cap at 60 seconds to exclude stale time)
     const rawReactionTimeMs = Date.now() - startTime;
@@ -464,9 +194,6 @@ async function fireNotificationInBackground(
           console.warn('Failed to report notification click event:', err),
         );
 
-      // Reset dismissal counter on CTA click
-      resetDismissalCounter(context);
-
       // Open the CTA URL in external browser
       await vscode.env.openExternal(
         vscode.Uri.parse(
@@ -484,8 +211,6 @@ async function fireNotificationInBackground(
           true,
         );
       }
-      // Reset dismissal counter since user took action
-      resetDismissalCounter(context);
     } else if (action === 'Maybe Later') {
       // Track deferral with reaction time for analytics (fire-and-forget with error handling)
       // Note: "Maybe Later" is a polite, engaged deferral - user is interested but not ready now
@@ -518,16 +243,6 @@ async function fireNotificationInBackground(
         .catch((err) =>
           console.warn('Failed to report notification dismiss event:', err),
         );
-
-      // Record dismissal ONLY for engagement notifications
-      // Exception: EXTENSION_PHP_PRO_ONLY is a feature gate triggered by user action,
-      // not a PLG notification. Users might dismiss it multiple times while testing.
-      // Dismissing it shouldn't count toward pause threshold.
-      if (notificationEvent !== NotificationEvent.EXTENSION_PHP_PRO_ONLY) {
-        // Increments consecutive counter and may pause notifications
-        // This protects users from notification fatigue after 3 consecutive X clicks
-        recordDismissal(context);
-      }
     }
   } catch (error) {
     console.error('Error showing notification:', error);

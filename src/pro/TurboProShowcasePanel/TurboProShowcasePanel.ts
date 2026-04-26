@@ -78,12 +78,7 @@ export class TurboProShowcasePanel implements vscode.WebviewViewProvider {
         ? this.launcherView.badge.value
         : 0;
 
-    // Get trial status to conditionally show trial CTA
-    const trialStatus = this.context.globalState.get<
-      'active' | 'expired' | undefined
-    >('trial-status');
-
     // Pro-only panel: Always show workspace analytics, Pro features, and Pro illustration
-    return getStaticHtml(logCount, metadata, trialStatus);
+    return getStaticHtml(logCount, metadata);
   }
 }

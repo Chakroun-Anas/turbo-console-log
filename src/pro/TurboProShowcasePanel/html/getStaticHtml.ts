@@ -34,63 +34,10 @@ export function getStaticHtml(
       percentage: number;
     }>;
   } | null,
-  trialStatus?: 'active' | 'expired' | undefined,
 ): string {
   // Determine if we should show analytics section
   // Skip when: metadata is null (error) OR logCount is 0 (no logs found)
   const showAnalytics = metadata !== null && logCount > 0;
-
-  // Create trial CTA at the very top (for users who haven't tried yet)
-  const trialCta: DynamicFreemiumPanelContent | null =
-    trialStatus !== 'expired' && trialStatus !== 'active'
-      ? {
-          type: 'paragraph',
-          order: showAnalytics ? -1 : 1, // Show before everything else
-          component: {
-            title: 'Try Turbo Pro Free for 2 Hours 🎁',
-            rawHtml: true,
-            content: `
-        <div class="trial-cta-banner">
-          <p class="trial-message">
-            Experience <strong>workspace navigation, bulk cleanup, filtering, and search</strong> with zero commitment.
-          </p>
-          <a href="${TURBO_WEBSITE_BASE_URL}/pro-trial?utm_source=panel&utm_campaign=trial_cta&utm_medium=extension_panel&position=top&event=trial-workflow&variant=panel-trial-invitation" 
-             class="trial-button" 
-             onclick="event.preventDefault(); acquireVsCodeApi().postMessage({ type: 'open-external', url: this.href });">
-            Start Free Trial →
-          </a>
-          <p class="trial-details">No credit card required • Activate whenever you're ready</p>
-        </div>
-      `,
-          },
-        }
-      : null;
-
-  // Create expired trial CTA (for users whose trial has ended)
-  const trialExpiredCta: DynamicFreemiumPanelContent | null =
-    trialStatus === 'expired'
-      ? {
-          type: 'paragraph',
-          order: showAnalytics ? -1 : 1, // Show before everything else
-          component: {
-            title: 'Your Trial Has Ended ⏰',
-            rawHtml: true,
-            content: `
-        <div class="trial-expired-banner">
-          <p class="trial-expired-message">
-            You've experienced the power of <strong>Turbo Pro</strong>. Ready to make it permanent?
-          </p>
-          <a href="${TURBO_WEBSITE_BASE_URL}/pro?utm_source=panel&utm_campaign=trial_expired&utm_medium=extension_panel&position=top&event=trial-workflow&variant=panel-trial-expired" 
-             class="trial-expired-button" 
-             onclick="event.preventDefault(); acquireVsCodeApi().postMessage({ type: 'open-external', url: this.href });">
-            Get Turbo Pro Now 🚀
-          </a>
-          <p class="trial-expired-details">Unlock unlimited access to all Pro features</p>
-        </div>
-      `,
-          },
-        }
-      : null;
 
   // Conditionally create workspace analytics component (only if we have data to show)
   const workspaceLogCount: DynamicFreemiumPanelContent | null = showAnalytics
@@ -172,10 +119,8 @@ export function getStaticHtml(
     },
   };
 
-  // Pro-only content: Trial CTA and analytics conditionally shown
+  // Pro-only content: Analytics conditionally shown
   const proOnlyContent: DynamicFreemiumPanelContent[] = [
-    ...(trialCta ? [trialCta] : []),
-    ...(trialExpiredCta ? [trialExpiredCta] : []),
     ...(workspaceLogCount ? [workspaceLogCount] : []),
     turboProShowcase,
     proFeaturesReveal,

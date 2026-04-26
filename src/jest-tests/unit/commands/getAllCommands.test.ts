@@ -104,7 +104,6 @@ describe('getAllCommands', () => {
       'turboConsoleLog.deleteAllLogMessages',
       'turboConsoleLog.correctAllLogMessages',
       'turboConsoleLog.activatePro',
-      'turboConsoleLog.activateTrial',
     ];
 
     expect(Array.isArray(commands)).toBe(true);
