@@ -157,15 +157,11 @@ export async function activate(
     return;
   }
 
-  // Count initial workspace logs and potentially show notification (with error handling)
+  // Count initial workspace logs (with error handling)
   // Wait for completion before making panel accessible to avoid empty state
+  // v3.21.2: No longer shows workspace scanning notifications
   try {
-    await initialWorkspaceLogsCount(
-      extensionProperties,
-      launcherView,
-      context,
-      version,
-    );
+    await initialWorkspaceLogsCount(extensionProperties, launcherView, context);
   } catch (error) {
     console.error(
       '[Extension] Failed to initialize workspace log count:',

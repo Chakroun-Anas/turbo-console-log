@@ -3,38 +3,11 @@ import path from 'path';
 import { GitIgnoreMatcher } from './GitIgnoreMatcher';
 import { collectFilesWithLogs } from './collectFilesWithLogs';
 import { ExtensionProperties, Message, GlobalStateKey } from '@/entities';
-import { readFromGlobalState, writeToGlobalState } from '@/helpers';
-import { showNotification } from '@/notifications/showNotification';
-import { NotificationEvent } from '@/notifications/NotificationEvent';
-
-/**
- * Minimum log count threshold to trigger notification
- */
-const WORKSPACE_LOG_COUNT_THRESHOLD = 1000;
-
-/**
- * Minimum commented log count threshold to trigger notification
- * Set to 50 as practical sweet spot - catches significant patterns without being too restrictive
- * Balances signal quality (real workflow issue) with reach (catches before becoming massive)
- */
-const WORKSPACE_COMMENTED_LOG_THRESHOLD = 50;
-
-/**
- * Minimum duplicate log count threshold to trigger notification
- * Consecutive duplicates are always a code smell indicating copy-paste mistakes or debugging artifacts
- * Set to 1 because even a single duplicate group warrants immediate attention
- */
-const WORKSPACE_DUPLICATE_LOGS_THRESHOLD = 1;
-
-/**
- * Minimum log count in a single nested folder to trigger hot folder notification
- * High log concentration in one folder indicates architectural issues and navigation challenges
- * Set to 100 as it represents significant complexity warranting attention
- */
-const WORKSPACE_HOT_FOLDER_THRESHOLD = 100;
+import { writeToGlobalState } from '@/helpers';
 
 /**
  * Workspace log analytics metadata
+ * v3.21.2: Notification thresholds removed (no longer showing workspace scanning notifications)
  */
 export type WorkspaceLogMetadata = {
   totalLogs: number;
@@ -66,7 +39,6 @@ export async function initialWorkspaceLogsCount(
   config: ExtensionProperties,
   launcherView: vscode.TreeView<string>,
   context: vscode.ExtensionContext,
-  version: string,
 ): Promise<void> {
   if (
     !vscode.workspace.workspaceFolders ||
@@ -306,128 +278,6 @@ export async function initialWorkspaceLogsCount(
     tooltip: 'Total log statements in workspace',
   };
 
-  // Check all notification triggers independently (each one-time only)
-  // Note: This function is only called for non-Pro users (see extension.ts activation)
-
-  // 1. Workspace log threshold notification (1000+ logs)
-  const hasShownLogThresholdNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_WORKSPACE_LOG_THRESHOLD_NOTIFICATION,
-  );
-  if (
-    !hasShownLogThresholdNotification &&
-    totalLogsCount >= WORKSPACE_LOG_COUNT_THRESHOLD
-  ) {
-    const wasShown = await showNotification(
-      NotificationEvent.EXTENSION_WORKSPACE_LOG_THRESHOLD,
-      version,
-      context,
-      totalLogsCount,
-    );
-    if (wasShown) {
-      writeToGlobalState(
-        context,
-        GlobalStateKey.HAS_SHOWN_WORKSPACE_LOG_THRESHOLD_NOTIFICATION,
-        true,
-      );
-    }
-  }
-
-  // 2. Commented logs notification (50+ commented logs)
-  const hasShownCommentedLogsNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_WORKSPACE_COMMENTED_LOGS_NOTIFICATION,
-  );
-  if (
-    !hasShownCommentedLogsNotification &&
-    totalCommentedLogsCount >= WORKSPACE_COMMENTED_LOG_THRESHOLD
-  ) {
-    const wasShown = await showNotification(
-      NotificationEvent.EXTENSION_WORKSPACE_COMMENTED_LOGS,
-      version,
-      context,
-      totalCommentedLogsCount,
-    );
-    if (wasShown) {
-      writeToGlobalState(
-        context,
-        GlobalStateKey.HAS_SHOWN_WORKSPACE_COMMENTED_LOGS_NOTIFICATION,
-        true,
-      );
-    }
-  }
-
-  // 3. Duplicate logs notification (1+ duplicate groups)
-  const hasShownDuplicateLogsNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_WORKSPACE_DUPLICATE_LOGS_NOTIFICATION,
-  );
-  if (
-    !hasShownDuplicateLogsNotification &&
-    duplicateGroupsCount >= WORKSPACE_DUPLICATE_LOGS_THRESHOLD
-  ) {
-    const wasShown = await showNotification(
-      NotificationEvent.EXTENSION_WORKSPACE_DUPLICATE_LOGS,
-      version,
-      context,
-      duplicateGroupsCount,
-    );
-    if (wasShown) {
-      writeToGlobalState(
-        context,
-        GlobalStateKey.HAS_SHOWN_WORKSPACE_DUPLICATE_LOGS_NOTIFICATION,
-        true,
-      );
-    }
-  }
-
-  // 4. Hot folder notification (100+ logs in single nested folder)
-  // Find the hottest folder across all repositories
-  const hasShownHotFolderNotification = readFromGlobalState<boolean>(
-    context,
-    GlobalStateKey.HAS_SHOWN_WORKSPACE_HOT_FOLDER_NOTIFICATION,
-  );
-  if (!hasShownHotFolderNotification) {
-    // Find the repository with the highest log concentration in a single folder
-    let hottestFolder: {
-      repoName: string;
-      folderPath: string;
-      logCount: number;
-    } | null = null;
-
-    for (const repo of repositoryData) {
-      if (
-        repo.topNestedFolder &&
-        repo.topNestedFolder.logCount >= WORKSPACE_HOT_FOLDER_THRESHOLD
-      ) {
-        if (
-          !hottestFolder ||
-          repo.topNestedFolder.logCount > hottestFolder.logCount
-        ) {
-          hottestFolder = {
-            repoName: repo.name,
-            folderPath: repo.topNestedFolder.relativePath,
-            logCount: repo.topNestedFolder.logCount,
-          };
-        }
-      }
-    }
-
-    if (hottestFolder) {
-      const wasShown = await showNotification(
-        NotificationEvent.EXTENSION_WORKSPACE_HOT_FOLDER,
-        version,
-        context,
-        hottestFolder.logCount,
-        `${hottestFolder.repoName}/${hottestFolder.folderPath}`,
-      );
-      if (wasShown) {
-        writeToGlobalState(
-          context,
-          GlobalStateKey.HAS_SHOWN_WORKSPACE_HOT_FOLDER_NOTIFICATION,
-          true,
-        );
-      }
-    }
-  }
+  // v3.21.2: All workspace scanning notifications removed
+  // (log threshold, commented logs, duplicate logs, hot folder)
 }

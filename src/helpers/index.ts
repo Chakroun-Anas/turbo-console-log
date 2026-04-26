@@ -15,9 +15,6 @@ import { isJavaScriptOrTypeScriptFile } from './isJavaScriptOrTypeScriptFile';
 import { canInsertLogInDocument } from './canInsertLogInDocument';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
-import { listenToWeekendTurboSundays } from './listenToWeekendTurboSundays';
-import { listenToCommitWithLogs } from './listenToCommitWithLogs';
-import { listenToLogLibraryInstalled } from './listenToLogLibraryInstalled';
 import { loadPhpDebugMessage } from './loadPhpDebugMessage';
 import { showReleaseWebView } from './showReleaseWebView';
 import { showReleaseNotification } from './showReleaseNotification';
@@ -28,9 +25,6 @@ import { initialWorkspaceLogsCount } from './initialWorkspaceLogsCount/initialWo
 import { listenToFileOpeningNotifications } from './listenToFileOpeningNotifications';
 import { allNotificationHandlers } from './notificationHandlers';
 import { setupNotificationListeners } from './setupNotificationListeners';
-
-// Export individual handlers for potential standalone use
-export { customLogLibraryHandler } from './listenToCustomLogLibrary';
 
 export {
   readFromGlobalState,
@@ -50,9 +44,6 @@ export {
   canInsertLogInDocument,
   traceExtensionVersionHistory,
   isFreshInstall,
-  listenToWeekendTurboSundays,
-  listenToCommitWithLogs,
-  listenToLogLibraryInstalled,
   loadPhpDebugMessage,
   showReleaseWebView,
   showReleaseNotification,

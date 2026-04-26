@@ -2,6 +2,38 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.21.2] - 2026-04-26
+
+### 💙 We Heard You
+
+Recent reviews expressed frustration with notifications. This release **eliminates 27 of 34 notification events** (79% reduction) based on hard data and community feedback.
+
+**👉 [View NotificationEvent.ts on GitHub](https://github.com/Chakroun-Anas/turbo-console-log/blob/master/src/notifications/NotificationEvent.ts)**
+
+**Removed:** All milestone notifications (10/20/50/100 inserts), log management achievements, code quality warnings, workspace scanning alerts, and time-based marketing.
+
+**Kept (6 events):** Fresh install welcome, PHP Pro gate (PHP files only), major release announcements, 2-week inactivity re-engagement, manual log detection reminder, and Day 7 inactive user check-in.
+
+### 🚀 What This Extension Does
+
+**AST Engine** (86% test coverage, 750+ tests) · **Universal Support** (Vue, Svelte, Astro, PHP) · **Performance** (40K files in 5s) · **7 Console Methods** · **Pro Features** (tree panel, Git integration, mass cleanup) · **Open Source**
+
+We fixed the notification problem. We hope you'll give the tool a fresh look.
+
+### 💎 About Turbo Pro
+
+**One-time purchase, lifetime access** (not a subscription). Tree panel for entire codebase, mass cleanup by type/scope, Git filtering to changed lines, instant search, real-time sync, multi-language support.
+
+👉 **[Explore Features](https://www.turboconsolelog.io/pro)**
+
+### ⭐ Your Review Matters
+
+We fixed the notification problem (79% reduction, GitHub proof). If you've benefited from the AST engine, performance, framework support, or any of the 7 console methods — **leave a review that reflects the actual tool**, not just the notification frustration.
+
+👉 **[Leave Your Review](https://marketplace.visualstudio.com/items?itemName=ChakrounAnas.turbo-console-log&ssr=false#review-details)**
+
+---
+
 ## [3.21.1] - 2026-04-24
 
 ### 🚀 Focusing on What Works Best

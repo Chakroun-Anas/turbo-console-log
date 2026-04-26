@@ -88,16 +88,4 @@ export enum GlobalStateKey {
 
   // Logs in test file detection
   HAS_SHOWN_LOGS_IN_TEST_FILE_NOTIFICATION = 'HAS_SHOWN_LOGS_IN_TEST_FILE_NOTIFICATION',
-
-  // Notification cooldown system
-  LAST_SHOWN_NOTIFICATION = 'LAST_SHOWN_NOTIFICATION',
-  MONTHLY_NOTIFICATION_COUNT = 'MONTHLY_NOTIFICATION_COUNT',
-  MONTHLY_NOTIFICATION_MONTH_KEY = 'MONTHLY_NOTIFICATION_MONTH_KEY',
-  MONTHLY_LIMIT_REPORTED_FOR_MONTH = 'MONTHLY_LIMIT_REPORTED_FOR_MONTH', // Tracks which month we last reported limit reached (prevents duplicate reports)
-
-  // Dismissal tracking and pause system
-  CONSECUTIVE_DISMISSALS_COUNT = 'CONSECUTIVE_DISMISSALS_COUNT',
-  DISMISSAL_TRACKING_MONTH_KEY = 'DISMISSAL_TRACKING_MONTH_KEY', // Separate month key for dismissal counter (independent of notification count month tracking)
-  NOTIFICATIONS_PAUSED_UNTIL = 'NOTIFICATIONS_PAUSED_UNTIL', // Timestamp when pause expires (end of current month)
-  PAUSE_REPORTED_FOR_MONTH = 'PAUSE_REPORTED_FOR_MONTH', // Tracks which month we last reported pause (prevents duplicate reports)
 }
