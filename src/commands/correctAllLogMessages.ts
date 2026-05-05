@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import { Command, Message } from '../entities';
 import { showNotification } from '../ui';
 import { trackLogManagementCommands } from '../helpers';
+import { getActiveDebugRuntime } from './commandRuntime';
 
 function getFilenameFromLogMessage(
   logMessage: string,
@@ -30,7 +31,12 @@ export function correctAllLogMessagesCommand(): Command {
         ? document.fileName.split('/').pop()
         : document.fileName.split('\\').pop();
 
-      const logMessages: Message[] = await debugMessage.detectAll(
+      const runtime = await getActiveDebugRuntime(context, document, debugMessage);
+      if (!runtime) {
+        return;
+      }
+
+      const logMessages: Message[] = await runtime.debugMessage.detectAll(
         fs,
         vscode,
         document.uri.fsPath,
