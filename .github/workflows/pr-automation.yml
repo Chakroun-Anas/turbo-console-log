@@ -1,0 +1,140 @@
+name: PR Automation & Quality Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Validate PR title
+      uses: amannn/action-semantic-pull-request@v5
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        types: |
+          feat
+          fix
+          docs
+          style
+          refactor
+          perf
+          test
+          build
+          ci
+          chore
+          revert
+        requireScope: false
+      continue-on-error: true
+
+    - name: Check PR size
+      run: |
+        FILES_CHANGED=$(git diff --name-only origin/master...HEAD | wc -l)
+        LINES_CHANGED=$(git diff --stat origin/master...HEAD | tail -1 | awk '{print $4+$6}')
+        
+        echo "## 📊 PR Statistics" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Files Changed:** $FILES_CHANGED" >> $GITHUB_STEP_SUMMARY
+        echo "- **Lines Changed:** $LINES_CHANGED" >> $GITHUB_STEP_SUMMARY
+        
+        if [ $FILES_CHANGED -gt 50 ]; then
+          echo "::warning::This PR modifies more than 50 files. Consider breaking it into smaller PRs."
+        fi
+        
+        if [ $LINES_CHANGED -gt 1000 ]; then
+          echo "::warning::This PR changes more than 1000 lines. Consider breaking it into smaller PRs."
+        fi
+
+    - name: Label PR based on changes
+      uses: actions/labeler@v5
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+      continue-on-error: true
+
+  pr-comment:
+    name: Add PR Comment
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event.action == 'opened'
+
+    steps:
+    - name: Comment on PR
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## 👋 Thank you for your contribution!
+            
+            Your pull request will be reviewed soon. In the meantime:
+            
+            - ✅ Make sure all CI checks pass
+            - 📝 Update documentation if needed
+            - 🧪 Add tests for new features
+            - 🔒 Ensure no security vulnerabilities are introduced
+            
+            ### Useful Commands
+            - \`npm run lint\` - Check code style
+            - \`npm run test\` - Run all tests
+            - \`npm run esbuild\` - Build the extension
+            
+            ### Resources
+            - [Contributing Guide](https://github.com/${{ github.repository }}/blob/master/CONTRIBUTING.md)
+            - [Documentation](https://www.turboconsolelog.io/documentation)
+            
+            ---
+            
+            🤖 This comment was automatically generated.`
+          })
+
+  check-dependencies:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+
+    - name: Check for dependency changes
+      id: dep_changes
+      run: |
+        git fetch origin master
+        if git diff --name-only origin/master...HEAD | grep -q "package.json\|package-lock.json"; then
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "Dependency files have been modified"
+        else
+          echo "changed=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Analyze new dependencies
+      if: steps.dep_changes.outputs.changed == 'true'
+      run: |
+        echo "## 📦 Dependency Changes Detected" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Please ensure:" >> $GITHUB_STEP_SUMMARY
+        echo "- All new dependencies are necessary" >> $GITHUB_STEP_SUMMARY
+        echo "- Dependencies are from trusted sources" >> $GITHUB_STEP_SUMMARY
+        echo "- Versions are pinned or use conservative ranges" >> $GITHUB_STEP_SUMMARY
+        echo "- License compatibility is verified" >> $GITHUB_STEP_SUMMARY

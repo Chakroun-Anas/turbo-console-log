@@ -1,0 +1,74 @@
+name: Stale Issues & PRs Management
+
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    name: Manage Stale Issues & PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Close stale issues and PRs
+      uses: actions/stale@v9
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        
+        # Issues
+        stale-issue-message: |
+          👋 This issue has been automatically marked as stale because it has not had recent activity.
+          
+          It will be closed in 7 days if no further activity occurs.
+          
+          If this issue is still relevant, please:
+          - Add a comment to keep it open
+          - Provide additional context or information
+          - Reference any related PRs or issues
+          
+          Thank you for your contributions to Turbo Console Log! 🚀
+        close-issue-message: |
+          🔒 This issue has been automatically closed due to inactivity.
+          
+          If you believe this issue should remain open, feel free to reopen it or create a new issue with updated information.
+          
+          Thank you for your understanding! 🙏
+        days-before-issue-stale: 60
+        days-before-issue-close: 7
+        stale-issue-label: 'stale'
+        exempt-issue-labels: 'pinned,security,bug,enhancement'
+        
+        # Pull Requests
+        stale-pr-message: |
+          👋 This pull request has been automatically marked as stale because it has not had recent activity.
+          
+          It will be closed in 14 days if no further activity occurs.
+          
+          If this PR is still being worked on, please:
+          - Add a comment to keep it open
+          - Push new commits to update it
+          - Rebase on the latest master branch
+          
+          Thank you for your contributions! 🚀
+        close-pr-message: |
+          🔒 This pull request has been automatically closed due to inactivity.
+          
+          If you'd like to resume work on this PR, feel free to reopen it or create a new one.
+          
+          Thank you for your understanding! 🙏
+        days-before-pr-stale: 30
+        days-before-pr-close: 14
+        stale-pr-label: 'stale'
+        exempt-pr-labels: 'pinned,security,in-progress'
+        
+        # General settings
+        operations-per-run: 100
+        remove-stale-when-updated: true
+        ascending: true

@@ -1,0 +1,120 @@
+name: Performance Benchmarks
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+  schedule:
+    # Run benchmarks weekly on Saturdays at 00:00 UTC
+    - cron: '0 0 * * 6'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  benchmark:
+    name: Performance Benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+
+    - name: Install dependencies and build
+      run: |
+        npm install || npm install --legacy-peer-deps
+        npm run esbuild
+        npm run esbuild-base-minify
+
+    - name: Measure build performance
+      run: |
+        echo "## ⚡ Build Performance Metrics" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Development build
+        START=$(date +%s%N)
+        npm run esbuild > /dev/null 2>&1
+        END=$(date +%s%N)
+        DEV_TIME=$(( ($END - $START) / 1000000 ))
+        
+        # Production build
+        START=$(date +%s%N)
+        npm run esbuild-base-minify > /dev/null 2>&1
+        END=$(date +%s%N)
+        PROD_TIME=$(( ($END - $START) / 1000000 ))
+        
+        echo "- **Development Build:** ${DEV_TIME}ms" >> $GITHUB_STEP_SUMMARY
+        echo "- **Production Build:** ${PROD_TIME}ms" >> $GITHUB_STEP_SUMMARY
+
+    - name: Analyze bundle size
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 📦 Bundle Size Analysis" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "out/extension.js" ]; then
+          SIZE=$(stat -c%s "out/extension.js" 2>/dev/null || stat -f%z "out/extension.js" 2>/dev/null || echo "0")
+          if [ "$SIZE" != "0" ]; then
+            SIZE_KB=$((SIZE / 1024))
+            SIZE_MB=$(echo "scale=2; $SIZE / 1048576" | bc 2>/dev/null || echo "0")
+            
+            echo "- **Raw Size:** ${SIZE} bytes" >> $GITHUB_STEP_SUMMARY
+            echo "- **Size (KB):** ${SIZE_KB} KB" >> $GITHUB_STEP_SUMMARY
+            echo "- **Size (MB):** ${SIZE_MB} MB" >> $GITHUB_STEP_SUMMARY
+            
+            # Check if size is reasonable
+            if [ $SIZE_KB -gt 5000 ]; then
+              echo "::warning::Bundle size exceeds 5MB - consider optimization"
+            fi
+          fi
+        fi
+
+    - name: Count dependencies
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 📊 Dependency Analysis" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        DEPS=$(cat package.json | grep -A 100 '"dependencies"' | grep -c '": "' || echo "0")
+        DEV_DEPS=$(cat package.json | grep -A 100 '"devDependencies"' | grep -c '": "' || echo "0")
+        
+        echo "- **Production Dependencies:** $DEPS" >> $GITHUB_STEP_SUMMARY
+        echo "- **Development Dependencies:** $DEV_DEPS" >> $GITHUB_STEP_SUMMARY
+        echo "- **Total Dependencies:** $(($DEPS + $DEV_DEPS))" >> $GITHUB_STEP_SUMMARY
+
+    - name: Analyze code complexity
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 🧮 Code Complexity" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        TS_FILES=$(find src -name "*.ts" 2>/dev/null | wc -l)
+        if [ "$TS_FILES" -gt 0 ]; then
+          TOTAL_LINES=$(find src -name "*.ts" -exec wc -l {} + 2>/dev/null | tail -1 | awk '{print $1}' || echo "0")
+          AVG_LINES=$(($TOTAL_LINES / $TS_FILES))
+          
+          echo "- **TypeScript Files:** $TS_FILES" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total Lines of Code:** $TOTAL_LINES" >> $GITHUB_STEP_SUMMARY
+          echo "- **Average Lines per File:** $AVG_LINES" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- **TypeScript Files:** 0" >> $GITHUB_STEP_SUMMARY
+          echo "- No TypeScript files found" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Memory usage analysis
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 💾 Memory Profile" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Memory profiling requires runtime analysis in VS Code environment." >> $GITHUB_STEP_SUMMARY
+        echo "Consider using VS Code Extension Host Profiler for detailed analysis." >> $GITHUB_STEP_SUMMARY

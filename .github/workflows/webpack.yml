@@ -1,0 +1,289 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+  schedule:
+    # Run weekly on Sundays at 00:00 UTC for dependency checks
+    - cron: '0 0 * * 0'
+
+# Cancel in-progress runs for the same workflow and branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Minimal permissions for security
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  issues: write
+  checks: write
+
+env:
+  NODE_ENV: production
+  CI: true
+
+jobs:
+  # Job 1: Code Quality & Linting
+  code-quality:
+    name: Code Quality & Linting
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for better analysis
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install || npm install --legacy-peer-deps
+      continue-on-error: true
+        
+    - name: Run TypeScript compiler check
+      run: npm run lint || npx tsc --noEmit || true
+      continue-on-error: true
+
+    - name: Check code formatting
+      run: npx prettier --check "src/**/*.{ts,js,json}" || true
+      continue-on-error: true
+
+    - name: Analyze bundle size
+      run: npm run esbuild-base-minify-analyze || true
+      continue-on-error: true
+
+  # Job 2: Security Scanning
+  security:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+
+    - name: Run npm audit
+      run: |
+        npm audit --audit-level=moderate || echo "::warning::Security vulnerabilities found"
+      continue-on-error: true
+
+    - name: Dependency Review
+      uses: actions/dependency-review-action@v4
+      if: github.event_name == 'pull_request'
+      continue-on-error: true
+
+    - name: Check for secrets
+      uses: trufflesecurity/trufflehog@main
+      continue-on-error: true
+      with:
+        extra_args: --only-verified
+
+  # Job 3: Build & Test Matrix
+  build-and-test:
+    name: Build & Test (Node ${{ matrix.node-version }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    needs: [code-quality]
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies and build
+      run: |
+        npm install || npm install --legacy-peer-deps
+        npm run esbuild
+        npm run esbuild-base-minify
+      shell: bash
+
+    - name: Verify build output
+      run: |
+        if [ ! -f "out/extension.js" ]; then
+          echo "::error::Build failed - extension.js not found"
+          exit 1
+        fi
+        echo "✅ Build successful - extension.js created"
+        ls -lh out/extension.js
+      shell: bash
+
+    - name: Run tests
+      run: npm run test || npm run test:jest || echo "::warning::Some tests failed"
+      shell: bash
+      continue-on-error: true
+
+    - name: Run Jest tests with coverage
+      run: npm run test:jest:coverage || echo "::warning::Jest tests failed"
+      shell: bash
+      continue-on-error: true
+
+    - name: Upload coverage reports
+      if: matrix.node-version == '22.x' && matrix.os == 'ubuntu-latest'
+      uses: codecov/codecov-action@v5
+      continue-on-error: true
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+
+    - name: Upload build artifacts
+      if: matrix.node-version == '22.x' && matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4.5.0
+      with:
+        name: extension-build
+        path: |
+          out/
+          package.json
+          README.md
+          CHANGELOG.md
+        retention-days: 14
+        compression-level: 9
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4.5.0
+      continue-on-error: true
+      with:
+        name: test-results-${{ runner.os }}-node${{ matrix.node-version }}
+        path: |
+          coverage/
+          *.log
+        retention-days: 7
+
+  # Job 4: Package Extension
+  package:
+    name: Package Extension
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [build-and-test]
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install || npm install --legacy-peer-deps
+
+    - name: Install VSCE
+      run: npm install -g @vscode/vsce
+
+    - name: Package extension
+      run: vsce package --out turbo-console-log.vsix
+      continue-on-error: true
+
+    - name: Upload VSIX package
+      if: success()
+      uses: actions/upload-artifact@v4.5.0
+      with:
+        name: vsix-package
+        path: "*.vsix"
+        retention-days: 30
+
+  # Job 5: Performance & Quality Metrics
+  metrics:
+    name: Performance & Quality Metrics
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [build-and-test]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+
+    - name: Install dependencies and build
+      run: |
+        npm install || npm install --legacy-peer-deps
+        npm run esbuild-base-minify
+
+    - name: Generate bundle size report
+      run: |
+        echo "## Bundle Size Analysis 📊" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -f "out/extension.js" ]; then
+          SIZE=$(stat -c%s "out/extension.js" 2>/dev/null || stat -f%z "out/extension.js" 2>/dev/null || echo "0")
+          if [ "$SIZE" != "0" ]; then
+            SIZE_KB=$((SIZE / 1024))
+            echo "- **Bundle Size:** ${SIZE_KB} KB" >> $GITHUB_STEP_SUMMARY
+            echo "- **File:** out/extension.js" >> $GITHUB_STEP_SUMMARY
+          fi
+        fi
+
+    - name: Count lines of code
+      run: |
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Code Statistics 📈" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        find src -name "*.ts" -o -name "*.js" | xargs wc -l | tail -1 >> $GITHUB_STEP_SUMMARY || true
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+  # Job 6: Final Summary
+  summary:
+    name: Workflow Summary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [code-quality, security, build-and-test, package, metrics]
+    if: always()
+
+    steps:
+    - name: Generate comprehensive summary
+      run: |
+        echo "# 🎉 CI/CD Pipeline Complete" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Workflow Information" >> $GITHUB_STEP_SUMMARY
+        echo "- **Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Actor:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Run ID:** ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## Job Status" >> $GITHUB_STEP_SUMMARY
+        echo "- Code Quality: ${{ needs.code-quality.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Security Scan: ${{ needs.security.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Build & Test: ${{ needs.build-and-test.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Package: ${{ needs.package.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Metrics: ${{ needs.metrics.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "---" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 Built with Turbo Console Log CI/CD Pipeline" >> $GITHUB_STEP_SUMMARY

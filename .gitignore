@@ -7,3 +7,4 @@ coverage
 .test-extensions
 scripts/tmp
 .github/copilot-instructions.md
+.env

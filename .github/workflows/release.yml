@@ -1,0 +1,154 @@
+name: Release Management
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 3.14.1)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  discussions: write
+
+jobs:
+  build-release:
+    name: Build Release Package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+
+    - name: Install dependencies and build
+      run: |
+        npm install || npm install --legacy-peer-deps
+        npm run vscode:prepublish
+
+    - name: Install VSCE
+      run: npm install -g @vscode/vsce
+
+    - name: Package extension
+      run: vsce package
+
+    - name: Upload VSIX artifact
+      uses: actions/upload-artifact@v4.5.0
+      with:
+        name: vsix-package
+        path: "*.vsix"
+        retention-days: 90
+
+  create-release:
+    name: Create GitHub Release
+    needs: build-release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Download VSIX artifact
+      uses: actions/download-artifact@v7.0.0
+      with:
+        name: vsix-package
+
+    - name: Extract version
+      id: extract_version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/v}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION"
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        if [ -f "CHANGELOG.md" ]; then
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          head -n 50 CHANGELOG.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "changelog=No changelog available" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ steps.extract_version.outputs.version }}
+        name: Release v${{ steps.extract_version.outputs.version }}
+        body: |
+          # Turbo Console Log v${{ steps.extract_version.outputs.version }}
+          
+          ## 🎉 What's New
+          
+          ${{ steps.changelog.outputs.changelog }}
+          
+          ## 📦 Installation
+          
+          Download the `.vsix` file below and install it in VS Code:
+          1. Open VS Code
+          2. Go to Extensions (Ctrl+Shift+X)
+          3. Click the "..." menu → "Install from VSIX"
+          4. Select the downloaded file
+          
+          ## 🔗 Links
+          - [Official Website](https://www.turboconsolelog.io)
+          - [Documentation](https://www.turboconsolelog.io/documentation)
+          - [Upgrade to Pro](https://www.turboconsolelog.io/pro)
+          
+          ---
+          
+          🚀 Thank you for using Turbo Console Log!
+        files: "*.vsix"
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        discussion_category_name: Releases
+
+  publish-marketplace:
+    name: Publish to VS Code Marketplace
+    needs: create-release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+
+    - name: Install dependencies and build
+      run: |
+        npm install || npm install --legacy-peer-deps
+        npm run vscode:prepublish
+
+    - name: Install VSCE
+      run: npm install -g @vscode/vsce
+
+    - name: Publish to Marketplace
+      run: vsce publish -p ${{ secrets.VSCE_TOKEN }}
+      continue-on-error: true

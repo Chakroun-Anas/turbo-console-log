@@ -1,0 +1,44 @@
+# PR Labeler Configuration
+# Automatically label PRs based on changed files
+
+# Source code changes
+src:
+  - 'src/**/*.ts'
+  - 'src/**/*.js'
+
+# Test changes
+tests:
+  - 'src/**/*.test.ts'
+  - 'src/**/*.spec.ts'
+  - 'src/jest-tests/**'
+  - 'src/mocha-tests/**'
+
+# Configuration changes
+configuration:
+  - '*.json'
+  - '*.yml'
+  - '*.yaml'
+  - '.github/**'
+  - 'tsconfig.json'
+  - 'package.json'
+
+# Documentation changes
+documentation:
+  - '*.md'
+  - 'docs/**'
+
+# CI/CD changes
+ci:
+  - '.github/workflows/**'
+  - '.github/actions/**'
+
+# Dependencies
+dependencies:
+  - 'package.json'
+  - 'package-lock.json'
+
+# Build changes
+build:
+  - 'webpack.config.js'
+  - 'esbuild.config.js'
+  - 'tsconfig.json'

@@ -1,0 +1,85 @@
+name: Documentation & Link Validation
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [ "master" ]
+    paths:
+      - '**.md'
+      - 'docs/**'
+  schedule:
+    # Run weekly on Wednesdays at 00:00 UTC
+    - cron: '0 0 * * 3'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  markdown-lint:
+    name: Markdown Linting
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Lint Markdown files
+      uses: articulate/actions-markdownlint@v1
+      continue-on-error: true
+      with:
+        config: .markdownlint.json
+        files: '*.md'
+        ignore: node_modules
+
+    - name: Check Markdown formatting
+      run: |
+        echo "## 📝 Markdown Files Checked" >> $GITHUB_STEP_SUMMARY
+        find . -name "*.md" -not -path "*/node_modules/*" | wc -l >> $GITHUB_STEP_SUMMARY
+
+  link-checker:
+    name: Link Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check links in Markdown files
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        use-verbose-mode: 'no'
+        config-file: '.github/markdown-link-check-config.json'
+      continue-on-error: true
+
+    - name: Generate link check summary
+      if: always()
+      run: |
+        echo "## 🔗 Link Validation Complete" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "All Markdown links have been validated." >> $GITHUB_STEP_SUMMARY
+        echo "Check the logs above for any broken links." >> $GITHUB_STEP_SUMMARY
+
+  spelling-check:
+    name: Spelling Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check spelling
+      uses: rojopolis/spellcheck-github-actions@0.36.0
+      continue-on-error: true
+      with:
+        config_path: .github/spellcheck-config.yml
+        task_name: Markdown

@@ -1,0 +1,23 @@
+# CodeQL configuration for enhanced security scanning
+name: "CodeQL Configuration"
+
+# Paths to ignore during analysis
+paths-ignore:
+  - 'node_modules/**'
+  - 'out/**'
+  - 'coverage/**'
+  - '**/*.test.ts'
+  - '**/*.spec.ts'
+  - '.vscode-test/**'
+
+# Paths to include in analysis
+paths:
+  - 'src/**'
+
+# Query suites to run
+queries:
+  - uses: security-and-quality
+  - uses: security-extended
+
+# Disable default queries that may produce false positives
+disable-default-queries: false

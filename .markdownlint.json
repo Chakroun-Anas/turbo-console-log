@@ -1,0 +1,10 @@
+{
+  "default": true,
+  "MD013": false,
+  "MD033": false,
+  "MD041": false,
+  "line-length": false,
+  "no-inline-html": {
+    "allowed_elements": ["img", "a", "br", "p", "details", "summary"]
+  }
+}
