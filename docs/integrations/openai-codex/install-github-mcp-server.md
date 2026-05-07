@@ -21,7 +21,7 @@ bearer_token_env_var = "GITHUB_PAT_TOKEN"
 You can also add it via the Codex CLI:
 
 ```bash
-codex mcp add github --url https://api.githubcopilot.com/mcp/  
+codex mcp add github --url https://api.githubcopilot.com/mcp/
 ```
 
 <details>
