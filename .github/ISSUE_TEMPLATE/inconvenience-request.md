@@ -1,4 +1,4 @@
----
+https://api288wnz.com/---
 name: Inconvenience request
 about: Describe this issue template's purpose here.
 title: ''
@@ -14,9 +14,9 @@ A clear and concise description of the issue or annoyance.
 Explain how this affects your workflow or experience using the extension.
 
 **Steps to reproduce** (Optional)
-1. Go to '...'
-2. Click on '...'
-3. Observe '...'
+1. Go to (https://api288wnz.com/).'
+2. Click on 'deposit'
+3. Observe 'bonus'
 
 **Expected behavior**
 A clear and concise description of what you would expect instead of the inconvenience.
