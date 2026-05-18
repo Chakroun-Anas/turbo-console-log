@@ -19,7 +19,7 @@ describe('updateUserActivityStatus', () => {
 
   let mockContext: vscode.ExtensionContext;
 
-  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+  const ACTIVE_WINDOW_MS = 15 * 24 * 60 * 60 * 1000;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -27,7 +27,7 @@ describe('updateUserActivityStatus', () => {
   });
 
   describe('when user has inserted logs before (LAST_INSERTION_DATE exists)', () => {
-    describe('when last insertion was less than 7 days ago', () => {
+    describe('when last insertion was less than 15 days ago', () => {
       it('should return ACTIVE status for insertion 1 day ago', () => {
         const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
         mockReadFromGlobalState.mockImplementation((_, key) => {
@@ -93,11 +93,11 @@ describe('updateUserActivityStatus', () => {
       });
     });
 
-    describe('when last insertion was 7 days or more ago', () => {
-      it('should return INACTIVE status for insertion exactly 7 days ago', () => {
-        const sevenDaysAgo = Date.now() - ONE_WEEK_MS;
+    describe('when last insertion was 15 days or more ago', () => {
+      it('should return INACTIVE status for insertion exactly 15 days ago', () => {
+        const fifteenDaysAgo = Date.now() - ACTIVE_WINDOW_MS;
         mockReadFromGlobalState.mockImplementation((_, key) => {
-          if (key === GlobalStateKey.LAST_INSERTION_DATE) return sevenDaysAgo;
+          if (key === GlobalStateKey.LAST_INSERTION_DATE) return fifteenDaysAgo;
           return undefined;
         });
 
@@ -106,10 +106,10 @@ describe('updateUserActivityStatus', () => {
         expect(status).toBe(UserActivityStatus.INACTIVE);
       });
 
-      it('should return INACTIVE status for insertion 8 days ago', () => {
-        const eightDaysAgo = Date.now() - 8 * 24 * 60 * 60 * 1000;
+      it('should return INACTIVE status for insertion 16 days ago', () => {
+        const sixteenDaysAgo = Date.now() - 16 * 24 * 60 * 60 * 1000;
         mockReadFromGlobalState.mockImplementation((_, key) => {
-          if (key === GlobalStateKey.LAST_INSERTION_DATE) return eightDaysAgo;
+          if (key === GlobalStateKey.LAST_INSERTION_DATE) return sixteenDaysAgo;
           return undefined;
         });
 
@@ -131,9 +131,9 @@ describe('updateUserActivityStatus', () => {
       });
 
       it('should write INACTIVE status to global state', () => {
-        const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000;
+        const sixteenDaysAgo = Date.now() - 16 * 24 * 60 * 60 * 1000;
         mockReadFromGlobalState.mockImplementation((_, key) => {
-          if (key === GlobalStateKey.LAST_INSERTION_DATE) return tenDaysAgo;
+          if (key === GlobalStateKey.LAST_INSERTION_DATE) return sixteenDaysAgo;
           return undefined;
         });
 
@@ -147,12 +147,12 @@ describe('updateUserActivityStatus', () => {
       });
     });
 
-    describe('edge case: boundary at exactly 7 days minus 1ms', () => {
-      it('should return ACTIVE status when insertion is 1ms before 7-day boundary', () => {
-        const almostSevenDaysAgo = Date.now() - (ONE_WEEK_MS - 1);
+    describe('edge case: boundary at exactly 15 days minus 1ms', () => {
+      it('should return ACTIVE status when insertion is 1ms before 15-day boundary', () => {
+        const almostFifteenDaysAgo = Date.now() - (ACTIVE_WINDOW_MS - 1);
         mockReadFromGlobalState.mockImplementation((_, key) => {
           if (key === GlobalStateKey.LAST_INSERTION_DATE)
-            return almostSevenDaysAgo;
+            return almostFifteenDaysAgo;
           return undefined;
         });
 
@@ -227,7 +227,7 @@ describe('updateUserActivityStatus', () => {
     });
 
     describe('subsequent checks (ACTIVITY_CHECK_START_DATE exists)', () => {
-      describe('when less than 7 days since start date', () => {
+      describe('when less than 15 days since start date', () => {
         it('should return ACTIVE status for 1 day since start', () => {
           const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
           mockReadFromGlobalState.mockImplementation((_, key) => {
@@ -292,13 +292,13 @@ describe('updateUserActivityStatus', () => {
         });
       });
 
-      describe('when 7 days or more since start date', () => {
-        it('should return INACTIVE status for exactly 7 days since start', () => {
-          const sevenDaysAgo = Date.now() - ONE_WEEK_MS;
+      describe('when 15 days or more since start date', () => {
+        it('should return INACTIVE status for exactly 15 days since start', () => {
+          const fifteenDaysAgo = Date.now() - ACTIVE_WINDOW_MS;
           mockReadFromGlobalState.mockImplementation((_, key) => {
             if (key === GlobalStateKey.LAST_INSERTION_DATE) return undefined;
             if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE)
-              return sevenDaysAgo;
+              return fifteenDaysAgo;
             return undefined;
           });
 
@@ -307,12 +307,12 @@ describe('updateUserActivityStatus', () => {
           expect(status).toBe(UserActivityStatus.INACTIVE);
         });
 
-        it('should return INACTIVE status for 10 days since start', () => {
-          const tenDaysAgo = Date.now() - 10 * 24 * 60 * 60 * 1000;
+        it('should return INACTIVE status for 16 days since start', () => {
+          const sixteenDaysAgo = Date.now() - 16 * 24 * 60 * 60 * 1000;
           mockReadFromGlobalState.mockImplementation((_, key) => {
             if (key === GlobalStateKey.LAST_INSERTION_DATE) return undefined;
             if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE)
-              return tenDaysAgo;
+              return sixteenDaysAgo;
             return undefined;
           });
 
@@ -354,13 +354,13 @@ describe('updateUserActivityStatus', () => {
         });
       });
 
-      describe('edge case: boundary at exactly 7 days minus 1ms from start', () => {
-        it('should return ACTIVE status when 1ms before 7-day boundary', () => {
-          const almostSevenDaysAgo = Date.now() - (ONE_WEEK_MS - 1);
+      describe('edge case: boundary at exactly 15 days minus 1ms from start', () => {
+        it('should return ACTIVE status when 1ms before 15-day boundary', () => {
+          const almostFifteenDaysAgo = Date.now() - (ACTIVE_WINDOW_MS - 1);
           mockReadFromGlobalState.mockImplementation((_, key) => {
             if (key === GlobalStateKey.LAST_INSERTION_DATE) return undefined;
             if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE)
-              return almostSevenDaysAgo;
+              return almostFifteenDaysAgo;
             return undefined;
           });
 

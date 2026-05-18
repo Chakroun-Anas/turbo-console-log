@@ -1,0 +1,19 @@
+import failingCase1 from './1';
+import failingCase2 from './2';
+import failingCase3 from './3';
+import failingCase4 from './4';
+import failingCase5 from './5';
+import failingCase6 from './6';
+import failingCase7 from './7';
+import failingCase8 from './8';
+
+export default [
+  failingCase1,
+  failingCase2,
+  failingCase3,
+  failingCase4,
+  failingCase5,
+  failingCase6,
+  failingCase7,
+  failingCase8,
+];

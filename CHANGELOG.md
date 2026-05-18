@@ -2,6 +2,12 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.22.0] - 2026-05-18
+
+→ [v3.22.0: PHP Support Moves To Turbo Core](https://www.turboconsolelog.io/articles/release-3220)
+
+---
+
 ## [3.21.2] - 2026-04-26
 
 ### 💙 We Heard You

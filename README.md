@@ -1,20 +1,20 @@
-# 🚀 Turbo Console Log
+# Turbo Console Log 🚀
 
 **[Official Website](https://www.turboconsolelog.io)** | **[Turbo Pro](https://www.turboconsolelog.io/pro)** | **[GitHub Repository](https://github.com/Chakroun-Anas/turbo-console-log)**
 
 ---
 
-## 🚀 Automated Logging for JavaScript/TypeScript and PHP
+## Automated Logging for JavaScript/TypeScript and PHP
 
 **Turbo Console Log automates the process of writing meaningful log statements.** Insert logs with a single keyboard shortcut, then manage them across your entire workspace with precision and speed.
 
 ### **Two Editions**
 
 **🆓 Turbo Console Log (Free)**  
-Focused on the active editor for JavaScript and TypeScript. Insert, comment, uncomment, and delete logs with keyboard shortcuts. Uses AST parsing to place logs correctly, even in complex code structures.
+Single-file debugging for JavaScript, TypeScript, and PHP. Insert, comment, uncomment, and delete logs with keyboard shortcuts. Uses AST parsing to place logs correctly, even in complex code structures.
 
 **💎 Turbo Console Log Pro**  
-Workspace-wide log management for JavaScript, TypeScript, and PHP. View all logs across your entire codebase in a tree view, delete logs by type across multiple files, filter and search logs instantly.
+Workspace-wide log management across JavaScript, TypeScript, and PHP. View all logs across your entire codebase in a tree view, delete logs by type across multiple files, filter and search logs instantly — beyond what single-file editing allows.
 
 ---
 
@@ -26,7 +26,7 @@ The free version provides intelligent log insertion in your active editor:
 
 - **AST-Powered Precision** – Logs are placed correctly based on code structure, handling complex patterns like ternaries, destructuring, and nested expressions
 - **7 Console Methods (JS/TS)** – Dedicated commands for `console.log`, `console.info`, `console.debug`, `console.warn`, `console.error`, `console.table`, and custom log functions
-- **PHP Methods (Pro only)** – Support for `var_dump()`, `print_r()`, `error_log()`, and custom PHP logging functions
+- **PHP Methods** – Support for `var_dump()`, `print_r()`, `error_log()`, and custom PHP logging functions
 - **Individual Shortcuts** – Each method has its own keyboard shortcut (⌘K combinations)
 - **Multi-Cursor Support** – Insert logs for multiple variables simultaneously
 - **Customizable Format** – Configure prefixes, quotes, spacing, and context information
@@ -42,15 +42,64 @@ The free version provides intelligent log insertion in your active editor:
 
 ### ⌨️ Keyboard Shortcuts
 
+**JavaScript / TypeScript**
+
 - **`⌘K ⌘L`** (Ctrl+K Ctrl+L on Windows/Linux) – Insert console.log
 - **`⌘K ⌘E`** – Insert console.error
 - **`⌘K ⌘R`** – Insert console.warn
 - **`⌘K ⌘N`** – Insert console.info
+
+**PHP**
+
+- **`⌘K ⌘L`** (Ctrl+K Ctrl+L on Windows/Linux) – Insert var_dump()
+- **`⌘K ⌘N`** – Insert print_r()
+- **`⌘K ⌘B`** / **`⌘K ⌘E`** – Insert error_log()
+
+**Log Management (all languages)**
+
 - **`Alt+Shift+D`** – Delete all logs in current file
 - **`Alt+Shift+C`** – Comment all logs in current file
 - **`Alt+Shift+U`** – Uncomment all logs in current file
 
 **Full Documentation:** **[Turbo Console Log Docs](https://www.turboconsolelog.io/documentation)**
+
+---
+
+## ⚙️ Configuration
+
+Both editions are fully customizable through VS Code settings. Access via `Preferences > Settings` and search for "Turbo Console Log".
+
+### Log Message Format
+
+- **`logMessagePrefix`** – Customize the prefix (default: `🚀`)
+- **`logMessageSuffix`** – Customize the suffix (default: `:`)
+- **`delimiterInsideMessage`** – Separator between log elements (default: `~`)
+- **`quote`** – Quote style: `"` (double), `'` (single), or `` ` `` (backticks)
+- **`wrapLogMessage`** – Wrap log messages in curly braces
+
+### Context Information
+
+- **`includeFilename`** – Add file name to log output
+- **`includeLineNum`** – Add line number to log output
+- **`insertEnclosingClass`** – Include class name in logs (default: `true`)
+- **`insertEnclosingFunction`** – Include function name in logs (default: `true`)
+
+### Spacing & Formatting
+
+- **`insertEmptyLineBeforeLogMessage`** – Add blank line before logs
+- **`insertEmptyLineAfterLogMessage`** – Add blank line after logs
+- **`addSemicolonInTheEnd`** – Append semicolon to log statements
+
+### Custom Logging
+
+- **`logFunction`** – Custom log function name for the "Insert Custom Log" command (default: `log`)
+
+### Notifications & Telemetry
+
+- **`logCorrectionNotificationEnabled`** – Show notifications when logs are corrected
+- **`isTurboTelemetryEnabled`** – Anonymous usage analytics (respects VS Code global settings)
+
+**Full Settings Documentation:** **[Settings Guide](https://www.turboconsolelog.io/documentation/settings/custom-prefix)**
 
 ---
 
@@ -113,44 +162,6 @@ The free version provides intelligent log insertion in your active editor:
 **One-time payment, no subscription required.**
 
 **[See Pro in Action](https://www.turboconsolelog.io/pro#see-it-in-action)** | **[Upgrade to Pro](https://www.turboconsolelog.io/pro)**
-
----
-
-## ⚙️ Configuration
-
-Both editions are fully customizable through VS Code settings. Access via `Preferences > Settings` and search for "Turbo Console Log".
-
-### Log Message Format
-
-- **`logMessagePrefix`** – Customize the prefix (default: `🚀`)
-- **`logMessageSuffix`** – Customize the suffix (default: `:`)
-- **`delimiterInsideMessage`** – Separator between log elements (default: `~`)
-- **`quote`** – Quote style: `"` (double), `'` (single), or `` ` `` (backticks)
-- **`wrapLogMessage`** – Wrap log messages in curly braces
-
-### Context Information
-
-- **`includeFilename`** – Add file name to log output
-- **`includeLineNum`** – Add line number to log output
-- **`insertEnclosingClass`** – Include class name in logs (default: `true`)
-- **`insertEnclosingFunction`** – Include function name in logs (default: `true`)
-
-### Spacing & Formatting
-
-- **`insertEmptyLineBeforeLogMessage`** – Add blank line before logs
-- **`insertEmptyLineAfterLogMessage`** – Add blank line after logs
-- **`addSemicolonInTheEnd`** – Append semicolon to log statements
-
-### Custom Logging
-
-- **`logFunction`** – Custom log function name for the "Insert Custom Log" command (default: `log`)
-
-### Notifications & Telemetry
-
-- **`logCorrectionNotificationEnabled`** – Show notifications when logs are corrected
-- **`isTurboTelemetryEnabled`** – Anonymous usage analytics (respects VS Code global settings)
-
-**Full Settings Documentation:** **[Settings Guide](https://www.turboconsolelog.io/documentation/settings/custom-prefix)**
 
 ---
 

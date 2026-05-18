@@ -12,10 +12,8 @@ import { trackLogManagementCommands } from './trackLogManagementCommands';
 import { isProUser } from './isProUser';
 import { isPhpFile } from './isPhpFile';
 import { isJavaScriptOrTypeScriptFile } from './isJavaScriptOrTypeScriptFile';
-import { canInsertLogInDocument } from './canInsertLogInDocument';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
-import { loadPhpDebugMessage } from './loadPhpDebugMessage';
 import { showReleaseWebView } from './showReleaseWebView';
 import { showReleaseNotification } from './showReleaseNotification';
 import { updateUserActivityStatus } from './updateUserActivityStatus';
@@ -41,10 +39,8 @@ export {
   isProUser,
   isJavaScriptOrTypeScriptFile,
   isPhpFile,
-  canInsertLogInDocument,
   traceExtensionVersionHistory,
   isFreshInstall,
-  loadPhpDebugMessage,
   showReleaseWebView,
   showReleaseNotification,
   updateUserActivityStatus,

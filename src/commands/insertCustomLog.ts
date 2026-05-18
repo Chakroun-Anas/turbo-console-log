@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
-import { trackLogInsertions, canInsertLogInDocument } from '../helpers';
+import { trackLogInsertions } from '../helpers';
 
 export function insertCustomLogCommand(): Command {
   return {
@@ -14,17 +14,6 @@ export function insertCustomLogCommand(): Command {
       }
       const tabSize: number | string = getTabSize(editor.options.tabSize);
       const document: vscode.TextDocument = editor.document;
-
-      // Get extension version
-      const version = vscode.extensions.getExtension(
-        'ChakrounAnas.turbo-console-log',
-      )?.packageJSON.version;
-
-      // Check if log insertion is allowed (PHP requires Pro)
-      const canInsert = canInsertLogInDocument(context, document, version);
-      if (!canInsert) {
-        return;
-      }
 
       // For PHP files, notify about available commands
       if (document.languageId === 'php') {
