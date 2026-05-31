@@ -8,17 +8,25 @@
 
 **Turbo Console Log automates the process of writing meaningful log statements.** Insert logs with a single keyboard shortcut, then manage them across your entire workspace with precision and speed.
 
+---
+
 ### **Two Editions**
 
-**🆓 Turbo Console Log (Free)**  
+**Turbo Console Log Community 🚀**  
 Single-file debugging for JavaScript, TypeScript, and PHP. Insert, comment, uncomment, and delete logs with keyboard shortcuts. Uses AST parsing to place logs correctly, even in complex code structures.
 
-**💎 Turbo Console Log Pro**  
+**Turbo Console Log Pro 👑**  
 Workspace-wide log management across JavaScript, TypeScript, and PHP. View all logs across your entire codebase in a tree view, delete logs by type across multiple files, filter and search logs instantly — beyond what single-file editing allows.
 
 ---
 
-## 🆓 Free Version Features
+### 🐍 Python Support Coming June 2026
+
+**Turbo Console Log is expanding to Python!** After successfully bringing intelligent logging to JavaScript, TypeScript, and PHP, Python support launches next month with the same AST-powered precision you know and trust.
+
+**[Read the full announcement →](https://www.turboconsolelog.io/articles/release-3230)**
+
+## Community Version Features 🚀
 
 The free version provides intelligent log insertion in your active editor:
 
@@ -103,7 +111,7 @@ Both editions are fully customizable through VS Code settings. Access via `Prefe
 
 ---
 
-## 💎 Turbo Pro Features
+## Turbo Pro Features 💎
 
 <p align="center">
   <img src="https://www.turboconsolelog.io/assets/turbo-pro-illustration.png" alt="Turbo Console Log Pro" width="300">

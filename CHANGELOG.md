@@ -2,6 +2,12 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.23.0] - 2026-05-31
+
+→ [v3.23.0: Python Support Coming June 2026](https://www.turboconsolelog.io/articles/release-3230)
+
+---
+
 ## [3.22.0] - 2026-05-18
 
 → [v3.22.0: PHP Support Moves To Turbo Core](https://www.turboconsolelog.io/articles/release-3220)
