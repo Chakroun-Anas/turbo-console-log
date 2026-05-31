@@ -55,9 +55,9 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
         message:
-          '🎉 PHP devs rejoice! Full Turbo logging support is now in the free tier.',
+          '🐍 v3.23.0: Python support coming June 2026! 4th language after JS, TS & PHP',
         ctaText: 'See The Gains',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3220`,
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3230`,
       },
     };
 
