@@ -2,11 +2,11 @@ import * as vscode from 'vscode';
 import { DebugMessage } from '@/debug-message';
 import { ExtensionProperties } from '@/entities';
 import {
-  InsertCommandLogType,
-  ResolvedDebugRuntime,
+  type InsertCommandLogType,
+  type ResolvedDebugRuntime,
   resolveDebugRuntime,
   resolveLogFunctionForRuntime,
-} from '@/helpers';
+} from '@/helpers/resolveDebugRuntime';
 
 export async function getActiveDebugRuntime(
   document: vscode.TextDocument,

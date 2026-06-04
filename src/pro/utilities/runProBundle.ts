@@ -59,8 +59,14 @@ export async function runProBundle(
   extensionProperties: ExtensionProperties,
   proBundle: string,
   context: vscode.ExtensionContext,
-  version: string,
+  version?: string,
 ): Promise<void> {
+  const extensionVersion =
+    version ??
+    vscode.extensions.getExtension('ChakrounAnas.turbo-console-log')
+      ?.packageJSON.version ??
+    'unknown';
+
   console.log('[Pro] Starting Pro Bundle initialization...');
 
   // Patch the Pro bundle to include .py files in extension filtering
@@ -75,7 +81,7 @@ export async function runProBundle(
 
   // Also try simpler pattern: extensions without quotes in regex
   patchedBundle = patchedBundle.replace(
-    /\.js\|\.jsx\|\.ts\|\.tsx\|\.php(?=[\)\|\"])/g,
+    /\.js\|\.jsx\|\.ts\|\.tsx\|\.php(?=[)|"])/g,
     '.js|.jsx|.ts|.tsx|.php|.py',
   );
 
@@ -132,7 +138,7 @@ export async function runProBundle(
           );
           await showNotification(
             NotificationEvent.EXTENSION_PYTHON_PRO_SUPPORT,
-            version,
+            extensionVersion,
             context,
           );
         }
