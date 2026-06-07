@@ -6,6 +6,7 @@ import { ExtensionProperties, Message } from '@/entities';
 import { GitIgnoreMatcher } from './GitIgnoreMatcher';
 import { detectAll as phpDetectAll } from '@/debug-message/php/detectAll';
 import { detectAll as jsDetectAll } from '@/debug-message/js/JSDebugMessage/detectAll';
+import { detectAll as pythonDetectAll } from '@/debug-message/python/detectAll';
 import { filesToWatch } from './targetFiles';
 
 /**
@@ -60,9 +61,19 @@ export async function collectFilesWithLogs(
           try {
             // Determine which detectAll to use based on file extension
             const isPHP = filePath.endsWith('.php');
+            const isPython = filePath.endsWith('.py');
             let logs: Array<Message> = [];
             if (isPHP) {
               logs = await phpDetectAll(
+                filePath,
+                config.logFunction,
+                config.logMessagePrefix,
+                config.delimiterInsideMessage,
+              );
+            } else if (isPython) {
+              logs = await pythonDetectAll(
+                fs,
+                vscode,
                 filePath,
                 config.logFunction,
                 config.logMessagePrefix,

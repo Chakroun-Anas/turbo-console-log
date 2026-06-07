@@ -11,7 +11,12 @@ import { trackLogInsertions } from './trackLogInsertions';
 import { trackLogManagementCommands } from './trackLogManagementCommands';
 import { isProUser } from './isProUser';
 import { isPhpFile } from './isPhpFile';
+import { isPythonFile } from './isPythonFile';
 import { isJavaScriptOrTypeScriptFile } from './isJavaScriptOrTypeScriptFile';
+import {
+  resolveDebugRuntime,
+  resolveLogFunctionForRuntime,
+} from './resolveDebugRuntime';
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
 import { showReleaseWebView } from './showReleaseWebView';
@@ -39,6 +44,9 @@ export {
   isProUser,
   isJavaScriptOrTypeScriptFile,
   isPhpFile,
+  isPythonFile,
+  resolveDebugRuntime,
+  resolveLogFunctionForRuntime,
   traceExtensionVersionHistory,
   isFreshInstall,
   showReleaseWebView,

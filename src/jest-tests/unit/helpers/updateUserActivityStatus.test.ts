@@ -26,6 +26,10 @@ describe('updateUserActivityStatus', () => {
     mockContext = makeExtensionContext();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   describe('when user has inserted logs before (LAST_INSERTION_DATE exists)', () => {
     describe('when last insertion was less than 15 days ago', () => {
       it('should return ACTIVE status for insertion 1 day ago', () => {
@@ -149,7 +153,9 @@ describe('updateUserActivityStatus', () => {
 
     describe('edge case: boundary at exactly 15 days minus 1ms', () => {
       it('should return ACTIVE status when insertion is 1ms before 15-day boundary', () => {
-        const almostFifteenDaysAgo = Date.now() - (ACTIVE_WINDOW_MS - 1);
+        const now = Date.now();
+        jest.spyOn(Date, 'now').mockReturnValue(now);
+        const almostFifteenDaysAgo = now - (ACTIVE_WINDOW_MS - 1);
         mockReadFromGlobalState.mockImplementation((_, key) => {
           if (key === GlobalStateKey.LAST_INSERTION_DATE)
             return almostFifteenDaysAgo;
@@ -356,7 +362,9 @@ describe('updateUserActivityStatus', () => {
 
       describe('edge case: boundary at exactly 15 days minus 1ms from start', () => {
         it('should return ACTIVE status when 1ms before 15-day boundary', () => {
-          const almostFifteenDaysAgo = Date.now() - (ACTIVE_WINDOW_MS - 1);
+          const now = Date.now();
+          jest.spyOn(Date, 'now').mockReturnValue(now);
+          const almostFifteenDaysAgo = now - (ACTIVE_WINDOW_MS - 1);
           mockReadFromGlobalState.mockImplementation((_, key) => {
             if (key === GlobalStateKey.LAST_INSERTION_DATE) return undefined;
             if (key === GlobalStateKey.ACTIVITY_CHECK_START_DATE)

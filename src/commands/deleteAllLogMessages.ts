@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Command, Message } from '../entities';
 import { trackLogManagementCommands } from '../helpers';
-import { phpDebugMessage } from '@/debug-message/php';
+import { getActiveDebugRuntime } from './commandRuntime';
 
 export function deleteAllLogMessagesCommand(): Command {
   return {
@@ -15,15 +15,10 @@ export function deleteAllLogMessagesCommand(): Command {
       if (!editor) {
         return;
       }
+
       const document: vscode.TextDocument = editor.document;
-
-      // For PHP files, use PHP debug message from core
-      let activeDebugMessage = debugMessage;
-      if (document.languageId === 'php') {
-        activeDebugMessage = phpDebugMessage;
-      }
-
-      const logMessages: Message[] = await activeDebugMessage.detectAll(
+      const runtime = await getActiveDebugRuntime(document, debugMessage);
+      const logMessages: Message[] = await runtime.debugMessage.detectAll(
         fs,
         vscode,
         document.uri.fsPath,
@@ -31,6 +26,7 @@ export function deleteAllLogMessagesCommand(): Command {
         logMessagePrefix,
         delimiterInsideMessage,
       );
+
       editor
         .edit((editBuilder) => {
           logMessages.forEach(({ lines, isTurboConsoleLog }) => {

@@ -2,6 +2,10 @@ import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
 import { trackLogInsertions } from '../helpers';
+import { insertForSelections } from './commandRuntime';
+
+const PHP_DEBUGGING_COMMANDS_MESSAGE =
+  'PHP debugging commands: Ctrl/Cmd+K Ctrl/Cmd+L (var_dump), Ctrl/Cmd+K Ctrl/Cmd+N (print_r), Ctrl/Cmd+K Ctrl/Cmd+B/E (error_log)';
 
 export function insertCustomLogCommand(): Command {
   return {
@@ -12,42 +16,21 @@ export function insertCustomLogCommand(): Command {
       if (!editor) {
         return;
       }
-      const tabSize: number | string = getTabSize(editor.options.tabSize);
-      const document: vscode.TextDocument = editor.document;
 
-      // For PHP files, notify about available commands
+      const document: vscode.TextDocument = editor.document;
       if (document.languageId === 'php') {
-        vscode.window.showInformationMessage(
-          'PHP debugging commands: Ctrl/Cmd+K Ctrl/Cmd+L (var_dump), Ctrl/Cmd+K Ctrl/Cmd+N (print_r), Ctrl/Cmd+K Ctrl/Cmd+B/E (error_log)',
-        );
+        vscode.window.showInformationMessage(PHP_DEBUGGING_COMMANDS_MESSAGE);
         return;
       }
-      for (let index = 0; index < editor.selections.length; index++) {
-        const selection: vscode.Selection = editor.selections[index];
-        let wordUnderCursor = '';
-        const rangeUnderCursor: vscode.Range | undefined =
-          document.getWordRangeAtPosition(selection.active);
-        // if rangeUnderCursor is undefined, `document.getText(undefined)` will return the entire file.
-        if (rangeUnderCursor) {
-          wordUnderCursor = document.getText(rangeUnderCursor);
-        }
-        const selectedVar: string =
-          document.getText(selection) || wordUnderCursor;
-        const lineOfSelectedVar: number = selection.active.line;
-        if (selectedVar.trim().length !== 0) {
-          await editor.edit((editBuilder) => {
-            debugMessage.msg(
-              editBuilder,
-              document,
-              selectedVar,
-              lineOfSelectedVar,
-              tabSize,
-              extensionProperties,
-              extensionProperties.logFunction || 'log',
-            );
-          });
-        }
-      }
+
+      const tabSize: number = getTabSize(editor.options.tabSize);
+      await insertForSelections(
+        editor,
+        extensionProperties,
+        debugMessage,
+        'custom',
+        tabSize,
+      );
 
       // Track logs insertions
       trackLogInsertions(context);

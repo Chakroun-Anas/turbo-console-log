@@ -1,7 +1,7 @@
 {
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
-  "description": "Automated logging for JavaScript, TypeScript, and PHP. Insert, manage, and clean log messages with AST-powered precision.",
+  "description": "Automated logging for JavaScript, TypeScript, Python, and PHP. Insert, manage, and clean log messages with AST-powered precision.",
   "version": "3.23.0",
   "publisher": "ChakrounAnas",
   "engines": {
@@ -19,6 +19,7 @@
     "debug",
     "javascript",
     "typescript",
+    "python",
     "php",
     "debugging",
     "var_dump",
@@ -41,7 +42,8 @@
     "onLanguage:javascriptreact",
     "onLanguage:typescript",
     "onLanguage:typescriptreact",
-    "onLanguage:php"
+    "onLanguage:php",
+    "onLanguage:python"
   ],
   "extensionDependencies": [
     "vscode.git"

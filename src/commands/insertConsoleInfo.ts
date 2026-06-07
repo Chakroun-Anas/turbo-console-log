@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { Command } from '../entities';
 import { getTabSize } from '../utilities';
 import { trackLogInsertions } from '../helpers';
-import { phpDebugMessage } from '@/debug-message/php';
+import { insertForSelections } from './commandRuntime';
 
 export function insertConsoleInfoCommand(): Command {
   return {
@@ -13,43 +13,15 @@ export function insertConsoleInfoCommand(): Command {
       if (!editor) {
         return;
       }
-      const tabSize: number | string = getTabSize(editor.options.tabSize);
-      const document: vscode.TextDocument = editor.document;
 
-      // For PHP files, use PHP debug message from core
-      let activeDebugMessage = debugMessage;
-      let logType = 'info';
-
-      if (document.languageId === 'php') {
-        activeDebugMessage = phpDebugMessage;
-        logType = 'print_r';
-      }
-      for (let index = 0; index < editor.selections.length; index++) {
-        const selection: vscode.Selection = editor.selections[index];
-        let wordUnderCursor = '';
-        const rangeUnderCursor: vscode.Range | undefined =
-          document.getWordRangeAtPosition(selection.active);
-        // if rangeUnderCursor is undefined, `document.getText(undefined)` will return the entire file.
-        if (rangeUnderCursor) {
-          wordUnderCursor = document.getText(rangeUnderCursor);
-        }
-        const selectedVar: string =
-          document.getText(selection) || wordUnderCursor;
-        const lineOfSelectedVar: number = selection.active.line;
-        if (selectedVar.trim().length !== 0) {
-          await editor.edit((editBuilder) => {
-            activeDebugMessage.msg(
-              editBuilder,
-              document,
-              selectedVar,
-              lineOfSelectedVar,
-              tabSize,
-              extensionProperties,
-              logType,
-            );
-          });
-        }
-      }
+      const tabSize: number = getTabSize(editor.options.tabSize);
+      await insertForSelections(
+        editor,
+        extensionProperties,
+        debugMessage,
+        'info',
+        tabSize,
+      );
 
       // Track logs insertions
       trackLogInsertions(context);
