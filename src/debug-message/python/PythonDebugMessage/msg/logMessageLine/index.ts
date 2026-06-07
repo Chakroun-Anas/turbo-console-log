@@ -1,0 +1,1 @@
+export { line } from './logMessageLine';

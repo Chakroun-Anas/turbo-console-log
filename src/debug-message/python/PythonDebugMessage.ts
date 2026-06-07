@@ -2,7 +2,7 @@ import { TextDocument, TextEditorEdit } from 'vscode';
 import { ExtensionProperties, Message } from '@/entities';
 import { DebugMessage } from '@/debug-message/DebugMessage';
 import { detectAll } from './detectAll';
-import { msg } from './msg';
+import { msg } from './PythonDebugMessage/msg';
 
 export const pythonDebugMessage: DebugMessage = {
   msg(

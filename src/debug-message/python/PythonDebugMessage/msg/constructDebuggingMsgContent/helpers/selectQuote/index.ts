@@ -1,0 +1,1 @@
+export { selectPythonQuote } from './selectQuote';
