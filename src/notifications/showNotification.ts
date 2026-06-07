@@ -35,12 +35,6 @@ export async function showNotification(
         ctaText: 'Get Started',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/overview/motivation`,
       },
-      [NotificationEvent.EXTENSION_PYTHON_PRO_SUPPORT]: {
-        message:
-          '🐍 Python support is now available in Turbo Console Log Pro workspaces.',
-        ctaText: 'Learn More',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
-      },
       [NotificationEvent.EXTENSION_INACTIVE_MANUAL_LOG]: {
         message:
           '💡 Still typing console.log()? Save time with Turbo! Insert logs 10x faster.',
