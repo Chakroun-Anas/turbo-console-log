@@ -6,7 +6,6 @@ import fastGlob from 'fast-glob';
 import pLimit from 'p-limit';
 import { ExtensionProperties } from '../../entities';
 import { activateProMode, deactivateRepairMode } from '../../helpers';
-import { detectAll } from '../../debug-message/js/JSDebugMessage/detectAll';
 
 export async function runProBundle(
   extensionProperties: ExtensionProperties,
@@ -25,7 +24,6 @@ export async function runProBundle(
     'ignore',
     'fastGlob',
     'pLimit',
-    'detectAll',
     proBundle,
   );
 
@@ -38,7 +36,6 @@ export async function runProBundle(
     ignore,
     fastGlob,
     pLimit,
-    detectAll,
   );
 
   const turboConsoleLogPro =

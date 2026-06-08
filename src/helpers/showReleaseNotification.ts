@@ -34,6 +34,7 @@ export async function showReleaseNotification(
     '3.21.0', // Release 3.21.0 announcement
     '3.22.0', // Release 3.22.0 announcement,
     '3.23.0', // Release 3.23.0 announcement,
+    '3.24.0',
   ];
 
   // Only show notification for specific versions

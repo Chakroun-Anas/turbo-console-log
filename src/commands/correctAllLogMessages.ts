@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { Command, Message } from '../entities';
 import { showNotification } from '../ui';
 import { trackLogManagementCommands } from '../helpers';
-import { getActiveDebugRuntime } from './commandRuntime';
+import { resolveDebugRuntime } from '@/helpers/resolveDebugRuntime';
 
 function getFilenameFromLogMessage(
   logMessage: string,
@@ -19,7 +19,7 @@ function getFilenameFromLogMessage(
 export function correctAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.correctAllLogMessages',
-    handler: async ({ extensionProperties, debugMessage, context }) => {
+    handler: async ({ extensionProperties, context }) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
@@ -31,7 +31,7 @@ export function correctAllLogMessagesCommand(): Command {
         ? document.fileName.split('/').pop()
         : document.fileName.split('\\').pop();
 
-      const runtime = await getActiveDebugRuntime(document, debugMessage);
+      const runtime = resolveDebugRuntime(document);
 
       const logMessages: Message[] = await runtime.debugMessage.detectAll(
         fs,

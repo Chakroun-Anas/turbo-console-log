@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { jsDebugMessage } from './debug-message/js';
 import { Command, ExtensionProperties } from './entities';
 import { getAllCommands } from './commands/';
 import {
@@ -55,7 +54,6 @@ export async function activate(
     vscode.commands.registerCommand(name, (args: unknown[]) => {
       handler({
         extensionProperties,
-        debugMessage: jsDebugMessage,
         args,
         context,
         launcherView,

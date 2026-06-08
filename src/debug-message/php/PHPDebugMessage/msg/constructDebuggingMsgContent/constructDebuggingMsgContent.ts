@@ -91,13 +91,7 @@ export function constructDebuggingMsgContent(
   parts.push(...addVariable(cleanVar, logMessageSuffix));
 
   // Build final message
-  const result = buildLogMessage(
-    parts,
-    logFunction,
-    quote,
-    cleanVar,
-    extensionProperties.addSemicolonInTheEnd,
-  );
+  const result = buildLogMessage(parts, logFunction, quote, cleanVar);
 
   return result;
 }

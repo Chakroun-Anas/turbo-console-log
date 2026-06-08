@@ -9,6 +9,16 @@ import {
 } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
 import { DebugMessage } from '@/debug-message';
+import { resolveDebugRuntime } from '@/helpers/resolveDebugRuntime';
+
+jest.mock('@/helpers/resolveDebugRuntime', () => {
+  const actual = jest.requireActual('@/helpers/resolveDebugRuntime');
+  return { ...actual, resolveDebugRuntime: jest.fn() };
+});
+
+const mockResolveDebugRuntime = resolveDebugRuntime as jest.MockedFunction<
+  typeof resolveDebugRuntime
+>;
 
 describe('uncommentAllLogMessagesCommand', () => {
   let mockExtensionProperties: ExtensionProperties;
@@ -28,6 +38,11 @@ describe('uncommentAllLogMessagesCommand', () => {
 
     mockDebugMessage = makeDebugMessage();
     mockContext = makeExtensionContext();
+    mockResolveDebugRuntime.mockReturnValue({
+      language: 'javascript',
+      commentPrefix: '//',
+      debugMessage: mockDebugMessage,
+    });
   });
 
   describe('when no editor is active', () => {
@@ -40,7 +55,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         }),
       ).resolves.not.toThrow();
 
@@ -97,7 +111,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -158,7 +171,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange1);
@@ -229,7 +241,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange1);
@@ -281,7 +292,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).not.toHaveBeenCalled();
@@ -326,7 +336,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -374,7 +383,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -424,7 +432,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
@@ -534,7 +541,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         // Verify all commented log messages are deleted
@@ -586,7 +592,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
@@ -622,7 +627,6 @@ describe('uncommentAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(

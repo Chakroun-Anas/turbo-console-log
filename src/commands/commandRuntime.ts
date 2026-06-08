@@ -1,28 +1,18 @@
 import * as vscode from 'vscode';
-import { DebugMessage } from '@/debug-message';
 import { ExtensionProperties } from '@/entities';
 import {
   type InsertCommandLogType,
-  type ResolvedDebugRuntime,
   resolveDebugRuntime,
   resolveLogFunctionForRuntime,
 } from '@/helpers/resolveDebugRuntime';
 
-export async function getActiveDebugRuntime(
-  document: vscode.TextDocument,
-  debugMessage: DebugMessage,
-): Promise<ResolvedDebugRuntime> {
-  return resolveDebugRuntime(document, debugMessage);
-}
-
 export async function insertForSelections(
   editor: vscode.TextEditor,
   extensionProperties: ExtensionProperties,
-  debugMessage: DebugMessage,
   requestedLogType: InsertCommandLogType,
   tabSize: number,
 ): Promise<boolean> {
-  const runtime = await getActiveDebugRuntime(editor.document, debugMessage);
+  const runtime = resolveDebugRuntime(editor.document);
 
   const logFunction = resolveLogFunctionForRuntime(
     runtime.language,

@@ -55,9 +55,9 @@ export async function showNotification(
       },
       [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
         message:
-          '🐍 v3.23.0: Python support coming June 2026! 4th language after JS, TS & PHP',
-        ctaText: 'See The Gains',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3230`,
+          '🚀 Python developers, the wait is over — Turbo Console Log now speaks Python!',
+        ctaText: 'Try It Now',
+        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3240`,
       },
     };
 
