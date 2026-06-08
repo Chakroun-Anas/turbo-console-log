@@ -7,7 +7,7 @@ import { insertForSelections } from './commandRuntime';
 export function displayLogMessageCommand(): Command {
   return {
     name: 'turboConsoleLog.displayLogMessage',
-    handler: async ({ extensionProperties, debugMessage, context }) => {
+    handler: async ({ extensionProperties, context }) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
@@ -18,7 +18,6 @@ export function displayLogMessageCommand(): Command {
       await insertForSelections(
         editor,
         extensionProperties,
-        debugMessage,
         'log',
         tabSize,
       );

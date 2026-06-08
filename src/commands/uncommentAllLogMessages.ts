@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import { Command, Message } from '../entities';
 import { trackLogManagementCommands } from '../helpers';
-import { getActiveDebugRuntime } from './commandRuntime';
+import { resolveDebugRuntime } from '@/helpers/resolveDebugRuntime';
 
 function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -11,7 +11,7 @@ function escapeRegex(value: string): string {
 export function uncommentAllLogMessagesCommand(): Command {
   return {
     name: 'turboConsoleLog.uncommentAllLogMessages',
-    handler: async ({ extensionProperties, debugMessage, context }) => {
+    handler: async ({ extensionProperties, context }) => {
       const { logFunction, logMessagePrefix, delimiterInsideMessage } =
         extensionProperties;
       const editor: vscode.TextEditor | undefined =
@@ -21,7 +21,7 @@ export function uncommentAllLogMessagesCommand(): Command {
       }
 
       const document: vscode.TextDocument = editor.document;
-      const runtime = await getActiveDebugRuntime(document, debugMessage);
+      const runtime = resolveDebugRuntime(document);
       const logMessages: Message[] = await runtime.debugMessage.detectAll(
         fs,
         vscode,

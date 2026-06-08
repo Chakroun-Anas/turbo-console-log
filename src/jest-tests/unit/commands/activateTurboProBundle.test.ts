@@ -1,9 +1,6 @@
 import * as vscode from 'vscode';
 import { activateTurboProBundleCommand } from '@/commands/activateTurboProBundle';
-import {
-  makeExtensionContext,
-  makeDebugMessage,
-} from '@/jest-tests/mocks/helpers';
+import { makeExtensionContext } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
 import { showNotification } from '@/ui';
 import * as proUtilities from '@/pro/utilities';
@@ -20,7 +17,6 @@ jest.mock('@/helpers');
 describe('activateTurboProBundleCommand', () => {
   const mockContext = makeExtensionContext();
   const mockExtensionProperties = {} as ExtensionProperties;
-  const mockDebugMessage = makeDebugMessage();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -47,7 +43,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
@@ -70,7 +65,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
@@ -93,7 +87,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(vscode.window.showWarningMessage).toHaveBeenCalledWith(
@@ -114,7 +107,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(vscode.window.showWarningMessage).toHaveBeenCalledWith(
@@ -137,7 +129,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(vscode.window.showWarningMessage).toHaveBeenCalledWith(
@@ -160,7 +151,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(proUtilities.fetchProBundle).toHaveBeenCalledWith(
@@ -181,7 +171,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
@@ -203,7 +192,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(proUtilities.fetchProBundle).toHaveBeenCalledWith(
@@ -251,7 +239,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(errorMessage);
@@ -280,7 +267,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
@@ -302,7 +288,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(showNotification).toHaveBeenCalledWith(
@@ -328,7 +313,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       expect(proUtilities.fetchProBundle).toHaveBeenCalledWith(
@@ -350,7 +334,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       // Verify all three trial metadata keys are cleared
@@ -390,7 +373,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       // Trial metadata should NOT be cleared when activation fails
@@ -421,7 +403,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       // Trial metadata should NOT be cleared when offline
@@ -449,7 +430,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
       });
 
       // Trial cleanup should happen before runProBundle
@@ -475,7 +455,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
         launcherView: mockLauncherView,
       });
 
@@ -496,7 +475,6 @@ describe('activateTurboProBundleCommand', () => {
         command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
           launcherView: undefined,
         }),
       ).resolves.not.toThrow();
@@ -538,7 +516,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
         launcherView: mockLauncherView,
       });
 
@@ -570,7 +547,6 @@ describe('activateTurboProBundleCommand', () => {
       await command.handler({
         context: mockContext,
         extensionProperties: mockExtensionProperties,
-        debugMessage: mockDebugMessage,
         launcherView: mockLauncherView,
       });
 

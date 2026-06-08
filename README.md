@@ -4,7 +4,7 @@
 
 ---
 
-## Automated Logging for JavaScript/TypeScript and PHP
+## Automated Logging for JavaScript, TypeScript, Python, and PHP
 
 **Turbo Console Log transforms debugging in JavaScript, TypeScript, Python, and PHP.** It's built for developers who refuse to waste time manually typing log statements or hunting them down across dozens of files.
 
@@ -13,18 +13,18 @@
 ### **Two Editions**
 
 **Turbo Console Log Community 🚀**  
-Single-file debugging for JavaScript, TypeScript, and PHP. Insert, comment, uncomment, and delete logs with keyboard shortcuts. Uses AST parsing to place logs correctly, even in complex code structures.
+Single-file debugging for JavaScript, TypeScript, Python, and PHP. Insert, comment, uncomment, and delete logs with keyboard shortcuts. Uses AST parsing to place logs correctly, even in complex code structures.
 
 **Turbo Console Log Pro 👑**  
-Workspace-wide log management across JavaScript, TypeScript, and PHP. View all logs across your entire codebase in a tree view, delete logs by type across multiple files, filter and search logs instantly — beyond what single-file editing allows.
+Workspace-wide log management across JavaScript, TypeScript, Python, and PHP. View all logs across your entire codebase in a tree view, delete logs by type across multiple files, filter and search logs instantly — beyond what single-file editing allows.
 
 ---
 
-### 🐍 Python Support Coming June 2026
+### 🐍 Python Support Is Here
 
-**Turbo Console Log is expanding to Python!** After successfully bringing intelligent logging to JavaScript, TypeScript, and PHP, Python support launches next month with the same AST-powered precision you know and trust.
+**Turbo Console Log now supports Python!** After successfully bringing intelligent logging to JavaScript, TypeScript, and PHP, Python support is now available with the same AST-powered precision you know and trust.
 
-**[Read the full announcement →](https://www.turboconsolelog.io/articles/release-3230)**
+**[Read the full announcement →](https://www.turboconsolelog.io/articles/release-3240)**
 
 ## Community Version Features 🚀
 
@@ -34,6 +34,7 @@ The free version provides intelligent log insertion in your active editor:
 
 - **AST-Powered Precision** – Logs are placed correctly based on code structure, handling complex patterns like ternaries, destructuring, and nested expressions
 - **7 Console Methods (JS/TS)** – Dedicated commands for `console.log`, `console.info`, `console.debug`, `console.warn`, `console.error`, `console.table`, and custom log functions
+- **Python Methods** – Support for `print()`, `logging.debug()`, `logging.info()`, `logging.warning()`, `logging.error()`, and custom Python logging functions
 - **PHP Methods** – Support for `var_dump()`, `print_r()`, `error_log()`, and custom PHP logging functions
 - **Individual Shortcuts** – Each method has its own keyboard shortcut (⌘K combinations)
 - **Multi-Cursor Support** – Insert logs for multiple variables simultaneously
@@ -57,6 +58,14 @@ The free version provides intelligent log insertion in your active editor:
 - **`⌘K ⌘R`** – Insert console.warn
 - **`⌘K ⌘N`** – Insert console.info
 
+**Python**
+
+- **`⌘K ⌘L`** (Ctrl+K Ctrl+L on Windows/Linux) – Insert print()
+- **`⌘K ⌘B`** – Insert logging.debug()
+- **`⌘K ⌘N`** – Insert logging.info()
+- **`⌘K ⌘R`** – Insert logging.warning()
+- **`⌘K ⌘E`** – Insert logging.error()
+
 **PHP**
 
 - **`⌘K ⌘L`** (Ctrl+K Ctrl+L on Windows/Linux) – Insert var_dump()
@@ -68,6 +77,7 @@ The free version provides intelligent log insertion in your active editor:
 - **`Alt+Shift+D`** – Delete all logs in current file
 - **`Alt+Shift+C`** – Comment all logs in current file
 - **`Alt+Shift+U`** – Uncomment all logs in current file
+- **`Alt+Shift+X`** – Correct log messages (update file names & line numbers)
 
 **Full Documentation:** **[Turbo Console Log Docs](https://www.turboconsolelog.io/documentation)**
 

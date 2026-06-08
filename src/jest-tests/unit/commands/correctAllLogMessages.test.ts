@@ -9,10 +9,20 @@ import {
 } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
 import { DebugMessage } from '@/debug-message';
+import { resolveDebugRuntime } from '@/helpers/resolveDebugRuntime';
 import { showNotification } from '@/ui';
 
 // Mock the UI module
 jest.mock('@/ui');
+
+jest.mock('@/helpers/resolveDebugRuntime', () => {
+  const actual = jest.requireActual('@/helpers/resolveDebugRuntime');
+  return { ...actual, resolveDebugRuntime: jest.fn() };
+});
+
+const mockResolveDebugRuntime = resolveDebugRuntime as jest.MockedFunction<
+  typeof resolveDebugRuntime
+>;
 
 describe('correctAllLogMessagesCommand', () => {
   let mockExtensionProperties: ExtensionProperties;
@@ -33,6 +43,11 @@ describe('correctAllLogMessagesCommand', () => {
 
     mockDebugMessage = makeDebugMessage();
     mockContext = makeExtensionContext();
+    mockResolveDebugRuntime.mockReturnValue({
+      language: 'javascript',
+      commentPrefix: '//',
+      debugMessage: mockDebugMessage,
+    });
   });
 
   describe('when no editor is active', () => {
@@ -45,7 +60,6 @@ describe('correctAllLogMessagesCommand', () => {
         command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         }),
       ).resolves.not.toThrow();
 
@@ -99,7 +113,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.replace).toHaveBeenCalledWith(
@@ -146,7 +159,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.replace).not.toHaveBeenCalled();
@@ -188,7 +200,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.replace).toHaveBeenCalledWith(
@@ -233,7 +244,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.replace).not.toHaveBeenCalled();
@@ -277,7 +287,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.replace).toHaveBeenCalledWith(
@@ -332,7 +341,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.replace).toHaveBeenCalledWith(
@@ -383,7 +391,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(showNotification).toHaveBeenCalledWith(
@@ -438,7 +445,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(showNotification).toHaveBeenCalledWith(
@@ -485,7 +491,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(showNotification).not.toHaveBeenCalled();
@@ -525,7 +530,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(showNotification).not.toHaveBeenCalled();
@@ -569,7 +573,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.replace).toHaveBeenCalledWith(
@@ -601,7 +604,6 @@ describe('correctAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.replace).not.toHaveBeenCalled();

@@ -8,16 +8,32 @@ import {
   makeDebugMessage,
 } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
+import { resolveDebugRuntime } from '@/helpers/resolveDebugRuntime';
+
+jest.mock('@/helpers/resolveDebugRuntime', () => {
+  const actual = jest.requireActual('@/helpers/resolveDebugRuntime');
+  return { ...actual, resolveDebugRuntime: jest.fn() };
+});
+
+const mockResolveDebugRuntime = resolveDebugRuntime as jest.MockedFunction<
+  typeof resolveDebugRuntime
+>;
 
 describe('commentAllLogMessagesCommand', () => {
+  let debugMessage: ReturnType<typeof makeDebugMessage>;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    debugMessage = makeDebugMessage();
+    mockResolveDebugRuntime.mockReturnValue({
+      language: 'javascript',
+      commentPrefix: '//',
+      debugMessage,
+    });
   });
 
   it('should not throw or call debugMessage.detectAll when no editor is active', async () => {
     vscode.window.activeTextEditor = undefined; // simulate no open editor
-
-    const debugMessage = makeDebugMessage();
 
     const command = commentAllLogMessagesCommand();
 
@@ -25,7 +41,6 @@ describe('commentAllLogMessagesCommand', () => {
       command.handler({
         context: makeExtensionContext(),
         extensionProperties: {} as ExtensionProperties,
-        debugMessage,
       }),
     ).resolves.not.toThrow();
 
@@ -48,8 +63,6 @@ describe('commentAllLogMessagesCommand', () => {
     });
 
     const extensionContext = makeExtensionContext();
-
-    const debugMessage = makeDebugMessage();
     debugMessage.detectAll = jest.fn().mockReturnValue([
       {
         spaces: '    ',
@@ -74,7 +87,6 @@ describe('commentAllLogMessagesCommand', () => {
         logMessagePrefix: 'Debug',
         delimiterInsideMessage: ':',
       } as ExtensionProperties,
-      debugMessage,
     });
 
     expect(debugMessage.detectAll).toHaveBeenCalled();
@@ -103,8 +115,6 @@ describe('commentAllLogMessagesCommand', () => {
     });
 
     const extensionContext = makeExtensionContext();
-
-    const debugMessage = makeDebugMessage();
     // Simulate detectAll finding a commented log (which it actually does)
     debugMessage.detectAll = jest.fn().mockReturnValue([
       {
@@ -131,7 +141,6 @@ describe('commentAllLogMessagesCommand', () => {
         logMessagePrefix: 'Debug',
         delimiterInsideMessage: ':',
       } as ExtensionProperties,
-      debugMessage,
     });
 
     expect(debugMessage.detectAll).toHaveBeenCalled();
@@ -166,8 +175,6 @@ describe('commentAllLogMessagesCommand', () => {
     });
 
     const extensionContext = makeExtensionContext();
-
-    const debugMessage = makeDebugMessage();
     debugMessage.detectAll = jest.fn().mockReturnValue([
       {
         spaces: '',
@@ -199,7 +206,6 @@ describe('commentAllLogMessagesCommand', () => {
         logMessagePrefix: 'Debug',
         delimiterInsideMessage: ':',
       } as ExtensionProperties,
-      debugMessage,
     });
 
     expect(debugMessage.detectAll).toHaveBeenCalled();

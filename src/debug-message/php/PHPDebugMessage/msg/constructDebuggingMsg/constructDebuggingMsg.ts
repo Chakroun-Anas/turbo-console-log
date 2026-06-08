@@ -22,14 +22,14 @@ export function constructDebuggingMsg(
   spacesBeforeMsg: string,
   logFunction: string,
 ): string {
-  // Construct wrapping message if enabled
+  // Construct wrapping message if enabled.
+  // PHP statements always end with a semicolon (omitting it is a syntax error),
+  // so the wrapper lines terminate with ';' regardless of `addSemicolonInTheEnd`.
   const wrappingMsg = `${getLogFunction(logFunction)}(${extensionProperties.quote}${
     extensionProperties.logMessagePrefix
   } ${'-'.repeat(debuggingMsgContent.length - WRAPPER_OFFSET)}${
     extensionProperties.logMessagePrefix
-  }${extensionProperties.quote})${
-    extensionProperties.addSemicolonInTheEnd ? ';' : ''
-  }`;
+  }${extensionProperties.quote});`;
 
   const debuggingMsg: string = extensionProperties.wrapLogMessage
     ? `${spacesBeforeMsg}${wrappingMsg}\n${spacesBeforeMsg}${debuggingMsgContent}\n${spacesBeforeMsg}${wrappingMsg}`

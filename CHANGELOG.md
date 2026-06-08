@@ -2,6 +2,12 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.24.0] - 2026-06-08
+
+→ [v3.24.0: Python Support Is Here 🐍](https://www.turboconsolelog.io/articles/release-3240)
+
+---
+
 ## [3.23.0] - 2026-05-31
 
 → [v3.23.0: Python Support Coming June 2026](https://www.turboconsolelog.io/articles/release-3230)

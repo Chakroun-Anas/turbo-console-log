@@ -1,4 +1,3 @@
-import { Range } from 'vscode';
 import { Message, ExtensionProperties, BracketType } from '@/entities';
 import { spacesBeforeLogMsg } from '../msg/spacesBeforeLogMsg';
 import { closingContextLine } from '@/utilities';
@@ -86,6 +85,7 @@ export async function detectAll(
 
     // Detect all log messages (both active and commented) using unified detection
     const messages = detectLogMessages(
+      vscode,
       turboDocument,
       knownLogFunctions,
       logMessagePrefix,
@@ -111,6 +111,7 @@ export async function detectAll(
  * Marks each message with isTurboConsoleLog flag to distinguish Turbo logs from regular ones.
  */
 function detectLogMessages(
+  vscode: typeof import('vscode'),
   document: TurboTextDocument,
   knownLogFunctions: string[],
   logMessagePrefix: string,
@@ -176,7 +177,7 @@ function detectLogMessages(
       messages.push({
         spaces,
         lines: [
-          new Range(
+          new vscode.Range(
             range.start.line,
             range.start.character,
             range.end.line,
@@ -204,7 +205,7 @@ function detectLogMessages(
       msg += document.lineAt(j).text;
       const range = document.lineAt(j).rangeIncludingLineBreak;
       logMessage.lines.push(
-        new Range(
+        new vscode.Range(
           range.start.line,
           range.start.character,
           range.end.line,

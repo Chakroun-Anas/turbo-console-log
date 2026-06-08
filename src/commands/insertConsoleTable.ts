@@ -10,7 +10,7 @@ const PHP_DEBUGGING_COMMANDS_MESSAGE =
 export function insertConsoleTableCommand(): Command {
   return {
     name: 'turboConsoleLog.insertConsoleTable',
-    handler: async ({ extensionProperties, debugMessage, context }) => {
+    handler: async ({ extensionProperties, context }) => {
       const editor: vscode.TextEditor | undefined =
         vscode.window.activeTextEditor;
       if (!editor) {
@@ -27,7 +27,6 @@ export function insertConsoleTableCommand(): Command {
       await insertForSelections(
         editor,
         extensionProperties,
-        debugMessage,
         'table',
         tabSize,
       );

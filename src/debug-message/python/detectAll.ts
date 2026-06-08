@@ -1,7 +1,10 @@
-import type { TextDocument } from 'vscode';
 import { Message, ExtensionProperties, BracketType } from '@/entities';
 import { spacesBeforeLogMsg } from '@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg/spacesBeforeLogMsg';
 import { closingContextLine } from '@/utilities';
+import {
+  openTurboTextDocument,
+  type TurboTextDocument,
+} from '@/debug-message/js/JSDebugMessage/detectAll/TurboTextDocument';
 
 function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -13,10 +16,7 @@ function getKnownLogFunctions(customLogFunction: string): string[] {
     'logging.debug',
     'logging.info',
     'logging.warning',
-    'logging.warn',
     'logging.error',
-    'logging.exception',
-    'logging.critical',
     customLogFunction,
   ].filter(Boolean);
 }
@@ -45,16 +45,16 @@ export async function detectAll(
   delimiterInsideMessage: ExtensionProperties['delimiterInsideMessage'],
 ): Promise<Message[]> {
   try {
-    const sourceCode = await fs.promises.readFile(filePath, 'utf8');
+    const sourceCode = fs.readFileSync(filePath, 'utf8');
 
     if (!hasLogs(sourceCode, customLogFunction)) {
       return [];
     }
 
-    const uri = vscode.Uri.file(filePath);
-    const document = await vscode.workspace.openTextDocument(uri);
+    const turboDocument = openTurboTextDocument(sourceCode);
     const messages = detectLogMessages(
-      document,
+      vscode,
+      turboDocument,
       getKnownLogFunctions(customLogFunction),
       logMessagePrefix,
       delimiterInsideMessage,
@@ -73,7 +73,8 @@ export async function detectAll(
 }
 
 function detectLogMessages(
-  document: TextDocument,
+  vscode: typeof import('vscode'),
+  document: TurboTextDocument,
   knownLogFunctions: string[],
   logMessagePrefix: string,
   delimiterInsideMessage: string,
@@ -118,9 +119,17 @@ function detectLogMessages(
     }
 
     if (closedParenthesisLine === index) {
+      const range = line.rangeIncludingLineBreak;
       messages.push({
         spaces: spacesBeforeLogMsg(document, index, closedParenthesisLine),
-        lines: [line.rangeIncludingLineBreak],
+        lines: [
+          new vscode.Range(
+            range.start.line,
+            range.start.character,
+            range.end.line,
+            range.end.character,
+          ),
+        ],
         ...(isCommented && { isCommented: true }),
         ...(logFunction && { logFunction }),
         isTurboConsoleLog:
@@ -139,7 +148,15 @@ function detectLogMessages(
     let fullMessage = '';
     for (let cursor = index; cursor <= closedParenthesisLine; cursor++) {
       fullMessage += document.lineAt(cursor).text;
-      logMessage.lines.push(document.lineAt(cursor).rangeIncludingLineBreak);
+      const range = document.lineAt(cursor).rangeIncludingLineBreak;
+      logMessage.lines.push(
+        new vscode.Range(
+          range.start.line,
+          range.start.character,
+          range.end.line,
+          range.end.character,
+        ),
+      );
     }
 
     logMessage.isTurboConsoleLog =

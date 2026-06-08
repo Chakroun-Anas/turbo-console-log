@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { DebugMessage } from '@/debug-message';
+import { jsDebugMessage } from '@/debug-message/js';
 import { phpDebugMessage } from '@/debug-message/php';
 import { pythonDebugMessage } from '@/debug-message/python';
 import { isPhpFile } from './isPhpFile';
@@ -23,7 +24,6 @@ export type ResolvedDebugRuntime = {
 
 export function resolveDebugRuntime(
   document: vscode.TextDocument,
-  defaultDebugMessage: DebugMessage,
 ): ResolvedDebugRuntime {
   if (isPhpFile(document)) {
     return {
@@ -43,7 +43,7 @@ export function resolveDebugRuntime(
 
   return {
     commentPrefix: '//',
-    debugMessage: defaultDebugMessage,
+    debugMessage: jsDebugMessage,
     language: 'javascript',
   };
 }
@@ -53,14 +53,6 @@ export function resolveLogFunctionForRuntime(
   requestedLogType: InsertCommandLogType,
   customLogFunction: string,
 ): string {
-  if (requestedLogType === 'custom') {
-    if (language === 'python' && customLogFunction === 'log') {
-      return 'print';
-    }
-
-    return customLogFunction || 'log';
-  }
-
   if (language === 'php') {
     switch (requestedLogType) {
       case 'log':
@@ -72,6 +64,10 @@ export function resolveLogFunctionForRuntime(
       case 'warn':
       case 'error':
         return 'error_log';
+      case 'custom':
+        return customLogFunction && customLogFunction !== 'log'
+          ? customLogFunction
+          : 'var_dump';
       default:
         return 'var_dump';
     }
@@ -90,9 +86,18 @@ export function resolveLogFunctionForRuntime(
         return 'logging.warning';
       case 'error':
         return 'logging.error';
+      case 'custom':
+        return customLogFunction && customLogFunction !== 'log'
+          ? customLogFunction
+          : 'print';
       default:
         return 'print';
     }
+  }
+
+  // JavaScript
+  if (requestedLogType === 'custom') {
+    return customLogFunction || 'log';
   }
 
   return requestedLogType;

@@ -9,6 +9,16 @@ import {
 } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
 import { DebugMessage } from '@/debug-message';
+import { resolveDebugRuntime } from '@/helpers/resolveDebugRuntime';
+
+jest.mock('@/helpers/resolveDebugRuntime', () => {
+  const actual = jest.requireActual('@/helpers/resolveDebugRuntime');
+  return { ...actual, resolveDebugRuntime: jest.fn() };
+});
+
+const mockResolveDebugRuntime = resolveDebugRuntime as jest.MockedFunction<
+  typeof resolveDebugRuntime
+>;
 
 describe('deleteAllLogMessagesCommand', () => {
   let mockExtensionProperties: ExtensionProperties;
@@ -28,6 +38,11 @@ describe('deleteAllLogMessagesCommand', () => {
 
     mockDebugMessage = makeDebugMessage();
     mockContext = makeExtensionContext();
+    mockResolveDebugRuntime.mockReturnValue({
+      language: 'javascript',
+      commentPrefix: '//',
+      debugMessage: mockDebugMessage,
+    });
   });
 
   describe('when no editor is active', () => {
@@ -40,7 +55,6 @@ describe('deleteAllLogMessagesCommand', () => {
         command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         }),
       ).resolves.not.toThrow();
 
@@ -96,7 +110,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -151,7 +164,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange1);
@@ -212,7 +224,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange1);
@@ -268,7 +279,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -321,7 +331,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -378,7 +387,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -426,7 +434,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -562,7 +569,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         // Verify all log messages are deleted
@@ -619,7 +625,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).not.toHaveBeenCalled();
@@ -662,7 +667,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -705,7 +709,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockEditBuilder.delete).toHaveBeenCalledWith(mockRange);
@@ -750,7 +753,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
@@ -789,7 +791,6 @@ describe('deleteAllLogMessagesCommand', () => {
         await command.handler({
           context: mockContext,
           extensionProperties: mockExtensionProperties,
-          debugMessage: mockDebugMessage,
         });
 
         expect(mockDebugMessage.detectAll).toHaveBeenCalledWith(
