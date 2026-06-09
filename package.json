@@ -471,5 +471,11 @@
     "ignore": "^7.0.5",
     "p-limit": "^6.2.0",
     "php-parser": "^3.2.5"
+  },
+  "overrides": {
+    "flatted": "3.4.2",
+    "micromatch": {
+      "picomatch": "2.3.2"
+    }
   }
 }
