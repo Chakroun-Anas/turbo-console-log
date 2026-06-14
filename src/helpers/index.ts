@@ -20,7 +20,6 @@ import {
 import { traceExtensionVersionHistory } from './traceExtensionVersionHistory';
 import { isFreshInstall } from './isFreshInstall';
 import { showReleaseWebView } from './showReleaseWebView';
-import { showReleaseNotification } from './showReleaseNotification';
 import { updateUserActivityStatus } from './updateUserActivityStatus';
 import { getUserActivityStatus } from './getUserActivityStatus';
 import { listenToManualConsoleLogs } from './listenToManualConsoleLogs';
@@ -28,6 +27,10 @@ import { initialWorkspaceLogsCount } from './initialWorkspaceLogsCount/initialWo
 import { listenToFileOpeningNotifications } from './listenToFileOpeningNotifications';
 import { allNotificationHandlers } from './notificationHandlers';
 import { setupNotificationListeners } from './setupNotificationListeners';
+import { shouldShowReleasePanel, RELEASE_PANEL_VERSIONS } from './shouldShowReleasePanel';
+import { resolveReleaseVersion } from './resolveReleaseVersion';
+import { activateReleaseLauncherMode } from './activateReleaseLauncherMode';
+import { createReleasePanelStatusBarItem } from './createReleasePanelStatusBarItem';
 
 export {
   readFromGlobalState,
@@ -50,7 +53,6 @@ export {
   traceExtensionVersionHistory,
   isFreshInstall,
   showReleaseWebView,
-  showReleaseNotification,
   updateUserActivityStatus,
   getUserActivityStatus,
   listenToManualConsoleLogs,
@@ -58,4 +60,9 @@ export {
   listenToFileOpeningNotifications,
   allNotificationHandlers,
   setupNotificationListeners,
+  shouldShowReleasePanel,
+  RELEASE_PANEL_VERSIONS,
+  resolveReleaseVersion,
+  activateReleaseLauncherMode,
+  createReleasePanelStatusBarItem,
 };

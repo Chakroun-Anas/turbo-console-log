@@ -85,6 +85,22 @@ export interface TurboAnalyticsProvider {
   ): Promise<void>;
 
   /**
+   * Reports when the release panel is shown to the user
+   * Only sends data if both VS Code telemetry and custom telemetry are enabled
+   */
+  reportReleasePanelShown(variant: string, version: string): Promise<void>;
+
+  /**
+   * Reports when the user clicks a CTA in the release panel
+   * Only sends data if both VS Code telemetry and custom telemetry are enabled
+   */
+  reportReleasePanelCtaClick(
+    ctaUrl: string,
+    variant: string,
+    version: string,
+  ): Promise<void>;
+
+  /**
    * Dispose of any resources and event listeners
    * Should be called when the extension is deactivated
    */

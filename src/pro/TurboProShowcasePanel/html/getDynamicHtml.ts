@@ -8,7 +8,10 @@ import { getJavaScript } from '../javascript/javascript';
  * @param dynamicContent The dynamic content to render
  * @returns Complete HTML string for dynamic content
  */
-export function getDynamicHtml(dynamicContent: DynamicFreemiumPanel): string {
+export function getDynamicHtml(
+  dynamicContent: DynamicFreemiumPanel,
+  variant?: string,
+): string {
   // Separate content by type for different placement
   const { topContentHtml, articlesHtml } = contentByType(dynamicContent);
 
@@ -41,11 +44,12 @@ export function getDynamicHtml(dynamicContent: DynamicFreemiumPanel): string {
         
         <!-- Footer -->
         <footer class="footer">
-          © 2025 Turbo Console Log • Built with ❤️ by Turbo Unicorn 🦄
+          © 2026 Turbo Console Log • Built with ❤️ by Turbo Unicorn 🦄
         </footer>
       </div>
 
       <script>
+        ${variant ? `const PANEL_VARIANT = '${variant}';` : ''}
         ${getJavaScript()}
       </script>
     </body>

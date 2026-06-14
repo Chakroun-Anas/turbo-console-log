@@ -294,15 +294,6 @@ export function getCommonStyles(): string {
           border-radius: 8px;
         }
         
-        /* Features Reveal Standalone - for separate component */
-        .features-reveal-standalone {
-          background: linear-gradient(135deg, rgba(139, 123, 216, 0.1) 0%, rgba(72, 191, 227, 0.08) 100%);
-          border: 2px solid rgba(139, 123, 216, 0.2);
-          padding: 20px;
-          border-radius: 12px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-        
         .feature-list {
           display: flex;
           flex-direction: column;
@@ -361,6 +352,45 @@ export function getCommonStyles(): string {
           border-radius: 4px;
           margin-left: 6px;
           text-transform: uppercase;
+        }
+
+        /* Locked Pro feature board (upsell teaser inside the analytics card) */
+        .feature-item.feature-locked {
+          opacity: 0.62;
+          background: rgba(0, 0, 0, 0.28);
+          border: 1px dashed rgba(255, 255, 255, 0.18);
+        }
+
+        .feature-item.feature-locked:hover {
+          transform: none;
+          box-shadow: none;
+        }
+
+        /* Compact (name-only) supporting feature row */
+        .feature-item.feature-compact {
+          padding: 8px 12px;
+          align-items: center;
+        }
+
+        .feature-item.feature-compact .feature-name {
+          margin-bottom: 0;
+          font-size: 13px;
+        }
+
+        .feature-item.feature-compact .feature-icon {
+          font-size: 18px;
+        }
+
+        .pro-unlock-link {
+          color: inherit;
+          text-decoration: none;
+          cursor: pointer;
+          transition: opacity 0.2s ease;
+        }
+
+        .pro-unlock-link:hover {
+          text-decoration: underline;
+          opacity: 0.85;
         }
         
         /* Testimonial Section */
@@ -620,7 +650,7 @@ export function getCommonStyles(): string {
         
         .media-showcase-image {
           width: auto;
-          max-width: 340px;
+          max-width: 100%;
           max-height: 400px;
           margin: 0 auto;
           display: block;
@@ -637,6 +667,99 @@ export function getCommonStyles(): string {
           color: #FFC947;
           margin: 8px 0;
           line-height: 1.4;
+        }
+
+        .media-showcase-subtitle {
+          font-size: 13px;
+          font-weight: 400;
+          color: rgba(255, 255, 255, 0.75);
+          line-height: 1.5;
+          max-width: 320px;
+          margin: 0 auto 14px;
+          text-align: justify;
+        }
+
+        /* Inline "before/after" cleanup demo (replaces the mascot) — full-width
+           code banner above the CTA card */
+        .cleanup-demo {
+          box-sizing: border-box;
+          margin-bottom: 16px;
+          background: rgba(0, 0, 0, 0.35);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          padding: 12px 14px;
+          font-family: 'SF Mono', Menlo, Consolas, 'Courier New', monospace;
+          font-size: 12px;
+          line-height: 1.65;
+          text-align: left;
+          overflow-x: auto;
+        }
+
+        .cleanup-demo-line {
+          white-space: pre;
+          color: rgba(255, 255, 255, 0.82);
+        }
+
+        .cleanup-demo-line.removed {
+          color: #FF8787;
+          text-decoration: line-through;
+          opacity: 0.65;
+        }
+
+        .cleanup-demo-caption {
+          margin-top: 8px;
+          font-size: 11px;
+          font-weight: 700;
+          color: #6EE7A8;
+        }
+
+        /* Tiny "cleanup config" panel above the code demo */
+        .settings-demo {
+          margin-bottom: 12px;
+          background: rgba(0, 0, 0, 0.22);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          padding: 10px 12px;
+          font-size: 11.5px;
+          text-align: left;
+        }
+
+        .settings-demo-title {
+          font-size: 10.5px;
+          font-weight: 700;
+          color: #FFC947;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          margin-bottom: 6px;
+        }
+
+        .settings-demo-item {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          color: rgba(255, 255, 255, 0.82);
+          line-height: 2;
+        }
+
+        .settings-demo-toggle {
+          display: inline-flex;
+          width: 15px;
+          height: 15px;
+          border-radius: 3px;
+          font-size: 10px;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .settings-demo-toggle.on {
+          background: #2EA043;
+          color: #FFFFFF;
+        }
+
+        .settings-demo-toggle.off {
+          background: rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.35);
         }
 
         .media-showcase-cta-button {

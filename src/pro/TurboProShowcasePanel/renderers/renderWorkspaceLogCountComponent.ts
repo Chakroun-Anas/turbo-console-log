@@ -13,6 +13,58 @@ function formatLogCount(count: number): string {
 }
 
 /**
+ * Render the locked Pro feature board (the upsell teaser shown inside the
+ * analytics card). Returns '' when no features are provided so the dynamic
+ * content path and other callers are unaffected. When `unlockUrl` is set, the
+ * board header becomes a tracked link to the Pro page.
+ */
+function renderLockedFeaturesBoard(
+  lockedFeatures: WorkspaceLogCountComponent['lockedFeatures'],
+  unlockUrl?: string,
+): string {
+  if (!lockedFeatures || lockedFeatures.length === 0) {
+    return '';
+  }
+  const rows = lockedFeatures
+    .map((feature) => {
+      // Hero features (the v3.25.0 cleanup story) get the full treatment with a
+      // version badge + description. Supporting features collapse to a compact,
+      // name-only row to keep the board short.
+      if (feature.isNew) {
+        return `
+            <div class="feature-item feature-locked">
+              <div class="feature-icon">${escapeHtml(feature.icon)}</div>
+              <div class="feature-content">
+                <div class="feature-name">${escapeHtml(feature.name)}<span class="new-badge">v3.25.0</span></div>
+                <div class="feature-desc">${escapeHtml(feature.desc)}</div>
+              </div>
+            </div>`;
+      }
+      return `
+            <div class="feature-item feature-locked feature-compact">
+              <div class="feature-icon">${escapeHtml(feature.icon)}</div>
+              <div class="feature-content">
+                <div class="feature-name">${escapeHtml(feature.name)}</div>
+              </div>
+            </div>`;
+    })
+    .join('');
+  const header = unlockUrl
+    ? `<h4 class="section-title">
+          <a class="pro-unlock-link" onclick="openUrlWithTracking('${escapeHtml(
+            unlockUrl,
+          )}', 'pro-locked-board', 'Unlock with Turbo Pro'); return false;" style="cursor: pointer;">🔒 Unlock with Turbo Pro →</a>
+        </h4>`
+    : `<h4 class="section-title">🔒 Unlock with Turbo Pro</h4>`;
+  return `
+      <div class="analytics-section pro-locked-section">
+        ${header}
+        <div class="feature-list">${rows}
+        </div>
+      </div>`;
+}
+
+/**
  * Render a workspace log count component as HTML with real data visualization
  * @param component The workspace log count component to render
  * @returns HTML string for the workspace log count component
@@ -23,8 +75,22 @@ export function renderWorkspaceLogCountComponent(
   const { logCount, metadata } = component;
   const formattedCount = formatLogCount(logCount);
 
-  // If no metadata available, show simple count fallback
+  const lockedBoardHtml = renderLockedFeaturesBoard(
+    component.lockedFeatures,
+    component.unlockUrl,
+  );
+
+  // No analytics data to chart. When a locked Pro board is provided, render it
+  // on its own (no "0 Logs" header for a fresh workspace) so the features + the
+  // CTA below still show. Otherwise fall back to the original simple count card.
   if (!metadata || metadata.totalLogs === 0) {
+    if (lockedBoardHtml) {
+      return `
+      <div class="workspace-analytics-card">
+        ${lockedBoardHtml}
+      </div>
+    `;
+    }
     return `
       <div class="workspace-analytics-card">
         <div class="analytics-header">
@@ -162,6 +228,8 @@ export function renderWorkspaceLogCountComponent(
       `
           : ''
       }
+
+      ${lockedBoardHtml}
     </div>
   `;
 }

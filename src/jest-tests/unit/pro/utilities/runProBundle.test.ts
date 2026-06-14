@@ -72,4 +72,52 @@ describe('runProBundle', () => {
       'Pro bundle does not export turboConsoleLogPro. Activation failed!',
     );
   });
+
+  it('captures the bundle disposer and invokes it on disposeProBundle()', async () => {
+    const disposeMock = jest.fn();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (global as any).__disposeHook__ = disposeMock;
+    jest.mock('../../../../helpers/', () => ({
+      activateProMode: jest.fn(),
+      deactivateRepairMode: jest.fn(),
+    }));
+    const fakeBundle = `
+      exports.turboConsoleLogPro = function() {};
+      exports.disposeIPCServer = function() { global.__disposeHook__(); };
+    `;
+
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { runProBundle, disposeProBundle } = require('../../../../pro/utilities');
+    await runProBundle(extensionPropertiesMock, fakeBundle, mockContext);
+
+    // Not invoked until deactivate.
+    expect(disposeMock).not.toHaveBeenCalled();
+
+    disposeProBundle();
+    expect(disposeMock).toHaveBeenCalledTimes(1);
+
+    // Idempotent: the reference is cleared, so a second call is a no-op.
+    disposeProBundle();
+    expect(disposeMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('disposeProBundle() is a safe no-op when no bundle has run', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { disposeProBundle } = require('../../../../pro/utilities');
+    expect(() => disposeProBundle()).not.toThrow();
+  });
+
+  it('does not register a disposer when the bundle exports none', async () => {
+    jest.mock('../../../../helpers/', () => ({
+      activateProMode: jest.fn(),
+      deactivateRepairMode: jest.fn(),
+    }));
+    const fakeBundle = `exports.turboConsoleLogPro = function() {};`;
+
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { runProBundle, disposeProBundle } = require('../../../../pro/utilities');
+    await runProBundle(extensionPropertiesMock, fakeBundle, mockContext);
+
+    expect(() => disposeProBundle()).not.toThrow();
+  });
 });

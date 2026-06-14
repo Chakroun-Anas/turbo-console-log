@@ -9,7 +9,6 @@ jest.mock('@/helpers/readFromGlobalState');
 jest.mock('@/helpers/writeToGlobalState');
 jest.mock('@/telemetry');
 jest.mock('@/notifications');
-jest.mock('@/helpers/showReleaseNotification');
 
 describe('traceExtensionVersionHistory', () => {
   let mockContext: ExtensionContext;
@@ -45,6 +44,8 @@ describe('traceExtensionVersionHistory', () => {
       reportWebviewInteraction: jest.fn(),
       reportNotificationLimitReached: jest.fn(),
       reportNotificationsPaused: jest.fn(),
+      reportReleasePanelShown: jest.fn(),
+      reportReleasePanelCtaClick: jest.fn(),
     } as ReturnType<typeof createTelemetryService>);
   });
 
@@ -297,6 +298,8 @@ describe('traceExtensionVersionHistory', () => {
         reportWebviewInteraction: jest.fn(),
         reportNotificationLimitReached: jest.fn(),
         reportNotificationsPaused: jest.fn(),
+        reportReleasePanelShown: jest.fn(),
+        reportReleasePanelCtaClick: jest.fn(),
       } as ReturnType<typeof createTelemetryService>);
 
       const consoleWarnSpy = jest

@@ -4,6 +4,7 @@
 # Include only the files specified in package.json "files" array
 !out/extension.js
 !images/icon.png
+!images/turbo-release-update.png
 !README.md
 !CHANGELOG.md
 !LICENSE.txt

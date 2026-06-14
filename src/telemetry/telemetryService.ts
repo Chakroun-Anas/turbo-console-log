@@ -586,6 +586,94 @@ class TelemetryService implements TurboAnalyticsProvider {
     }
   }
 
+  public async reportReleasePanelShown(
+    variant: string,
+    version: string,
+  ): Promise<void> {
+    try {
+      if (!this.canSendTelemetry()) {
+        return;
+      }
+
+      const developerId = this.generateDeveloperId();
+      const extensionVersion = vscode.extensions.getExtension(
+        'ChakrounAnas.turbo-console-log',
+      )?.packageJSON.version;
+      const vscodeVersion = vscode.version;
+      const platform = process.platform;
+      const timezoneOffset = new Date().getTimezoneOffset();
+
+      await axios.post(
+        `${TURBO_WEBSITE_BASE_URL}/api/reportReleasePanelInteraction`,
+        {
+          developerId,
+          version,
+          variant,
+          interactionType: 'shown',
+          timezoneOffset,
+          extensionVersion,
+          vscodeVersion,
+          platform,
+        },
+        {
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': `turbo-console-log-extension/${extensionVersion}`,
+          },
+        },
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      // Silently fail to ensure extension functionality is not affected
+    }
+  }
+
+  public async reportReleasePanelCtaClick(
+    ctaUrl: string,
+    variant: string,
+    version: string,
+  ): Promise<void> {
+    try {
+      if (!this.canSendTelemetry()) {
+        return;
+      }
+
+      const developerId = this.generateDeveloperId();
+      const extensionVersion = vscode.extensions.getExtension(
+        'ChakrounAnas.turbo-console-log',
+      )?.packageJSON.version;
+      const vscodeVersion = vscode.version;
+      const platform = process.platform;
+      const timezoneOffset = new Date().getTimezoneOffset();
+
+      await axios.post(
+        `${TURBO_WEBSITE_BASE_URL}/api/reportReleasePanelInteraction`,
+        {
+          developerId,
+          version,
+          variant,
+          interactionType: 'clicked',
+          ctaUrl,
+          timezoneOffset,
+          extensionVersion,
+          vscodeVersion,
+          platform,
+        },
+        {
+          timeout: 5000,
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': `turbo-console-log-extension/${extensionVersion}`,
+          },
+        },
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      // Silently fail to ensure extension functionality is not affected
+    }
+  }
+
   dispose(): void {
     // No cleanup needed since we removed the event listeners
     // This method is kept for interface compatibility

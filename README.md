@@ -16,15 +16,19 @@
 Single-file debugging for JavaScript, TypeScript, Python, and PHP. Insert, comment, uncomment, and delete logs with keyboard shortcuts. Uses AST parsing to place logs correctly, even in complex code structures.
 
 **Turbo Console Log Pro 👑**  
-Workspace-wide log management across JavaScript, TypeScript, Python, and PHP. View all logs across your entire codebase in a tree view, delete logs by type across multiple files, filter and search logs instantly — beyond what single-file editing allows.
+The other half of Turbo — Pro automatically removes the debug logs in your staged changes the moment you commit, previewed first, with the scope under your control (limit it to Turbo's own logs with 🚀 Turbo Logs Only). Plus a workspace-wide tree view, instant search, and git-aware filtering across JavaScript, TypeScript, Python, and PHP.
 
 ---
 
-### 🐍 Python Support Is Here
+### 🧹 Never Commit a Debug Log Again
 
-**Turbo Console Log now supports Python!** After successfully bringing intelligent logging to JavaScript, TypeScript, and PHP, Python support is now available with the same AST-powered precision you know and trust.
+<p align="center">
+  <img src="https://www.turboconsolelog.io/assets/turbo-commit-auto-cleanup.webp" alt="Turbo Pro removes debug logs automatically on commit" width="280">
+</p>
 
-**[Read the full announcement →](https://www.turboconsolelog.io/articles/release-3240)**
+**Auto-cleanup on commit is here.** Turbo Pro now removes the debug logs in your staged changes automatically, the moment you commit — previewed first, so a stray `console.log` never slips into a PR again. Turbo puts the logs in; Pro takes them out — before every commit.
+
+**[Read the full announcement →](https://www.turboconsolelog.io/articles/release-3250)**
 
 ## Community Version Features 🚀
 
@@ -127,9 +131,25 @@ Both editions are fully customizable through VS Code settings. Access via `Prefe
   <img src="https://www.turboconsolelog.io/assets/turbo-pro-illustration.png" alt="Turbo Console Log Pro" width="300">
 </p>
 
-**For larger codebases with logs spread across many files, Pro provides workspace-wide visibility and management.** See all logs across your entire workspace, delete logs by type across multiple files, and use advanced filtering and search.
+**Pro closes the loop the free extension opens: it removes the debug logs in your changed lines — automatically, the moment you commit.** Every other tool just flags stray logs and hands the work back to you. Turbo removes them — with a live preview before every commit, and the scope under your control: clean every matching log, or limit it to the ones Turbo inserted.
 
-**Best for:** Multi-file projects, teams, large codebases, and pre-commit cleanup workflows
+**Best for:** Anyone who commits code and never wants a stray debug log to slip into a PR again
+
+### 🧹 Auto-Cleanup on Commit
+
+**Never commit a debug log again.** When you commit, the debug logs in your staged changes are removed automatically — before they ever reach the commit.
+
+- Cleans **every matching log in your changed lines** by default — or limit it to Turbo's own logs with **🚀 Turbo Logs Only**
+- Works for editor commits and terminal commits (via an optional pre-commit hook)
+- Skips files with unstaged or unsaved changes, so it never touches work you didn't mean to commit
+- Confirm with a live preview: **Remove & Commit**, or keep them with **Commit Anyway**
+
+### 👀 Live Cleanup Preview
+
+**See exactly what will be removed before you commit.** The Auto-Cleanup Preview panel lists every log queued for removal, grouped by file, so there are no surprises in your diff.
+
+- Review staged vs. pending logs at a glance
+- Click any entry to jump straight to its line in the code
 
 ### 🌲 Workspace Log Explorer
 

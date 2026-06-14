@@ -170,12 +170,15 @@ describe('getStaticHtml', () => {
       expect(result).toContain('Your Workspace Analytics');
       expect(result).toContain('150 Logs');
 
-      // Should show first CTA after analytics
-      expect(result).toContain('Stop hunting logs file by file');
-      expect(result).toContain('Take Back Control');
+      // Should show the Pro CTA (tagline + button)
+      expect(result).toContain('Never commit a debug log again');
+      expect(result).toContain('Turn On Auto-Cleanup');
 
-      // Pro features title should indicate "What Turbo Pro Brings"
-      expect(result).toContain('What Turbo Pro Brings ✨');
+      // Should show the supporting subtitle (mechanism + reassurance)
+      expect(result).toContain('Pay once, yours forever.');
+
+      // Pro features now live in the locked board inside the analytics card
+      expect(result).toContain('Unlock with Turbo Pro');
     });
 
     it('should skip analytics section when metadata is null', () => {
@@ -186,7 +189,7 @@ describe('getStaticHtml', () => {
       expect(result).not.toContain('100 Logs');
 
       // Pro features should still be shown
-      expect(result).toContain('What Turbo Pro Brings ✨');
+      expect(result).toContain('Unlock with Turbo Pro');
     });
 
     it('should skip analytics section when logCount is 0', () => {
@@ -196,58 +199,65 @@ describe('getStaticHtml', () => {
       expect(result).not.toContain('Your Workspace Analytics');
 
       // Pro features should still be shown
-      expect(result).toContain('What Turbo Pro Brings ✨');
+      expect(result).toContain('Unlock with Turbo Pro');
     });
 
     it('should show Pro CTA when analytics is shown', () => {
       const result = getStaticHtml(150, mockMetadata);
 
       // Should contain Pro CTA button and tagline
-      expect(result).toContain('Take Back Control');
-      expect(result).toContain('Stop hunting logs file by file');
+      expect(result).toContain('Turn On Auto-Cleanup');
+      expect(result).toContain('Never commit a debug log again');
     });
 
     it('should show Pro CTA when analytics is not shown', () => {
       const result = getStaticHtml(100, null);
 
       // Should still contain CTA
-      expect(result).toContain('Take Back Control');
-      expect(result).toContain('Stop hunting logs file by file');
+      expect(result).toContain('Turn On Auto-Cleanup');
+      expect(result).toContain('Never commit a debug log again');
     });
 
-    it('should include feature descriptions', () => {
+    it('shows descriptions for hero features and names only for the rest', () => {
       const result = getStaticHtml(123, mockMetadata);
 
-      // Should include feature descriptions (not personalized with log count anymore)
-      expect(result).toContain('See all logs organized by file in one view');
+      // Hero (v3.25.0) features render their description...
+      expect(result).toContain('Keep debug logs like these out of every commit');
+      expect(result).toContain(
+        'See exactly what will be removed before you commit',
+      );
+      // ...supporting features collapse to a name-only row (no description).
       expect(result).toContain('Workspace Tree View');
-      expect(result).toContain('Instant Search');
-      expect(result).toContain('Bulk Cleanup');
+      expect(result).not.toContain(
+        'Manage every log across your files in one place',
+      );
     });
 
     it('should include testimonial in both scenarios', () => {
       const resultWithAnalytics = getStaticHtml(150, mockMetadata);
       const resultWithoutAnalytics = getStaticHtml(100, null);
 
-      // Both should contain Kristian Serrano testimonial
-      expect(resultWithAnalytics).toContain('Kristian Serrano');
-      expect(resultWithoutAnalytics).toContain('Kristian Serrano');
+      // Both should contain the Caio Lemos testimonial
+      expect(resultWithAnalytics).toContain('Caio Lemos');
+      expect(resultWithoutAnalytics).toContain('Caio Lemos');
 
-      expect(resultWithAnalytics).toContain(
-        'This is one of the best extensions',
-      );
-      expect(resultWithoutAnalytics).toContain(
-        'This is one of the best extensions',
-      );
+      expect(resultWithAnalytics).toContain('The Pro Plan is super worthy');
+      expect(resultWithoutAnalytics).toContain('The Pro Plan is super worthy');
     });
 
-    it('should include Git Filter feature with version badge', () => {
+    it('should include Auto-Cleanup on Commit feature with version badge', () => {
       const result = getStaticHtml(150, mockMetadata);
 
-      // Should contain Git Filter feature
+      // Newest Pro feature, badged with its version
+      expect(result).toContain('Auto-Cleanup on Commit');
+      expect(result).toContain('v3.25.0');
+      expect(result).toContain(
+        'Keep debug logs like these out of every commit',
+      );
+
+      // Git Filter is a compact, name-only supporting row (no badge, no description).
       expect(result).toContain('Git Filter');
-      expect(result).toContain('v3.19.0');
-      expect(result).toContain('Show ONLY logs in your changed files');
+      expect(result).not.toContain('Focus on the logs in your changed files');
     });
 
     it('should include all Pro features regardless of analytics visibility', () => {
@@ -255,10 +265,10 @@ describe('getStaticHtml', () => {
       const resultWithoutAnalytics = getStaticHtml(0, null);
 
       const features = [
-        'Workspace Tree View',
-        'Instant Search',
+        'Auto-Cleanup on Commit',
+        'Live Cleanup Preview',
         'Git Filter',
-        'Bulk Cleanup',
+        'Workspace Tree View',
       ];
 
       features.forEach((feature) => {
@@ -277,6 +287,14 @@ describe('getStaticHtml', () => {
 
       // Should have position tracking
       expect(result).toContain('position=after_analytics');
+    });
+
+    it('links the "Unlock with Turbo Pro" board header to the Pro page', () => {
+      const result = getStaticHtml(150, mockMetadata);
+
+      expect(result).toContain('class="pro-unlock-link"');
+      expect(result).toContain('position=locked_board');
+      expect(result).toContain('variant=panel-pro-unlock');
     });
   });
 });
