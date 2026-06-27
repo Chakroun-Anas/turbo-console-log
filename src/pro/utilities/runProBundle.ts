@@ -4,8 +4,33 @@ import path from 'path';
 import ignore from 'ignore';
 import fastGlob from 'fast-glob';
 import pLimit from 'p-limit';
+import * as net from 'net';
+import * as os from 'os';
+import * as crypto from 'crypto';
+import * as childProcess from 'child_process';
 import { ExtensionProperties } from '../../entities';
 import { activateProMode, deactivateRepairMode } from '../../helpers';
+
+// The Pro bundle's `disposeIPCServer`, captured after a successful run so the
+// extension's deactivate() can tear the pre-commit IPC server down. The bundle
+// is eval'd via `new Function`, so the core can't import it statically — it
+// reads the function off the bundle's exports here and holds the reference.
+let proBundleDispose: (() => void) | null = null;
+
+/**
+ * Disposes resources held by the running Pro bundle (currently the pre-commit
+ * IPC server). Safe to call when no bundle is active — it's a no-op. Intended
+ * for the extension's `deactivate()` lifecycle hook.
+ */
+export function disposeProBundle(): void {
+  try {
+    proBundleDispose?.();
+  } catch (error) {
+    console.error('Error disposing Turbo Console Log Pro:', error);
+  } finally {
+    proBundleDispose = null;
+  }
+}
 
 export async function runProBundle(
   extensionProperties: ExtensionProperties,
@@ -24,6 +49,10 @@ export async function runProBundle(
     'ignore',
     'fastGlob',
     'pLimit',
+    'net',
+    'os',
+    'crypto',
+    'childProcess',
     proBundle,
   );
 
@@ -36,6 +65,10 @@ export async function runProBundle(
     ignore,
     fastGlob,
     pLimit,
+    net,
+    os,
+    crypto,
+    childProcess,
   );
 
   const turboConsoleLogPro =
@@ -43,6 +76,14 @@ export async function runProBundle(
   if (typeof turboConsoleLogPro === 'function') {
     try {
       await turboConsoleLogPro(extensionProperties, context);
+      // Capture the bundle's disposer (if any) so deactivate() can stop the
+      // pre-commit IPC server cleanly.
+      const disposeIPCServer =
+        exports.disposeIPCServer || module.exports?.disposeIPCServer;
+      proBundleDispose =
+        typeof disposeIPCServer === 'function'
+          ? (disposeIPCServer as () => void)
+          : null;
       deactivateRepairMode();
       activateProMode();
     } catch (error) {

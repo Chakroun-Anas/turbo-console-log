@@ -506,4 +506,182 @@ describe('renderWorkspaceLogCountComponent', () => {
       expect(result).toContain('2 Repositories Involved');
     });
   });
+
+  describe('locked Pro feature board', () => {
+    const lockedFeatures = [
+      {
+        icon: '🧹',
+        name: 'Auto-Cleanup on Commit',
+        desc: 'Keep debug logs like these out of every commit',
+        isNew: true,
+      },
+      {
+        icon: '🌲',
+        name: 'Workspace Tree View',
+        desc: 'Manage every log across your files in one place',
+      },
+    ];
+
+    it('renders the locked board alongside the charts when metadata is present', () => {
+      const component: WorkspaceLogCountComponent = {
+        logCount: 150,
+        title: 'Your Workspace Analytics',
+        description: '',
+        metadata: {
+          totalLogs: 150,
+          totalFiles: 25,
+          repositories: [
+            {
+              name: 'frontend',
+              path: '/workspace/frontend',
+              logCount: 150,
+              fileCount: 15,
+            },
+          ],
+          logTypeDistribution: [
+            { type: 'console.log', count: 150, percentage: 100 },
+          ],
+        },
+        lockedFeatures,
+      };
+
+      const result = renderWorkspaceLogCountComponent(component);
+
+      // Charts AND the locked board both render.
+      expect(result).toContain('Log Type Distribution');
+      expect(result).toContain('🔒 Unlock with Turbo Pro');
+      expect(result).toContain('feature-locked');
+      expect(result).toContain('Auto-Cleanup on Commit');
+      expect(result).toContain('v3.25.0'); // isNew badge
+    });
+
+    it('renders the locked board on its own (no "0 Logs" header) when there is no metadata', () => {
+      const component: WorkspaceLogCountComponent = {
+        logCount: 0,
+        title: 'Your Workspace Analytics',
+        description: 'unused',
+        metadata: null,
+        lockedFeatures,
+      };
+
+      const result = renderWorkspaceLogCountComponent(component);
+
+      expect(result).toContain('🔒 Unlock with Turbo Pro');
+      expect(result).toContain('Workspace Tree View');
+      // No analytics header / count badge for a fresh workspace.
+      expect(result).not.toContain('Your Workspace Analytics');
+      expect(result).not.toContain('log-count-badge');
+    });
+
+    it('makes the "Unlock with Turbo Pro" header a tracked link when unlockUrl is set', () => {
+      const component: WorkspaceLogCountComponent = {
+        logCount: 0,
+        title: 'Your Workspace Analytics',
+        description: '',
+        metadata: null,
+        lockedFeatures,
+        unlockUrl: 'https://turboconsolelog.io/pro?position=locked_board',
+      };
+
+      const result = renderWorkspaceLogCountComponent(component);
+
+      expect(result).toContain('class="pro-unlock-link"');
+      expect(result).toContain('openUrlWithTracking');
+      expect(result).toContain('position=locked_board');
+    });
+
+    it('renders a plain (non-link) header when no unlockUrl is provided', () => {
+      const component: WorkspaceLogCountComponent = {
+        logCount: 0,
+        title: 'Your Workspace Analytics',
+        description: '',
+        metadata: null,
+        lockedFeatures,
+      };
+
+      const result = renderWorkspaceLogCountComponent(component);
+
+      expect(result).toContain('🔒 Unlock with Turbo Pro');
+      expect(result).not.toContain('pro-unlock-link');
+    });
+
+    it('shows the version badge only for isNew features', () => {
+      const component: WorkspaceLogCountComponent = {
+        logCount: 0,
+        title: 'Your Workspace Analytics',
+        description: '',
+        metadata: null,
+        lockedFeatures,
+      };
+
+      const result = renderWorkspaceLogCountComponent(component);
+
+      // Auto-Cleanup is new (badge); Tree View is not (no badge).
+      const badgeCount = (result.match(/new-badge/g) || []).length;
+      expect(badgeCount).toBe(1);
+    });
+
+    it('falls back to the simple count card when no locked board is provided', () => {
+      const component: WorkspaceLogCountComponent = {
+        logCount: 5,
+        title: 'Your Workspace Analytics',
+        description: 'Simple fallback description.',
+        metadata: null,
+      };
+
+      const result = renderWorkspaceLogCountComponent(component);
+
+      expect(result).toContain('Your Workspace Analytics');
+      expect(result).toContain('5 Logs');
+      expect(result).toContain('Simple fallback description.');
+      expect(result).not.toContain('Unlock with Turbo Pro');
+    });
+
+    it('escapes HTML in locked feature text', () => {
+      const component: WorkspaceLogCountComponent = {
+        logCount: 0,
+        title: 'Your Workspace Analytics',
+        description: '',
+        metadata: null,
+        lockedFeatures: [
+          { icon: '🧹', name: '<b>Name</b>', desc: '<i>Desc</i>' },
+        ],
+      };
+
+      const result = renderWorkspaceLogCountComponent(component);
+
+      expect(result).not.toContain('<b>Name</b>');
+      expect(result).toContain('&lt;b&gt;Name&lt;/b&gt;');
+    });
+
+    it('shows the description only for hero (isNew) features', () => {
+      const component: WorkspaceLogCountComponent = {
+        logCount: 0,
+        title: 'Your Workspace Analytics',
+        description: '',
+        metadata: null,
+        lockedFeatures: [
+          {
+            icon: '🧹',
+            name: 'Auto-Cleanup on Commit',
+            desc: 'HERO DESCRIPTION',
+            isNew: true,
+          },
+          {
+            icon: '🌲',
+            name: 'Workspace Tree View',
+            desc: 'SUPPORTING DESCRIPTION',
+          },
+        ],
+      };
+
+      const result = renderWorkspaceLogCountComponent(component);
+
+      // Hero feature renders its description; supporting feature is name-only.
+      expect(result).toContain('HERO DESCRIPTION');
+      expect(result).not.toContain('SUPPORTING DESCRIPTION');
+      expect(result).toContain('feature-compact');
+      expect(result).toContain('Workspace Tree View');
+    });
+  });
 });

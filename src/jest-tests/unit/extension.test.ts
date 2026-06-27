@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { activate } from '../../extension';
+import { activate, deactivate } from '../../extension';
 import * as commandsModule from '../../commands';
 import * as helpers from '../../helpers';
 import * as releases from '../../releases';
@@ -23,11 +23,18 @@ jest.mock('../../pro', () => {
     TurboFreemiumLauncherPanel: class {
       static viewType = 'mocked.panel.freemiumLauncherPanel';
     },
+    TurboReleaseLauncherPanel: class {
+      static viewType = 'mocked.panel.releaseLauncherPanel';
+    },
+    TurboReleasePanel: class {
+      static viewType = 'mocked.panel.releasePanel';
+    },
   };
 });
 
 jest.mock('../../pro/utilities', () => ({
   runProBundle: jest.fn(),
+  disposeProBundle: jest.fn(),
   updateProBundle: jest.fn(),
   proBundleNeedsUpdate: jest.fn(),
 }));
@@ -117,13 +124,17 @@ describe('activate - command registration', () => {
 
     activate(fakeContext);
 
-    expect(registerCommandMock).toHaveBeenCalledTimes(2);
+    expect(registerCommandMock).toHaveBeenCalledTimes(3);
     expect(registerCommandMock).toHaveBeenCalledWith(
       'turbo.sayHello',
       expect.any(Function),
     );
     expect(registerCommandMock).toHaveBeenCalledWith(
       'turbo.doSomething',
+      expect.any(Function),
+    );
+    expect(registerCommandMock).toHaveBeenCalledWith(
+      'turboConsoleLog.showReleasePanel',
       expect.any(Function),
     );
   });
@@ -539,5 +550,12 @@ describe('activate - command registration', () => {
 
     expect(helpers.updateUserActivityStatus).toHaveBeenCalledWith(fakeContext);
     expect(helpers.updateUserActivityStatus).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('deactivate', () => {
+  it('disposes the Pro bundle (stops the pre-commit IPC server)', () => {
+    deactivate();
+    expect(proUtilities.disposeProBundle).toHaveBeenCalledTimes(1);
   });
 });

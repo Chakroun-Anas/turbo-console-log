@@ -97,7 +97,7 @@ describe('activationDaySevenHandler', () => {
           return false;
         }
         if (
-          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_THREE_NOTIFICATION
+          key === GlobalStateKey.HAS_SHOWN_ACTIVATION_DAY_SEVEN_NOTIFICATION
         ) {
           return false;
         }

@@ -53,12 +53,6 @@ export async function showNotification(
         ctaText: 'See How It Works',
         ctaUrl: `${TURBO_WEBSITE_BASE_URL}/documentation/features/insert-log-message`,
       },
-      [NotificationEvent.EXTENSION_RELEASE_ANNOUNCEMENT]: {
-        message:
-          '🚀 Python developers, the wait is over — Turbo Console Log now speaks Python!',
-        ctaText: 'Try It Now',
-        ctaUrl: `${TURBO_WEBSITE_BASE_URL}/articles/release-3240`,
-      },
     };
 
     const fallback = fallbackMessages[notificationEvent];

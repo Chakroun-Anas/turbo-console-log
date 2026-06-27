@@ -1,8 +1,8 @@
 {
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
-  "description": "Automated logging for JavaScript, TypeScript, Python, and PHP. Insert, manage, and clean log messages with AST-powered precision.",
-  "version": "3.24.0",
+  "description": "Insert debug logs in one keystroke — and with Pro, automatically remove them before every commit. AST-powered logging for JavaScript, TypeScript, Python, and PHP.",
+  "version": "3.25.0",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.94.0"
@@ -52,6 +52,7 @@
   "files": [
     "out/extension.js",
     "images/icon.png",
+    "images/turbo-release-update.png",
     "README.md",
     "CHANGELOG.md",
     "LICENSE.txt",
@@ -233,6 +234,10 @@
       {
         "command": "turboConsoleLogPro.searchLogs",
         "title": "Turbo Console Log Pro: Search Logs"
+      },
+      {
+        "command": "turboConsoleLog.showReleasePanel",
+        "title": "Turbo Console Log: What's New"
       }
     ],
     "keybindings": [
@@ -321,6 +326,11 @@
           "id": "turboConsoleLogProPanelContainer",
           "title": "TCL",
           "icon": "images/icon.png"
+        },
+        {
+          "id": "turboConsoleLogReleasePanelContainer",
+          "title": "TCL",
+          "icon": "images/turbo-release-update.png"
         }
       ]
     },
@@ -330,32 +340,32 @@
           "id": "turboConsoleLogProView",
           "name": "PRO Panel",
           "icon": "images/icon.png",
-          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro"
+          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro && !turboConsoleLog:isNewRelease"
         },
         {
           "id": "turboConsoleLogLogFiltersView",
           "name": "Log Filters",
           "icon": "images/icon.png",
-          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro"
+          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro && !turboConsoleLog:isNewRelease"
         },
         {
           "id": "turboConsoleLogLogCleanupConfigView",
           "name": "Log Cleanup Config",
           "icon": "images/icon.png",
-          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro"
+          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isPro && !turboConsoleLog:isNewRelease"
         },
         {
           "id": "turboConsoleLogFreemiumLauncher",
           "name": "Become Pro",
           "icon": "images/icon.png",
-          "when": "turboConsoleLog:isInitialized && !turboConsoleLog:isPro && !turboConsoleLog:isRepairMode && turboConsoleLog:isLauncherMode"
+          "when": "turboConsoleLog:isInitialized && !turboConsoleLog:isPro && !turboConsoleLog:isRepairMode && turboConsoleLog:isLauncherMode && !turboConsoleLog:isNewRelease"
         },
         {
           "id": "turboConsoleLogFreemiumPanel",
           "name": "Turbo Console Log Freemium",
           "icon": "images/icon.png",
           "type": "webview",
-          "when": "turboConsoleLog:isInitialized && !turboConsoleLog:isPro && !turboConsoleLog:isRepairMode && !turboConsoleLog:isLauncherMode"
+          "when": "turboConsoleLog:isInitialized && !turboConsoleLog:isPro && !turboConsoleLog:isRepairMode && !turboConsoleLog:isLauncherMode && !turboConsoleLog:isNewRelease"
         },
         {
           "id": "turboConsoleLogBundleRepairPanel",
@@ -363,6 +373,21 @@
           "icon": "images/icon.png",
           "type": "webview",
           "when": "turboConsoleLog:isInitialized && turboConsoleLog:isRepairMode"
+        }
+      ],
+      "turboConsoleLogReleasePanelContainer": [
+        {
+          "id": "turboConsoleLogReleasePanelLauncher",
+          "name": "What's New",
+          "icon": "images/turbo-release-update.png",
+          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isNewRelease && turboConsoleLog:isReleaseLauncherMode"
+        },
+        {
+          "id": "turboConsoleLogReleasePanel",
+          "name": "What's New",
+          "icon": "images/turbo-release-update.png",
+          "type": "webview",
+          "when": "turboConsoleLog:isInitialized && turboConsoleLog:isNewRelease && !turboConsoleLog:isReleaseLauncherMode"
         }
       ]
     },

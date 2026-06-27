@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { Command, ExtensionProperties } from './entities';
+import { Command, ExtensionProperties, GlobalStateKey } from './entities';
 import { getAllCommands } from './commands/';
 import {
   readFromGlobalState,
@@ -11,17 +11,25 @@ import {
   updateUserActivityStatus,
   initialWorkspaceLogsCount,
   setupNotificationListeners,
+  shouldShowReleasePanel,
+  resolveReleaseVersion,
+  activateReleaseLauncherMode,
+  createReleasePanelStatusBarItem,
 } from './helpers';
 import { isTestMode } from './runTime';
+import { generateDeveloperId } from './helpers/generateDeveloperId';
 import {
   TurboFreemiumLauncherPanel,
   TurboProBundleRepairPanel,
   TurboProShowcasePanel,
+  TurboReleasePanel,
+  TurboReleaseLauncherPanel,
 } from './pro';
 import { releaseNotes } from './releases';
 import {
   proBundleNeedsUpdate,
   runProBundle,
+  disposeProBundle,
   updateProBundle,
 } from './pro/utilities';
 
@@ -61,6 +69,42 @@ export async function activate(
     });
   }
 
+  // Resolve version early so release panel and show-release check can use it
+  const version = vscode.extensions.getExtension(
+    'ChakrounAnas.turbo-console-log',
+  )?.packageJSON.version;
+
+  // Falls back to the last entry in RELEASE_PANEL_VERSIONS when the current
+  // version is a patch/minor that has no dedicated release panel
+  const releaseVersion = resolveReleaseVersion(version);
+
+  // Register release launcher (tree view — badge can be set before panel opens)
+  const releaseLauncherProvider = new TurboReleaseLauncherPanel(
+    releaseVersion ?? version,
+  );
+  context.subscriptions.push(
+    vscode.window.registerTreeDataProvider(
+      TurboReleaseLauncherPanel.viewType,
+      releaseLauncherProvider,
+    ),
+  );
+  const releaseLauncherView = vscode.window.createTreeView(
+    TurboReleaseLauncherPanel.viewType,
+    { treeDataProvider: releaseLauncherProvider },
+  );
+
+  // Register release badge panel (webview — shown after launcher is dismissed)
+  const releasePanelProvider = new TurboReleasePanel(
+    context,
+    releaseVersion ?? version,
+  );
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      TurboReleasePanel.viewType,
+      releasePanelProvider,
+    ),
+  );
+
   // Register remaining webview panels
   const turboProShowCasePanel = new TurboProShowcasePanel(
     context,
@@ -81,11 +125,6 @@ export async function activate(
     ),
   );
 
-  // Get current extension version
-  const version = vscode.extensions.getExtension(
-    'ChakrounAnas.turbo-console-log',
-  )?.packageJSON.version;
-
   // Update user activity status (ACTIVE/INACTIVE based on 7-day window)
   // Must run before traceExtensionVersionHistory since update reporting relies on this
   updateUserActivityStatus(context);
@@ -94,10 +133,60 @@ export async function activate(
   // (creates or updates version array in global state + shows welcome for new users)
   traceExtensionVersionHistory(context, version);
 
+  // Command to force-open the release panel from the status bar (bypasses shouldShowReleasePanel)
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'turboConsoleLog.showReleasePanel',
+      async () => {
+        await vscode.commands.executeCommand(
+          'setContext',
+          'turboConsoleLog:isInitialized',
+          true,
+        );
+        await vscode.commands.executeCommand(
+          'setContext',
+          'turboConsoleLog:isNewRelease',
+          true,
+        );
+        await vscode.commands.executeCommand(
+          'setContext',
+          'turboConsoleLog:isReleaseLauncherMode',
+          false,
+        );
+        await vscode.commands.executeCommand(
+          `${TurboReleasePanel.viewType}.focus`,
+        );
+      },
+    ),
+  );
+
+  // Permanent status bar entry — always shown, uses releaseVersion as fallback
+  if (releaseVersion) {
+    context.subscriptions.push(createReleasePanelStatusBarItem(releaseVersion));
+  }
+
+  // Determine whether the release badge panel should be shown this session
+  const developerId = generateDeveloperId();
+  const showRelease = releaseVersion
+    ? await shouldShowReleasePanel(context, releaseVersion, developerId)
+    : false;
+  if (showRelease) {
+    activateReleaseLauncherMode(context, releaseLauncherView);
+  }
+
   // Check Pro user status early to optimize notification setup
-  const proLicenseKey = readFromGlobalState<string>(context, 'license-key');
-  const proBundle = readFromGlobalState<string>(context, 'pro-bundle');
-  const proBundleVersion = readFromGlobalState<string>(context, 'version');
+  const proLicenseKey = readFromGlobalState<string>(
+    context,
+    GlobalStateKey.LICENSE_KEY,
+  );
+  const proBundle = readFromGlobalState<string>(
+    context,
+    GlobalStateKey.PRO_BUNDLE,
+  );
+  const proBundleVersion = readFromGlobalState<string>(
+    context,
+    GlobalStateKey.PRO_BUNDLE_VERSION,
+  );
   const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
 
   // Sets up all notification event listeners (file opening + other triggers)
@@ -172,4 +261,10 @@ export async function activate(
     // Activate freemium launcher for non-Pro users
     activateFreemiumLauncherMode(context, launcherView);
   }
+}
+
+export function deactivate(): void {
+  // Tear down resources held by the Pro bundle (the pre-commit IPC server).
+  // No-op when no Pro bundle was run.
+  disposeProBundle();
 }

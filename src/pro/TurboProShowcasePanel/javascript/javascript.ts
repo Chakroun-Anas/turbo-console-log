@@ -18,7 +18,8 @@ export function getJavaScript(): string {
             command: 'trackCtaClick',
             ctaType: ctaType,
             ctaText: ctaText,
-            ctaUrl: ctaUrl
+            ctaUrl: ctaUrl,
+            variant: typeof PANEL_VARIANT !== 'undefined' ? PANEL_VARIANT : undefined
           });
         }
 

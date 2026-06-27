@@ -2,6 +2,12 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.25.0] - 2026-06-24
+
+→ [v3.25.0: Never Commit a Debug Log Again 🚀](https://www.turboconsolelog.io/articles/release-3250)
+
+---
+
 ## [3.24.0] - 2026-06-08
 
 → [v3.24.0: Python Support Is Here 🐍](https://www.turboconsolelog.io/articles/release-3240)
