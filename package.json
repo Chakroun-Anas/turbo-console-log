@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Insert debug logs in one keystroke — and with Pro, automatically remove them before every commit. AST-powered logging for JavaScript, TypeScript, Python, and PHP.",
-  "version": "3.25.0",
+  "version": "3.25.1",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.94.0"

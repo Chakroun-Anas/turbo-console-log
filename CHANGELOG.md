@@ -2,7 +2,15 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
-## [3.25.0] - 2026-06-24
+## [3.25.1] - 2026-06-27
+
+### 🩹 Patch
+
+Suppresses a harmless "no view registered" error notification that could appear once right after updating — VS Code only registers newly-added views after a window reload. No functional impact; the What's New panel still appears after reloading.
+
+---
+
+## [3.25.0] - 2026-06-27
 
 → [v3.25.0: Never Commit a Debug Log Again 🚀](https://www.turboconsolelog.io/articles/release-3250)
 

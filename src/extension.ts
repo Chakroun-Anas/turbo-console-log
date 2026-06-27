@@ -78,32 +78,44 @@ export async function activate(
   // version is a patch/minor that has no dedicated release panel
   const releaseVersion = resolveReleaseVersion(version);
 
-  // Register release launcher (tree view — badge can be set before panel opens)
+  // Register release launcher (tree view) + release badge panel (webview).
+  // These views are first contributed in v3.25.0's manifest, so on an in-place
+  // UPDATE the already-running window hasn't registered the new container/views
+  // yet — `createTreeView` throws "no view with id …" and VS Code surfaces a
+  // (harmless) error toast. The views become available after the natural window
+  // reload, so guard the setup and skip it silently until then.
   const releaseLauncherProvider = new TurboReleaseLauncherPanel(
     releaseVersion ?? version,
   );
-  context.subscriptions.push(
-    vscode.window.registerTreeDataProvider(
+  let releaseLauncherView: vscode.TreeView<string> | undefined;
+  let releasePanelRegistrationWentWrong = false;
+  try {
+    context.subscriptions.push(
+      vscode.window.registerTreeDataProvider(
+        TurboReleaseLauncherPanel.viewType,
+        releaseLauncherProvider,
+      ),
+    );
+    releaseLauncherView = vscode.window.createTreeView(
       TurboReleaseLauncherPanel.viewType,
-      releaseLauncherProvider,
-    ),
-  );
-  const releaseLauncherView = vscode.window.createTreeView(
-    TurboReleaseLauncherPanel.viewType,
-    { treeDataProvider: releaseLauncherProvider },
-  );
+      { treeDataProvider: releaseLauncherProvider },
+    );
 
-  // Register release badge panel (webview — shown after launcher is dismissed)
-  const releasePanelProvider = new TurboReleasePanel(
-    context,
-    releaseVersion ?? version,
-  );
-  context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(
-      TurboReleasePanel.viewType,
-      releasePanelProvider,
-    ),
-  );
+    const releasePanelProvider = new TurboReleasePanel(
+      context,
+      releaseVersion ?? version,
+    );
+    context.subscriptions.push(
+      vscode.window.registerWebviewViewProvider(
+        TurboReleasePanel.viewType,
+        releasePanelProvider,
+      ),
+    );
+  } catch {
+    // Release-panel views not yet registered in this window (pending the
+    // post-update reload). Harmless — the panel comes up correctly after reload.
+    releasePanelRegistrationWentWrong = true;
+  }
 
   // Register remaining webview panels
   const turboProShowCasePanel = new TurboProShowcasePanel(
@@ -138,30 +150,43 @@ export async function activate(
     vscode.commands.registerCommand(
       'turboConsoleLog.showReleasePanel',
       async () => {
-        await vscode.commands.executeCommand(
-          'setContext',
-          'turboConsoleLog:isInitialized',
-          true,
-        );
-        await vscode.commands.executeCommand(
-          'setContext',
-          'turboConsoleLog:isNewRelease',
-          true,
-        );
-        await vscode.commands.executeCommand(
-          'setContext',
-          'turboConsoleLog:isReleaseLauncherMode',
-          false,
-        );
-        await vscode.commands.executeCommand(
-          `${TurboReleasePanel.viewType}.focus`,
-        );
+        // If the release-panel views failed to register this session (in-place
+        // update before reload), do NOT toggle isNewRelease on — it would hide
+        // the freemium/Pro panels while the release panel itself can't render,
+        // leaving a blank container. Everything works after the natural reload.
+        if (releasePanelRegistrationWentWrong) {
+          return;
+        }
+        try {
+          await vscode.commands.executeCommand(
+            'setContext',
+            'turboConsoleLog:isInitialized',
+            true,
+          );
+          await vscode.commands.executeCommand(
+            'setContext',
+            'turboConsoleLog:isNewRelease',
+            true,
+          );
+          await vscode.commands.executeCommand(
+            'setContext',
+            'turboConsoleLog:isReleaseLauncherMode',
+            false,
+          );
+          await vscode.commands.executeCommand(
+            `${TurboReleasePanel.viewType}.focus`,
+          );
+        } catch {
+          // Release panel view not available yet (pending post-update reload).
+        }
       },
     ),
   );
 
-  // Permanent status bar entry — always shown, uses releaseVersion as fallback
-  if (releaseVersion) {
+  // Permanent status bar entry — only when the release-panel views actually
+  // registered. Skipped on the update-before-reload activation, since clicking
+  // it focuses those (not-yet-registered) views.
+  if (releaseVersion && !releasePanelRegistrationWentWrong) {
     context.subscriptions.push(createReleasePanelStatusBarItem(releaseVersion));
   }
 
@@ -170,7 +195,11 @@ export async function activate(
   const showRelease = releaseVersion
     ? await shouldShowReleasePanel(context, releaseVersion, developerId)
     : false;
-  if (showRelease) {
+  if (
+    showRelease &&
+    releaseLauncherView &&
+    !releasePanelRegistrationWentWrong
+  ) {
     activateReleaseLauncherMode(context, releaseLauncherView);
   }
 
