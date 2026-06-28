@@ -2,6 +2,14 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.25.2] - 2026-06-28
+
+### 🩹 Patch
+
+Fixes pre-commit hook installation failing with "could not prepare the pre-commit hook script." The hook runner script wasn't being packaged into the extension, so auto-cleanup-on-commit couldn't be enabled from the terminal-commit path. The script now ships with the extension and the hook installs as expected.
+
+---
+
 ## [3.25.1] - 2026-06-27
 
 ### 🩹 Patch

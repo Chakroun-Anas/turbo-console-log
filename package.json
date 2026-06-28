@@ -2,7 +2,7 @@
   "name": "turbo-console-log",
   "displayName": "Turbo Console Log",
   "description": "Insert debug logs in one keystroke — and with Pro, automatically remove them before every commit. AST-powered logging for JavaScript, TypeScript, Python, and PHP.",
-  "version": "3.25.1",
+  "version": "3.25.2",
   "publisher": "ChakrounAnas",
   "engines": {
     "vscode": "^1.94.0"
@@ -51,6 +51,7 @@
   "main": "./out/extension.js",
   "files": [
     "out/extension.js",
+    "out/hooks/pre-commit-hook.js",
     "images/icon.png",
     "images/turbo-release-update.png",
     "README.md",
@@ -430,11 +431,12 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "rm -rf out && npm run esbuild-base -- --minify",
+    "vscode:prepublish": "rm -rf out && npm run esbuild-base -- --minify && npm run copy-hooks",
+    "copy-hooks": "mkdir -p out/hooks && cp src/hooks/pre-commit-hook.js out/hooks/pre-commit-hook.js",
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild-base-minify": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
     "esbuild-base-minify-analyze": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify --analyze",
-    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild": "npm run esbuild-base -- --sourcemap && npm run copy-hooks",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "watch": "npm run esbuild --watch",
     "lint": "tsc --noEmit && tsc --project src/jest-tests/tsconfig.json --noEmit && eslint src --ext ts",

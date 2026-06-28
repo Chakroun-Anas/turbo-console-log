@@ -21,4 +21,26 @@ export default [
       },
     },
   },
+  {
+    // Standalone Node CommonJS scripts shipped as-is (e.g. the git pre-commit
+    // hook). They run outside the TS build, so allow require() and node globals.
+    files: ['src/hooks/**/*.js'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        require: 'readonly',
+        module: 'readonly',
+        process: 'readonly',
+        console: 'readonly',
+        Buffer: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
 ];

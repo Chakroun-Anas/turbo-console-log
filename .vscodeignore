@@ -3,6 +3,7 @@
 
 # Include only the files specified in package.json "files" array
 !out/extension.js
+!out/hooks/pre-commit-hook.js
 !images/icon.png
 !images/turbo-release-update.png
 !README.md
@@ -12,4 +13,5 @@
 
 # Ensure parent directories are not ignored (required for nested paths)
 !out/
+!out/hooks/
 !images/
