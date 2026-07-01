@@ -2,6 +2,14 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.25.3] - 2026-07-01
+
+### 🩹 Patch
+
+Removes the network call the release panel made on every startup to check whether it had already been shown — it was generating a disproportionate amount of backend traffic for very little benefit. The show/hide decision is now made entirely locally; reopening the panel still keeps your local state in sync, so behavior for anyone who already saw it is unaffected. The release panel also gains a Bypass button so you can return to the main Turbo Console Log view at any time.
+
+---
+
 ## [3.25.2] - 2026-06-28
 
 ### 🩹 Patch

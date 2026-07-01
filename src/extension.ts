@@ -17,7 +17,6 @@ import {
   createReleasePanelStatusBarItem,
 } from './helpers';
 import { isTestMode } from './runTime';
-import { generateDeveloperId } from './helpers/generateDeveloperId';
 import {
   TurboFreemiumLauncherPanel,
   TurboProBundleRepairPanel,
@@ -191,9 +190,9 @@ export async function activate(
   }
 
   // Determine whether the release badge panel should be shown this session
-  const developerId = generateDeveloperId();
+  // (purely local — no network round-trip; see shouldShowReleasePanel)
   const showRelease = releaseVersion
-    ? await shouldShowReleasePanel(context, releaseVersion, developerId)
+    ? await shouldShowReleasePanel(context, releaseVersion)
     : false;
   if (
     showRelease &&

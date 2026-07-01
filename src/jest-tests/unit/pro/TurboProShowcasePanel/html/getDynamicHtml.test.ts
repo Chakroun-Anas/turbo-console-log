@@ -85,6 +85,21 @@ describe('getDynamicHtml', () => {
     );
   });
 
+  it('does not render the dismiss button by default', () => {
+    const result = getDynamicHtml(createMockDynamicPanel());
+
+    expect(result).not.toContain('onclick="dismiss()"');
+  });
+
+  it('renders the dismiss button when dismissible is true', () => {
+    const result = getDynamicHtml(createMockDynamicPanel(), 'A', {
+      dismissible: true,
+    });
+
+    expect(result).toContain('onclick="dismiss()"');
+    expect(result).toContain('✕ Bypass');
+  });
+
   it('should call contentByType with provided dynamic content', () => {
     const dynamicContent: DynamicFreemiumPanel = {
       tooltip: 'Test tooltip',

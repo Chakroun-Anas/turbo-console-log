@@ -11,9 +11,20 @@ import { getJavaScript } from '../javascript/javascript';
 export function getDynamicHtml(
   dynamicContent: DynamicFreemiumPanel,
   variant?: string,
+  options?: { dismissible?: boolean },
 ): string {
   // Separate content by type for different placement
   const { topContentHtml, articlesHtml } = contentByType(dynamicContent);
+
+  // Opt-in bypass affordance — only the release panel passes `dismissible`, so
+  // it never leaks into the shared freemium panel. Calls dismiss() (see
+  // getJavaScript) which posts { command: 'dismiss' } to flip isNewRelease off.
+  const dismissBarHtml = options?.dismissible
+    ? `
+        <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
+          <button onclick="dismiss()" title="Return to Turbo Console Log" style="padding:6px 12px; background:transparent; color:var(--vscode-foreground); border:1px solid var(--vscode-panel-border); border-radius:4px; cursor:pointer; font-family:var(--vscode-font-family); font-size:12px; opacity:0.85;">✕ Bypass</button>
+        </div>`
+    : '';
 
   return `
   <html>
@@ -25,6 +36,7 @@ export function getDynamicHtml(
     </head>
     <body>
       <div class="container">
+        ${dismissBarHtml}
         <!-- All Content in Order (except articles) -->
         ${topContentHtml}
 

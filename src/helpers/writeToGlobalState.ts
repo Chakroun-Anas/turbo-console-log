@@ -4,6 +4,6 @@ export function writeToGlobalState(
   context: vscode.ExtensionContext,
   key: string,
   value: unknown,
-): void {
-  context.globalState.update(key, value);
+): Thenable<void> {
+  return context.globalState.update(key, value);
 }

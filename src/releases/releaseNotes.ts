@@ -5,8 +5,8 @@ export const releaseNotes: Record<
     date?: Date;
   }
 > = {
-  '3.25.2': {
+  '3.25.3': {
     isPro: true,
-    date: new Date('2026-06-28'),
+    date: new Date('2026-07-01'),
   },
 };

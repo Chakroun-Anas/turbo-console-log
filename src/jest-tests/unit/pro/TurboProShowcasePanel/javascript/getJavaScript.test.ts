@@ -33,6 +33,13 @@ describe('getJavaScript', () => {
     expect(result).toContain('url: url');
   });
 
+  it('should include dismiss function that posts a dismiss command', () => {
+    const result = getJavaScript();
+
+    expect(result).toContain('function dismiss()');
+    expect(result).toContain("command: 'dismiss'");
+  });
+
   it('should include countdown functionality', () => {
     const result = getJavaScript();
 

@@ -25,7 +25,7 @@ export class TurboReleasePanel implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this.getLoadingHtml(this.version);
 
-    webviewView.webview.onDidReceiveMessage((message) => {
+    webviewView.webview.onDidReceiveMessage(async (message) => {
       switch (message.command) {
         case 'openUrl':
           vscode.env.openExternal(vscode.Uri.parse(message.url));
@@ -37,11 +37,31 @@ export class TurboReleasePanel implements vscode.WebviewViewProvider {
             message.variant,
             this.version,
           );
+          break;
         }
+        case 'dismiss':
+          // Bypass the release panel — reveal the normal Turbo views again.
+          // No guard write needed: resolveWebviewView already attempted it, so
+          // healthy stores are set and broken stores would fail identically.
+          await vscode.commands.executeCommand(
+            'setContext',
+            'turboConsoleLog:isNewRelease',
+            false,
+          );
+          // isNewRelease=false re-satisfies the main container's `when` clauses;
+          // bring that container forward so its content is revealed in place
+          // instead of the now-empty release container collapsing.
+          await vscode.commands.executeCommand(
+            'workbench.view.extension.turboConsoleLogProPanelContainer',
+          );
+          break;
       }
     });
 
-    writeToGlobalState(
+    // Unconditionally re-asserts the guard on every reveal — the local
+    // self-heal path for a lost/missing guard now that the show-decision is
+    // purely local (no server "already shown" check to fall back on).
+    await writeToGlobalState(
       this.context,
       `${GlobalStateKey.HAS_SHOWN_RELEASE_PANEL}${this.version}`,
       true,
@@ -81,7 +101,9 @@ export class TurboReleasePanel implements vscode.WebviewViewProvider {
         content,
       };
 
-      webviewView.webview.html = getDynamicHtml(dynamicPanel, variant);
+      webviewView.webview.html = getDynamicHtml(dynamicPanel, variant, {
+        dismissible: true,
+      });
 
       const telemetryService = createTelemetryService();
       telemetryService.reportReleasePanelShown(variant, this.version);
@@ -93,7 +115,9 @@ export class TurboReleasePanel implements vscode.WebviewViewProvider {
           date: new Date().toISOString(),
           content: fallbackContent,
         };
-        webviewView.webview.html = getDynamicHtml(fallbackPanel, 'fallback');
+        webviewView.webview.html = getDynamicHtml(fallbackPanel, 'fallback', {
+          dismissible: true,
+        });
         const telemetryService = createTelemetryService();
         telemetryService.reportReleasePanelShown('fallback', this.version);
       } else {
@@ -129,12 +153,20 @@ export class TurboReleasePanel implements vscode.WebviewViewProvider {
           <style>
             body { display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; font-family: var(--vscode-font-family); color: var(--vscode-foreground); }
             .message { text-align: center; opacity: 0.6; }
+            .dismiss { margin-top: 16px; padding: 6px 12px; background: transparent; color: var(--vscode-foreground); border: 1px solid var(--vscode-panel-border); border-radius: 4px; cursor: pointer; font-family: var(--vscode-font-family); font-size: 12px; opacity: 0.85; }
           </style>
         </head>
         <body>
           <div class="message">
             <p>Release notes coming soon for v${this.version}.</p>
+            <button class="dismiss" onclick="dismiss()" title="Return to Turbo Console Log">✕ Bypass</button>
           </div>
+          <script>
+            const vscode = acquireVsCodeApi();
+            function dismiss() {
+              vscode.postMessage({ command: 'dismiss' });
+            }
+          </script>
         </body>
       </html>
     `;

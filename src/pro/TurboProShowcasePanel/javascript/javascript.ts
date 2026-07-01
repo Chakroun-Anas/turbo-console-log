@@ -5,11 +5,17 @@
 export function getJavaScript(): string {
   return `
         const vscode = acquireVsCodeApi();
-        
+
         function openUrl(url) {
           vscode.postMessage({
             command: 'openUrl',
             url: url
+          });
+        }
+
+        function dismiss() {
+          vscode.postMessage({
+            command: 'dismiss'
           });
         }
 

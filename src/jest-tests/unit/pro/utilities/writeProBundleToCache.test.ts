@@ -10,7 +10,7 @@ describe('writeProBundleToCache', () => {
   it('writes license key, pro bundle, and version to global state', () => {
     const mockWrite = jest
       .spyOn(helpers, 'writeToGlobalState')
-      .mockImplementation(() => {});
+      .mockImplementation(() => Promise.resolve());
 
     writeProBundleToCache(
       mockContext,
