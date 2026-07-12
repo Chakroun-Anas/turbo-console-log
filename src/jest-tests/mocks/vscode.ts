@@ -19,11 +19,17 @@ export const window = {
     backgroundColor: null,
     show: jest.fn(),
     hide: jest.fn(),
+    dispose: jest.fn(),
   })),
 };
 
 export const ProgressLocation = {
   Notification: 'Notification',
+};
+
+export const StatusBarAlignment = {
+  Left: 1,
+  Right: 2,
 };
 
 export const ViewColumn = {
