@@ -9,8 +9,20 @@ jest.mock('@/pro/TurboProShowcasePanel/javascript/javascript', () => ({
   getJavaScript: jest.fn(() => 'function openUrl(url) { window.open(url); }'),
 }));
 
+// Mutable so individual tests can move the countdown target into the past/future.
+jest.mock('@/pro/campaign', () => ({
+  TURBO_CAMPAIGN: {
+    code: 'TURBOCLEANUP30',
+    percentage: 30,
+    countdownTarget: new Date('2099-01-01T00:00:00Z'),
+    eventName: 'Turbo v3.26.0 — 30% Off',
+    statusBarPromoText: '$(rocket) Turbo v3.26.0 — 30% off',
+  },
+}));
+
 import { getCommonStyles } from '@/pro/TurboProShowcasePanel/styles/getCommonStyles';
 import { getJavaScript } from '@/pro/TurboProShowcasePanel/javascript/javascript';
+import { TURBO_CAMPAIGN } from '@/pro/campaign';
 
 describe('getStaticHtml', () => {
   let consoleSpy: jest.SpyInstance;
@@ -69,31 +81,38 @@ describe('getStaticHtml', () => {
     expect(mockGetJavaScript).toHaveBeenCalled();
   });
 
-  it('should contain countdown section only if date is in the future', () => {
-    const result = getStaticHtml(49);
+  describe('campaign countdown', () => {
+    afterEach(() => {
+      (TURBO_CAMPAIGN as { countdownTarget: Date }).countdownTarget = new Date(
+        '2099-01-01T00:00:00Z',
+      );
+    });
 
-    // Countdown only shows if the target date hasn't passed
-    const hasCountdown = result.includes('class="countdown-widget"');
+    it('renders the countdown widget while the campaign target is in the future', () => {
+      const result = getStaticHtml(49);
 
-    if (hasCountdown) {
       expect(result).toContain('class="countdown-widget"');
       expect(result).toContain('class="countdown-cta"');
-    } else {
-      // If countdown has passed, it should not be in the HTML
+    });
+
+    it('self-hides the countdown widget once the campaign target is in the past', () => {
+      (TURBO_CAMPAIGN as { countdownTarget: Date }).countdownTarget = new Date(
+        '2000-01-01T00:00:00Z',
+      );
+
+      const result = getStaticHtml(49);
+
       expect(result).not.toContain('class="countdown-widget"');
-    }
-  });
+    });
 
-  it('should include countdown onclick handler with correct URL when countdown is present', () => {
-    const result = getStaticHtml(33);
+    it('includes the countdown onclick handler pointing at /pro', () => {
+      const result = getStaticHtml(33);
 
-    const hasCountdown = result.includes('class="countdown-widget"');
-
-    if (hasCountdown) {
       expect(result).toContain('onclick=');
       expect(result).toContain('openUrlWithTracking');
       expect(result).toContain('style="cursor: pointer;"');
-    }
+      expect(result).toContain('/pro?utm_source=panel');
+    });
   });
 
   it('should maintain proper HTML structure', () => {

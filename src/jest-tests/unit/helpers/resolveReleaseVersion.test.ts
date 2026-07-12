@@ -62,8 +62,12 @@ describe('resolveReleaseVersion', () => {
       expect(resolveReleaseVersion('3.25.0')).toBe('3.25.0');
     });
 
-    it('resolves a non-release version to the last release version', () => {
-      expect(resolveReleaseVersion('3.26.0')).toBe('3.25.0');
+    it('resolves 3.26.0 to itself', () => {
+      expect(resolveReleaseVersion('3.26.0')).toBe('3.26.0');
+    });
+
+    it('resolves a non-release version to the last (3.26.0) release version', () => {
+      expect(resolveReleaseVersion('3.27.0')).toBe('3.26.0');
     });
   });
 });

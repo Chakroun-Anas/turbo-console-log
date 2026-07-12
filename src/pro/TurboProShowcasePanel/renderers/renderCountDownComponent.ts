@@ -27,7 +27,7 @@ export function renderCountDownComponent(
   const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
   return `
-      <div class="countdown-widget" data-target-date="${targetDate.toISOString()}" style="--bg-image: url('https://www.turboconsolelog.io/assets/${escapeHtml(component.illustrationSrc)}')">
+      <div class="countdown-widget" data-target-date="${targetDate.toISOString()}" style="--bg-image: url('${escapeHtml(component.illustrationSrc)}')">
         <div class="countdown-content">
           <div class="countdown-title">${escapeHtml(component.eventName)}</div>
           <div class="countdown-timer">

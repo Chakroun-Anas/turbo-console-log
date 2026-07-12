@@ -20,7 +20,8 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'New Year Celebration',
       targetDateUTC: '2030-12-31T23:59:59Z', // Far future date
-      illustrationSrc: 'turbo-2026-celebration-wide-no-text.png',
+      illustrationSrc:
+        'https://www.turboconsolelog.io/assets/turbo-2026-celebration-wide-no-text.png',
       CTA: {
         text: 'Learn More',
         url: 'https://example.com',
@@ -36,11 +37,17 @@ describe('renderCountDownComponent', () => {
     expect(result).toContain('Minutes');
     expect(result).toContain('Seconds');
     expect(result).toContain('Learn More');
+    // illustrationSrc is already a full URL — the renderer must not prepend
+    // its own origin/path on top of it (that doubling is what broke the
+    // countdown's background image in production).
+    expect(result).toContain(
+      "url('https://www.turboconsolelog.io/assets/turbo-2026-celebration-wide-no-text.png')",
+    );
 
     // Verify escaping calls
     expect(mockEscapeHtml).toHaveBeenCalledWith('New Year Celebration');
     expect(mockEscapeHtml).toHaveBeenCalledWith(
-      'turbo-2026-celebration-wide-no-text.png',
+      'https://www.turboconsolelog.io/assets/turbo-2026-celebration-wide-no-text.png',
     );
     expect(mockEscapeHtml).toHaveBeenCalledWith('Learn More');
     expect(mockEscapeHtml).toHaveBeenCalledWith('https://example.com');
@@ -67,7 +74,8 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'Test Event',
       targetDateUTC: '2030-12-31T00:00:00Z', // Far future
-      illustrationSrc: 'turbo-test-event.png',
+      illustrationSrc:
+        'https://www.turboconsolelog.io/assets/turbo-test-event.png',
       CTA: {
         text: 'Test CTA',
         url: 'https://test.com',
@@ -88,7 +96,8 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'Event with <script>',
       targetDateUTC: '2030-12-31T23:59:59Z',
-      illustrationSrc: 'turbo-"malicious.png',
+      illustrationSrc:
+        'https://www.turboconsolelog.io/assets/turbo-"malicious.png',
       CTA: {
         text: 'Click "here"',
         url: 'https://example.com?param=<script>',
@@ -100,7 +109,9 @@ describe('renderCountDownComponent', () => {
     const result = renderCountDownComponent(component);
 
     expect(mockEscapeHtml).toHaveBeenCalledWith('Event with <script>');
-    expect(mockEscapeHtml).toHaveBeenCalledWith('turbo-"malicious.png');
+    expect(mockEscapeHtml).toHaveBeenCalledWith(
+      'https://www.turboconsolelog.io/assets/turbo-"malicious.png',
+    );
     expect(mockEscapeHtml).toHaveBeenCalledWith('Click "here"');
     expect(mockEscapeHtml).toHaveBeenCalledWith(
       'https://example.com?param=<script>',
@@ -108,7 +119,7 @@ describe('renderCountDownComponent', () => {
 
     expect(result).toContain('escaped:Event with <script>');
     expect(result).toContain(
-      'https://www.turboconsolelog.io/assets/escaped:turbo-"malicious.png',
+      'escaped:https://www.turboconsolelog.io/assets/turbo-"malicious.png',
     );
     expect(result).toContain('escaped:Click "here"');
   });
@@ -117,7 +128,8 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'Test Event',
       targetDateUTC: '2030-12-31T23:59:59Z',
-      illustrationSrc: 'turbo-test-widget.png',
+      illustrationSrc:
+        'https://www.turboconsolelog.io/assets/turbo-test-widget.png',
       CTA: {
         text: 'Test',
         url: 'https://test.com',
@@ -133,7 +145,8 @@ describe('renderCountDownComponent', () => {
     const component: CountDownPanelComponent = {
       eventName: 'CTA Test Event',
       targetDateUTC: '2030-12-31T23:59:59Z',
-      illustrationSrc: 'turbo-cta-test.png',
+      illustrationSrc:
+        'https://www.turboconsolelog.io/assets/turbo-cta-test.png',
       CTA: {
         text: 'Join Event',
         url: 'https://join.example.com',

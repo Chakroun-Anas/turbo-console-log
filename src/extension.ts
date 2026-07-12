@@ -25,6 +25,7 @@ import {
   TurboReleaseLauncherPanel,
 } from './pro';
 import { releaseNotes } from './releases';
+import { isCampaignLive } from './pro/campaign';
 import {
   proBundleNeedsUpdate,
   runProBundle,
@@ -186,7 +187,9 @@ export async function activate(
   // registered. Skipped on the update-before-reload activation, since clicking
   // it focuses those (not-yet-registered) views.
   if (releaseVersion && !releasePanelRegistrationWentWrong) {
-    context.subscriptions.push(createReleasePanelStatusBarItem(releaseVersion));
+    context.subscriptions.push(
+      createReleasePanelStatusBarItem(releaseVersion, isCampaignLive()),
+    );
   }
 
   // Determine whether the release badge panel should be shown this session

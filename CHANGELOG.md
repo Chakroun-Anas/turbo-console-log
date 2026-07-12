@@ -2,6 +2,18 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.26.0] - 2026-07-12
+
+### 🎉 Launch Week
+
+To celebrate auto-cleanup on commit, Turbo Pro is 30% off for one week — no promo code to remember, it's already applied at checkout. [Grab it on turboconsolelog.io/pro](https://www.turboconsolelog.io/pro).
+
+### 🩹 Patch
+
+Fixes the release panel getting permanently stuck in front of your Pro/freemium views if you never opened it. It now backs off on its own 3 days after first appearing, even if you never interact with it.
+
+---
+
 ## [3.25.3] - 2026-07-01
 
 ### 🩹 Patch
