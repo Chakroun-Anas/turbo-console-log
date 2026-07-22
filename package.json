@@ -493,7 +493,7 @@
     "@lezer/python": "^1.1.19",
     "@sveltejs/acorn-typescript": "^1.0.9",
     "acorn": "^8.15.0",
-    "axios": "^1.17.0",
+    "axios": "^1.18.0",
     "fast-glob": "^3.3.3",
     "ignore": "^7.0.5",
     "p-limit": "^6.2.0",
