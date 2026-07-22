@@ -624,7 +624,11 @@ export function getCommonStyles(): string {
           flex-direction: column;
           align-items: center;
           gap: 12px;
-          max-width: 250px;
+          /* Fill the panel rather than sitting in a 250px column — the sidebar
+             is already narrow, and the old cap shrank landscape illustrations
+             to roughly half the available width. The image's own max-height
+             keeps it from ballooning when the sidebar is dragged wide. */
+          max-width: 100%;
         }
         
         .media-showcase-images {

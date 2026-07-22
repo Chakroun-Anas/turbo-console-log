@@ -63,7 +63,7 @@ describe('shouldShowReleasePanel', () => {
     it('returns false when local state says already shown', async () => {
       mockState({ hasShown: true });
 
-      const result = await shouldShowReleasePanel(mockContext, '3.25.0');
+      const result = await shouldShowReleasePanel(mockContext, '3.27.0');
 
       expect(result).toBe(false);
     });
@@ -71,12 +71,12 @@ describe('shouldShowReleasePanel', () => {
     it('returns true and records first-seen when there is no record of the panel being shown', async () => {
       mockState({ hasShown: undefined, firstSeenAt: undefined });
 
-      const result = await shouldShowReleasePanel(mockContext, '3.25.0');
+      const result = await shouldShowReleasePanel(mockContext, '3.27.0');
 
       expect(result).toBe(true);
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,
-        expect.stringContaining('3.25.0'),
+        expect.stringContaining('3.27.0'),
         expect.any(Number),
       );
     });
@@ -84,28 +84,20 @@ describe('shouldShowReleasePanel', () => {
     it('reads the correct state key combining prefix and version', async () => {
       mockState({ hasShown: true });
 
-      await shouldShowReleasePanel(mockContext, '3.25.0');
+      await shouldShowReleasePanel(mockContext, '3.27.0');
 
       expect(mockReadFromGlobalState).toHaveBeenCalledWith(
         mockContext,
-        expect.stringContaining('3.25.0'),
+        expect.stringContaining('3.27.0'),
       );
     });
 
-    it('returns true for 3.26.0 when local state has no record of the panel being shown', async () => {
+    it('returns false for a retired release version, without touching local state', async () => {
       mockState({ hasShown: undefined, firstSeenAt: undefined });
 
-      const result = await shouldShowReleasePanel(mockContext, '3.26.0');
-
-      expect(result).toBe(true);
-    });
-
-    it('returns false for 3.26.0 when local state says already shown', async () => {
-      mockState({ hasShown: true });
-
-      const result = await shouldShowReleasePanel(mockContext, '3.26.0');
-
-      expect(result).toBe(false);
+      expect(await shouldShowReleasePanel(mockContext, '3.25.0')).toBe(false);
+      expect(await shouldShowReleasePanel(mockContext, '3.26.0')).toBe(false);
+      expect(mockReadFromGlobalState).not.toHaveBeenCalled();
     });
   });
 
@@ -114,7 +106,7 @@ describe('shouldShowReleasePanel', () => {
       const firstSeenAt = Date.now() - (THREE_DAYS_MS - 1000);
       mockState({ hasShown: undefined, firstSeenAt });
 
-      const result = await shouldShowReleasePanel(mockContext, '3.26.0');
+      const result = await shouldShowReleasePanel(mockContext, '3.27.0');
 
       expect(result).toBe(true);
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
@@ -124,7 +116,7 @@ describe('shouldShowReleasePanel', () => {
       const firstSeenAt = Date.now() - (THREE_DAYS_MS + 1000);
       mockState({ hasShown: undefined, firstSeenAt });
 
-      const result = await shouldShowReleasePanel(mockContext, '3.26.0');
+      const result = await shouldShowReleasePanel(mockContext, '3.27.0');
 
       expect(result).toBe(false);
     });
@@ -133,7 +125,7 @@ describe('shouldShowReleasePanel', () => {
       const firstSeenAt = Date.now() - 1000;
       mockState({ hasShown: undefined, firstSeenAt });
 
-      await shouldShowReleasePanel(mockContext, '3.26.0');
+      await shouldShowReleasePanel(mockContext, '3.27.0');
 
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
     });

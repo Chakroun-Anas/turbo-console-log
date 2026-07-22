@@ -3,7 +3,6 @@ import { getJavaScript } from '../javascript/javascript';
 import { contentByType } from '../contentByType';
 import { DynamicFreemiumPanelContent } from '../types';
 import { isTestMode } from '@/runTime';
-import { TURBO_CAMPAIGN } from '@/pro/campaign';
 
 const TURBO_WEBSITE_BASE_URL = isTestMode()
   ? 'http://localhost:3000'
@@ -133,26 +132,8 @@ export function getStaticHtml(
     },
   };
 
-  // Campaign countdown, first — self-hides once TURBO_CAMPAIGN.countdownTarget
-  // passes (renderCountDownComponent returns '' for a past target date), so
-  // no cleanup is needed once the promo week ends.
-  const campaignCountdown: DynamicFreemiumPanelContent = {
-    type: 'countdown',
-    order: -1,
-    component: {
-      eventName: TURBO_CAMPAIGN.eventName,
-      targetDateUTC: TURBO_CAMPAIGN.countdownTarget,
-      illustrationSrc: `${TURBO_WEBSITE_BASE_URL}/assets/turbo-auto-cleanup-discount.png`,
-      CTA: {
-        text: 'Get 30% Off Turbo Pro',
-        url: `${TURBO_WEBSITE_BASE_URL}/pro?utm_source=panel&utm_campaign=v3260_promo&utm_medium=dynamic_panel&position=countdown&event=freemiumPanel_v3260-promo&variant=panel-countdown`,
-      },
-    },
-  };
-
   // Analytics card (with the locked Pro board) first; illustration + CTA closes.
   const proOnlyContent: DynamicFreemiumPanelContent[] = [
-    campaignCountdown,
     workspaceLogCount,
     turboProShowcase,
   ];
