@@ -2,6 +2,16 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.27.0] - 2026-07-21
+
+### 🩹 Patch
+
+The release panel no longer takes over the Turbo Pro view for existing Pro users. If you already own Pro, it is never opened for you automatically — your Pro panel stays exactly where it is. You can still read the release notes whenever you like from the Turbo entry in the status bar.
+
+Nothing else changes: log insertion, cleanup, and every other extension behavior are untouched in this release.
+
+---
+
 ## [3.26.0] - 2026-07-12
 
 ### 🎉 Launch Week

@@ -145,6 +145,23 @@ export async function activate(
   // (creates or updates version array in global state + shows welcome for new users)
   traceExtensionVersionHistory(context, version);
 
+  // Check Pro user status early — it gates the release panel below and
+  // optimizes notification setup. Derived purely from global state, so it is
+  // safe to read before any of the release/Pro activation sequences run.
+  const proLicenseKey = readFromGlobalState<string>(
+    context,
+    GlobalStateKey.LICENSE_KEY,
+  );
+  const proBundle = readFromGlobalState<string>(
+    context,
+    GlobalStateKey.PRO_BUNDLE,
+  );
+  const proBundleVersion = readFromGlobalState<string>(
+    context,
+    GlobalStateKey.PRO_BUNDLE_VERSION,
+  );
+  const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
+
   // Command to force-open the release panel from the status bar (bypasses shouldShowReleasePanel)
   context.subscriptions.push(
     vscode.commands.registerCommand(
@@ -154,6 +171,8 @@ export async function activate(
         // update before reload), do NOT toggle isNewRelease on — it would hide
         // the freemium/Pro panels while the release panel itself can't render,
         // leaving a blank container. Everything works after the natural reload.
+        // Pro users DO reach this path: the panel is never pushed at them, but
+        // opening it on purpose is always allowed.
         if (releasePanelRegistrationWentWrong) {
           return;
         }
@@ -185,7 +204,8 @@ export async function activate(
 
   // Permanent status bar entry — only when the release-panel views actually
   // registered. Skipped on the update-before-reload activation, since clicking
-  // it focuses those (not-yet-registered) views.
+  // it focuses those (not-yet-registered) views. Shown to Pro users too: it is
+  // opt-in by definition, so it stays available to everyone.
   if (releaseVersion && !releasePanelRegistrationWentWrong) {
     context.subscriptions.push(
       createReleasePanelStatusBarItem(releaseVersion, isCampaignLive()),
@@ -193,10 +213,17 @@ export async function activate(
   }
 
   // Determine whether the release badge panel should be shown this session
-  // (purely local — no network round-trip; see shouldShowReleasePanel)
-  const showRelease = releaseVersion
-    ? await shouldShowReleasePanel(context, releaseVersion)
-    : false;
+  // (purely local — no network round-trip; see shouldShowReleasePanel).
+  //
+  // Pro users are excluded from the AUTOMATIC reveal only. The panel's content
+  // sells Turbo Pro, and pushing it at someone who already bought would replace
+  // their Pro views (`when: isPro && !isNewRelease`) with an upsell they have
+  // already acted on. They keep the status bar entry above and can open the
+  // panel whenever they want — it is just never forced on them.
+  const showRelease =
+    releaseVersion && !isProUser
+      ? await shouldShowReleasePanel(context, releaseVersion)
+      : false;
   if (
     showRelease &&
     releaseLauncherView &&
@@ -204,21 +231,6 @@ export async function activate(
   ) {
     activateReleaseLauncherMode(context, releaseLauncherView);
   }
-
-  // Check Pro user status early to optimize notification setup
-  const proLicenseKey = readFromGlobalState<string>(
-    context,
-    GlobalStateKey.LICENSE_KEY,
-  );
-  const proBundle = readFromGlobalState<string>(
-    context,
-    GlobalStateKey.PRO_BUNDLE,
-  );
-  const proBundleVersion = readFromGlobalState<string>(
-    context,
-    GlobalStateKey.PRO_BUNDLE_VERSION,
-  );
-  const isProUser = proLicenseKey !== undefined && proBundle !== undefined;
 
   // Sets up all notification event listeners (file opening + other triggers)
   // Skipped entirely for Pro users since they don't see marketing notifications

@@ -150,6 +150,86 @@ describe('activate - command registration', () => {
       '3.0.0',
     );
   });
+  // The release panel is an upsell, so it is never PUSHED at a user who already
+  // owns Pro. It stays reachable on demand though: Pro users keep the status bar
+  // entry and opening the panel from it works exactly as it does for everyone
+  // else (see the gate in extension.ts).
+  describe('release panel Pro gate', () => {
+    function mockProUser() {
+      (helpers.readFromGlobalState as jest.Mock).mockImplementation(
+        (_, key) => {
+          if (key === 'license-key') return 'LICENSE123';
+          if (key === 'pro-bundle') return 'PRO_BUNDLE_CODE';
+          return undefined;
+        },
+      );
+    }
+
+    it('evaluates the release panel for a non-Pro user', async () => {
+      const fakeContext = {
+        subscriptions: [],
+      } as unknown as vscode.ExtensionContext;
+      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.27.0');
+
+      await activate(fakeContext);
+
+      expect(helpers.shouldShowReleasePanel).toHaveBeenCalledWith(
+        fakeContext,
+        '3.27.0',
+      );
+    });
+
+    it('never auto-reveals the release panel for a Pro user', async () => {
+      const fakeContext = {
+        subscriptions: [],
+      } as unknown as vscode.ExtensionContext;
+      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.27.0');
+      mockProUser();
+
+      await activate(fakeContext);
+
+      expect(helpers.shouldShowReleasePanel).not.toHaveBeenCalled();
+      expect(helpers.activateReleaseLauncherMode).not.toHaveBeenCalled();
+    });
+
+    it('still creates the status bar entry for a Pro user', async () => {
+      const fakeContext = {
+        subscriptions: [],
+      } as unknown as vscode.ExtensionContext;
+      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.27.0');
+      mockProUser();
+
+      await activate(fakeContext);
+
+      expect(helpers.createReleasePanelStatusBarItem).toHaveBeenCalledWith(
+        '3.27.0',
+        expect.any(Boolean),
+      );
+    });
+
+    it('opens the release panel when a Pro user runs the showReleasePanel command', async () => {
+      const fakeContext = {
+        subscriptions: [],
+      } as unknown as vscode.ExtensionContext;
+      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.27.0');
+      mockProUser();
+
+      await activate(fakeContext);
+
+      const showReleasePanelHandler = registerCommandMock.mock.calls.find(
+        ([name]: [string]) => name === 'turboConsoleLog.showReleasePanel',
+      )?.[1];
+      executeCommandMock.mockClear();
+      await showReleasePanelHandler();
+
+      expect(executeCommandMock).toHaveBeenCalledWith(
+        'setContext',
+        'turboConsoleLog:isNewRelease',
+        true,
+      );
+    });
+  });
+
   it('calls updateProBundle if pro is active and update is needed', () => {
     const fakeContext = {
       subscriptions: [],

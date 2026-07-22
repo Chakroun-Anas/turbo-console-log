@@ -3,7 +3,7 @@ import { readFromGlobalState } from './readFromGlobalState';
 import { writeToGlobalState } from './writeToGlobalState';
 import { GlobalStateKey } from '@/entities';
 
-export const RELEASE_PANEL_VERSIONS = ['3.25.0', '3.26.0'];
+export const RELEASE_PANEL_VERSIONS = ['3.27.0'];
 
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 

@@ -9,20 +9,8 @@ jest.mock('@/pro/TurboProShowcasePanel/javascript/javascript', () => ({
   getJavaScript: jest.fn(() => 'function openUrl(url) { window.open(url); }'),
 }));
 
-// Mutable so individual tests can move the countdown target into the past/future.
-jest.mock('@/pro/campaign', () => ({
-  TURBO_CAMPAIGN: {
-    code: 'TURBOCLEANUP30',
-    percentage: 30,
-    countdownTarget: new Date('2099-01-01T00:00:00Z'),
-    eventName: 'Turbo v3.26.0 — 30% Off',
-    statusBarPromoText: '$(rocket) Turbo v3.26.0 — 30% off',
-  },
-}));
-
 import { getCommonStyles } from '@/pro/TurboProShowcasePanel/styles/getCommonStyles';
 import { getJavaScript } from '@/pro/TurboProShowcasePanel/javascript/javascript';
-import { TURBO_CAMPAIGN } from '@/pro/campaign';
 
 describe('getStaticHtml', () => {
   let consoleSpy: jest.SpyInstance;
@@ -81,38 +69,13 @@ describe('getStaticHtml', () => {
     expect(mockGetJavaScript).toHaveBeenCalled();
   });
 
-  describe('campaign countdown', () => {
-    afterEach(() => {
-      (TURBO_CAMPAIGN as { countdownTarget: Date }).countdownTarget = new Date(
-        '2099-01-01T00:00:00Z',
-      );
-    });
+  // The v3.26.0 launch-week promo is over, so the freemium panel no longer
+  // renders a countdown — only the analytics card and the Pro showcase CTA.
+  it('does not render any countdown widget', () => {
+    const result = getStaticHtml(49);
 
-    it('renders the countdown widget while the campaign target is in the future', () => {
-      const result = getStaticHtml(49);
-
-      expect(result).toContain('class="countdown-widget"');
-      expect(result).toContain('class="countdown-cta"');
-    });
-
-    it('self-hides the countdown widget once the campaign target is in the past', () => {
-      (TURBO_CAMPAIGN as { countdownTarget: Date }).countdownTarget = new Date(
-        '2000-01-01T00:00:00Z',
-      );
-
-      const result = getStaticHtml(49);
-
-      expect(result).not.toContain('class="countdown-widget"');
-    });
-
-    it('includes the countdown onclick handler pointing at /pro', () => {
-      const result = getStaticHtml(33);
-
-      expect(result).toContain('onclick=');
-      expect(result).toContain('openUrlWithTracking');
-      expect(result).toContain('style="cursor: pointer;"');
-      expect(result).toContain('/pro?utm_source=panel');
-    });
+    expect(result).not.toContain('class="countdown-widget"');
+    expect(result).not.toContain('turbo-auto-cleanup-discount.png');
   });
 
   it('should maintain proper HTML structure', () => {
@@ -241,7 +204,9 @@ describe('getStaticHtml', () => {
       const result = getStaticHtml(123, mockMetadata);
 
       // Hero (v3.25.0) features render their description...
-      expect(result).toContain('Keep debug logs like these out of every commit');
+      expect(result).toContain(
+        'Keep debug logs like these out of every commit',
+      );
       expect(result).toContain(
         'See exactly what will be removed before you commit',
       );
