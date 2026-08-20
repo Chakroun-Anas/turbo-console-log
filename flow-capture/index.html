@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#12211f" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; style-src 'self'; script-src 'self' 'unsafe-inline'; connect-src 'self'; media-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'" />
+    <meta name="referrer" content="no-referrer" />
+    <title>FLOW Capture</title>
+    <link rel="manifest" href="manifest.webmanifest?v=8" />
+    <link rel="stylesheet" href="styles.css?v=8" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">FLOW Capture</p>
+          <h1 id="screenTitle">Domů</h1>
+        </div>
+        <div class="topbar-actions">
+          <span class="connection-status" id="connectionStatus" role="status">Online</span>
+          <button class="icon-button hidden" id="installButton" type="button" title="Nainstalovat FLOW" aria-label="Nainstalovat FLOW">
+            <span aria-hidden="true">⇩</span>
+          </button>
+          <button class="icon-button" id="syncButton" type="button" title="Data a záloha" aria-label="Data a záloha">
+            <span aria-hidden="true">DATA</span>
+          </button>
+        </div>
+      </header>
+
+      <main id="app" class="app-content" aria-live="polite"></main>
+
+      <button class="fab" id="quickAddButton" type="button">+ Zapsat</button>
+
+      <nav class="bottom-nav" aria-label="Hlavní navigace">
+        <button class="nav-item is-active" type="button" data-route="home">
+          <span aria-hidden="true">⌂</span>
+          <span>Domů</span>
+        </button>
+        <button class="nav-item" type="button" data-route="capture">
+          <span aria-hidden="true">＋</span>
+          <span>Zapsat</span>
+        </button>
+        <button class="nav-item" type="button" data-route="search">
+          <span aria-hidden="true">⌕</span>
+          <span>Hledat</span>
+        </button>
+        <button class="nav-item" type="button" data-route="tl">
+          <span aria-hidden="true">TL</span>
+          <span>TL</span>
+        </button>
+        <button class="nav-item" type="button" data-route="sections">
+          <span aria-hidden="true">▦</span>
+          <span>Úseky</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js?v=10"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js?v=5").catch(() => {}));
+      }
+    </script>
+  </body>
+</html>
