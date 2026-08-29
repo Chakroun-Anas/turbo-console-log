@@ -57,6 +57,25 @@ describe('shouldShowReleasePanel', () => {
 
       expect(result).toBe(false);
     });
+
+    // 3.28.0 carries the back-from-vacation promo panel; 3.27.0 stays
+    // registered so users who never updated still get their own release
+    // panel rather than an empty card.
+    it('shows the panel for 3.28.0, the current release', async () => {
+      mockState({});
+
+      const result = await shouldShowReleasePanel(mockContext, '3.28.0');
+
+      expect(result).toBe(true);
+    });
+
+    it('still shows the panel for the previous release, 3.27.0', async () => {
+      mockState({});
+
+      const result = await shouldShowReleasePanel(mockContext, '3.27.0');
+
+      expect(result).toBe(true);
+    });
   });
 
   describe('local state guard (purely local, no network call)', () => {

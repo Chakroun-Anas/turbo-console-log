@@ -2,6 +2,22 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.28.0] - 2026-08-30
+
+### ☀️ Welcome Back
+
+Back from vacation? So are we. To make the return to the keyboard a little lighter, **Turbo Pro is 30% off for 10 days** — no promo code to remember, it's already applied at checkout. [Grab it on turboconsolelog.io/pro](https://www.turboconsolelog.io/pro).
+
+When the timer runs out the discount ends and Pro goes back to full price.
+
+### 🧹 What Turbo Pro Gives You
+
+Auto-cleanup on commit strips the debug logs from the lines you changed the moment you commit — always previewed first, scope always yours. Alongside it: a workspace-wide log tree, instant search, real-time type filtering, and bulk cleanup. One-time payment, lifetime access.
+
+Nothing else changes: log insertion, cleanup, and every other extension behavior are untouched in this release.
+
+---
+
 ## [3.27.0] - 2026-07-21
 
 ### 🩹 Patch
