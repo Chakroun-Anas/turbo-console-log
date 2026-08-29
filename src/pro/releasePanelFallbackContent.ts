@@ -1,4 +1,5 @@
 import { DynamicFreemiumPanelContent } from './TurboProShowcasePanel/types';
+import { TURBO_CAMPAIGN } from './campaign';
 
 const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
 
@@ -19,6 +20,20 @@ const RELEASE_3270_CTA_URL =
   '&event=releasePanel_3.27.0' +
   '&variant=fallback' +
   '&releaseVersion=3.27.0';
+
+// v3.28.0 fallback CTA — pre-absolutized + tagged the same way, since this
+// path skips the server's enrichContentUrls step. No discount code needed:
+// /pro applies the campaign discount to every visitor on its own while the
+// campaign is live, regardless of which link they arrived from.
+const RELEASE_3280_CTA_URL =
+  `${TURBO_WEBSITE_BASE_URL}/pro` +
+  '?utm_source=extension' +
+  '&utm_medium=release-panel' +
+  '&utm_campaign=release-v3-28-0' +
+  '&utm_content=variant-fallback' +
+  '&event=releasePanel_3.28.0' +
+  '&variant=fallback' +
+  '&releaseVersion=3.28.0';
 
 export const RELEASE_PANEL_FALLBACK_CONTENT: Record<
   string,
@@ -65,6 +80,48 @@ export const RELEASE_PANEL_FALLBACK_CONTENT: Record<
         title: '🧹 The Newest Capability: Auto-Cleanup on Commit',
         content:
           "The latest addition to Pro is auto-cleanup on commit. The moment you commit, it removes the debug logs from the lines you changed. It always previews first, and the scope is always yours. No manual strip-before-commit, no console.log slipping into review. It's why developers are going Pro.",
+      },
+      order: 4,
+    },
+  ],
+  '3.28.0': [
+    {
+      type: 'countdown',
+      component: {
+        eventName: TURBO_CAMPAIGN.eventName,
+        targetDateUTC: TURBO_CAMPAIGN.countdownTarget,
+        illustrationSrc: `${TURBO_WEBSITE_BASE_URL}/assets/turbo-pro-back-from-vacation-30-discount-wide.png`,
+        CTA: {
+          text: `Get ${TURBO_CAMPAIGN.percentage}% Off Turbo Pro`,
+          url: RELEASE_3280_CTA_URL,
+        },
+      },
+      order: 1,
+    },
+    {
+      type: 'paragraph',
+      component: {
+        title: '☀️ Welcome Back — Here’s 30% Off, From Us',
+        content:
+          'Vacation’s over. The branch you left half-finished is still there, the inbox isn’t going to read itself, and somewhere in that diff is a console.log you meant to delete. We’ve all had that first Monday. So the Turbo team is doing something about it: 30% off Turbo Pro for the next 10 days — our way of saying welcome back, and making the return to the keyboard a little lighter. No code to remember — it’s already applied at checkout.',
+      },
+      order: 2,
+    },
+    {
+      type: 'paragraph',
+      component: {
+        title: '💎 Everything Turbo Pro Includes',
+        content:
+          "Alongside auto-cleanup on commit, Turbo Pro lets you navigate, search, filter, and bulk-clean every debug log across your entire workspace. It stays instant even on huge codebases, with git-aware filtering. It's a one-time payment for lifetime access, every future update included, and priority email support. No subscription.",
+      },
+      order: 3,
+    },
+    {
+      type: 'paragraph',
+      component: {
+        title: '⏳ Ten Days, Then It’s Gone',
+        content:
+          'This is a welcome-back promo, not a price change. When the timer above hits zero the discount ends and Turbo Pro goes back to full price — no extra days, no second run later in the year. If Pro has been sitting on your maybe-list since before the break, this is the cheapest it will be.',
       },
       order: 4,
     },

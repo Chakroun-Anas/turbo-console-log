@@ -35,7 +35,9 @@ describe('createReleasePanelStatusBarItem', () => {
     expect(item.text).toBe(
       `$(rocket) Turbo v3.26.0 — ${PROMO_SUFFIX} · 2d 0h 0m 0s`,
     );
-    expect(item.tooltip).toContain(`${PROMO_SUFFIX} Turbo Pro this week`);
+    expect(item.tooltip).toContain(
+      `${PROMO_SUFFIX} Turbo Pro while the timer runs`,
+    );
   });
 
   it('ticks the countdown down every second, without recreating the item', () => {

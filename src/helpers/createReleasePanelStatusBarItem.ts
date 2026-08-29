@@ -42,7 +42,7 @@ export function createReleasePanelStatusBarItem(
     return item;
   }
 
-  const promoTooltip = `What's New in Turbo Console Log v${version} — ${TURBO_CAMPAIGN.percentage}% off Turbo Pro this week`;
+  const promoTooltip = `What's New in Turbo Console Log v${version} — welcome back! ${TURBO_CAMPAIGN.percentage}% off Turbo Pro while the timer runs`;
 
   let interval: ReturnType<typeof setInterval> | undefined;
 

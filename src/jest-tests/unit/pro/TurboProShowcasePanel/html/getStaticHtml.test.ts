@@ -1,4 +1,5 @@
 import { getStaticHtml } from '@/pro/TurboProShowcasePanel/html/getStaticHtml';
+import { TURBO_CAMPAIGN } from '@/pro/campaign';
 
 // Mock all dependencies
 jest.mock('@/pro/TurboProShowcasePanel/styles/getCommonStyles', () => ({
@@ -69,13 +70,45 @@ describe('getStaticHtml', () => {
     expect(mockGetJavaScript).toHaveBeenCalled();
   });
 
-  // The v3.26.0 launch-week promo is over, so the freemium panel no longer
-  // renders a countdown — only the analytics card and the Pro showcase CTA.
-  it('does not render any countdown widget', () => {
-    const result = getStaticHtml(49);
+  // The v3.28.0 back-from-vacation promo puts a countdown at the top of the
+  // freemium panel. It is driven entirely by TURBO_CAMPAIGN.countdownTarget,
+  // so it needs no teardown — it disappears on its own once the date passes.
+  describe('campaign countdown', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
 
-    expect(result).not.toContain('class="countdown-widget"');
-    expect(result).not.toContain('turbo-auto-cleanup-discount.png');
+    it('renders the promo countdown while the campaign is live', () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(
+        new Date(TURBO_CAMPAIGN.countdownTarget.getTime() - 60 * 60 * 1000),
+      );
+
+      const result = getStaticHtml(49);
+
+      expect(result).toContain('class="countdown-widget"');
+      expect(result).toContain(
+        'turbo-pro-back-from-vacation-30-discount-wide.png',
+      );
+      expect(result).toContain(
+        `Get ${TURBO_CAMPAIGN.percentage}% Off Turbo Pro`,
+      );
+      expect(result).toContain('event=freemiumPanel_v3280-promo');
+    });
+
+    it('self-hides the countdown once the campaign target has passed', () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(
+        new Date(TURBO_CAMPAIGN.countdownTarget.getTime() + 1000),
+      );
+
+      const result = getStaticHtml(49);
+
+      expect(result).not.toContain('class="countdown-widget"');
+      expect(result).not.toContain(
+        'turbo-pro-back-from-vacation-30-discount-wide.png',
+      );
+    });
   });
 
   it('should maintain proper HTML structure', () => {
