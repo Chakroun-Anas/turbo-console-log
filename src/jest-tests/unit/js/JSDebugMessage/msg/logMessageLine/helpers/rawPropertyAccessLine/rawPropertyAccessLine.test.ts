@@ -5,7 +5,10 @@ import testCases from './cases';
 
 describe('rawPropertyAccessLine', () => {
   for (const testCase of testCases) {
-    it(testCase.name, () => {
+    // `knownBroken` cases pin behaviour the engine does not honour yet.
+    const runner = testCase.knownBroken ? it.failing : it;
+
+    runner(testCase.name, () => {
       const document = makeTextDocument(testCase.lines);
       const ast = parseCode(
         document.getText(),

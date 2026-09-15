@@ -5,10 +5,8 @@ import {
   isThisExpression,
   isMemberExpression,
   isVariableDeclaration,
-  isObjectPattern,
   isTemplateLiteral,
-  isProperty,
-  isRestElement,
+  patternBindsName,
   walk,
 } from '../../acorn-utils';
 
@@ -65,66 +63,6 @@ function isPrimitiveRHS(expr: AcornNode): boolean {
   return false;
 }
 
-/**
- * Recursively searches for a variable name within a destructuring pattern.
- * Handles nested destructuring like: const { props: { children } } = this;
- */
-function findVariableInPattern(
-  pattern: AcornNode,
-  variableName: string,
-  visited: Set<AcornNode> = new Set(),
-  depth = 0,
-): boolean {
-  // Safety: prevent infinite recursion
-  const MAX_DEPTH = 1000; // Generous max depth for deeply nested destructuring
-  if (depth >= MAX_DEPTH) {
-    console.warn(
-      `findVariableInPattern: Hit max depth limit (${MAX_DEPTH}) - preventing infinite recursion`,
-    );
-    return false;
-  }
-
-  // Safety: prevent circular references
-  if (visited.has(pattern)) {
-    return false;
-  }
-
-  if (!isObjectPattern(pattern)) return false;
-
-  visited.add(pattern);
-
-  // TypeScript types ObjectPattern.properties as Property[], but runtime can include RestElement
-  const properties = pattern.properties as AcornNode[];
-
-  for (const prop of properties) {
-    // Handle Property nodes: { key: value } or { children }
-    if (isProperty(prop)) {
-      const value = prop.value;
-
-      // Direct match: { children }
-      if (isIdentifier(value) && value.name === variableName) {
-        return true;
-      }
-
-      // Nested destructuring: { props: { children } }
-      if (isObjectPattern(value)) {
-        if (findVariableInPattern(value, variableName, visited, depth + 1)) {
-          return true;
-        }
-      }
-    }
-    // Handle RestElement: { ...rest }
-    else if (isRestElement(prop)) {
-      const argument = prop.argument;
-      if (isIdentifier(argument) && argument.name === variableName) {
-        return true;
-      }
-    }
-  }
-
-  return false;
-}
-
 export function primitiveAssignmentChecker(
   ast: AcornNode,
   selectionLine: number,
@@ -152,18 +90,10 @@ export function primitiveAssignmentChecker(
         const { id, init } = decl;
         if (!init || !isPrimitiveRHS(init)) continue;
 
-        // Handle direct assignment: const foo = 42;
-        if (isIdentifier(id) && id.name === variableName) {
+        // const foo = 42; const { user, role = 'guest' } = state; const [a] = pair;
+        if (patternBindsName(id, variableName)) {
           isChecked = true;
           return true;
-        }
-
-        // Handle destructuring (including nested): const { foo } = user; or const { props: { children } } = this;
-        if (isObjectPattern(id)) {
-          if (findVariableInPattern(id, variableName)) {
-            isChecked = true;
-            return true;
-          }
         }
       }
     }

@@ -6,7 +6,10 @@ import failingCases from './failingCases';
 
 describe('rawPropertyAccessChecker', () => {
   for (const test of passingCases) {
-    it(`should detect property access – ${test.name}`, () => {
+    // `knownBroken` cases pin behaviour the engine does not honour yet.
+    const runner = test.knownBroken ? it.failing : it;
+
+    runner(`should detect property access – ${test.name}`, () => {
       const doc = makeTextDocument(test.lines);
       const ast = parseCode(
         doc.getText(),

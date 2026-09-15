@@ -1,7 +1,6 @@
 import { TextDocument } from 'vscode';
 import {
   type AcornNode,
-  type VariableDeclarator,
   isBinaryExpression,
   isLogicalExpression,
   isIdentifier,
@@ -10,6 +9,7 @@ import {
   isTSAsExpression,
   isTSTypeAssertion,
   isParenthesizedExpression,
+  findBindingDeclaration,
   walk,
 } from '../../acorn-utils';
 
@@ -30,75 +30,14 @@ export function binaryExpressionLine(
     return calculateMaxEndLine(document, assignment);
   }
 
-  // Try to locate the VariableDeclarator as fallback
-  const decl = findVariableDeclarator(ast, variableName);
-  if (decl && decl.init) {
-    const root = unwrap(decl.init);
-    if (isBinaryExpression(root) || isLogicalExpression(root)) {
-      return calculateMaxEndLine(document, root);
-    }
+  // Declarations: after the whole statement (a declarator list continues
+  // past the first initializer).
+  const declaration = findBindingDeclaration(ast, selectionLine, variableName);
+  if (declaration) {
+    return document.positionAt(declaration.end).line + 1;
   }
 
   return selectionLine + 1;
-}
-
-function unwrap(
-  node: AcornNode,
-  visited = new Set<AcornNode>(),
-  depth = 0,
-): AcornNode {
-  // Safeguards against infinite recursion
-  const MAX_DEPTH = 1000;
-
-  if (depth >= MAX_DEPTH) {
-    console.warn(
-      `unwrap: Hit max depth limit (${MAX_DEPTH}) - preventing infinite recursion`,
-    );
-    return node;
-  }
-
-  if (visited.has(node)) {
-    return node;
-  }
-
-  visited.add(node);
-
-  if (isParenthesizedExpression(node) || isTSAsExpression(node)) {
-    return unwrap(
-      (node as { expression: AcornNode }).expression,
-      visited,
-      depth + 1,
-    );
-  }
-  if (isTSTypeAssertion(node)) {
-    return unwrap(
-      (node as { expression: AcornNode }).expression,
-      visited,
-      depth + 1,
-    );
-  }
-  return node;
-}
-
-function findVariableDeclarator(
-  root: AcornNode,
-  name: string,
-): VariableDeclarator | undefined {
-  let found: VariableDeclarator | undefined;
-
-  walk(root, (node: AcornNode): boolean | void => {
-    if (found) return true;
-
-    if (node.type === 'VariableDeclarator') {
-      const varDecl = node as VariableDeclarator;
-      if (isIdentifier(varDecl.id) && varDecl.id.name === name) {
-        found = varDecl;
-        return true;
-      }
-    }
-  });
-
-  return found;
 }
 
 function findAssignmentExpression(

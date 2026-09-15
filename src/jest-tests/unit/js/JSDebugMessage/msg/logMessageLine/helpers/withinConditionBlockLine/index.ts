@@ -3,6 +3,7 @@ import case2 from './cases/2';
 import case3 from './cases/3';
 import case4 from './cases/4';
 import case5 from './cases/5';
+import case7 from './cases/7';
 
-const cases = [case1, case2, case3, case4, case5];
+const cases = [case1, case2, case3, case4, case5, case7];
 export default cases;
