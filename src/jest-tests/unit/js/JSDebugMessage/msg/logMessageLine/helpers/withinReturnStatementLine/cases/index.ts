@@ -26,6 +26,10 @@ import case25 from './25';
 import case26 from './26';
 import case27 from './27';
 import case29 from './29';
+import case30 from './30';
+import case31 from './31';
+import case32 from './32';
+import case33 from './33';
 
 const testCases = [
   case1,
@@ -56,6 +60,10 @@ const testCases = [
   case26,
   case27,
   case29,
+  case30,
+  case31,
+  case32,
+  case33,
 ];
 
 export default testCases;

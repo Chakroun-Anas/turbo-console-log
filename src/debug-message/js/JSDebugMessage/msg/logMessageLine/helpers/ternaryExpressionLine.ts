@@ -1,13 +1,10 @@
 import { TextDocument } from 'vscode';
 import {
   type AcornNode,
-  type VariableDeclaration,
   type ConditionalExpression,
   isConditionalExpression,
-  isVariableDeclaration,
   isIdentifier,
-  isArrayPattern,
-  isObjectPattern,
+  findBindingDeclaration,
   walk,
 } from '../../acorn-utils';
 
@@ -17,55 +14,19 @@ export function ternaryExpressionLine(
   selectionLine: number,
   variableName: string,
 ): number {
-  // ─── 1) Scope to the variable declarator if possible ─────────────────────
-
-  let condNode: ConditionalExpression | undefined;
-  const decl = findVariableDeclaration(ast, variableName);
-  if (decl && decl.init) {
-    if (isConditionalExpression(decl.init)) {
-      condNode = decl.init as ConditionalExpression;
-    } else {
-      condNode = findFirstConditional(decl.init);
-    }
+  // ─── 1) Declarations: after the whole declaration statement ─────────────
+  const declaration = findBindingDeclaration(ast, selectionLine, variableName);
+  if (declaration) {
+    return document.positionAt(declaration.end).line + 1;
   }
 
-  // ─── 2) Fallback: find any ternary whose condition contains our variable ───
-  if (!condNode) {
-    const candidates: ConditionalExpression[] = [];
-    walk(ast, (n: AcornNode): void => {
-      if (
-        isConditionalExpression(n) &&
-        containsIdentifier((n as ConditionalExpression).test, variableName)
-      ) {
-        candidates.push(n as ConditionalExpression);
-      }
-    });
-
-    if (candidates.length) {
-      // prefer those covering your cursor line
-      const covering = candidates.filter((n) => {
-        const start = document.positionAt(n.start).line;
-        const end = document.positionAt(n.end).line;
-        return selectionLine >= start && selectionLine <= end;
-      });
-      const pool = covering.length ? covering : candidates;
-
-      // pick the smallest span
-      let best = pool[0];
-      let bestSpan =
-        document.positionAt(best.end).line -
-        document.positionAt(best.start).line;
-      for (const c of pool) {
-        const span =
-          document.positionAt(c.end).line - document.positionAt(c.start).line;
-        if (span < bestSpan) {
-          best = c;
-          bestSpan = span;
-        }
-      }
-      condNode = best;
-    }
-  }
+  // ─── 2) Fallback: the ternary whose condition contains our variable ─────
+  const condNode = findConditionalWithTest(
+    ast,
+    document,
+    selectionLine,
+    variableName,
+  );
 
   // ─── 3) Nothing matched? just next line ─────────────────────────────────
   if (!condNode) {
@@ -85,62 +46,45 @@ export function ternaryExpressionLine(
 
 // ─── Helpers ────────────────────────────────────────────────────────────
 
-function findVariableDeclaration(
-  root: AcornNode,
-  name: string,
-): { id: AcornNode; init: AcornNode } | undefined {
-  let found: { id: AcornNode; init: AcornNode } | undefined;
-  walk(root, (n: AcornNode): boolean | void => {
-    if (isVariableDeclaration(n)) {
-      const varDecl = n as VariableDeclaration;
-      for (const decl of varDecl.declarations) {
-        if (!decl.init) continue;
-
-        // Simple identifier: const cookieName = ...
-        if (
-          isIdentifier(decl.id) &&
-          (decl.id as { name: string }).name === name
-        ) {
-          found = decl as { id: AcornNode; init: AcornNode };
-          return true;
-        }
-
-        // Destructuring: const [cookieName, cookieValue] = ... or const { x } = ...
-        if (
-          (isArrayPattern(decl.id) || isObjectPattern(decl.id)) &&
-          patternContainsIdentifier(decl.id, name)
-        ) {
-          found = decl as { id: AcornNode; init: AcornNode };
-          return true;
-        }
-      }
-    }
-  });
-  return found;
-}
-
-function patternContainsIdentifier(pattern: AcornNode, name: string): boolean {
-  let found = false;
-  walk(pattern, (n: AcornNode): boolean | void => {
-    if (isIdentifier(n) && (n as { name: string }).name === name) {
-      found = true;
-      return true;
-    }
-  });
-  return found;
-}
-
-function findFirstConditional(
-  root: AcornNode,
+/** Smallest ternary whose test references the variable, preferring those covering the selection. */
+function findConditionalWithTest(
+  ast: AcornNode,
+  document: TextDocument,
+  selectionLine: number,
+  variableName: string,
 ): ConditionalExpression | undefined {
-  let found: ConditionalExpression | undefined;
-  walk(root, (n: AcornNode): boolean | void => {
-    if (isConditionalExpression(n)) {
-      found = n as ConditionalExpression;
-      return true; // Stop early
+  const candidates: ConditionalExpression[] = [];
+  walk(ast, (n: AcornNode): void => {
+    if (
+      isConditionalExpression(n) &&
+      containsIdentifier((n as ConditionalExpression).test, variableName)
+    ) {
+      candidates.push(n as ConditionalExpression);
     }
   });
-  return found;
+  if (!candidates.length) return undefined;
+
+  // prefer those covering your cursor line
+  const covering = candidates.filter((n) => {
+    const start = document.positionAt(n.start).line;
+    const end = document.positionAt(n.end).line;
+    return selectionLine >= start && selectionLine <= end;
+  });
+  const pool = covering.length ? covering : candidates;
+
+  // pick the smallest span
+  let best = pool[0];
+  let bestSpan =
+    document.positionAt(best.end).line - document.positionAt(best.start).line;
+  for (const c of pool) {
+    const span =
+      document.positionAt(c.end).line - document.positionAt(c.start).line;
+    if (span < bestSpan) {
+      best = c;
+      bestSpan = span;
+    }
+  }
+  return best;
 }
 
 function containsIdentifier(node: AcornNode, name: string): boolean {

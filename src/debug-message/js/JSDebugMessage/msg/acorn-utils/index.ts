@@ -32,10 +32,16 @@ export type {
   RestElement,
   AssignmentPattern,
   ChainExpression,
+  NewExpression,
+  ImportExpression,
+  YieldExpression,
+  TSNonNullExpression,
+  TSSatisfiesExpression,
   MethodDefinition,
   ClassMethod,
   TSParameterProperty,
   PropertyDefinition,
+  CatchClause,
 } from './types';
 
 // Type guards
@@ -69,6 +75,11 @@ export {
   isRestElement,
   isAssignmentPattern,
   isChainExpression,
+  isNewExpression,
+  isImportExpression,
+  isYieldExpression,
+  isTSNonNullExpression,
+  isTSSatisfiesExpression,
   isMethodDefinition,
   isClassMethod,
   isProperty,
@@ -76,11 +87,43 @@ export {
   isVariableDeclarator,
   isTSParameterProperty,
   isPropertyDefinition,
+  isCatchClause,
   STATEMENT_TYPES,
 } from './guards';
 
 // AST walker
 export { walk } from './walk';
+
+// Shared resolution helpers
+export { isCallLikeExpression } from './callLike';
+export { isTransparentWrapper, unwrapTransparent } from './transparentWrapper';
+export {
+  parameterList,
+  patternBindingIdentifiers,
+  patternBindsName,
+  findBindingDeclaration,
+} from './bindings';
+export {
+  findEnclosingStatement,
+  isInStatementHead,
+  ifConsequentBlock,
+  ifBodyFirstLine,
+  statementAnchorStart,
+  statementHeads,
+  statementLines,
+  type EnclosingStatement,
+  type StatementLines,
+} from './enclosingStatement';
+export {
+  findObjectLiteralKey,
+  type ObjectLiteralKey,
+  type ObjectLiteralRoot,
+} from './objectLiteralKey';
+export { findSelectionReturnStatement } from './returnStatement';
+export {
+  findAssignmentStatement,
+  type AssignmentStatement,
+} from './assignmentStatement';
 
 // Parser
 export { parseCode } from './parseCode';

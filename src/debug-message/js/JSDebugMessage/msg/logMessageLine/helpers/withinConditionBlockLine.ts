@@ -1,9 +1,12 @@
 import { TextDocument } from 'vscode';
 import {
   type AcornNode,
+  findEnclosingStatement,
+  ifBodyFirstLine,
   isIdentifier,
   isMemberExpression,
   isConditionalExpression,
+  statementLines,
   walk,
 } from '../../acorn-utils';
 
@@ -23,10 +26,7 @@ export function withinConditionBlockLine(
 
     // Extract condition based on statement type
     if (node.type === 'IfStatement') {
-      const ifNode = node as unknown as {
-        test: AcornNode;
-        consequent: AcornNode;
-      };
+      const ifNode = node as unknown as { test: AcornNode };
       condition = ifNode.test;
       hasBlock = true;
     } else if (node.type === 'WhileStatement') {
@@ -61,9 +61,7 @@ export function withinConditionBlockLine(
       if (selectionLine >= conditionStart && selectionLine <= conditionEnd) {
         // Check if the wanted variable appears in the condition
         if (containsPropertyAccess(condition, variableName.trim(), code)) {
-          // Always insert before the start of the statement
-          const statementStart = document.positionAt(node.start).line;
-          targetLine = statementStart;
+          targetLine = conditionLogLine(ast, document, node);
           return true; // Stop early
         }
       }
@@ -91,6 +89,26 @@ export function withinConditionBlockLine(
   });
 
   return targetLine;
+}
+
+/**
+ * Before the statement (and any label in front of it). An else-if condition
+ * is logged at the top of its body instead: before the `} else if` line is
+ * the previous branch, and before the whole chain is not safe since the
+ * condition may rely on earlier branches (`if (!user) … else if (user.role)`).
+ */
+function conditionLogLine(
+  ast: AcornNode,
+  document: TextDocument,
+  statement: AcornNode,
+): number {
+  const isElseIf =
+    statement.type === 'IfStatement' &&
+    findEnclosingStatement(ast, statement)?.isElseIf;
+  const bodyLine = isElseIf ? ifBodyFirstLine(statement) : undefined;
+  if (bodyLine !== undefined) return bodyLine;
+  const { before, after } = statementLines(ast, document, statement);
+  return before ?? after;
 }
 
 function containsPropertyAccess(

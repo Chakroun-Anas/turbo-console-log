@@ -1,57 +1,45 @@
 import { DynamicFreemiumPanelContent } from './TurboProShowcasePanel/types';
-import { TURBO_CAMPAIGN } from './campaign';
 
 const TURBO_WEBSITE_BASE_URL = 'https://www.turboconsolelog.io';
 
 // Offline/error fallback for the release panel, shown only when the website's
 // /api/releasePanel endpoint is unreachable. Mirrors variant A of the
-// server-side RELEASE_PANEL_VARIANTS so users still see real release copy.
+// server-side RELEASE_PANEL_VARIANTS['3.29.0'] so users still see real release
+// copy; edit both together.
 //
-// The server normally absolutizes CTA urls and appends UTM params (its
+// The server normally absolutizes urls and appends UTM params (its
 // enrichContentUrls step); that step is skipped on this fallback path, so the
-// url below is pre-absolutized and tagged variant=fallback to match the
+// urls below are pre-absolutized and tagged variant=fallback to match the
 // 'fallback' label this path already reports in its shown/CTA-click telemetry.
-const RELEASE_3270_CTA_URL =
-  `${TURBO_WEBSITE_BASE_URL}/pro` +
+const RELEASE_3290_TRACKING =
   '?utm_source=extension' +
   '&utm_medium=release-panel' +
-  '&utm_campaign=release-v3-27-0' +
+  '&utm_campaign=release-v3-29-0' +
   '&utm_content=variant-fallback' +
-  '&event=releasePanel_3.27.0' +
+  '&event=releasePanel_3.29.0' +
   '&variant=fallback' +
-  '&releaseVersion=3.27.0';
+  '&releaseVersion=3.29.0';
 
-// v3.28.0 fallback CTA — pre-absolutized + tagged the same way, since this
-// path skips the server's enrichContentUrls step. No discount code needed:
-// /pro applies the campaign discount to every visitor on its own while the
-// campaign is live, regardless of which link they arrived from.
-const RELEASE_3280_CTA_URL =
-  `${TURBO_WEBSITE_BASE_URL}/pro` +
-  '?utm_source=extension' +
-  '&utm_medium=release-panel' +
-  '&utm_campaign=release-v3-28-0' +
-  '&utm_content=variant-fallback' +
-  '&event=releasePanel_3.28.0' +
-  '&variant=fallback' +
-  '&releaseVersion=3.28.0';
+const RELEASE_3290_CTA_URL = `${TURBO_WEBSITE_BASE_URL}/pro${RELEASE_3290_TRACKING}`;
+const RELEASE_3290_ARTICLE_URL = `${TURBO_WEBSITE_BASE_URL}/articles/release-3290${RELEASE_3290_TRACKING}`;
 
 export const RELEASE_PANEL_FALLBACK_CONTENT: Record<
   string,
   Array<DynamicFreemiumPanelContent>
 > = {
-  '3.27.0': [
+  '3.29.0': [
     {
       type: 'media-showcase-cta',
       component: {
         illustrationSrcs: [
           `${TURBO_WEBSITE_BASE_URL}/assets/turbo-console-log-pro-wide.png`,
         ],
-        tagline: 'Outgrown single logs? Turbo Pro manages all of them.',
+        tagline: 'Every log on the right line. Turbo Pro takes them all out.',
         subtitle:
-          'Search, filter, and bulk-clean every debug log across your workspace, and keep the free core funded. One-time payment, lifetime access.',
+          'v3.29.0 ships 14 placement fixes to the free engine. Turbo Pro adds auto-cleanup on commit, workspace-wide search, filtering, and bulk cleanup. One-time payment, lifetime access.',
         cta: {
           text: 'Get Turbo Pro',
-          url: RELEASE_3270_CTA_URL,
+          url: RELEASE_3290_CTA_URL,
         },
       },
       order: 1,
@@ -59,11 +47,23 @@ export const RELEASE_PANEL_FALLBACK_CONTENT: Record<
     {
       type: 'paragraph',
       component: {
-        title: '🤝 Free Core, Funded by Pro',
+        title: '🎯 14 Placement Fixes, Free for Everyone',
         content:
-          "The core Turbo Console Log is free, and it stays free: intelligent, one-keystroke log insertion across JavaScript, TypeScript, Python, and PHP. Turbo Pro is the paid edition that funds that work. When a single log isn't enough and you're managing them across a whole codebase, Pro is there when you're ready.",
+          'v3.29.0 is a release about one promise: when you insert a log, it lands on the right line. We probed the insertion engine against more than 700 real-world React, TypeScript, Node, and framework snippets and fixed the patterns where a log landed in the wrong place: inside an object literal, after a return, before the value it was meant to show, or outside the block where the variable exists. Every fix is pinned by an end-to-end test, so it stays fixed.',
       },
       order: 2,
+    },
+    {
+      type: 'article',
+      component: {
+        title: 'v3.29.0: 14 Placement Fixes',
+        description:
+          'The patterns where a log used to land on the wrong line, and how the engine handles them now.',
+        illustrationSrc: `${TURBO_WEBSITE_BASE_URL}/assets/turbo-full-ast-engine-wide.png`,
+        illustrationFocus: 'top',
+        url: RELEASE_3290_ARTICLE_URL,
+      },
+      order: 3,
     },
     {
       type: 'paragraph',
@@ -72,58 +72,16 @@ export const RELEASE_PANEL_FALLBACK_CONTENT: Record<
         content:
           "Alongside auto-cleanup on commit, Turbo Pro lets you navigate, search, filter, and bulk-clean every debug log across your entire workspace. It stays instant even on huge codebases, with git-aware filtering. It's a one-time payment for lifetime access, every future update included, and priority email support. No subscription.",
       },
-      order: 3,
-    },
-    {
-      type: 'paragraph',
-      component: {
-        title: '🧹 The Newest Capability: Auto-Cleanup on Commit',
-        content:
-          "The latest addition to Pro is auto-cleanup on commit. The moment you commit, it removes the debug logs from the lines you changed. It always previews first, and the scope is always yours. No manual strip-before-commit, no console.log slipping into review. It's why developers are going Pro.",
-      },
       order: 4,
     },
-  ],
-  '3.28.0': [
-    {
-      type: 'countdown',
-      component: {
-        eventName: TURBO_CAMPAIGN.eventName,
-        targetDateUTC: TURBO_CAMPAIGN.countdownTarget,
-        illustrationSrc: `${TURBO_WEBSITE_BASE_URL}/assets/turbo-pro-back-from-vacation-30-discount-wide.png`,
-        CTA: {
-          text: `Get ${TURBO_CAMPAIGN.percentage}% Off Turbo Pro`,
-          url: RELEASE_3280_CTA_URL,
-        },
-      },
-      order: 1,
-    },
     {
       type: 'paragraph',
       component: {
-        title: '☀️ Welcome Back — Here’s 30% Off, From Us',
+        title: '🤝 Your License Funds the Free Core',
         content:
-          'Vacation’s over. The branch you left half-finished is still there, the inbox isn’t going to read itself, and somewhere in that diff is a console.log you meant to delete. We’ve all had that first Monday. So the Turbo team is doing something about it: 30% off Turbo Pro for the next 10 days — our way of saying welcome back, and making the return to the keyboard a little lighter. No code to remember — it’s already applied at checkout.',
+          'The fixes in this release are free, like every improvement to log insertion since 2018. Turbo Pro is what pays for them. If Turbo saves you time every day, a Pro license is a one-time payment that funds the next round of fixes and gets you complete log management today, with every future update included.',
       },
-      order: 2,
-    },
-    {
-      type: 'paragraph',
-      component: {
-        title: '💎 Everything Turbo Pro Includes',
-        content:
-          "Alongside auto-cleanup on commit, Turbo Pro lets you navigate, search, filter, and bulk-clean every debug log across your entire workspace. It stays instant even on huge codebases, with git-aware filtering. It's a one-time payment for lifetime access, every future update included, and priority email support. No subscription.",
-      },
-      order: 3,
-    },
-    {
-      type: 'paragraph',
-      component: {
-        title: '⏳ Ten Days, Then It’s Gone',
-        content:
-          'This is a welcome-back promo, not a price change. When the timer above hits zero the discount ends and Turbo Pro goes back to full price — no extra days, no second run later in the year. If Pro has been sitting on your maybe-list since before the break, this is the cheapest it will be.',
-      },
-      order: 4,
+      order: 5,
     },
   ],
 };

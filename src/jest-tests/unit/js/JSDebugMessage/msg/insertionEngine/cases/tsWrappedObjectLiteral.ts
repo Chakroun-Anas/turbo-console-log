@@ -1,0 +1,87 @@
+import { InsertionEngineCase } from './types';
+
+// A key inside a declared object literal wrapped in `as const`, `satisfies`,
+// `as T` or `<T>`: the key chain climbs through TS expression wrappers, so the
+// logged path keeps its declared root (it used to lose it).
+export const tsWrappedObjectLiteralCases: InsertionEngineCase[] = [
+  {
+    name: 'deep key in an as-const object logs its full path from the declared root',
+    fileExtension: '.ts',
+    lines: [
+      'export const ROUTES = {',
+      "  home: '/',",
+      '  settings: {',
+      "    profile: '/settings/profile',",
+      '  },',
+      '} as const;',
+      'go(ROUTES);',
+    ],
+    selectionLine: 3,
+    variableName: 'profile',
+    expectedLine: 6,
+    expectedDeepObjectPath: 'ROUTES.settings.profile',
+  },
+  {
+    name: 'deep key in a satisfies object logs its full path from the declared root',
+    fileExtension: '.ts',
+    lines: [
+      'const theme = {',
+      '  colors: {',
+      "    primary: '#0055ff',",
+      '  },',
+      '} satisfies ThemeConfig;',
+      'use(theme);',
+    ],
+    selectionLine: 2,
+    variableName: 'primary',
+    expectedLine: 5,
+    expectedDeepObjectPath: 'theme.colors.primary',
+  },
+  {
+    name: 'key in a nested as-cast object logs its full path from the declared root',
+    fileExtension: '.ts',
+    lines: [
+      'const options = {',
+      '  headers: {',
+      '    Authorization: `Bearer ${token}`,',
+      '  } as HeadersInit,',
+      '};',
+      'fetch(url, options);',
+    ],
+    selectionLine: 2,
+    variableName: 'Authorization',
+    expectedLine: 5,
+    expectedDeepObjectPath: 'options.headers.Authorization',
+  },
+  {
+    name: 'key in an angle-bracket asserted object logs its path from the declared root',
+    fileExtension: '.ts',
+    lines: [
+      'const defaults = <RequestOptions>{',
+      '  retries: 3,',
+      '  timeout: 5000,',
+      '};',
+      'use(defaults);',
+    ],
+    selectionLine: 1,
+    variableName: 'retries',
+    expectedLine: 4,
+    expectedDeepObjectPath: 'defaults.retries',
+  },
+  {
+    name: 'deep key in a type-annotated declared object logs its full path',
+    fileExtension: '.ts',
+    lines: [
+      'const config: AppConfig = {',
+      '  nested: {',
+      '    b: 2,',
+      '  },',
+      '};',
+      'use(config);',
+    ],
+    selectionLine: 2,
+    variableName: 'b',
+    expectedLine: 5,
+    expectedDeepObjectPath: 'config.nested.b',
+  },
+];

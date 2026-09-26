@@ -4,10 +4,8 @@ import {
   type VariableDeclaration,
   isIdentifier,
   isMemberExpression,
-  isTSAsExpression,
-  isParenthesizedExpression,
-  isExpressionStatement,
-  isAssignmentExpression,
+  unwrapTransparent,
+  findAssignmentStatement,
   walk,
 } from '../../acorn-utils';
 
@@ -17,8 +15,7 @@ export function propertyAccessAssignmentLine(
   selectionLine: number,
   variableName: string,
 ): number {
-  let insertionLine = selectionLine + 1;
-  const code = document.getText();
+  let insertionLine: number | undefined;
 
   walk(ast, (node: AcornNode): void => {
     // Case 1: const foo = obj.prop;
@@ -37,37 +34,11 @@ export function propertyAccessAssignmentLine(
           const nodeEnd = document.positionAt(node.end).line;
           if (selectionLine < nodeStart || selectionLine > nodeEnd) continue;
 
-          const unwrapped = unwrap(decl.init);
+          const unwrapped = unwrapTransparent(decl.init);
           if (
             isMemberExpression(unwrapped) ||
-            unwrapped.type === 'ChainExpression' ||
-            unwrapped.type === 'TSNonNullExpression'
+            unwrapped.type === 'ChainExpression'
           ) {
-            insertionLine = nodeEnd + 1;
-          }
-        }
-      }
-    }
-
-    // Case 2: this.foo = obj.prop;
-    if (isExpressionStatement(node)) {
-      const expr = (node as { expression: AcornNode }).expression;
-      if (
-        isAssignmentExpression(expr) &&
-        (expr as { operator: string }).operator === '='
-      ) {
-        if (node.start === undefined || node.end === undefined) return;
-
-        const nodeStart = document.positionAt(node.start).line;
-        const nodeEnd = document.positionAt(node.end).line;
-        if (selectionLine < nodeStart || selectionLine > nodeEnd) return;
-
-        const left = (expr as { left: AcornNode }).left;
-
-        if (isMemberExpression(left)) {
-          // Get the text representation of the left side
-          const leftText = getNodeText(code, left);
-          if (leftText === variableName) {
             insertionLine = nodeEnd + 1;
           }
         }
@@ -75,41 +46,19 @@ export function propertyAccessAssignmentLine(
     }
   });
 
-  return insertionLine;
-}
+  if (insertionLine !== undefined) return insertionLine;
 
-function unwrap(expr: AcornNode): AcornNode {
-  let current = expr;
-  const visited = new Set<AcornNode>();
-  let depth = 0;
-  const MAX_DEPTH = 1000;
-
-  while (
-    isTSAsExpression(current) ||
-    isParenthesizedExpression(current) ||
-    current.type === 'TSNonNullExpression'
-  ) {
-    // Safeguards against infinite loops
-    if (depth >= MAX_DEPTH) {
-      console.warn(
-        `unwrap: Hit max depth limit (${MAX_DEPTH}) - preventing infinite loop`,
-      );
-      return current;
-    }
-    if (visited.has(current)) {
-      return current;
-    }
-    visited.add(current);
-    depth++;
-
-    current = (current as unknown as { expression: AcornNode }).expression;
+  // Case 2: reassignments (this.foo = obj.prop; state = {…}; x ??= new X(…)):
+  // after the whole statement, so the log prints the assigned value.
+  const assignment = findAssignmentStatement(
+    ast,
+    document.getText(),
+    selectionLine,
+    variableName,
+  );
+  if (assignment) {
+    return document.positionAt(assignment.end).line + 1;
   }
-  return current;
-}
 
-function getNodeText(code: string, node: AcornNode): string {
-  if (node.start !== undefined && node.end !== undefined) {
-    return code.substring(node.start, node.end);
-  }
-  return '';
+  return selectionLine + 1;
 }

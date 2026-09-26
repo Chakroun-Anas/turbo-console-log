@@ -7,6 +7,7 @@ import {
   isRestElement,
   isAssignmentPattern,
   isTSParameterProperty,
+  parameterList,
   walk,
 } from '../../acorn-utils';
 
@@ -28,19 +29,9 @@ export function functionParameterChecker(
   walk(ast, (node: AcornNode): boolean | void => {
     if (match) return true;
 
-    // Check if this is a function with params
-    if (
-      node.type === 'FunctionDeclaration' ||
-      node.type === 'FunctionExpression' ||
-      node.type === 'ArrowFunctionExpression'
-    ) {
-      const params = (
-        node as {
-          params?: AcornNode[];
-        }
-      ).params;
-      if (!params || !Array.isArray(params)) return;
-
+    // A function's parameters, or the parameter of a `catch` clause
+    const params = parameterList(node);
+    if (params) {
       for (const param of params) {
         // Use start/end positions instead of loc
         if (param.start === undefined) continue;

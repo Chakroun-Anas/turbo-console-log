@@ -1,5 +1,4 @@
 import { getStaticHtml } from '@/pro/TurboProShowcasePanel/html/getStaticHtml';
-import { TURBO_CAMPAIGN } from '@/pro/campaign';
 
 // Mock all dependencies
 jest.mock('@/pro/TurboProShowcasePanel/styles/getCommonStyles', () => ({
@@ -70,44 +69,41 @@ describe('getStaticHtml', () => {
     expect(mockGetJavaScript).toHaveBeenCalled();
   });
 
-  // The v3.28.0 back-from-vacation promo puts a countdown at the top of the
-  // freemium panel. It is driven entirely by TURBO_CAMPAIGN.countdownTarget,
-  // so it needs no teardown — it disappears on its own once the date passes.
-  describe('campaign countdown', () => {
-    afterEach(() => {
-      jest.useRealTimers();
-    });
-
-    it('renders the promo countdown while the campaign is live', () => {
-      jest.useFakeTimers();
-      jest.setSystemTime(
-        new Date(TURBO_CAMPAIGN.countdownTarget.getTime() - 60 * 60 * 1000),
-      );
-
-      const result = getStaticHtml(49);
-
-      expect(result).toContain('class="countdown-widget"');
-      expect(result).toContain(
-        'turbo-pro-back-from-vacation-30-discount-wide.png',
-      );
-      expect(result).toContain(
-        `Get ${TURBO_CAMPAIGN.percentage}% Off Turbo Pro`,
-      );
-      expect(result).toContain('event=freemiumPanel_v3280-promo');
-    });
-
-    it('self-hides the countdown once the campaign target has passed', () => {
-      jest.useFakeTimers();
-      jest.setSystemTime(
-        new Date(TURBO_CAMPAIGN.countdownTarget.getTime() + 1000),
-      );
-
+  describe('v3.29.0 release content', () => {
+    it('renders no campaign countdown', () => {
       const result = getStaticHtml(49);
 
       expect(result).not.toContain('class="countdown-widget"');
-      expect(result).not.toContain(
-        'turbo-pro-back-from-vacation-30-discount-wide.png',
+      expect(result).not.toContain('% Off Turbo Pro');
+    });
+
+    it('opens with the v3.29.0 placement fixes highlight', () => {
+      const result = getStaticHtml(49);
+
+      expect(result).toContain('New in v3.29.0');
+      expect(result.indexOf('New in v3.29.0')).toBeLessThan(
+        result.indexOf('Unlock with Turbo Pro'),
       );
+    });
+
+    it('shows the Pro illustration above the showcase CTA', () => {
+      const result = getStaticHtml(49);
+
+      const illustration = '/assets/turbo-console-log-pro-wide.png';
+      expect(result).toContain(illustration);
+      expect(result.indexOf(illustration)).toBeLessThan(
+        result.indexOf('Never commit a debug log again'),
+      );
+    });
+
+    it('links the release article with panel tracking', () => {
+      const result = getStaticHtml(49);
+
+      expect(result).toContain('Featured Turbo Articles');
+      expect(result).toContain('/assets/turbo-full-ast-engine-wide.png');
+      expect(result).toContain('/articles/release-3290');
+      expect(result).toContain('utm_campaign=v3290_release');
+      expect(result).toContain('position=article');
     });
   });
 

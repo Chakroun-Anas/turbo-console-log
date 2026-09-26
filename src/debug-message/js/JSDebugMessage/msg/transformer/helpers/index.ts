@@ -1,2 +1,4 @@
-export { containsVariable } from './containsVariable';
-export { buildMemberPath } from './buildMemberPath';
+export {
+  findTransformationTarget,
+  type TransformableFunction,
+} from './findTransformationTarget';

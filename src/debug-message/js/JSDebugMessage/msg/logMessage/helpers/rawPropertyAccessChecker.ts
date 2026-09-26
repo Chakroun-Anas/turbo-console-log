@@ -2,10 +2,11 @@ import { Position, TextDocument } from 'vscode';
 import { LogContextMetadata } from '@/entities';
 import {
   type AcornNode,
+  type ObjectLiteralKey,
   type Property,
+  findObjectLiteralKey,
   isIdentifier,
   isMemberExpression,
-  isObjectExpression,
   walk,
 } from '../../acorn-utils';
 
@@ -24,7 +25,7 @@ export function rawPropertyAccessChecker(
   document: TextDocument,
   selectionLine: number,
   selectedText: string,
-) {
+): RawPropertyAccessCheck {
   // Find the selection in the line
   const lineText = document.lineAt(selectionLine).text;
   const charIndex = lineText.indexOf(selectedText);
@@ -40,201 +41,182 @@ export function rawPropertyAccessChecker(
     return { isChecked: false };
   }
 
-  // Build a parent map by walking the tree once
-  const parentMap = new Map<AcornNode, AcornNode>();
+  // 1) Object literal key: e.g., `mother: {...}` or `age: 28`
+  //    (destructuring patterns like `const { fullName } = person;` never match)
+  const objectKey = findObjectLiteralKey(
+    ast,
+    startOffset,
+    endOffset,
+    selectedText,
+  );
+  if (objectKey) {
+    return checked(objectKeyPath(objectKey, sourceCode));
+  }
 
-  walk(ast, (node: AcornNode) => {
-    // For each node, store parent references for its direct children
-    if (node.type === 'Property') {
-      const prop = node as Property;
-      if (prop.key) parentMap.set(prop.key, node);
-      if (prop.value) parentMap.set(prop.value, node);
-    } else if (node.type === 'MemberExpression') {
-      const member = node as { object?: AcornNode; property?: AcornNode };
-      if (member.object) parentMap.set(member.object, node);
-      if (member.property) parentMap.set(member.property, node);
-    } else if (node.type === 'ObjectExpression') {
-      const obj = node as { properties?: AcornNode[] };
-      if (obj.properties) {
-        obj.properties.forEach((prop) => parentMap.set(prop, node));
-      }
-    } else if (node.type === 'ObjectPattern') {
-      // Destructuring pattern: const { fullName } = person;
-      const objPattern = node as { properties?: AcornNode[] };
-      if (objPattern.properties) {
-        objPattern.properties.forEach((prop) => parentMap.set(prop, node));
-      }
-    } else if (node.type === 'VariableDeclaration') {
-      const varDecl = node as { declarations?: AcornNode[] };
-      if (varDecl.declarations) {
-        varDecl.declarations.forEach((decl) => parentMap.set(decl, node));
-      }
-    } else if (node.type === 'VariableDeclarator') {
-      const varDeclarator = node as { id?: AcornNode; init?: AcornNode };
-      if (varDeclarator.id) parentMap.set(varDeclarator.id, node);
-      if (varDeclarator.init) parentMap.set(varDeclarator.init, node);
+  const access = findPropertyAccess(
+    ast,
+    startOffset,
+    endOffset,
+    selectedText,
+    sourceCode,
+  );
+  return access ? checked(memberAccessPath(access)) : { isChecked: false };
+}
+
+type RawPropertyAccessCheck = {
+  isChecked: boolean;
+  metadata?: LogContextMetadata;
+};
+
+function checked(deepObjectPath: string): RawPropertyAccessCheck {
+  return {
+    isChecked: true,
+    metadata: { deepObjectPath } as LogContextMetadata,
+  };
+}
+
+/**
+ * The expression that reads the selected key:
+ * - a declared root: `person.family.mother`
+ * - a member-assigned root: `this.state.ready`, `module.exports.a`
+ * - no root: a key is not a binding, so the property's value is logged
+ *   (`id: user.id` logs `user.id`). A value that cannot be logged again
+ *   (`stamp: now()`) is replaced by the key name as a string: the bare key
+ *   would be an undeclared identifier and throw a ReferenceError at runtime.
+ */
+function objectKeyPath(key: ObjectLiteralKey, sourceCode: string): string {
+  const keyNames = key.keyPath.map((property) => keyName(property, sourceCode));
+  switch (key.root.kind) {
+    case 'declaration':
+      return [key.root.name, ...keyNames].join('.');
+    case 'assignment':
+      return [getNodeText(key.root.target, sourceCode), ...keyNames].join('.');
+    case 'none':
+      return (
+        loggableValue(key.property, sourceCode) ??
+        JSON.stringify(keyNames[keyNames.length - 1])
+      );
+  }
+}
+
+function keyName(property: Property, sourceCode: string): string {
+  const { key } = property;
+  if (isIdentifier(key)) return key.name;
+  if (key.type === 'Literal') {
+    return String((key as { value?: string | number }).value);
+  }
+  return getNodeText(key, sourceCode);
+}
+
+/**
+ * Types whose evaluation has side effects: logging a value that contains one
+ * would run it a second time (`id: nextId()`).
+ */
+const SIDE_EFFECT_TYPES = new Set([
+  'CallExpression',
+  'NewExpression',
+  'ImportExpression',
+  'TaggedTemplateExpression',
+  'AwaitExpression',
+  'YieldExpression',
+  'UpdateExpression',
+  'AssignmentExpression',
+]);
+
+/**
+ * The value's source when it can be logged as is: an expression that is not a
+ * function and does not re-run side effects. A multi-line value is joined onto
+ * one line (the log label repeats it) unless it holds a template literal or a
+ * comment, whose content a join would change. Undefined otherwise.
+ */
+function loggableValue(
+  property: Property,
+  sourceCode: string,
+): string | undefined {
+  const { value } = property;
+  if (property.method || property.kind !== 'init') return undefined;
+
+  const text = getNodeText(value, sourceCode);
+  if (!text) return undefined;
+
+  let loggable = true;
+  let hasTemplate = false;
+  walk(value, (node: AcornNode): boolean | void => {
+    if (node.type === 'TemplateLiteral') hasTemplate = true;
+    if (
+      SIDE_EFFECT_TYPES.has(node.type) ||
+      node.type === 'FunctionExpression' ||
+      node.type === 'ArrowFunctionExpression' ||
+      node.type === 'ClassExpression' ||
+      (node.type === 'UnaryExpression' &&
+        (node as { operator?: string }).operator === 'delete')
+    ) {
+      loggable = false;
     }
+    return !loggable;
   });
+  if (!loggable) return undefined;
+  if (!text.includes('\n')) return text;
+  if (hasTemplate || /\/[/*]|\\\r?\n/.test(text)) return undefined;
+  return text.replace(/\s*\r?\n\s*/g, ' ');
+}
 
-  // Locate the matching node
+/**
+ * Property access matching the selection: `person.family.mother` or
+ * `person['age']` (but not `this.property`).
+ */
+function findPropertyAccess(
+  ast: AcornNode,
+  startOffset: number,
+  endOffset: number,
+  selectedText: string,
+  sourceCode: string,
+): AcornNode | undefined {
   let matchedNode: AcornNode | undefined;
 
   walk(ast, (node: AcornNode): boolean | void => {
     if (matchedNode) return true;
+    if (!isMemberExpression(node)) return;
+    if (node.start > startOffset || node.end < endOffset) return;
 
-    // 1) Property assignment: e.g., `mother: {...}` or `age: 28`
-    //    BUT NOT destructuring patterns like `const { fullName } = person;`
-    if (node.type === 'Property') {
-      const prop = node as Property;
-      const key = prop.key;
-
-      if (
-        isIdentifier(key) &&
-        key.name === selectedText &&
-        key.start !== undefined &&
-        key.end !== undefined &&
-        key.start <= startOffset &&
-        key.end >= endOffset
-      ) {
-        // Check if this Property is inside an ObjectPattern (destructuring)
-        // by checking if the parent is an ObjectPattern
-        const parent = parentMap.get(node);
-        if (parent && parent.type === 'ObjectPattern') {
-          // This is a destructuring pattern, not a property access
-          return;
-        }
-
-        matchedNode = node;
-        return true;
-      }
-    }
+    const { object, property } = node;
+    // Skip this.property cases - they're not raw property access
+    if (object.type === 'ThisExpression') return;
 
     // 2) Property access: e.g., `person.family.mother`
-    // BUT NOT this.property access
-    if (isMemberExpression(node)) {
-      const property = (node as { property?: AcornNode }).property;
-      const object = (node as { object?: AcornNode }).object;
-
-      // // Skip this.property cases - they're not raw property access
-      if (object && object.type === 'ThisExpression') {
-        return;
-      }
-
-      if (
-        property &&
-        isIdentifier(property) &&
-        property.name === selectedText &&
-        node.start !== undefined &&
-        node.end !== undefined &&
-        node.start <= startOffset &&
-        node.end >= endOffset
-      ) {
-        matchedNode = node;
-        return true;
-      }
+    if (isIdentifier(property) && property.name === selectedText) {
+      matchedNode = node;
+      return true;
     }
 
     // 3) Element access: e.g., `person['age']`
-    if (
-      node.type === 'MemberExpression' &&
-      (node as { computed?: boolean }).computed
-    ) {
-      const property = (node as { property?: AcornNode }).property;
-
-      if (property) {
-        const propText = getNodeText(property, sourceCode).replace(
-          /^['"]|['"]$/g,
-          '',
-        );
-
-        if (
-          propText === selectedText &&
-          node.start !== undefined &&
-          node.end !== undefined &&
-          node.start <= startOffset &&
-          node.end >= endOffset
-        ) {
-          matchedNode = node;
-          return true;
-        }
+    if (node.computed) {
+      const propText = getNodeText(property, sourceCode).replace(
+        /^['"]|['"]$/g,
+        '',
+      );
+      if (propText === selectedText) {
+        matchedNode = node;
+        return true;
       }
     }
   });
 
-  if (!matchedNode) {
-    return { isChecked: false };
-  }
+  return matchedNode;
+}
 
-  // Build the full path: climb up through assignments → object literals → var decl
+/**
+ * The dotted identifier properties of a member chain, from the matched access
+ * down: `person.family.mother` yields `family.mother`.
+ */
+function memberAccessPath(node: AcornNode): string {
   const pathParts: string[] = [];
-  let current: AcornNode | undefined = matchedNode;
-
-  // Safeguards against infinite loops
-  const visited = new Set<AcornNode>();
-  const MAX_DEPTH = 1000; // Generous max depth for deeply nested objects
-  let depth = 0;
-
-  while (current && depth < MAX_DEPTH && !visited.has(current)) {
-    visited.add(current);
-    depth++;
-    if (isMemberExpression(current)) {
-      const property = (current as { property?: AcornNode }).property;
-      if (property && isIdentifier(property)) {
-        pathParts.unshift(property.name);
-      }
-      const memberExpr = current as { object?: AcornNode };
-      current = memberExpr.object;
-    } else if (
-      current.type === 'MemberExpression' &&
-      (current as { computed?: boolean }).computed
-    ) {
-      // Element access
-      const property = (current as { property?: AcornNode }).property;
-      if (property) {
-        const propText = getNodeText(property, sourceCode);
-        const arg = propText.slice(1, -1); // strip quotes
-        pathParts.unshift(arg);
-      }
-      const memberExpr = current as { object?: AcornNode };
-      current = memberExpr.object;
-    } else if (current.type === 'Property') {
-      const prop = current as Property;
-      const key = prop.key;
-
-      if (isIdentifier(key)) {
-        pathParts.unshift(key.name);
-      } else if (key.type === 'Literal') {
-        const value = (key as { value?: string | number }).value;
-        pathParts.unshift(String(value));
-      } else {
-        pathParts.unshift(getNodeText(key, sourceCode));
-      }
-
-      current = parentMap.get(current); // Move up to ObjectExpression
-    } else if (isObjectExpression(current)) {
-      current = parentMap.get(current); // Move to next Property or VariableDeclarator
-    } else if (current.type === 'VariableDeclarator') {
-      const id = (current as { id?: AcornNode }).id;
-      if (id && isIdentifier(id)) {
-        pathParts.unshift(id.name);
-      }
-      break;
-    } else {
-      current = parentMap.get(current); // Climb up the tree
+  let current: AcornNode = node;
+  while (isMemberExpression(current)) {
+    if (isIdentifier(current.property)) {
+      pathParts.unshift(current.property.name);
     }
+    current = current.object;
   }
-
-  // Log safety limit hits for debugging
-  if (depth >= MAX_DEPTH) {
-    console.warn(
-      `rawPropertyAccessChecker: Hit max depth limit (${MAX_DEPTH}) - preventing infinite loop`,
-    );
-  }
-
-  return {
-    isChecked: true,
-    metadata: {
-      deepObjectPath: pathParts.join('.'),
-    } as LogContextMetadata,
-  };
+  return pathParts.join('.');
 }

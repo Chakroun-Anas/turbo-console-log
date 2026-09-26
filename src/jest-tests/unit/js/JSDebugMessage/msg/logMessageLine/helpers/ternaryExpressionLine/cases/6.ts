@@ -9,5 +9,5 @@ export default {
   ],
   selectionLine: 1,
   variableName: 'config',
-  expectedLine: 2,
+  expectedLine: 3,
 };

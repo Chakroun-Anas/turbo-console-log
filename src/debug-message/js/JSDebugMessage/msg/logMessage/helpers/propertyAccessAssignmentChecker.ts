@@ -4,61 +4,52 @@ import {
   isVariableDeclaration,
   isIdentifier,
   isMemberExpression,
-  isExpressionStatement,
-  isAssignmentExpression,
   isChainExpression,
-  isParenthesizedExpression,
-  isTSAsExpression,
-  isTSTypeAssertion,
+  unwrapTransparent,
+  findAssignmentStatement,
   walk,
 } from '../../acorn-utils';
-
-/**
- * Helper function to unwrap type assertions and parentheses
- */
-function unwrap(node: AcornNode): AcornNode {
-  let current = node;
-  const visited = new Set<AcornNode>();
-  let depth = 0;
-  const MAX_DEPTH = 1000;
-
-  while (
-    isParenthesizedExpression(current) ||
-    isTSAsExpression(current) ||
-    isTSTypeAssertion(current)
-  ) {
-    // Safeguards against infinite loops
-    if (depth >= MAX_DEPTH) {
-      console.warn(
-        `unwrap: Hit max depth limit (${MAX_DEPTH}) - preventing infinite loop`,
-      );
-      return current;
-    }
-    if (visited.has(current)) {
-      return current;
-    }
-    visited.add(current);
-    depth++;
-
-    current = (current as { expression?: AcornNode }).expression || current;
-  }
-  return current;
-}
 
 /**
  * Helper function to check if a node is a property/element access or optional chain
  */
 function isPropertyOrElementAccess(node: AcornNode): boolean {
-  const unwrapped = unwrap(node);
+  const unwrapped = unwrapTransparent(node);
   return isMemberExpression(unwrapped) || isChainExpression(unwrapped);
 }
 
-/**
- * Helper function to get the full text representation of a member expression chain
- */
-function getMemberExpressionText(node: AcornNode, sourceCode: string): string {
-  if (!node.start || !node.end) return '';
-  return sourceCode.substring(node.start, node.end);
+function isPropertyAccessDeclaration(
+  ast: AcornNode,
+  selectionLine: number,
+  variableName: string,
+): boolean {
+  let isChecked = false;
+
+  walk(ast, (node: AcornNode): boolean | void => {
+    if (isChecked) return true;
+    if (!isVariableDeclaration(node)) return;
+
+    for (const decl of node.declarations) {
+      if (!decl.loc) continue;
+
+      const startLine = decl.loc.start.line - 1; // Acorn uses 1-based lines
+
+      if (startLine !== selectionLine || !decl.init) continue;
+
+      const { id, init } = decl;
+
+      if (
+        isIdentifier(id) &&
+        id.name === variableName &&
+        isPropertyOrElementAccess(init)
+      ) {
+        isChecked = true;
+        return true;
+      }
+    }
+  });
+
+  return isChecked;
 }
 
 export function propertyAccessAssignmentChecker(
@@ -67,65 +58,26 @@ export function propertyAccessAssignmentChecker(
   selectionLine: number,
   variableName: string,
 ) {
-  let isChecked = false;
-
-  const sourceCode = document.getText();
-
   if (!ast) {
     return { isChecked: false };
   }
 
-  walk(ast, (node: AcornNode): boolean | void => {
-    if (isChecked) return true;
+  // Case ①: const value = obj.prop;
+  if (isPropertyAccessDeclaration(ast, selectionLine, variableName)) {
+    return { isChecked: true };
+  }
 
-    // Case ①: const value = obj.prop;
-    if (isVariableDeclaration(node)) {
-      for (const decl of node.declarations) {
-        if (!decl.loc) continue;
+  // Case ②: a reassignment of the selected target, whatever its value and
+  // operator ($scope.users = data; state = {…}; client ??= new Client(…)).
+  // The target has to start on the selection line: a selection on a later
+  // line of the value is an expression of its own.
+  const assignment = findAssignmentStatement(
+    ast,
+    document.getText(),
+    selectionLine,
+    variableName,
+  );
+  const targetLine = assignment?.expression.left.loc?.start.line;
 
-        const startLine = decl.loc.start.line - 1; // Acorn uses 1-based lines
-
-        if (startLine !== selectionLine || !decl.init) continue;
-
-        const { id, init } = decl;
-
-        if (
-          isIdentifier(id) &&
-          id.name === variableName &&
-          isPropertyOrElementAccess(init)
-        ) {
-          isChecked = true;
-          return true;
-        }
-      }
-    }
-
-    // Case ②: $scope.users = something;
-    if (isExpressionStatement(node)) {
-      const expr = node.expression;
-      if (!expr.loc) return;
-
-      const startLine = expr.loc.start.line - 1;
-
-      if (startLine !== selectionLine) return;
-
-      if (isAssignmentExpression(expr)) {
-        const { left, operator } = expr as {
-          left: AcornNode;
-          operator?: string;
-        };
-
-        if (
-          operator === '=' &&
-          isMemberExpression(left) &&
-          getMemberExpressionText(left, sourceCode) === variableName
-        ) {
-          isChecked = true;
-          return true;
-        }
-      }
-    }
-  });
-
-  return { isChecked };
+  return { isChecked: targetLine === selectionLine + 1 }; // Acorn lines are 1-based
 }

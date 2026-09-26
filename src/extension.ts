@@ -25,7 +25,6 @@ import {
   TurboReleaseLauncherPanel,
 } from './pro';
 import { releaseNotes } from './releases';
-import { isCampaignLive } from './pro/campaign';
 import {
   proBundleNeedsUpdate,
   runProBundle,
@@ -207,9 +206,7 @@ export async function activate(
   // it focuses those (not-yet-registered) views. Shown to Pro users too: it is
   // opt-in by definition, so it stays available to everyone.
   if (releaseVersion && !releasePanelRegistrationWentWrong) {
-    context.subscriptions.push(
-      createReleasePanelStatusBarItem(releaseVersion, isCampaignLive()),
-    );
+    context.subscriptions.push(createReleasePanelStatusBarItem(releaseVersion));
   }
 
   // Determine whether the release badge panel should be shown this session

@@ -179,6 +179,33 @@ export interface AssignmentPattern extends AcornNode {
   right: AcornNode;
 }
 
+export interface NewExpression extends AcornNode {
+  type: 'NewExpression';
+  callee: AcornNode;
+  arguments: AcornNode[];
+}
+
+export interface ImportExpression extends AcornNode {
+  type: 'ImportExpression';
+  source: AcornNode;
+}
+
+export interface YieldExpression extends AcornNode {
+  type: 'YieldExpression';
+  argument: AcornNode | null;
+  delegate: boolean;
+}
+
+export interface TSNonNullExpression extends AcornNode {
+  type: 'TSNonNullExpression';
+  expression: AcornNode;
+}
+
+export interface TSSatisfiesExpression extends AcornNode {
+  type: 'TSSatisfiesExpression';
+  expression: AcornNode;
+}
+
 export interface ChainExpression extends AcornNode {
   type: 'ChainExpression';
   expression: AcornNode;
@@ -214,4 +241,10 @@ export interface ClassMethod extends AcornNode {
   body: AcornNode;
   kind: 'constructor' | 'method' | 'get' | 'set';
   static: boolean;
+}
+
+export interface CatchClause extends AcornNode {
+  type: 'CatchClause';
+  param: AcornNode | null;
+  body: AcornNode; // BlockStatement
 }

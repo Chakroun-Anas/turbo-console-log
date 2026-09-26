@@ -2,6 +2,106 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.29.0] - 2026-09-16
+
+### 🎯 Every Log on the Right Line
+
+**An accuracy release: 14 placement fixes, no new features, no campaign.**
+
+We ran the insertion engine against more than 700 real-world snippets from React, Next.js, Angular, NestJS, Node, Vue, Svelte and Astro code, and fixed the patterns where a log landed in the wrong place: inside an object literal, after a `return`, before the value it was meant to show, or outside the block where the variable exists. A new end-to-end test table runs every snippet through the whole insertion pipeline, so each fix stays fixed. Read the full story in the [v3.29.0 article](https://www.turboconsolelog.io/articles/release-3290).
+
+#### 🐛 Bug Fixes
+
+- **Declarations logged inside their own statement or out of scope**
+
+  A parenthesized multi-line JSX declaration or the first variable of a multi-line `var a = ..., b = ...;` list got the log before the closing `);` or between declarators. A `const` inside a callback passed to an outer declaration (`useState(() => {...})`, `useQuery({ queryFn })`, a `useSWR` fetcher) got its log after the outer statement, where it is out of scope.
+
+  **Fix**: the log is anchored to the end of the innermost declaration that binds the selected name.
+
+- **Logs inside the arguments of multi-line `new`, type-asserted and optional-chained calls**
+
+  Variables initialized by `new IntersectionObserver(...)`, `<JwtPayload>jwt.verify(...)` or `obj?.method?.(...)` over several lines got the log inside the argument list.
+
+  **Fix**: every call-like initializer, including `new`, type assertions, optional chains, `yield` and `import()`, is anchored to the end of its declaration.
+
+- **Destructured variables with defaults, `yield` or `import()` logged before their declaration**
+
+  `const { variant = 'primary', ...rest } = props` over several lines put the log above the declaration, where the variable is not initialized yet.
+
+  **Fix**: destructuring patterns are matched at any depth, including defaults, array patterns and rest elements.
+
+- **Method-call objects logged inside conditions, JSX, argument lists and after `throw`**
+
+  Selecting `links` in `{links.map(...)}` inside JSX, or `user.roles` in `if (!user.roles.includes('admin'))`, inserted the log right after the call, ignoring the statement around it.
+
+  **Fix**: the log is placed relative to the enclosing statement: before a condition, a `throw` or a multi-line statement the call is only part of, and after the statement otherwise.
+
+- **Keys of returned, passed and exported objects broke the file**
+
+  Selecting a key in `return { id: user.id }`, `emit({ kind })` or `export default { name }` inserted the log inside the literal or after the `return`, and printed the bare key.
+
+  **Fix**: the log prints the property's value (`user.id`) before the enclosing statement.
+
+- **Keys of objects assigned to a property broke the file**
+
+  Selecting a key in `this.state = { ready: true }` or `module.exports = { a }` inserted the log inside the literal. Declared objects wrapped in `as const` or `satisfies` also lost their variable name in the path.
+
+  **Fix**: the log prints the full path (`this.state.ready`) after the assignment.
+
+- **Parameters of one-line function bodies logged out of scope**
+
+  A one-line setter, an empty stub `onBlur(event) {},` or `const onSubmit = (event) => {};` got the log in the class body, before the function or between object properties.
+
+  **Fix**: the body is opened onto its own lines and the log goes at its top.
+
+- **Arrows rewritten without owning the selected variable**
+
+  `const user = useSelector((state) => state.auth.user)` rewrote the selector to log `user` inside its own initializer, only because the arrow reads a `user` property.
+
+  **Fix**: an arrow is rewritten only when it owns the variable, as a parameter or a real reference in its body.
+
+- **`switch`, `export default`, labels and `throw` misplaced**
+
+  A `switch` discriminant was logged above the whole function, `export default memo(Card)` and `import fs = require('fs')` were misplaced, a labelled loop got the log between the label and the loop, and a value in a single-line `throw` was logged after it.
+
+  **Fix**: these are statement boundaries now: heads before the statement, exports and imports after it, throws before the throw.
+
+- **Catch parameters logged outside the catch block**
+
+  Selecting `err` in `catch (err)` inserted the log above the `try`.
+
+  **Fix**: catch parameters, plain or destructured, are logged at the top of the catch body.
+
+- **Else-if conditions logged in the previous branch**
+
+  Selecting a value in `else if (user.role === 'admin')` inserted the log at the end of the previous branch.
+
+  **Fix**: else-if conditions are logged at the top of the else-if body.
+
+- **Selections in callbacks nested in a `return` logged before the outer return**
+
+  A `.map()` callback in returned JSX, an inline handler, a returned closure, an effect cleanup or a Promise executor got the log before the outer `return`, where the callback's variables do not exist.
+
+  **Fix**: a selection belongs to the function whose body contains it, and is logged there.
+
+- **Multi-line member reassignments logged before the assignment**
+
+  `globalThis.prisma ??= new PrismaClient({...})`, or `module.exports = {...}` at the start of a file, printed the previous value.
+
+  **Fix**: member reassignments, with any operator, are logged after the full statement.
+
+- **Multi-line variable reassignments logged before the assignment**
+
+  `state = {...}`, `data = await load(...)` or `connection ||= await createConnection({...})` without `const`/`let` printed the previous value, and a plain `||=` call could even put the log inside its argument.
+
+  **Fix**: variable reassignments, with any operator, are logged after the full statement.
+
+### 👑 Turbo Pro
+
+These fixes are free for everyone, and Turbo Pro is what funds them. Pro removes the debug logs in your changed lines when you commit, always previewed first, and adds a workspace-wide log tree, instant search, filtering and bulk cleanup. One-time payment, lifetime access. [See Turbo Pro](https://www.turboconsolelog.io/pro).
+
+---
+
 ## [3.28.0] - 2026-08-30
 
 ### ☀️ Welcome Back

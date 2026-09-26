@@ -18,6 +18,23 @@ Single-file debugging for JavaScript, TypeScript, Python, and PHP. Insert, comme
 **Turbo Console Log Pro 👑**  
 The other half of Turbo — Pro automatically removes the debug logs in your staged changes the moment you commit, previewed first, with the scope under your control (limit it to Turbo's own logs with 🚀 Turbo Logs Only). Plus a workspace-wide tree view, instant search, and git-aware filtering across JavaScript, TypeScript, Python, and PHP.
 
+|                                                                  | Community |                Pro                |
+| ---------------------------------------------------------------- | :-------: | :-------------------------------: |
+| AST-accurate log insertion for JavaScript, TypeScript, Python, and PHP |    ✅     |                ✅                 |
+| Comment, uncomment, delete, and correct logs in the active file  |    ✅     |                ✅                 |
+| Auto-cleanup of debug logs on commit, previewed first            |           |                ✅                 |
+| Workspace-wide log tree, instant search, and real-time filtering |           |                ✅                 |
+| Bulk cleanup by log type and scope (workspace, folder, or file)  |           |                ✅                 |
+| Price                                                            |   Free    | One-time payment, lifetime access |
+
+---
+
+### 🎯 New in v3.29.0: Every Log on the Right Line
+
+**This release is about one promise: when you insert a log, it lands on the right line.** We probed the insertion engine against more than 700 real-world React, TypeScript, Node, and framework snippets and fixed 14 patterns where a log used to land in the wrong place: inside an object literal, after a `return`, before the value it was meant to show, or outside the block where the variable exists. Every fix ships free and is pinned by an end-to-end test, so it stays fixed.
+
+**[Read what v3.29.0 fixed →](https://www.turboconsolelog.io/articles/release-3290)**
+
 ---
 
 ### 🧹 Never Commit a Debug Log Again
@@ -26,9 +43,9 @@ The other half of Turbo — Pro automatically removes the debug logs in your sta
   <img src="https://www.turboconsolelog.io/assets/turbo-commit-auto-cleanup.webp" alt="Turbo Pro removes debug logs automatically on commit" width="280">
 </p>
 
-**Auto-cleanup on commit is here.** Turbo Pro now removes the debug logs in your staged changes automatically, the moment you commit — previewed first, so a stray `console.log` never slips into a PR again. Turbo puts the logs in; Pro takes them out — before every commit.
+**Turbo puts the logs in; Pro takes them out.** Turbo Pro removes the debug logs in your staged changes automatically, the moment you commit — previewed first, so a stray `console.log` never slips into a PR again. A one-time payment funds the free core and includes every future update.
 
-**[Read the full announcement →](https://www.turboconsolelog.io/articles/release-3250)**
+**[See Turbo Pro →](https://www.turboconsolelog.io/pro)**
 
 ## Community Version Features 🚀
 

@@ -2,18 +2,14 @@ import { TextDocument } from 'vscode';
 import {
   type AcornNode,
   isIdentifier,
-  isFunctionDeclaration,
-  isFunctionExpression,
-  isArrowFunctionExpression,
-  isMethodDefinition,
-  isClassMethod,
   isBlockStatement,
+  parameterList,
   walk,
 } from '../../acorn-utils';
 
 /**
  * Determines the appropriate line to insert a log
- * for a function parameter.
+ * for a function parameter (or a `catch` clause parameter).
  */
 export function functionParameterLine(
   ast: AcornNode,
@@ -43,7 +39,10 @@ export function functionParameterLine(
     const inlineEmpty = /\{\s*\}/.test(braceLineText);
     if (inlineEmpty) return braceLine + 1;
 
-    const braceAtLineEnd = braceLineText.trim().endsWith('{');
+    // Nothing but a line comment after the brace (`function f(a) { // note`):
+    // the body starts on the next line as well.
+    const afterBrace = braceLineText.slice(bracePos.character + 1).trim();
+    const braceAtLineEnd = afterBrace === '' || afterBrace.startsWith('//');
     const target = braceAtLineEnd ? braceLine + 1 : braceLine;
 
     return Math.min(target, document.lineCount - 1);
@@ -91,16 +90,10 @@ function isWithinParameter(root: AcornNode, targetNode: AcornNode): boolean {
   let isParam = false;
 
   walk(root, (node: AcornNode): boolean | void => {
-    if (isFunctionLike(node)) {
-      const params = (node as { params?: AcornNode[] }).params;
-      if (params) {
-        for (const param of params) {
-          if (containsNode(param, targetNode)) {
-            isParam = true;
-            return true; // Stop walking
-          }
-        }
-      }
+    const params = parameterList(node);
+    if (params?.some((param) => containsNode(param, targetNode))) {
+      isParam = true;
+      return true; // Stop walking
     }
   });
 
@@ -133,28 +126,12 @@ function findContainingFunction(
   let containingFunc: AcornNode | null = null;
 
   walk(root, (node: AcornNode): boolean | void => {
-    if (isFunctionLike(node)) {
-      const params = (node as { params?: AcornNode[] }).params;
-      if (params) {
-        for (const param of params) {
-          if (containsNode(param, paramNode)) {
-            containingFunc = node;
-            return true; // Stop walking
-          }
-        }
-      }
+    const params = parameterList(node);
+    if (params?.some((param) => containsNode(param, paramNode))) {
+      containingFunc = node;
+      return true; // Stop walking
     }
   });
 
   return containingFunc;
-}
-
-function isFunctionLike(node: AcornNode): boolean {
-  return (
-    isFunctionDeclaration(node) ||
-    isFunctionExpression(node) ||
-    isArrowFunctionExpression(node) ||
-    isMethodDefinition(node) ||
-    isClassMethod(node)
-  );
 }

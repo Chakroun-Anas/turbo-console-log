@@ -1,10 +1,14 @@
 import { TextDocument } from 'vscode';
 import {
   type AcornNode,
+  type EnclosingStatement,
+  findEnclosingStatement,
+  ifBodyFirstLine,
   isIdentifier,
+  isInStatementHead,
   isMemberExpression,
+  statementLines,
   walk,
-  STATEMENT_TYPES,
 } from '../../acorn-utils';
 
 export function wanderingExpressionLine(
@@ -133,46 +137,18 @@ export function wanderingExpressionLine(
 
     // If this node contains the variable and isn't a declaration
     if (containsVariableName(node) && !isDeclaration(node)) {
-      // Climb up to the enclosing statement boundary
-      let top: AcornNode = node;
-      let parent = (top as { parent?: AcornNode }).parent;
-      const visited = new Set<AcornNode>();
-      let depth = 0;
-      const MAX_DEPTH = 1000;
-
-      while (parent) {
-        // Safeguards against infinite loops
-        if (depth >= MAX_DEPTH) {
-          console.warn(
-            `wanderingExpressionLine: Hit max depth limit (${MAX_DEPTH}) - preventing infinite loop`,
-          );
-          break;
-        }
-        if (visited.has(parent)) {
-          break;
-        }
-        visited.add(parent);
-        depth++;
-
-        top = parent;
-        parent = (top as { parent?: AcornNode }).parent;
-
-        if (STATEMENT_TYPES.has(top.type)) {
-          break;
-        }
-      }
-
-      const topStartLine = document.positionAt(top.start).line;
-      const topEndLine = document.positionAt(top.end).line;
-
-      // For multi-line statements: log before (start line)
-      // For single-line statements: log after (end line + 1)
-      const candidateLine =
-        topStartLine < topEndLine ? topStartLine : topEndLine + 1;
+      const enclosing = findEnclosingStatement(ast, node);
+      const top = enclosing?.statement ?? ast;
 
       if (bestEndOffset === -1 || top.end > bestEndOffset) {
         bestEndOffset = top.end;
-        resultLine = candidateLine;
+        resultLine = enclosing
+          ? statementLogLine(ast, document, enclosing, node)
+          : multiLineAwareLine(
+              document,
+              top,
+              document.positionAt(top.start).line,
+            );
       }
     }
   });
@@ -180,4 +156,51 @@ export function wanderingExpressionLine(
   if (resultLine === -1) return selectionLine + 1;
 
   return resultLine;
+}
+
+/**
+ * Where a wandering expression is logged relative to its enclosing statement:
+ * - in a statement head (if/loop condition, switch discriminant): before the
+ *   statement; for an else-if, the top of its body
+ * - in a return or throw: before it, nothing after them runs
+ * - in `import x = require()`: after it, the binding does not exist before
+ * - otherwise before a multi-line statement, after a single-line one
+ * "Before" climbs out of labels, braceless bodies and same-line `case`/`{`
+ * headers; when no line before is safe, the log goes after (statementLines).
+ */
+function statementLogLine(
+  ast: AcornNode,
+  document: TextDocument,
+  { statement, isElseIf }: EnclosingStatement,
+  node: AcornNode,
+): number {
+  const { before, after } = statementLines(ast, document, statement);
+  const beforeLine = before ?? after;
+
+  if (isInStatementHead(statement, node)) {
+    const elseIfBodyLine = isElseIf ? ifBodyFirstLine(statement) : undefined;
+    return elseIfBodyLine ?? beforeLine;
+  }
+
+  switch (statement.type) {
+    case 'ReturnStatement':
+    case 'ThrowStatement':
+      return beforeLine;
+    case 'TSImportEqualsDeclaration':
+      return document.positionAt(statement.end).line + 1;
+  }
+
+  return multiLineAwareLine(document, statement, beforeLine, after);
+}
+
+/** v3.18.0 rule: before a multi-line node, after a single-line one. */
+function multiLineAwareLine(
+  document: TextDocument,
+  node: AcornNode,
+  beforeLine: number,
+  afterLine = document.positionAt(node.end).line + 1,
+): number {
+  const startLine = document.positionAt(node.start).line;
+  const endLine = document.positionAt(node.end).line;
+  return startLine < endLine ? beforeLine : afterLine;
 }

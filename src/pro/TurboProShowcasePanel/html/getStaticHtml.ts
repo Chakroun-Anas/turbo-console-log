@@ -3,7 +3,6 @@ import { getJavaScript } from '../javascript/javascript';
 import { contentByType } from '../contentByType';
 import { DynamicFreemiumPanelContent } from '../types';
 import { isTestMode } from '@/runTime';
-import { TURBO_CAMPAIGN } from '@/pro/campaign';
 
 const TURBO_WEBSITE_BASE_URL = isTestMode()
   ? 'http://localhost:3000'
@@ -101,8 +100,12 @@ export function getStaticHtml(
     type: 'media-showcase-cta',
     order: 1,
     component: {
-      // No mascot — the inline cleanup demo below shows the feature instead.
-      illustrationSrcs: [],
+      // The crowned-rocket Pro artwork sits right above the tagline and CTA.
+      // Landscape crop on purpose: the panel is a narrow sidebar, so a wide
+      // image keeps the CTA button within reach instead of pushing it off-screen.
+      illustrationSrcs: [
+        `${TURBO_WEBSITE_BASE_URL}/assets/turbo-console-log-pro-wide.png`,
+      ],
       codeDemo: {
         lines: [
           { text: 'function pay(cart) {' },
@@ -124,7 +127,7 @@ export function getStaticHtml(
       },
       tagline: 'Never commit a debug log again',
       subtitle:
-        'For devs who ship fast: linters and pre-commit hooks just flag stray logs and leave the cleanup to you. Turbo removes them — always previewed, scope under your control. Pay once, yours forever.',
+        'Turbo puts every log on the right line, for free. Turbo Pro takes them out on commit, always previewed and scoped by you, then adds search, filters, and bulk cleanup across your workspace. Pay once, yours forever.',
       cta: {
         text: 'Turn On Auto-Cleanup',
         url: `${TURBO_WEBSITE_BASE_URL}/pro?utm_source=panel&utm_campaign=workspace_log_count&utm_medium=dynamic_panel&position=after_analytics&event=freemiumPanel_auto-cleanup-launch&variant=panel-pro-cta`,
@@ -133,31 +136,41 @@ export function getStaticHtml(
     },
   };
 
-  // Campaign countdown, first — self-hides once TURBO_CAMPAIGN.countdownTarget
-  // passes (renderCountDownComponent returns '' for a past target date), so
-  // no cleanup is needed once the promo window ends.
-  //
-  // The landscape (wide) crop is deliberate: this panel is a narrow sidebar,
-  // and a portrait illustration pushes the CTA below the fold.
-  const campaignCountdown: DynamicFreemiumPanelContent = {
-    type: 'countdown',
+  // v3.29.0 release highlight, first: the placement-accuracy fixes ship free to
+  // everyone, and the panel says so before it sells anything.
+  const releaseHighlight: DynamicFreemiumPanelContent = {
+    type: 'paragraph',
     order: -1,
     component: {
-      eventName: TURBO_CAMPAIGN.eventName,
-      targetDateUTC: TURBO_CAMPAIGN.countdownTarget,
-      illustrationSrc: `${TURBO_WEBSITE_BASE_URL}/assets/turbo-pro-back-from-vacation-30-discount-wide.png`,
-      CTA: {
-        text: `Get ${TURBO_CAMPAIGN.percentage}% Off Turbo Pro`,
-        url: `${TURBO_WEBSITE_BASE_URL}/pro?utm_source=panel&utm_campaign=v3280_promo&utm_medium=dynamic_panel&position=countdown&event=freemiumPanel_v3280-promo&variant=panel-countdown`,
-      },
+      title: '🎯 New in v3.29.0: 14 Placement Fixes',
+      content:
+        'This release is about one promise: when you insert a log, it lands on the right line. 14 real-world patterns where Turbo used to misplace a log are fixed, from catch blocks and else-if branches to reassignments and object literals. Free for everyone, funded by Turbo Pro.',
     },
   };
 
-  // Analytics card (with the locked Pro board) first; illustration + CTA closes.
+  // Rendered in the "Featured Turbo Articles" section below the Pro showcase.
+  const releaseArticle: DynamicFreemiumPanelContent = {
+    type: 'article',
+    order: 2,
+    component: {
+      title: 'v3.29.0: 14 Placement Fixes',
+      description:
+        'The patterns where a log used to land on the wrong line, and how the engine handles them now.',
+      // Landscape crop (title + rocket nose) of the article's portrait poster:
+      // the 110px article card would clip the title off the full image.
+      illustrationSrc: `${TURBO_WEBSITE_BASE_URL}/assets/turbo-full-ast-engine-wide.png`,
+      illustrationFocus: 'top',
+      url: `${TURBO_WEBSITE_BASE_URL}/articles/release-3290?utm_source=panel&utm_campaign=v3290_release&utm_medium=dynamic_panel&position=article`,
+    },
+  };
+
+  // Release highlight, then the analytics card (with the locked Pro board), the
+  // Pro showcase + CTA, and the release article last.
   const proOnlyContent: DynamicFreemiumPanelContent[] = [
-    campaignCountdown,
+    releaseHighlight,
     workspaceLogCount,
     turboProShowcase,
+    releaseArticle,
   ];
 
   // Use content separation logic for Pro components

@@ -169,13 +169,13 @@ describe('activate - command registration', () => {
       const fakeContext = {
         subscriptions: [],
       } as unknown as vscode.ExtensionContext;
-      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.27.0');
+      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.29.0');
 
       await activate(fakeContext);
 
       expect(helpers.shouldShowReleasePanel).toHaveBeenCalledWith(
         fakeContext,
-        '3.27.0',
+        '3.29.0',
       );
     });
 
@@ -183,7 +183,7 @@ describe('activate - command registration', () => {
       const fakeContext = {
         subscriptions: [],
       } as unknown as vscode.ExtensionContext;
-      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.27.0');
+      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.29.0');
       mockProUser();
 
       await activate(fakeContext);
@@ -196,14 +196,13 @@ describe('activate - command registration', () => {
       const fakeContext = {
         subscriptions: [],
       } as unknown as vscode.ExtensionContext;
-      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.27.0');
+      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.29.0');
       mockProUser();
 
       await activate(fakeContext);
 
       expect(helpers.createReleasePanelStatusBarItem).toHaveBeenCalledWith(
-        '3.27.0',
-        expect.any(Boolean),
+        '3.29.0',
       );
     });
 
@@ -211,7 +210,7 @@ describe('activate - command registration', () => {
       const fakeContext = {
         subscriptions: [],
       } as unknown as vscode.ExtensionContext;
-      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.27.0');
+      (helpers.resolveReleaseVersion as jest.Mock).mockReturnValue('3.29.0');
       mockProUser();
 
       await activate(fakeContext);

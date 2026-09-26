@@ -29,11 +29,17 @@ import type {
   RestElement,
   AssignmentPattern,
   ChainExpression,
+  NewExpression,
+  ImportExpression,
+  YieldExpression,
+  TSNonNullExpression,
+  TSSatisfiesExpression,
   MethodDefinition,
   ClassMethod,
   Property,
   TSParameterProperty,
   PropertyDefinition,
+  CatchClause,
 } from './types';
 
 export function isLiteral(node: AcornNode): node is Literal {
@@ -174,6 +180,30 @@ export function isChainExpression(node: AcornNode): node is ChainExpression {
   return node.type === 'ChainExpression';
 }
 
+export function isNewExpression(node: AcornNode): node is NewExpression {
+  return node.type === 'NewExpression';
+}
+
+export function isImportExpression(node: AcornNode): node is ImportExpression {
+  return node.type === 'ImportExpression';
+}
+
+export function isYieldExpression(node: AcornNode): node is YieldExpression {
+  return node.type === 'YieldExpression';
+}
+
+export function isTSNonNullExpression(
+  node: AcornNode,
+): node is TSNonNullExpression {
+  return node.type === 'TSNonNullExpression';
+}
+
+export function isTSSatisfiesExpression(
+  node: AcornNode,
+): node is TSSatisfiesExpression {
+  return node.type === 'TSSatisfiesExpression';
+}
+
 export function isMethodDefinition(node: AcornNode): node is MethodDefinition {
   return node.type === 'MethodDefinition';
 }
@@ -206,6 +236,10 @@ export function isPropertyDefinition(
   return node.type === 'PropertyDefinition';
 }
 
+export function isCatchClause(node: AcornNode): node is CatchClause {
+  return node.type === 'CatchClause';
+}
+
 export const STATEMENT_TYPES = new Set([
   'VariableDeclaration',
   'ExpressionStatement',
@@ -217,4 +251,9 @@ export const STATEMENT_TYPES = new Set([
   'ForOfStatement',
   'WhileStatement',
   'DoWhileStatement',
+  'SwitchStatement',
+  'LabeledStatement',
+  'ExportDefaultDeclaration',
+  'TSImportEqualsDeclaration',
+  'TSExportAssignment',
 ]);

@@ -1,0 +1,143 @@
+import { InsertionEngineCase } from './types';
+
+// Declarations are logged after the FULL statement. Line helpers anchor to the
+// declarator's initializer instead, so the log lands before the `);` of a
+// parenthesized JSX initializer or between the declarators of a multi-line
+// `var a = …, b = …;` list (syntax error).
+export const declarationStatementEndCases: InsertionEngineCase[] = [
+  {
+    name: 'parenthesized multi-line JSX const is logged after the closing parenthesis',
+    fileExtension: '.tsx',
+    lines: [
+      'export function Header({ title }: { title: string }) {',
+      '  const header = (',
+      '    <header className="flex items-center">',
+      '      <h1>{title}</h1>',
+      '    </header>',
+      '  );',
+      '  return header;',
+      '}',
+    ],
+    selectionLine: 1,
+    variableName: 'header',
+    expectedLine: 6,
+  },
+  {
+    name: 'parenthesized JSX const at module level in a .jsx file is logged after the closing parenthesis',
+    fileExtension: '.jsx',
+    lines: [
+      "const root = ReactDOM.createRoot(document.getElementById('root')!);",
+      'const app = (',
+      '  <React.StrictMode>',
+      '    <App />',
+      '  </React.StrictMode>',
+      ');',
+      'root.render(app);',
+    ],
+    selectionLine: 1,
+    variableName: 'app',
+    expectedLine: 6,
+  },
+  {
+    name: 'first declarator of a multi-line var list with require calls is logged after the whole list',
+    fileExtension: '.js',
+    lines: [
+      "var fs = require('fs'),",
+      "    path = require('path');",
+      '',
+      'module.exports = fs;',
+    ],
+    selectionLine: 0,
+    variableName: 'fs',
+    expectedLine: 2,
+  },
+  {
+    name: 'first declarator of a multi-line let list with primitives is logged after the whole list',
+    fileExtension: '.js',
+    lines: [
+      'let retries = 0,',
+      '  lastError = null;',
+      'while (retries < 3) {',
+      '  retries++;',
+      '}',
+    ],
+    selectionLine: 0,
+    variableName: 'retries',
+    expectedLine: 2,
+  },
+  {
+    name: 'first declarator of a multi-line var list with a logical default is logged after the whole list',
+    fileExtension: '.js',
+    lines: [
+      'function Router(options) {',
+      '  var opts = options || {},',
+      '    strict = opts.strict;',
+      '  this.strict = strict;',
+      '}',
+    ],
+    selectionLine: 1,
+    variableName: 'opts',
+    expectedLine: 3,
+  },
+  {
+    name: 'first declarator of a multi-line const list with a ternary is logged after the whole list',
+    fileExtension: '.js',
+    lines: [
+      "const level = isProd ? 'info' : 'debug',",
+      '  pretty = !isProd;',
+      'const logger = pino({ level });',
+    ],
+    selectionLine: 0,
+    variableName: 'level',
+    expectedLine: 2,
+  },
+  {
+    name: 'first declarator of a single-line let list is logged after the statement',
+    fileExtension: '.js',
+    lines: ['let a = 1, b = 2;', 'use(a);'],
+    selectionLine: 0,
+    variableName: 'a',
+    expectedLine: 1,
+  },
+  {
+    name: 'single-line JSX const is logged after the declaration',
+    fileExtension: '.tsx',
+    lines: [
+      'export function A({ title }) {',
+      '  const header = <h1>{title}</h1>;',
+      '  return header;',
+      '}',
+    ],
+    selectionLine: 1,
+    variableName: 'header',
+    expectedLine: 2,
+  },
+  {
+    name: 'multi-line ternary with a parenthesized JSX branch is logged after the declaration',
+    fileExtension: '.tsx',
+    lines: [
+      'export function Page({ user }) {',
+      '  const banner = user ? (',
+      '    <Banner />',
+      '  ) : null;',
+      '  return banner;',
+      '}',
+    ],
+    selectionLine: 1,
+    variableName: 'banner',
+    expectedLine: 4,
+  },
+  {
+    name: 'single-declarator var with a logical default is logged after the declaration',
+    fileExtension: '.ts',
+    lines: [
+      'function Router(options) {',
+      '  var opts = options || {};',
+      '  this.opts = opts;',
+      '}',
+    ],
+    selectionLine: 1,
+    variableName: 'opts',
+    expectedLine: 2,
+  },
+];
