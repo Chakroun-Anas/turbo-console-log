@@ -58,17 +58,17 @@ describe('resolveReleaseVersion', () => {
   });
 
   describe('uses real RELEASE_PANEL_VERSIONS when no override is passed', () => {
-    it('resolves 3.29.0 to itself', () => {
-      expect(resolveReleaseVersion('3.29.0')).toBe('3.29.0');
+    it('resolves 3.30.0 to itself', () => {
+      expect(resolveReleaseVersion('3.30.0')).toBe('3.30.0');
     });
 
-    it('resolves a retired release version to the last (3.29.0) release version', () => {
-      expect(resolveReleaseVersion('3.27.0')).toBe('3.29.0');
-      expect(resolveReleaseVersion('3.28.0')).toBe('3.29.0');
+    it('resolves a retired release version to the last (3.30.0) release version', () => {
+      expect(resolveReleaseVersion('3.28.0')).toBe('3.30.0');
+      expect(resolveReleaseVersion('3.29.0')).toBe('3.30.0');
     });
 
-    it('resolves a non-release version to the last (3.29.0) release version', () => {
-      expect(resolveReleaseVersion('3.24.0')).toBe('3.29.0');
+    it('resolves a non-release version to the last (3.30.0) release version', () => {
+      expect(resolveReleaseVersion('3.24.0')).toBe('3.30.0');
     });
   });
 });

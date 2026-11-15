@@ -2,6 +2,46 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.30.0] - 2026-11-15
+
+### 📐 Logs Indented Like Your Code
+
+**v3.29.0 made log placement more accurate. v3.30.0 does the same for indentation.**
+
+We ran more than 25,000 insertions in real, correctly formatted code, each one checked automatically against the code around it. Python passed every check. In JavaScript, TypeScript and PHP, we found three situations where a log got the wrong indent, and each one is fixed and pinned by a test. Read the full story in the [v3.30.0 article](https://www.turboconsolelog.io/articles/release-3300).
+
+#### 🐛 Bug Fixes
+
+- **Selections on a continuation line logged too deep (JS/TS, PHP)**
+
+  Selecting `user.avatar` in a multi-line JSX element, an argument of a multi-line call or an item of a multi-line array put the log at the indent of the selected line, deeper than the statement it is inserted before. In PHP, a value inside a chained `->where(...)` call did the same.
+
+  **Fix**: the log takes the indent of the first line of the statement that holds the selection.
+
+- **Logs in an empty block level with its braces (JS/TS, PHP)**
+
+  Selecting `err` in an empty `catch (err) {` block written over two lines put the log level with the closing `}`. Empty functions, arrows, methods and loops, and blocks starting with a blank line, did the same, including PHP methods with the brace on its own line.
+
+  **Fix**: the log copies the indent of the block's first statement, or goes one level deeper than the line that opens the block.
+
+- **Multi-line bodies left behind in rewritten arrows (JS/TS)**
+
+  Opening `rows.map((row) => ({ ... }))` into a block indented `return {` but left the object's properties and closing brace at their old depth.
+
+  **Fix**: the whole returned body moves one level deeper, under the `return`.
+
+- **Wrapped logs split across two indents in rewritten arrows (JS/TS)**
+
+  With Wrap Log Message on, opening a one-line arrow like `.then((profile) => normalize(profile))` into a block indented the first wrapper line only: the log and the closing wrapper line stayed one level short.
+
+  **Fix**: the three lines of a wrapped log share the indent of the new block.
+
+### 👑 Turbo Pro
+
+These fixes are free for everyone, and Turbo Pro is what funds them. Pro lists every debug log across your workspace in one tree, with instant search, filtering, manual cleanup, and auto-cleanup on commit, always previewed first. One-time payment, lifetime access. [See Turbo Pro](https://www.turboconsolelog.io/pro).
+
+---
+
 ## [3.29.0] - 2026-09-16
 
 ### 🎯 Every Log on the Right Line

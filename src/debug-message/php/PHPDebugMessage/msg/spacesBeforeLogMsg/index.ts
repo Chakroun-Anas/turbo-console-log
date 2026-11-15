@@ -1,1 +1,0 @@
-export { spacesBeforeLogMsg } from './spacesBeforeLogMsg';

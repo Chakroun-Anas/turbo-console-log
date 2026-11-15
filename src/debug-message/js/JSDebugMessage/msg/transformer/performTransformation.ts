@@ -1,6 +1,7 @@
 import vscode from 'vscode';
 import {
   isBlockStatement,
+  walk,
   type AcornNode,
   type ArrowFunctionExpression,
   type BlockStatement,
@@ -84,6 +85,55 @@ function getIndentAtPosition(sourceCode: string, pos: number): string {
 }
 
 /**
+ * A wrapped log is several lines, all at the indent of the insertion line:
+ * moves the ones after the first to the indent of the rewritten body too.
+ */
+function indentLogLines(logStatement: string, bodyIndent: string): string {
+  const [firstLine, ...otherLines] = logStatement.split('\n');
+  return [
+    firstLine,
+    ...otherLines.map((line) => bodyIndent + line.trimStart()),
+  ].join('\n');
+}
+
+/**
+ * The first line of a returned expression moves to `newIndent`: moves the lines
+ * after it by the same amount. The content of multi-line strings stays as
+ * written, since moving it would change their value.
+ */
+function moveBodyLines(
+  sourceCode: string,
+  body: AcornNode,
+  bodyText: string,
+  searchFrom: number,
+  newIndent: string,
+): string {
+  const textStart = sourceCode.indexOf(bodyText, searchFrom);
+  const oldIndent = getIndentAtPosition(sourceCode, textStart);
+  const strings: AcornNode[] = [];
+  walk(body, (node): boolean | void => {
+    if (node.type !== 'TemplateLiteral' && node.type !== 'Literal') return;
+    strings.push(node);
+    return true;
+  });
+
+  let lineStart = textStart;
+  return bodyText
+    .split('\n')
+    .map((line, index) => {
+      const start = lineStart;
+      lineStart += line.length + 1;
+      const isInString = strings.some(
+        (node) => node.start < start && start < node.end,
+      );
+      if (index === 0 || isInString) return line;
+      if (line.trim() === '' || !line.startsWith(oldIndent)) return line;
+      return newIndent + line.slice(oldIndent.length);
+    })
+    .join('\n');
+}
+
+/**
  * Opens a block body whose content (or closing brace) sits on its brace line
  * and puts the log on the first line of the body: `{}`, `{ return value; }`.
  */
@@ -95,7 +145,7 @@ function blockBodyReplacement(
 ): Replacement {
   const indent = getIndentAtPosition(sourceCode, body.start);
   const bodyIndent = indent + ' '.repeat(tabSize);
-  const opening = `{\n${bodyIndent}${logStatement}\n`;
+  const opening = `{\n${bodyIndent}${indentLogLines(logStatement, bodyIndent)}\n`;
   const inner = sourceCode.slice(body.start + 1, body.end - 1).trim();
   const bodyText = sourceCode.slice(body.start, body.end);
 
@@ -193,16 +243,27 @@ function expressionBodyReplacement(
 
   if (hasParentheses) {
     // Only wrap in parentheses if they were originally present
-    const indentedBodyText = actualBodyText
-      .split('\n')
-      .map((line, index) => (index === 0 ? line : `  ${line}`))
-      .join('\n');
-    returnStatement = `return (\n${bodyIndent}  ${indentedBodyText}\n${bodyIndent});`;
+    const returnedIndent = `${bodyIndent}  `;
+    const movedBodyText = moveBodyLines(
+      sourceCode,
+      arrowFunc.body,
+      actualBodyText,
+      arrowEnd,
+      returnedIndent,
+    );
+    returnStatement = `return (\n${returnedIndent}${movedBodyText}\n${bodyIndent});`;
   } else {
-    returnStatement = `return ${actualBodyText};`;
+    const movedBodyText = moveBodyLines(
+      sourceCode,
+      arrowFunc.body,
+      actualBodyText,
+      arrowEnd,
+      bodyIndent,
+    );
+    returnStatement = `return ${movedBodyText};`;
   }
 
-  const newBody = ` {\n${bodyIndent}${normalized}\n${bodyIndent}${returnStatement}\n${indent}}`;
+  const newBody = ` {\n${bodyIndent}${indentLogLines(normalized, bodyIndent)}\n${bodyIndent}${returnStatement}\n${indent}}`;
 
   return {
     start: arrowFunc.start,

@@ -1,5 +1,5 @@
 import { Message, ExtensionProperties, BracketType } from '@/entities';
-import { spacesBeforeLogMsg } from '../msg/spacesBeforeLogMsg';
+import { logMsgIndent } from '../msg/logMsgIndent';
 import { closingContextLine } from '@/utilities';
 import {
   openTurboTextDocument,
@@ -165,7 +165,7 @@ function detectLogMessages(
     if (closedParenthesisLine === i) {
       const hasTurboMarkers =
         prefixRegex.test(lineText) && delimiterRegex.test(lineText);
-      const spaces = spacesBeforeLogMsg(document, i, closedParenthesisLine);
+      const spaces = logMsgIndent(document, i, closedParenthesisLine);
       const content = line.text.trim(); // Capture single-line content
       const range = line.rangeIncludingLineBreak;
       messages.push({
@@ -188,7 +188,7 @@ function detectLogMessages(
 
     // Multi-line log statement
     const logMessage: Message = {
-      spaces: spacesBeforeLogMsg(document, i, closedParenthesisLine),
+      spaces: logMsgIndent(document, i, closedParenthesisLine),
       lines: [],
       ...(isCommented && { isCommented: true }),
       ...(logFunction && { logFunction }),

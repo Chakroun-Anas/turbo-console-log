@@ -50,6 +50,46 @@ function renderSettingsDemo(
         </div>`;
 }
 
+const TREE_DEMO_ICONS: Record<
+  NonNullable<
+    MediaShowcaseCTAPanelComponent['treeDemo']
+  >['nodes'][number]['kind'],
+  string
+> = {
+  folder: '📁',
+  file: '📄',
+  line: '💬',
+  log: '',
+};
+
+/**
+ * Render the optional mock of the Pro log tree: one row per node, indented by
+ * its depth, with the log itself in monospace. Returns '' when no tree is
+ * provided.
+ */
+function renderTreeDemo(
+  treeDemo: MediaShowcaseCTAPanelComponent['treeDemo'],
+): string {
+  if (!treeDemo || treeDemo.nodes.length === 0) {
+    return '';
+  }
+  const nodesHtml = treeDemo.nodes
+    .map((node) => {
+      const icon = TREE_DEMO_ICONS[node.kind];
+      const iconHtml = icon
+        ? `<span class="tree-demo-icon">${icon}</span>`
+        : '';
+      return `<div class="tree-demo-node ${node.kind}" style="padding-left: ${node.depth * 14}px;">${iconHtml}${escapeHtml(node.text)}</div>`;
+    })
+    .join('');
+  return `
+        <div class="tree-demo">
+          <div class="tree-demo-title">${escapeHtml(treeDemo.title)}</div>
+          ${nodesHtml}
+          <div class="tree-demo-caption">${escapeHtml(treeDemo.caption)}</div>
+        </div>`;
+}
+
 /**
  * Render a media showcase CTA component as HTML
  * @param component The media showcase CTA component to render
@@ -74,6 +114,7 @@ export function renderMediaShowcaseCTAComponent(
 
   const settingsHtml = renderSettingsDemo(component.settingsDemo);
   const demoHtml = renderCleanupDemo(component.codeDemo);
+  const treeHtml = renderTreeDemo(component.treeDemo);
 
   // Optional testimonial rendered full-width at the TOP of the showcase block —
   // i.e. right after the first main (analytics) card and before the demo.
@@ -85,7 +126,7 @@ export function renderMediaShowcaseCTAComponent(
       </div>`
     : '';
 
-  return `${testimonialHtml}${settingsHtml}${demoHtml}
+  return `${testimonialHtml}${settingsHtml}${demoHtml}${treeHtml}
       <div class="media-showcase-cta">
         ${imagesBlock}
         ${component.tagline ? `<div class="media-showcase-tagline">${escapeHtml(component.tagline)}</div>` : ''}

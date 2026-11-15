@@ -1,20 +1,20 @@
 import { detectAll } from '@/debug-message/js/JSDebugMessage/detectAll/detectAll';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers';
 import { ExtensionProperties } from '@/entities';
-import { spacesBeforeLogMsg } from '@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg';
+import { logMsgIndent } from '@/debug-message/js/JSDebugMessage/msg/logMsgIndent';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-jest.mock('@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg', () => ({
-  spacesBeforeLogMsg: jest.fn(),
+jest.mock('@/debug-message/js/JSDebugMessage/msg/logMsgIndent', () => ({
+  logMsgIndent: jest.fn(),
 }));
 
 jest.mock('fs', () => ({
   readFileSync: jest.fn(),
 }));
 
-const mockSpacesBeforeLogMsg = spacesBeforeLogMsg as jest.MockedFunction<
-  typeof spacesBeforeLogMsg
+const mockLogMsgIndent = logMsgIndent as jest.MockedFunction<
+  typeof logMsgIndent
 >;
 
 const mockFsReadFileSync = fs.readFileSync as jest.MockedFunction<
@@ -81,7 +81,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -113,7 +113,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -143,7 +143,7 @@ describe('detectAll', () => {
         'console.log("missing prefix ~", x);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -165,7 +165,7 @@ describe('detectAll', () => {
         'console.log("🚀 x missing delimiter", x);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -189,7 +189,7 @@ describe('detectAll', () => {
         'console.warn("🚀 ~ warning:", data);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -213,7 +213,7 @@ describe('detectAll', () => {
         'console.error("🚀 ~ error:", error);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('    ');
+      mockLogMsgIndent.mockReturnValue('    ');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -237,7 +237,7 @@ describe('detectAll', () => {
         'logger.debug("🚀 ~ debug:", debugInfo);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -261,7 +261,7 @@ describe('detectAll', () => {
     it('should handle regex special characters in log function name', async () => {
       const document = makeTextDocument(['$log.info("🚀 ~ info:", info);']);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -285,7 +285,7 @@ describe('detectAll', () => {
         'console.log("[DEBUG] ~ value:", value);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -307,7 +307,7 @@ describe('detectAll', () => {
     it('should handle regex special characters in delimiter', async () => {
       const document = makeTextDocument(['console.log("🚀 | value:", value);']);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -338,7 +338,7 @@ describe('detectAll', () => {
         'console.log("🚀 ~ z:", z);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -352,7 +352,7 @@ describe('detectAll', () => {
       );
 
       expect(result).toHaveLength(3);
-      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledTimes(3);
+      expect(mockLogMsgIndent).toHaveBeenCalledTimes(3);
 
       // Check individual log messages
       expect(result[0].spaces).toBe('');
@@ -376,7 +376,7 @@ describe('detectAll', () => {
         'console.log("🚀 ~ valid too:", a);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -457,7 +457,7 @@ describe('detectAll', () => {
         'console.log("🚀 ~ end:", end);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -491,7 +491,7 @@ describe('detectAll', () => {
         ');',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -528,7 +528,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('  ');
+      mockLogMsgIndent.mockReturnValue('  ');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -542,7 +542,7 @@ describe('detectAll', () => {
       );
 
       expect(result).toHaveLength(2);
-      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledTimes(2);
+      expect(mockLogMsgIndent).toHaveBeenCalledTimes(2);
 
       // Check individual log messages
       expect(result[0].spaces).toBe('  ');
@@ -567,7 +567,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('    ');
+      mockLogMsgIndent.mockReturnValue('    ');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -644,7 +644,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('  ');
+      mockLogMsgIndent.mockReturnValue('  ');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -735,7 +735,7 @@ describe('detectAll', () => {
         '  }, [activeFilters])',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('    ');
+      mockLogMsgIndent.mockReturnValue('    ');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -767,8 +767,8 @@ describe('detectAll', () => {
       expect(result[2].lines[0].start.line).toBe(4);
       expect(result[2].isTurboConsoleLog).toBe(false);
 
-      // Verify that spacesBeforeLogMsg was called for each detected log
-      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledTimes(3);
+      // Verify that logMsgIndent was called for each detected log
+      expect(mockLogMsgIndent).toHaveBeenCalledTimes(3);
     });
   });
 
@@ -784,7 +784,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -813,7 +813,7 @@ describe('detectAll', () => {
         'console.info("🚀 ~ info:", y);', // Should be detected (uncommented)
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -845,7 +845,7 @@ describe('detectAll', () => {
         'console.log("🚀 ~ valid:", x);', // Valid uncommented log
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -884,7 +884,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -913,7 +913,7 @@ describe('detectAll', () => {
     //     'console.warn("🚀 ~ y:", y);',
     //   ]);
 
-    //   mockSpacesBeforeLogMsg.mockReturnValue('');
+    //   mockLogMsgIndent.mockReturnValue('');
 
     //   const result = detectAll(
     //     document,
@@ -940,7 +940,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('  ');
+      mockLogMsgIndent.mockReturnValue('  ');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -980,7 +980,7 @@ describe('detectAll', () => {
         '}',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -1028,7 +1028,7 @@ describe('detectAll', () => {
         'console.warn("🚀 ~ processed:", processed);', // Another active log - should be detected
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -1071,7 +1071,7 @@ describe('detectAll', () => {
         'console.warn("🚀 ~ warning:", data);', // Should be detected (active log)
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -1105,7 +1105,7 @@ describe('detectAll', () => {
         '// );',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 
@@ -1148,7 +1148,7 @@ describe('detectAll', () => {
         'console.log("🚀 ~ regular log:", user);',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
       mockVscodeOpenTextDocument.mockResolvedValue(document);
 

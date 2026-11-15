@@ -14,7 +14,7 @@ function leadingWhitespace(text: string): string {
   return text.slice(0, firstNonWhitespaceIndex(text));
 }
 
-export function spacesBeforeLogMsg(
+export function logMsgIndent(
   program: PythonProgram,
   document: TextDocument,
   selectedVarLine: number,

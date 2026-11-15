@@ -421,6 +421,68 @@ describe('renderMediaShowcaseCTAComponent', () => {
     });
   });
 
+  describe('tree demo', () => {
+    it('renders one row per node, indented by depth, with the log in its own row', () => {
+      const component: MediaShowcaseCTAPanelComponent = {
+        illustrationSrcs: [],
+        cta: { text: 'Check Turbo Pro', url: 'https://example.com/pro' },
+        treeDemo: {
+          title: 'Workspace Tree View',
+          nodes: [
+            { depth: 0, kind: 'folder', text: 'src' },
+            { depth: 1, kind: 'file', text: 'checkout.ts' },
+            { depth: 2, kind: 'line', text: 'Line 12' },
+            { depth: 3, kind: 'log', text: 'console.log(cart)' },
+          ],
+          caption: '🌲 Every log in one tree',
+        },
+      };
+
+      const result = renderMediaShowcaseCTAComponent(component);
+
+      expect(result).toContain('class="tree-demo"');
+      expect(result).toContain('Workspace Tree View');
+      expect(result).toContain(
+        '<div class="tree-demo-node folder" style="padding-left: 0px;"><span class="tree-demo-icon">📁</span>src</div>',
+      );
+      expect(result).toContain(
+        '<div class="tree-demo-node line" style="padding-left: 28px;"><span class="tree-demo-icon">💬</span>Line 12</div>',
+      );
+      expect(result).toContain(
+        '<div class="tree-demo-node log" style="padding-left: 42px;">console.log(cart)</div>',
+      );
+      expect(result).toContain('🌲 Every log in one tree');
+    });
+
+    it('does NOT render a tree when none is provided', () => {
+      const component: MediaShowcaseCTAPanelComponent = {
+        illustrationSrcs: ['https://example.com/img.png'],
+        cta: { text: 'Go', url: 'https://example.com/pro' },
+      };
+
+      expect(renderMediaShowcaseCTAComponent(component)).not.toContain(
+        'class="tree-demo"',
+      );
+    });
+
+    it('escapes HTML in node text', () => {
+      const component: MediaShowcaseCTAPanelComponent = {
+        illustrationSrcs: [],
+        cta: { text: 'Go', url: 'https://example.com/pro' },
+        treeDemo: {
+          title: 'Tree',
+          nodes: [{ depth: 0, kind: 'log', text: '<b>x</b>' }],
+          caption: 'c',
+        },
+      };
+
+      const result = renderMediaShowcaseCTAComponent(component);
+
+      expect(result).toContain('&lt;b&gt;x&lt;/b&gt;');
+      expect(result).not.toContain('<b>x</b>');
+    });
+  });
+
   describe('cleanup demo', () => {
     it('renders the cleanup demo with struck-through removed lines (no mascot)', () => {
       const component: MediaShowcaseCTAPanelComponent = {

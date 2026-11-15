@@ -94,57 +94,52 @@ export function getStaticHtml(
     },
   };
 
-  // Inline cleanup demo + CTA, with the testimonial rendered full-width below it
-  // — the closing block, directly under the analytics + locked board.
+  // Log tree demo + CTA, with the testimonial rendered full-width above them:
+  // the closing block, directly under the analytics and the locked board.
   const turboProShowcase: DynamicFreemiumPanelContent = {
     type: 'media-showcase-cta',
     order: 1,
     component: {
-      // The crowned-rocket Pro artwork sits right above the tagline and CTA.
-      // Landscape crop on purpose: the panel is a narrow sidebar, so a wide
-      // image keeps the CTA button within reach instead of pushing it off-screen.
+      // The same portrait Pro poster as the v3.30.0 release panel.
       illustrationSrcs: [
-        `${TURBO_WEBSITE_BASE_URL}/assets/turbo-console-log-pro-wide.png`,
+        `${TURBO_WEBSITE_BASE_URL}/assets/turbo-pro-illustration.png`,
       ],
-      codeDemo: {
-        lines: [
-          { text: 'function pay(cart) {' },
-          { text: "  console.log('🚀 cart:', cart)", removed: true },
-          { text: '  const total = sum(cart)' },
-          { text: '  console.log(total)', removed: true },
-          { text: '  return total' },
-          { text: '}' },
+      // Mirrors the Pro tree: folder, file, "Line N", then the log itself.
+      treeDemo: {
+        title: 'Workspace Tree View',
+        nodes: [
+          { depth: 0, kind: 'folder', text: 'src' },
+          { depth: 1, kind: 'file', text: 'checkout.ts' },
+          { depth: 2, kind: 'line', text: 'Line 12' },
+          { depth: 3, kind: 'log', text: "console.log('🚀 cart:', cart)" },
+          { depth: 2, kind: 'line', text: 'Line 27' },
+          { depth: 3, kind: 'log', text: 'console.error(err)' },
+          { depth: 1, kind: 'file', text: 'user.ts' },
+          { depth: 2, kind: 'line', text: 'Line 8' },
+          { depth: 3, kind: 'log', text: 'console.log(user)' },
         ],
-        caption: "🧹 Turbo's and yours — removed on commit",
+        caption: '🌲 Every log across your workspace, in one tree',
       },
-      settingsDemo: {
-        title: 'Log Cleanup config',
-        items: [
-          { label: 'Auto-cleanup on Commit', on: true },
-          { label: 'console.log, console.error', on: true },
-          { label: '🚀 Turbo Logs Only', on: false },
-        ],
-      },
-      tagline: 'Never commit a debug log again',
+      tagline: 'Find, filter, and clean up every debug log',
       subtitle:
-        'Turbo puts every log on the right line, for free. Turbo Pro takes them out on commit, always previewed and scoped by you, then adds search, filters, and bulk cleanup across your workspace. Pay once, yours forever.',
+        'Turbo Pro brings the tree, instant search, filters, manual cleanup, and auto-cleanup on commit. It also keeps Turbo Core free. Pay once, yours forever.',
       cta: {
-        text: 'Turn On Auto-Cleanup',
+        text: 'Check Turbo Pro',
         url: `${TURBO_WEBSITE_BASE_URL}/pro?utm_source=panel&utm_campaign=workspace_log_count&utm_medium=dynamic_panel&position=after_analytics&event=freemiumPanel_auto-cleanup-launch&variant=panel-pro-cta`,
       },
       testimonial,
     },
   };
 
-  // v3.29.0 release highlight, first: the placement-accuracy fixes ship free to
+  // v3.30.0 release highlight, first: the indentation fixes ship free to
   // everyone, and the panel says so before it sells anything.
   const releaseHighlight: DynamicFreemiumPanelContent = {
     type: 'paragraph',
     order: -1,
     component: {
-      title: '🎯 New in v3.29.0: 14 Placement Fixes',
+      title: '📐 New in v3.30.0: Logs Indented Like Your Code',
       content:
-        'This release is about one promise: when you insert a log, it lands on the right line. 14 real-world patterns where Turbo used to misplace a log are fixed, from catch blocks and else-if branches to reassignments and object literals. Free for everyone, funded by Turbo Pro.',
+        'v3.29.0 made log placement more accurate. v3.30.0 does the same for indentation, with three fixes in JavaScript, TypeScript, and PHP: a value selected inside a multi-line statement, an empty block, and code Turbo rewrites around a log. Free for everyone, funded by Turbo Pro.',
     },
   };
 
@@ -153,14 +148,14 @@ export function getStaticHtml(
     type: 'article',
     order: 2,
     component: {
-      title: 'v3.29.0: 14 Placement Fixes',
+      title: 'v3.30.0: Logs Indented Like Your Code',
       description:
-        'The patterns where a log used to land on the wrong line, and how the engine handles them now.',
+        'Where a log used to get the wrong spaces, and how the engine indents it now.',
       // Landscape crop (title + rocket nose) of the article's portrait poster:
       // the 110px article card would clip the title off the full image.
       illustrationSrc: `${TURBO_WEBSITE_BASE_URL}/assets/turbo-full-ast-engine-wide.png`,
       illustrationFocus: 'top',
-      url: `${TURBO_WEBSITE_BASE_URL}/articles/release-3290?utm_source=panel&utm_campaign=v3290_release&utm_medium=dynamic_panel&position=article`,
+      url: `${TURBO_WEBSITE_BASE_URL}/articles/release-3300?utm_source=panel&utm_campaign=v3300_release&utm_medium=dynamic_panel&position=article`,
     },
   };
 

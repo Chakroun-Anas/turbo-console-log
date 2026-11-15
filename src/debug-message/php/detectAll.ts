@@ -2,7 +2,7 @@ import { Range } from 'vscode';
 import fs from 'fs';
 import { Message, ExtensionProperties, BracketType } from '@/entities';
 import { closingContextLine } from '@/utilities';
-import { spacesBeforeLogMsg } from '../js/JSDebugMessage/msg/spacesBeforeLogMsg';
+import { logMsgIndent } from '../js/JSDebugMessage/msg/logMsgIndent';
 import {
   openTurboTextDocument,
   type TurboTextDocument,
@@ -163,7 +163,7 @@ function detectLogMessages(
     if (closedParenthesisLine === i) {
       const hasTurboMarkers =
         prefixRegex.test(lineText) && delimiterRegex.test(lineText);
-      const spaces = spacesBeforeLogMsg(document, i, closedParenthesisLine);
+      const spaces = logMsgIndent(document, i, closedParenthesisLine);
       const content = line.text.trim(); // Capture single-line content
       const range = line.rangeIncludingLineBreak;
       messages.push({
@@ -186,7 +186,7 @@ function detectLogMessages(
 
     // Multi-line log statement
     const logMessage: Message = {
-      spaces: spacesBeforeLogMsg(document, i, closedParenthesisLine),
+      spaces: logMsgIndent(document, i, closedParenthesisLine),
       lines: [],
       ...(isCommented && { isCommented: true }),
       ...(logFunction && { logFunction }),

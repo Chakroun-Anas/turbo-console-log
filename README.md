@@ -29,11 +29,11 @@ The other half of Turbo — Pro automatically removes the debug logs in your sta
 
 ---
 
-### 🎯 New in v3.29.0: Every Log on the Right Line
+### 📐 New in v3.30.0: Logs Indented Like Your Code
 
-**This release is about one promise: when you insert a log, it lands on the right line.** We probed the insertion engine against more than 700 real-world React, TypeScript, Node, and framework snippets and fixed 14 patterns where a log used to land in the wrong place: inside an object literal, after a `return`, before the value it was meant to show, or outside the block where the variable exists. Every fix ships free and is pinned by an end-to-end test, so it stays fixed.
+**This release is about the spaces before a log.** We ran more than 25,000 insertions in real, correctly formatted code. Python came out clean, and in JavaScript, TypeScript, and PHP we fixed the three situations where a log got the wrong indent: a value selected inside a multi-line statement got a log indented too deep, a log in an empty block sat level with its braces, and code Turbo rewrote around a log kept its old indent. Every fix ships free and is pinned by a test.
 
-**[Read what v3.29.0 fixed →](https://www.turboconsolelog.io/articles/release-3290)**
+**[Read what v3.30.0 fixed →](https://www.turboconsolelog.io/articles/release-3300)**
 
 ---
 

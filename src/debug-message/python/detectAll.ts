@@ -1,5 +1,5 @@
 import { Message, ExtensionProperties, BracketType } from '@/entities';
-import { spacesBeforeLogMsg } from '@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg/spacesBeforeLogMsg';
+import { logMsgIndent } from '@/debug-message/js/JSDebugMessage/msg/logMsgIndent/logMsgIndent';
 import { closingContextLine } from '@/utilities';
 import {
   openTurboTextDocument,
@@ -121,7 +121,7 @@ function detectLogMessages(
     if (closedParenthesisLine === index) {
       const range = line.rangeIncludingLineBreak;
       messages.push({
-        spaces: spacesBeforeLogMsg(document, index, closedParenthesisLine),
+        spaces: logMsgIndent(document, index, closedParenthesisLine),
         lines: [
           new vscode.Range(
             range.start.line,
@@ -139,7 +139,7 @@ function detectLogMessages(
     }
 
     const logMessage: Message = {
-      spaces: spacesBeforeLogMsg(document, index, closedParenthesisLine),
+      spaces: logMsgIndent(document, index, closedParenthesisLine),
       lines: [],
       ...(isCommented && { isCommented: true }),
       ...(logFunction && { logFunction }),
