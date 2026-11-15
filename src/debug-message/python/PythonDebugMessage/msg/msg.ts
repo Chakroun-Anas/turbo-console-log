@@ -4,7 +4,7 @@ import type { ExtensionProperties } from '@/entities';
 import { parseCode } from './python-parser-utils/parseCode';
 import { logMessage } from './logMessage/logMessage';
 import { line as logMessageLine } from './logMessageLine/logMessageLine';
-import { spacesBeforeLogMsg } from './spacesBeforeLogMsg/spacesBeforeLogMsg';
+import { logMsgIndent } from './logMsgIndent/logMsgIndent';
 import { constructDebuggingMsgContent } from './constructDebuggingMsgContent/constructDebuggingMsgContent';
 import { constructDebuggingMsg } from './constructDebuggingMsg/constructDebuggingMsg';
 import { insertDebugMessage } from '@/debug-message/js/JSDebugMessage/msg/insertDebugMessage/insertDebugMessage';
@@ -40,7 +40,7 @@ export function msg(
     lineOfSelectedVar,
     logMsg,
   );
-  const spacesBeforeMsg = spacesBeforeLogMsg(
+  const spacesBeforeMsg = logMsgIndent(
     program,
     document,
     lineOfSelectedVar,

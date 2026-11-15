@@ -1,0 +1,26 @@
+export default {
+  fileExtension: '.js',
+  name: 'object holding a multi-line template literal: the template content stays as written',
+  lines: [
+    'const toRow = (row) => ({',
+    '  html: `',
+    '  <b>${row.id}</b>',
+    '`,',
+    '  id: row.id,',
+    '});',
+  ],
+  selectedVar: 'row',
+  line: 0,
+  debuggingMsg: '  console.log("row", row);',
+  expected: [
+    'const toRow = (row) => {',
+    '  console.log("row", row);',
+    '  return {',
+    '    html: `',
+    '  <b>${row.id}</b>',
+    '`,',
+    '    id: row.id,',
+    '  };',
+    '};',
+  ],
+};

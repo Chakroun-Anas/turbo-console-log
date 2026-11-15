@@ -6,7 +6,7 @@ import {
   LogContextMetadata,
 } from '@/entities';
 import { logMessage } from './logMessage';
-import { spacesBeforeLogMsg } from './spacesBeforeLogMsg';
+import { logMsgIndent } from './logMsgIndent';
 import { line as logMessageLine } from './logMessageLine';
 import {
   applyTransformedCode,
@@ -73,12 +73,13 @@ export function msg(
     selectedVar,
     logMsg,
   );
-  const spacesBeforeMsg: string = spacesBeforeLogMsg(
+  const spacesBeforeMsg: string = logMsgIndent(
     document,
     (logMsg.metadata as LogContextMetadata)?.deepObjectLine
       ? (logMsg.metadata as LogContextMetadata)?.deepObjectLine
       : lineOfSelectedVar,
     lineOfLogMsg,
+    { ast, tabSize },
   );
   const debuggingMsgContent: string = constructDebuggingMsgContent(
     ast,

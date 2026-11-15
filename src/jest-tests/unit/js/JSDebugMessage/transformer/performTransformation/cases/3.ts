@@ -14,9 +14,9 @@ export default {
     'const data = items.map(raw => {',
     '  console.log("DEBUG");',
     '  return {',
-    '  ...raw,',
-    '  processed: true',
-    '};',
+    '    ...raw,',
+    '    processed: true',
+    '  };',
     '});',
   ],
 };

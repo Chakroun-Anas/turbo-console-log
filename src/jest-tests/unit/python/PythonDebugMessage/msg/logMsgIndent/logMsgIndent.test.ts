@@ -1,4 +1,4 @@
-import { spacesBeforeLogMsg } from '@/debug-message/python/PythonDebugMessage/msg/spacesBeforeLogMsg/spacesBeforeLogMsg';
+import { logMsgIndent } from '@/debug-message/python/PythonDebugMessage/msg/logMsgIndent/logMsgIndent';
 import { parseCode } from '@/debug-message/python/PythonDebugMessage/msg/python-parser-utils/parseCode';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers/';
 
@@ -9,10 +9,10 @@ function indentFor(
 ): string {
   const doc = makeTextDocument(lines, 'test.py', 'python');
   const program = parseCode(doc);
-  return spacesBeforeLogMsg(program, doc, selectedVarLine, logMsgLine);
+  return logMsgIndent(program, doc, selectedVarLine, logMsgLine);
 }
 
-describe('Python spacesBeforeLogMsg', () => {
+describe('Python logMsgIndent', () => {
   it('uses the statement first-line indent, not a continuation line (multi-line return)', () => {
     // Regression: selecting `content` on the continuation line (8 spaces) must
     // not over-indent the log inserted before the `return` (4 spaces).

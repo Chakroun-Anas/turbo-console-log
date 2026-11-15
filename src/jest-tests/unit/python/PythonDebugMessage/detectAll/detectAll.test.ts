@@ -1,14 +1,14 @@
 import { detectAll } from '@/debug-message/python/detectAll';
-import { spacesBeforeLogMsg } from '@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg/spacesBeforeLogMsg';
+import { logMsgIndent } from '@/debug-message/js/JSDebugMessage/msg/logMsgIndent/logMsgIndent';
 import { ExtensionProperties } from '@/entities';
 import { makeTextDocument } from '@/jest-tests/mocks/helpers';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
 jest.mock(
-  '@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg/spacesBeforeLogMsg',
+  '@/debug-message/js/JSDebugMessage/msg/logMsgIndent/logMsgIndent',
   () => ({
-    spacesBeforeLogMsg: jest.fn(),
+    logMsgIndent: jest.fn(),
   }),
 );
 
@@ -16,8 +16,8 @@ jest.mock('fs', () => ({
   readFileSync: jest.fn(),
 }));
 
-const mockSpacesBeforeLogMsg = spacesBeforeLogMsg as jest.MockedFunction<
-  typeof spacesBeforeLogMsg
+const mockLogMsgIndent = logMsgIndent as jest.MockedFunction<
+  typeof logMsgIndent
 >;
 
 const mockFsReadFileSync = fs.readFileSync as jest.MockedFunction<
@@ -77,7 +77,7 @@ describe('detectAll (Python)', () => {
         '    return x',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -108,7 +108,7 @@ describe('detectAll (Python)', () => {
         '    return obj',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -136,7 +136,7 @@ describe('detectAll (Python)', () => {
         'logging.debug("🚀 ~ value:", value)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -159,7 +159,7 @@ describe('detectAll (Python)', () => {
         'logging.info("🚀 ~ status:", status)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -182,7 +182,7 @@ describe('detectAll (Python)', () => {
         'logging.warning("🚀 ~ issue:", issue)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -205,7 +205,7 @@ describe('detectAll (Python)', () => {
         'logging.error("🚀 ~ err:", err)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -227,7 +227,7 @@ describe('detectAll (Python)', () => {
         'logger.debug("🚀 ~ data:", data)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -254,7 +254,7 @@ describe('detectAll (Python)', () => {
         'logging.error("🚀 ~ e:", e)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -281,7 +281,7 @@ describe('detectAll (Python)', () => {
         'print("🚀 ~ variable:", variable)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -302,7 +302,7 @@ describe('detectAll (Python)', () => {
         'print("missing prefix ~ variable:", variable)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -323,7 +323,7 @@ describe('detectAll (Python)', () => {
         'print("🚀 no delimiter here", variable)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -349,7 +349,7 @@ describe('detectAll (Python)', () => {
         '    return x',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -373,7 +373,7 @@ describe('detectAll (Python)', () => {
         '# logging.debug("🚀 ~ value:", value)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -400,7 +400,7 @@ describe('detectAll (Python)', () => {
         '# logging.debug("🚀 ~ commented y:", y)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -434,7 +434,7 @@ describe('detectAll (Python)', () => {
         '#   print("🚀 ~ c:", c)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -484,7 +484,7 @@ describe('detectAll (Python)', () => {
         'result = process(data)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -538,7 +538,7 @@ describe('detectAll (Python)', () => {
         'print("🚀 ~ z:", z)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -551,7 +551,7 @@ describe('detectAll (Python)', () => {
       );
 
       expect(result).toHaveLength(3);
-      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledTimes(3);
+      expect(mockLogMsgIndent).toHaveBeenCalledTimes(3);
       expect(result[0].lines[0].start.line).toBe(1);
       expect(result[1].lines[0].start.line).toBe(3);
       expect(result[2].lines[0].start.line).toBe(5);
@@ -565,7 +565,7 @@ describe('detectAll (Python)', () => {
         'print("🚀 ~ valid too:", a)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -593,7 +593,7 @@ describe('detectAll (Python)', () => {
         'logging.warning("🚀 ~ third:", y)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -619,7 +619,7 @@ describe('detectAll (Python)', () => {
     it('should set logFunction to "print" for print calls', async () => {
       const document = makeTextDocument(['print("🚀 ~ x:", x)']);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -641,7 +641,7 @@ describe('detectAll (Python)', () => {
         '# logging.debug("🚀 ~ y:", y)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -666,7 +666,7 @@ describe('detectAll (Python)', () => {
         'logging.debug(variable)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -693,7 +693,7 @@ describe('detectAll (Python)', () => {
         ')',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -753,7 +753,7 @@ describe('detectAll (Python)', () => {
         'x = compute()',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -775,7 +775,7 @@ describe('detectAll (Python)', () => {
         'print("🚀 ~ end:", x)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -800,7 +800,7 @@ describe('detectAll (Python)', () => {
         ')',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -830,7 +830,7 @@ describe('detectAll (Python)', () => {
         '    return result',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('    ');
+      mockLogMsgIndent.mockReturnValue('    ');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -856,7 +856,7 @@ describe('detectAll (Python)', () => {
         '        return data',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('        ');
+      mockLogMsgIndent.mockReturnValue('        ');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -883,7 +883,7 @@ describe('detectAll (Python)', () => {
         '        print("🚀 ~ y:", y)',
       ]);
 
-      mockSpacesBeforeLogMsg
+      mockLogMsgIndent
         .mockReturnValueOnce('    ')
         .mockReturnValueOnce('        ');
       mockFsReadFileSync.mockReturnValue(document.getText());
@@ -916,7 +916,7 @@ describe('detectAll (Python)', () => {
         '    print("🚀 ~ result:", result)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('    ');
+      mockLogMsgIndent.mockReturnValue('    ');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -946,7 +946,7 @@ describe('detectAll (Python)', () => {
         '$logger.info("🚀 ~ value:", value)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(
@@ -967,7 +967,7 @@ describe('detectAll (Python)', () => {
         'print("[DEBUG] | value:", value)',
       ]);
 
-      mockSpacesBeforeLogMsg.mockReturnValue('');
+      mockLogMsgIndent.mockReturnValue('');
       mockFsReadFileSync.mockReturnValue(document.getText());
 
       const result = await detectAll(

@@ -4,7 +4,7 @@ import { parseCode } from './php-parser-utils';
 import { logMessage } from './logMessage';
 import { type PHPLogMessage } from './logMessage/phpLogMessageTypes';
 import { line as logMessageLine } from './logMessageLine';
-import { spacesBeforeLogMsg } from './spacesBeforeLogMsg';
+import { logMsgIndent } from './logMsgIndent';
 import { constructDebuggingMsg } from './constructDebuggingMsg';
 import { constructDebuggingMsgContent } from './constructDebuggingMsgContent';
 import { insertDebugMessage } from './insertDebugMessage';
@@ -80,10 +80,11 @@ export function msg(
   );
 
   // 4. Calculate indentation
-  const spacesBeforeMsg = spacesBeforeLogMsg(
+  const spacesBeforeMsg = logMsgIndent(
     document,
     lineOfSelectedVar,
     lineOfLogMsg,
+    { ast, tabSize },
   );
 
   // 5. Construct the debugging message content (passing AST for context extraction)

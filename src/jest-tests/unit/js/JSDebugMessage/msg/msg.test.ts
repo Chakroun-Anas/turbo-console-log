@@ -1,7 +1,7 @@
 import { msg } from '@/debug-message/js/JSDebugMessage/msg';
 import { logMessage } from '@/debug-message/js/JSDebugMessage/msg/logMessage';
 import { line as logMessageLine } from '@/debug-message/js/JSDebugMessage/msg/logMessageLine';
-import { spacesBeforeLogMsg } from '@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg';
+import { logMsgIndent } from '@/debug-message/js/JSDebugMessage/msg/logMsgIndent';
 import { constructDebuggingMsgContent } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent';
 import { constructDebuggingMsg } from '@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsg';
 import { insertDebugMessage } from '@/debug-message/js/JSDebugMessage/msg/insertDebugMessage';
@@ -23,7 +23,7 @@ jest.mock('@/debug-message/js/JSDebugMessage/msg/logMessageLine');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsgContent');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/constructDebuggingMsg');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/insertDebugMessage');
-jest.mock('@/debug-message/js/JSDebugMessage/msg/spacesBeforeLogMsg');
+jest.mock('@/debug-message/js/JSDebugMessage/msg/logMsgIndent');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/transformer');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/helpers/omit');
 jest.mock('@/debug-message/js/JSDebugMessage/msg/acorn-utils');
@@ -35,8 +35,8 @@ describe('msg', () => {
   const mockLogMessageLine = logMessageLine as jest.MockedFunction<
     typeof logMessageLine
   >;
-  const mockSpacesBeforeLogMsg = spacesBeforeLogMsg as jest.MockedFunction<
-    typeof spacesBeforeLogMsg
+  const mockLogMsgIndent = logMsgIndent as jest.MockedFunction<
+    typeof logMsgIndent
   >;
   const mockConstructDebuggingMsgContent =
     constructDebuggingMsgContent as jest.MockedFunction<
@@ -98,7 +98,7 @@ describe('msg', () => {
     mockParseCode.mockReturnValue(mockAst as any);
     mockLogMessage.mockReturnValue(mockLogMsg);
     mockLogMessageLine.mockReturnValue(1);
-    mockSpacesBeforeLogMsg.mockReturnValue('  ');
+    mockLogMsgIndent.mockReturnValue('  ');
     mockConstructDebuggingMsgContent.mockReturnValue('value');
     mockConstructDebuggingMsg.mockReturnValue('console.log("value", value);');
     mockNeedTransformation.mockReturnValue(false);
@@ -178,10 +178,14 @@ describe('msg', () => {
         selectedVar,
         mockLogMsg,
       );
-      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledWith(
+      expect(mockLogMsgIndent).toHaveBeenCalledWith(
         mockDocument,
         lineOfSelectedVar,
         1,
+        {
+          ast: expect.objectContaining({ type: 'Program' }),
+          tabSize,
+        },
       );
       expect(mockConstructDebuggingMsgContent).toHaveBeenCalled();
       expect(mockConstructDebuggingMsg).toHaveBeenCalled();
@@ -316,7 +320,10 @@ describe('msg', () => {
         'log',
       );
 
-      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledWith(mockDocument, 5, 1);
+      expect(mockLogMsgIndent).toHaveBeenCalledWith(mockDocument, 5, 1, {
+        ast: expect.objectContaining({ type: 'Program' }),
+        tabSize,
+      });
       expect(mockConstructDebuggingMsgContent).toHaveBeenCalledWith(
         expect.objectContaining({ type: 'Program' }), // AST object
         mockDocument,
@@ -344,10 +351,14 @@ describe('msg', () => {
         'log',
       );
 
-      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledWith(
+      expect(mockLogMsgIndent).toHaveBeenCalledWith(
         mockDocument,
         lineOfSelectedVar,
         1,
+        {
+          ast: expect.objectContaining({ type: 'Program' }),
+          tabSize,
+        },
       );
       expect(mockConstructDebuggingMsgContent).toHaveBeenCalledWith(
         expect.objectContaining({ type: 'Program' }), // AST object
@@ -366,7 +377,7 @@ describe('msg', () => {
       const mockContent = 'debug content';
       const mockSpaces = '    ';
       mockConstructDebuggingMsgContent.mockReturnValue(mockContent);
-      mockSpacesBeforeLogMsg.mockReturnValue(mockSpaces);
+      mockLogMsgIndent.mockReturnValue(mockSpaces);
 
       msg(
         mockTextEditor,
@@ -400,10 +411,14 @@ describe('msg', () => {
         'log',
       );
 
-      expect(mockSpacesBeforeLogMsg).toHaveBeenCalledWith(
+      expect(mockLogMsgIndent).toHaveBeenCalledWith(
         mockDocument,
         lineOfSelectedVar,
         mockLineOfLogMsg,
+        {
+          ast: expect.objectContaining({ type: 'Program' }),
+          tabSize,
+        },
       );
       expect(mockConstructDebuggingMsgContent).toHaveBeenCalledWith(
         expect.objectContaining({ type: 'Program' }), // AST object

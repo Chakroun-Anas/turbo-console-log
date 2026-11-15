@@ -1,0 +1,26 @@
+export default {
+  fileExtension: '.js',
+  name: 'arrow returning a multi-line object: the object moves one level deeper',
+  lines: [
+    'export function toDtos(rows) {',
+    '  return rows.map((row) => ({',
+    '    id: row.id,',
+    '    name: row.name,',
+    '  }));',
+    '}',
+  ],
+  selectedVar: 'row',
+  line: 1,
+  debuggingMsg: '    console.log("row", row);',
+  expected: [
+    'export function toDtos(rows) {',
+    '  return rows.map((row) => {',
+    '    console.log("row", row);',
+    '    return {',
+    '      id: row.id,',
+    '      name: row.name,',
+    '    };',
+    '  });',
+    '}',
+  ],
+};
