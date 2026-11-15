@@ -766,6 +766,56 @@ export function getCommonStyles(): string {
           color: rgba(255, 255, 255, 0.35);
         }
 
+        /* Mock of the Pro log tree above the CTA card */
+        .tree-demo {
+          box-sizing: border-box;
+          margin-bottom: 16px;
+          background: rgba(0, 0, 0, 0.35);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          padding: 10px 12px;
+          font-size: 12px;
+          text-align: left;
+        }
+
+        .tree-demo-title {
+          font-size: 10.5px;
+          font-weight: 700;
+          color: #FFC947;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          margin-bottom: 6px;
+        }
+
+        .tree-demo-node {
+          color: rgba(255, 255, 255, 0.82);
+          line-height: 1.85;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .tree-demo-node.line {
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .tree-demo-node.log {
+          font-family: 'SF Mono', Menlo, Consolas, 'Courier New', monospace;
+          font-size: 11.5px;
+          color: #9CDCFE;
+        }
+
+        .tree-demo-icon {
+          margin-right: 6px;
+        }
+
+        .tree-demo-caption {
+          margin-top: 8px;
+          font-size: 11px;
+          font-weight: 700;
+          color: #6EE7A8;
+        }
+
         .media-showcase-cta-button {
           display: inline-block;
           padding: 10px 20px;

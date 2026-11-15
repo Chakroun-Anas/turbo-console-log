@@ -69,7 +69,7 @@ describe('getStaticHtml', () => {
     expect(mockGetJavaScript).toHaveBeenCalled();
   });
 
-  describe('v3.29.0 release content', () => {
+  describe('v3.30.0 release content', () => {
     it('renders no campaign countdown', () => {
       const result = getStaticHtml(49);
 
@@ -77,11 +77,11 @@ describe('getStaticHtml', () => {
       expect(result).not.toContain('% Off Turbo Pro');
     });
 
-    it('opens with the v3.29.0 placement fixes highlight', () => {
+    it('opens with the v3.30.0 indentation fixes highlight', () => {
       const result = getStaticHtml(49);
 
-      expect(result).toContain('New in v3.29.0');
-      expect(result.indexOf('New in v3.29.0')).toBeLessThan(
+      expect(result).toContain('New in v3.30.0');
+      expect(result.indexOf('New in v3.30.0')).toBeLessThan(
         result.indexOf('Unlock with Turbo Pro'),
       );
     });
@@ -89,11 +89,24 @@ describe('getStaticHtml', () => {
     it('shows the Pro illustration above the showcase CTA', () => {
       const result = getStaticHtml(49);
 
-      const illustration = '/assets/turbo-console-log-pro-wide.png';
+      const illustration = '/assets/turbo-pro-illustration.png';
       expect(result).toContain(illustration);
       expect(result.indexOf(illustration)).toBeLessThan(
-        result.indexOf('Never commit a debug log again'),
+        result.indexOf('Find, filter, and clean up every debug log'),
       );
+    });
+
+    it('shows the Pro log tree instead of the cleanup demo', () => {
+      const result = getStaticHtml(49);
+
+      expect(result).toContain('class="tree-demo"');
+      expect(result).toContain('Workspace Tree View');
+      expect(result).toContain('checkout.ts');
+      expect(result).toContain(
+        '🌲 Every log across your workspace, in one tree',
+      );
+      expect(result).not.toContain('class="cleanup-demo"');
+      expect(result).not.toContain('class="settings-demo"');
     });
 
     it('links the release article with panel tracking', () => {
@@ -101,8 +114,8 @@ describe('getStaticHtml', () => {
 
       expect(result).toContain('Featured Turbo Articles');
       expect(result).toContain('/assets/turbo-full-ast-engine-wide.png');
-      expect(result).toContain('/articles/release-3290');
-      expect(result).toContain('utm_campaign=v3290_release');
+      expect(result).toContain('/articles/release-3300');
+      expect(result).toContain('utm_campaign=v3300_release');
       expect(result).toContain('position=article');
     });
   });
@@ -182,8 +195,8 @@ describe('getStaticHtml', () => {
       expect(result).toContain('150 Logs');
 
       // Should show the Pro CTA (tagline + button)
-      expect(result).toContain('Never commit a debug log again');
-      expect(result).toContain('Turn On Auto-Cleanup');
+      expect(result).toContain('Find, filter, and clean up every debug log');
+      expect(result).toContain('Check Turbo Pro');
 
       // Should show the supporting subtitle (mechanism + reassurance)
       expect(result).toContain('Pay once, yours forever.');
@@ -217,16 +230,16 @@ describe('getStaticHtml', () => {
       const result = getStaticHtml(150, mockMetadata);
 
       // Should contain Pro CTA button and tagline
-      expect(result).toContain('Turn On Auto-Cleanup');
-      expect(result).toContain('Never commit a debug log again');
+      expect(result).toContain('Check Turbo Pro');
+      expect(result).toContain('Find, filter, and clean up every debug log');
     });
 
     it('should show Pro CTA when analytics is not shown', () => {
       const result = getStaticHtml(100, null);
 
       // Should still contain CTA
-      expect(result).toContain('Turn On Auto-Cleanup');
-      expect(result).toContain('Never commit a debug log again');
+      expect(result).toContain('Check Turbo Pro');
+      expect(result).toContain('Find, filter, and clean up every debug log');
     });
 
     it('shows descriptions for hero features and names only for the rest', () => {

@@ -55,6 +55,18 @@ export interface MediaShowcaseCTAPanelComponent {
     title: string;
     items: Array<{ label: string; on: boolean }>;
   };
+  // Optional mock of the Pro log tree (folders, files, log lines and the log
+  // under each), so the viewer sees the workspace-wide listing. `depth` sets
+  // the indent of a node.
+  treeDemo?: {
+    title: string;
+    nodes: Array<{
+      depth: number;
+      kind: 'folder' | 'file' | 'line' | 'log';
+      text: string;
+    }>;
+    caption: string;
+  };
   cta: {
     text: string;
     url: string;

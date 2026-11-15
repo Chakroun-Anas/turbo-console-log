@@ -2,14 +2,14 @@ import { createReleasePanelStatusBarItem } from '../../../helpers/createReleaseP
 
 describe('createReleasePanelStatusBarItem', () => {
   it('shows the rocket text and the What’s New tooltip for the version', () => {
-    const item = createReleasePanelStatusBarItem('3.29.0');
+    const item = createReleasePanelStatusBarItem('3.30.0');
 
-    expect(item.text).toBe('$(rocket) Turbo v3.29.0');
-    expect(item.tooltip).toBe("What's New in Turbo Console Log v3.29.0");
+    expect(item.text).toBe('$(rocket) Turbo v3.30.0');
+    expect(item.tooltip).toBe("What's New in Turbo Console Log v3.30.0");
   });
 
   it('opens the release panel when clicked and shows the item', () => {
-    const item = createReleasePanelStatusBarItem('3.29.0');
+    const item = createReleasePanelStatusBarItem('3.30.0');
 
     expect(item.command).toBe('turboConsoleLog.showReleasePanel');
     expect(item.show).toHaveBeenCalled();
@@ -18,7 +18,7 @@ describe('createReleasePanelStatusBarItem', () => {
   it('never schedules a timer, since there is no campaign countdown', () => {
     const setIntervalSpy = jest.spyOn(global, 'setInterval');
 
-    createReleasePanelStatusBarItem('3.29.0');
+    createReleasePanelStatusBarItem('3.30.0');
 
     expect(setIntervalSpy).not.toHaveBeenCalled();
     setIntervalSpy.mockRestore();

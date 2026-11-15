@@ -59,11 +59,11 @@ describe('shouldShowReleasePanel', () => {
     });
 
     // VS Code auto-updates the fleet, so only the current release is
-    // registered: 3.29.0 carries the placement-accuracy release panel.
-    it('shows the panel for 3.29.0, the current release', async () => {
+    // registered: 3.30.0 carries the indentation release panel.
+    it('shows the panel for 3.30.0, the current release', async () => {
       mockState({});
 
-      const result = await shouldShowReleasePanel(mockContext, '3.29.0');
+      const result = await shouldShowReleasePanel(mockContext, '3.30.0');
 
       expect(result).toBe(true);
     });
@@ -73,7 +73,7 @@ describe('shouldShowReleasePanel', () => {
     it('returns false when local state says already shown', async () => {
       mockState({ hasShown: true });
 
-      const result = await shouldShowReleasePanel(mockContext, '3.29.0');
+      const result = await shouldShowReleasePanel(mockContext, '3.30.0');
 
       expect(result).toBe(false);
     });
@@ -81,12 +81,12 @@ describe('shouldShowReleasePanel', () => {
     it('returns true and records first-seen when there is no record of the panel being shown', async () => {
       mockState({ hasShown: undefined, firstSeenAt: undefined });
 
-      const result = await shouldShowReleasePanel(mockContext, '3.29.0');
+      const result = await shouldShowReleasePanel(mockContext, '3.30.0');
 
       expect(result).toBe(true);
       expect(mockWriteToGlobalState).toHaveBeenCalledWith(
         mockContext,
-        expect.stringContaining('3.29.0'),
+        expect.stringContaining('3.30.0'),
         expect.any(Number),
       );
     });
@@ -94,11 +94,11 @@ describe('shouldShowReleasePanel', () => {
     it('reads the correct state key combining prefix and version', async () => {
       mockState({ hasShown: true });
 
-      await shouldShowReleasePanel(mockContext, '3.29.0');
+      await shouldShowReleasePanel(mockContext, '3.30.0');
 
       expect(mockReadFromGlobalState).toHaveBeenCalledWith(
         mockContext,
-        expect.stringContaining('3.29.0'),
+        expect.stringContaining('3.30.0'),
       );
     });
 
@@ -109,6 +109,7 @@ describe('shouldShowReleasePanel', () => {
       expect(await shouldShowReleasePanel(mockContext, '3.26.0')).toBe(false);
       expect(await shouldShowReleasePanel(mockContext, '3.27.0')).toBe(false);
       expect(await shouldShowReleasePanel(mockContext, '3.28.0')).toBe(false);
+      expect(await shouldShowReleasePanel(mockContext, '3.29.0')).toBe(false);
       expect(mockReadFromGlobalState).not.toHaveBeenCalled();
     });
   });
@@ -118,7 +119,7 @@ describe('shouldShowReleasePanel', () => {
       const firstSeenAt = Date.now() - (THREE_DAYS_MS - 1000);
       mockState({ hasShown: undefined, firstSeenAt });
 
-      const result = await shouldShowReleasePanel(mockContext, '3.29.0');
+      const result = await shouldShowReleasePanel(mockContext, '3.30.0');
 
       expect(result).toBe(true);
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
@@ -128,7 +129,7 @@ describe('shouldShowReleasePanel', () => {
       const firstSeenAt = Date.now() - (THREE_DAYS_MS + 1000);
       mockState({ hasShown: undefined, firstSeenAt });
 
-      const result = await shouldShowReleasePanel(mockContext, '3.29.0');
+      const result = await shouldShowReleasePanel(mockContext, '3.30.0');
 
       expect(result).toBe(false);
     });
@@ -137,7 +138,7 @@ describe('shouldShowReleasePanel', () => {
       const firstSeenAt = Date.now() - 1000;
       mockState({ hasShown: undefined, firstSeenAt });
 
-      await shouldShowReleasePanel(mockContext, '3.29.0');
+      await shouldShowReleasePanel(mockContext, '3.30.0');
 
       expect(mockWriteToGlobalState).not.toHaveBeenCalled();
     });
