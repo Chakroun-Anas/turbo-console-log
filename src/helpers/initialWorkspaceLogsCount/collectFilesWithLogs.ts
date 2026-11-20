@@ -20,7 +20,10 @@ export async function collectFilesWithLogs(
   const filesLogsMap: Map<string, Array<Message>> = new Map();
 
   try {
-    // Step 1: Use essential ignore patterns for fast-glob (broad strokes only)
+    // Step 1: Use essential ignore patterns for fast-glob (broad strokes only).
+    // `dot: false` only hides hidden entries from the results: the walk still
+    // enters every hidden folder (Claude worktrees, caches, ...) unless an
+    // ignore pattern ending in `/**` skips it, hence the last pattern.
     const essentialPatterns = [
       '**/node_modules/**',
       '**/.git/**',
@@ -32,6 +35,7 @@ export async function collectFilesWithLogs(
       '**/coverage/**',
       '**/.cache/**',
       '**/vendor/**',
+      '**/.*/**',
     ];
 
     // Step 2: Use fast-glob with essential patterns only
@@ -42,6 +46,9 @@ export async function collectFilesWithLogs(
       dot: false,
       onlyFiles: true,
       stats: false,
+      // A symlinked folder pointing back to one of its parents makes the walk
+      // loop, and two such links make it grow until memory runs out.
+      followSymbolicLinks: false,
     });
 
     // Step 3: Filter with GitIgnoreMatcher for project-specific .gitignore rules

@@ -23,11 +23,14 @@ export class GitIgnoreMatcher {
     const workspaceRoot = this.workspaceFolders[0]?.uri.fsPath;
     if (!workspaceRoot) return;
 
-    // Use fast-glob instead of vscode.workspace.findFiles to respect essential ignore patterns
+    // Use fast-glob instead of vscode.workspace.findFiles to respect essential ignore patterns.
+    // Hidden folders and symlinked folders are skipped for the same reasons as
+    // in collectFilesWithLogs: the first are walked otherwise, the second can loop.
     const gitIgnorePaths = await fastGlob(['**/.gitignore'], {
       cwd: workspaceRoot,
       absolute: true,
-      ignore: ['**/node_modules/**'],
+      ignore: ['**/node_modules/**', '**/.*/**'],
+      followSymbolicLinks: false,
     });
 
     const limit = pLimit(16);
