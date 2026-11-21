@@ -2,6 +2,14 @@
 
 All notable changes to the "turbo-console-log" extension will be documented in this file.
 
+## [3.30.1] - 2026-11-21
+
+### 🩹 Patch
+
+Fixes VS Code slowing down, and the extension host running out of memory, in some workspaces ([#385](https://github.com/Chakroun-Anas/turbo-console-log/issues/385), [#386](https://github.com/Chakroun-Anas/turbo-console-log/issues/386)). The workspace log scan now skips hidden folders such as `.claude/worktrees`, which can hold whole copies of the project, and no longer follows symbolic links, which could send it around a loop until memory ran out. Files reachable only through a symlinked folder are no longer counted. Turbo Pro commands run on a folder of the logs tree skip hidden folders too. Hidden files such as `.eslintrc.js` are still scanned.
+
+---
+
 ## [3.30.0] - 2026-11-15
 
 ### 📐 Logs Indented Like Your Code
