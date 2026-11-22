@@ -460,7 +460,7 @@
     "@vscode/test-electron": "^2.4.1",
     "chai": "^4.3.7",
     "chalk": "^4.1.0",
-    "esbuild": "^0.25.4",
+    "esbuild": "^0.28.1",
     "eslint": "^9.27.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^3.1.4",
